@@ -1,0 +1,55 @@
+# http://www.gnu.org/software/automake
+
+Makefile
+Makefile.in
+
+# http://www.gnu.org/software/autoconf
+
+/autom4te.cache/
+/aclocal.m4
+/config.*
+/configure
+/m4/
+
+depcomp
+install-sh
+libtool
+ltmain.sh
+missing
+ylwrap
+stamp-h?
+
+.deps/
+.dirstamp
+.libs/
+*.l[ao]
+*~
+
+# Object files
+*.o
+
+# Libraries
+*.a
+*.la
+*.lo
+
+# Shared objects
+*.so
+*.so.*
+
+# Executables
+*.out
+
+# vim
+*.swp
+
+# doxygen
+/doxygen-html/
+
+# src
+src/parser.cc
+src/parser.h
+src/scanner.cc
+
+# binary
+exprtest

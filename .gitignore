@@ -48,8 +48,12 @@ stamp-h?
 
 # src
 src/parser.cc
-src/parser.h
 src/scanner.cc
+*.hh
 
 # binary
-exprtest
+ddc
+
+# usr
+CMakeLists.txt
+.idea/

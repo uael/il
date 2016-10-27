@@ -6,7 +6,7 @@
 #include "driver.h"
 #include "scanner.h"
 
-namespace dcc {
+namespace ddc {
 
     Driver::Driver(class CalcContext &_calc)
             : trace_scanning(false),

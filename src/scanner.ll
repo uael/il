@@ -1,5 +1,5 @@
 /* $Id$ -*- mode: c++ -*- */
-/** \file scanner.ll Define the dcc Flex lexical scanner */
+/** \file scanner.ll Define the ddc Flex lexical scanner */
 
 %{ /*** C/C++ Declarations ***/
 
@@ -8,8 +8,8 @@
 #include "scanner.h"
 
 /* import the parser's token type into a local typedef */
-typedef dcc::Parser::token token;
-typedef dcc::Parser::token_type token_type;
+typedef ddc::Parser::token token;
+typedef ddc::Parser::token_type token_type;
 
 /* By default yylex returns int, we use token_type. Unfortunately yyterminate
  * by default returns 0, which is not of token_type. */
@@ -27,7 +27,7 @@ typedef dcc::Parser::token_type token_type;
 %option c++
 
 /* change the name of the scanner class. results in "yyFlexLexer" */
-%option prefix="Dcc"
+%option prefix="Ddc"
 
 /* the manual says "somewhat more optimized" */
 %option batch
@@ -56,7 +56,7 @@ typedef dcc::Parser::token_type token_type;
     yylloc->step();
 %}
 
- /*** BEGIN  - Change the dcc lexer rules below ***/
+ /*** BEGIN  - Change the ddc lexer rules below ***/
 
 [0-9]+ {
     yylval->integerVal = atoi(yytext);
@@ -89,11 +89,11 @@ typedef dcc::Parser::token_type token_type;
     return static_cast<token_type>(*yytext);
 }
 
- /*** END  - Change the dcc lexer rules above ***/
+ /*** END  - Change the ddc lexer rules above ***/
 
 %% /*** Additional Code ***/
 
-namespace dcc {
+namespace ddc {
 
 Scanner::Scanner(std::istream* in,
 		 std::ostream* out)

@@ -2,7 +2,7 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([dcc], [0.0.1])
+AC_INIT([ddc], [0.0.1])
 AC_CONFIG_SRCDIR([src/driver.cc])
 AC_CONFIG_AUX_DIR([scripts])
 

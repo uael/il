@@ -30,7 +30,7 @@
 %skeleton "lalr1.cc"
 
 /* namespace to enclose parser in */
-%define api.namespace {dcc}
+%define api.namespace {ddc}
 
 /* set the parser's class identifier */
 %define parser_class_name {Parser}
@@ -216,7 +216,7 @@ start	: /* empty */
 
 %% /*** Additional Code ***/
 
-void dcc::Parser::error(const Parser::location_type& l,
+void ddc::Parser::error(const Parser::location_type& l,
 			    const std::string& m)
 {
     driver.error(l, m);

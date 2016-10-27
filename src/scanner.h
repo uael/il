@@ -5,31 +5,31 @@
 
 #ifndef YY_DECL
 #define YY_DECL \
-  dcc::Parser::token_type \
-  dcc::Scanner::lex( \
-    dcc::Parser::semantic_type* yylval, \
-    dcc::Parser::location_type* yylloc \
+  ddc::Parser::token_type \
+  ddc::Scanner::lex( \
+    ddc::Parser::semantic_type* yylval, \
+    ddc::Parser::location_type* yylloc \
   )
 #endif
 
 #ifndef __FLEX_LEXER_H
-#define yyFlexLexer DccFlexLexer
+#define yyFlexLexer DdcFlexLexer
 #include "FlexLexer.h"
 #undef yyFlexLexer
 #endif
 
 #include "parser.hh"
 
-namespace dcc {
+namespace ddc {
 
     /**
      * Scanner is a derived class to add some extra function to the scanner
      * class. Flex itself creates a class named yyFlexLexer, which is renamed using
-     * macros to DccFlexLexer. However we change the context of the generated
+     * macros to DdcFlexLexer. However we change the context of the generated
      * yylex() function to be contained within the Scanner class. This is required
-     * because the yylex() defined in DccFlexLexer has no parameters.
+     * because the yylex() defined in DdcFlexLexer has no parameters.
      */
-    class Scanner : public DccFlexLexer {
+    class Scanner : public DdcFlexLexer {
     public:
         /**
          * Create a new scanner object. The streams arg_yyin and arg_yyout default

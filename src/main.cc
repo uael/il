@@ -8,7 +8,7 @@
 
 int main(int argc, char *argv[]) {
     CalcContext calc;
-    dcc::Driver driver(calc);
+    ddc::Driver driver(calc);
     bool readfile = false;
 
     for (int ai = 1; ai < argc; ++ai) {

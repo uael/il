@@ -12,9 +12,9 @@ libscc_a_SOURCES = \
 
 LIBS = libscc.a
 
-bin_PROGRAMS = dcc
+bin_PROGRAMS = ddc
 
-dcc_SOURCES = main.cc
-dcc_DEPENDENCIES = libscc.a
+ddc_SOURCES = main.cc
+ddc_DEPENDENCIES = libscc.a
 
 AM_LFLAGS = -olex.yy.c

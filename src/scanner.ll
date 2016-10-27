@@ -1,5 +1,5 @@
 /* $Id$ -*- mode: c++ -*- */
-/** \file scanner.ll Define the example Flex lexical scanner */
+/** \file scanner.ll Define the dcc Flex lexical scanner */
 
 %{ /*** C/C++ Declarations ***/
 
@@ -8,8 +8,8 @@
 #include "scanner.h"
 
 /* import the parser's token type into a local typedef */
-typedef example::Parser::token token;
-typedef example::Parser::token_type token_type;
+typedef dcc::Parser::token token;
+typedef dcc::Parser::token_type token_type;
 
 /* By default yylex returns int, we use token_type. Unfortunately yyterminate
  * by default returns 0, which is not of token_type. */
@@ -26,8 +26,8 @@ typedef example::Parser::token_type token_type;
 /* enable c++ scanner class generation */
 %option c++
 
-/* change the name of the scanner class. results in "ExampleFlexLexer" */
-%option prefix="Example"
+/* change the name of the scanner class. results in "yyFlexLexer" */
+%option prefix="Dcc"
 
 /* the manual says "somewhat more optimized" */
 %option batch
@@ -56,7 +56,7 @@ typedef example::Parser::token_type token_type;
     yylloc->step();
 %}
 
- /*** BEGIN EXAMPLE - Change the example lexer rules below ***/
+ /*** BEGIN  - Change the dcc lexer rules below ***/
 
 [0-9]+ {
     yylval->integerVal = atoi(yytext);
@@ -89,15 +89,15 @@ typedef example::Parser::token_type token_type;
     return static_cast<token_type>(*yytext);
 }
 
- /*** END EXAMPLE - Change the example lexer rules above ***/
+ /*** END  - Change the dcc lexer rules above ***/
 
 %% /*** Additional Code ***/
 
-namespace example {
+namespace dcc {
 
 Scanner::Scanner(std::istream* in,
 		 std::ostream* out)
-    : ExampleFlexLexer(in, out)
+    : yyFlexLexer(in, out)
 {
 }
 
@@ -112,17 +112,17 @@ void Scanner::set_debug(bool b)
 
 }
 
-/* This implementation of ExampleFlexLexer::yylex() is required to fill the
- * vtable of the class ExampleFlexLexer. We define the scanner's main yylex
+/* This implementation of yyFlexLexer::yylex() is required to fill the
+ * vtable of the class yyFlexLexer. We define the scanner's main yylex
  * function via YY_DECL to reside in the Scanner class instead. */
 
 #ifdef yylex
 #undef yylex
 #endif
 
-int ExampleFlexLexer::yylex()
+int yyFlexLexer::yylex()
 {
-    std::cerr << "in ExampleFlexLexer::yylex() !" << std::endl;
+    std::cerr << "in yyFlexLexer::yylex() !" << std::endl;
     return 0;
 }
 
@@ -132,7 +132,7 @@ int ExampleFlexLexer::yylex()
  * another input file, and scanning continues. If it returns true (non-zero),
  * then the scanner terminates, returning 0 to its caller. */
 
-int ExampleFlexLexer::yywrap()
+int yyFlexLexer::yywrap()
 {
     return 1;
 }

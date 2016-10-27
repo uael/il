@@ -2,8 +2,8 @@
 
 AC_PREREQ(2.59)
 
-AC_INIT([flex-bison-cpp-example], [0.1.4])
-AC_CONFIG_SRCDIR([src/exprtest.cc])
+AC_INIT([dcc], [0.0.1])
+AC_CONFIG_SRCDIR([src/driver.cc])
 AC_CONFIG_AUX_DIR([scripts])
 
 AM_INIT_AUTOMAKE([foreign subdir-objects])
@@ -15,6 +15,6 @@ AC_PROG_RANLIB
 AC_PROG_LEX
 AC_PROG_YACC
 
-# Create the Makefile
-AC_CONFIG_FILES([Makefile])
+# Create the Makefiles
+AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT

@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-#include "src/expression.h"
+#include "expression.h"
 
 %}
 
@@ -30,10 +30,10 @@
 %skeleton "lalr1.cc"
 
 /* namespace to enclose parser in */
-%name-prefix="example"
+%define api.namespace {dcc}
 
 /* set the parser's class identifier */
-%define "parser_class_name" "Parser"
+%define parser_class_name {Parser}
 
 /* keep track of the current position within the input */
 %locations
@@ -51,7 +51,7 @@
 /* verbose error messages */
 %error-verbose
 
- /*** BEGIN EXAMPLE - Change the example grammar's tokens below ***/
+ /*** BEGIN  - Change the example grammar's tokens below ***/
 
 %union {
     int  			integerVal;
@@ -73,12 +73,12 @@
 %destructor { delete $$; } constant variable
 %destructor { delete $$; } atomexpr powexpr unaryexpr mulexpr addexpr expr
 
- /*** END EXAMPLE - Change the example grammar's tokens above ***/
+ /*** END  - Change the example grammar's tokens above ***/
 
 %{
 
-#include "src/driver.h"
-#include "src/scanner.h"
+#include "driver.h"
+#include "scanner.h"
 
 /* this "connects" the bison parser in the driver to the flex scanner class
  * object. it defines the yylex() function call to pull the next token from the
@@ -90,7 +90,7 @@
 
 %% /*** Grammar Rules ***/
 
- /*** BEGIN EXAMPLE - Change the example grammar rules below ***/
+ /*** BEGIN  - Change the example grammar rules below ***/
 
 constant : INTEGER
            {
@@ -104,7 +104,7 @@ constant : INTEGER
 variable : STRING
            {
 	       if (!driver.calc.existsVariable(*$1)) {
-		   error(yyloc, std::string("Unknown variable \"") + *$1 + "\"");
+		   error(yyla.location, std::string("Unknown variable \"") + *$1 + "\"");
 		   delete $1;
 		   YYERROR;
 	       }
@@ -212,11 +212,11 @@ start	: /* empty */
 	      driver.calc.expressions.push_back($2);
 	  }
 
- /*** END EXAMPLE - Change the example grammar rules above ***/
+ /*** END  - Change the example grammar rules above ***/
 
 %% /*** Additional Code ***/
 
-void example::Parser::error(const Parser::location_type& l,
+void dcc::Parser::error(const Parser::location_type& l,
 			    const std::string& m)
 {
     driver.error(l, m);

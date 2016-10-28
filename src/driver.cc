@@ -22,7 +22,6 @@ namespace ddc {
         this->lexer = &scanner;
 
         Parser parser(*this);
-        parser.set_debug_level(trace_parsing);
         return (parser.parse() == 0);
     }
 

@@ -3,18 +3,18 @@
 AM_CFLAGS = -W -Wall -Wextra -ansi
 AM_CXXFLAGS = -W -Wall -Wextra -ansi
 
-noinst_LIBRARIES = libscc.a
+noinst_LIBRARIES = libdcc.a
 
-libscc_a_SOURCES = \
+libdcc_a_SOURCES = \
 	parser.yy scanner.ll parser.hh scanner.h y.tab.h \
 	location.hh position.hh stack.hh \
 	driver.cc driver.h expression.h
 
-LIBS = libscc.a
+LIBS = libdcc.a
 
 bin_PROGRAMS = ddc
 
 ddc_SOURCES = main.cc
-ddc_DEPENDENCIES = libscc.a
+ddc_DEPENDENCIES = libdcc.a
 
 AM_LFLAGS = -olex.yy.c

@@ -36,11 +36,7 @@
 #  undef yyFlexLexer
 #endif
 
-#ifdef BISON_USE_PARSER_H_EXTENSION
-#  include "parser.h"
-#else
-#  include "parser.hh"
-#endif
+#include "parser.h"
 
 namespace ddc {
 

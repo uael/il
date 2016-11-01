@@ -1,138 +1,80 @@
-/* $Id$ -*- mode: c++ -*- */
-/** \file scanner.ll Define the ddc Flex lexical scanner */
+/*
+ * Copyright (c) 2016, Abel Lucas <ylilt71@gmail.com>
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
 
-%{ /*** C/C++ Declarations ***/
+/* $Id$ */
 
-#include <string>
-
+%{
+#include "ast.h"
 #include "scanner.h"
 
-/* import the parser's token type into a local typedef */
-typedef ddc::Parser::token token;
-typedef ddc::Parser::token_type token_type;
+typedef ddc::parser::token token;
 
-/* By default yylex returns int, we use token_type. Unfortunately yyterminate
- * by default returns 0, which is not of token_type. */
 #define yyterminate() return token::END
-
-/* This disables inclusion of unistd.h, which is not available under Visual C++
- * on Win32. The C++ scanner uses STL streams instead. */
 #define YY_NO_UNISTD_H
-
 %}
 
-/*** Flex Declarations and Options ***/
-
-/* enable c++ scanner class generation */
 %option c++
-
-/* change the name of the scanner class. results in "yyFlexLexer" */
-%option prefix="Ddc"
-
-/* the manual says "somewhat more optimized" */
+%option prefix="ddc"
 %option batch
-
-/* enable scanner to generate debug output. disable this for release
- * versions. */
 %option debug
-
-/* no support for include files is planned */
-%option yywrap nounput 
-
-/* enables the use of start condition stacks */
+%option yywrap nounput
 %option stack
 
-/* The following paragraph suffices to track locations accurately. Each time
- * yylex is invoked, the begin position is moved onto the end position. */
 %{
-#define YY_USER_ACTION  yylloc->columns(yyleng);
+#define YY_USER_ACTION  yylloc->step(); yylloc->columns(yyleng);
+#define TOKEN(t) token::TOKEN_##t
+#define SAVE_TOKEN yylval->_string = new std::string(yytext, yyleng)
 %}
 
-%% /*** Regular Expressions Part ***/
+%%
 
- /* code to place at the beginning of yylex() */
-%{
-    // reset location
-    yylloc->step();
-%}
+:               return TOKEN(COLON);
+[A-Za-z0-9_]*   SAVE_TOKEN; return TOKEN(IDENTIFIER);
 
- /*** BEGIN  - Change the ddc lexer rules below ***/
-
-[0-9]+ {
-    yylval->integerVal = atoi(yytext);
-    return token::INTEGER;
-}
-
-[0-9]+"."[0-9]* {
-    yylval->doubleVal = atof(yytext);
-    return token::DOUBLE;
-}
-
-[A-Za-z][A-Za-z0-9_,.-]* {
-    yylval->stringVal = new std::string(yytext, yyleng);
-    return token::STRING;
-}
-
- /* gobble up white-spaces */
-[ \t\r]+ {
-    yylloc->step();
-}
-
- /* gobble up end-of-lines */
-\n {
-    yylloc->lines(yyleng); yylloc->step();
-    return token::EOL;
-}
-
- /* pass all other characters up to bison */
-. {
-    return static_cast<token_type>(*yytext);
-}
-
- /*** END  - Change the ddc lexer rules above ***/
-
-%% /*** Additional Code ***/
+%%
 
 namespace ddc {
+    scanner::scanner(std::istream* in, std::ostream* out)
+        : yyFlexLexer(in, out) { }
 
-Scanner::Scanner(std::istream* in,
-		 std::ostream* out)
-    : yyFlexLexer(in, out)
-{
+    scanner::~scanner() { }
+
+    void scanner::set_debug(bool b) {
+        yy_flex_debug = b;
+    }
 }
-
-Scanner::~Scanner()
-{
-}
-
-void Scanner::set_debug(bool b)
-{
-    yy_flex_debug = b;
-}
-
-}
-
-/* This implementation of yyFlexLexer::yylex() is required to fill the
- * vtable of the class yyFlexLexer. We define the scanner's main yylex
- * function via YY_DECL to reside in the Scanner class instead. */
 
 #ifdef yylex
 #undef yylex
 #endif
 
-int yyFlexLexer::yylex()
-{
+int yyFlexLexer::yylex() {
     std::cerr << "in yyFlexLexer::yylex() !" << std::endl;
     return 0;
 }
 
-/* When the scanner receives an end-of-file indication from YY_INPUT, it then
- * checks the yywrap() function. If yywrap() returns false (zero), then it is
- * assumed that the function has gone ahead and set up `yyin' to point to
- * another input file, and scanning continues. If it returns true (non-zero),
- * then the scanner terminates, returning 0 to its caller. */
-
-int yyFlexLexer::yywrap()
-{
+int yyFlexLexer::yywrap() {
     return 1;
 }
+
+/*
+ * Local variables:
+ * tab-width: 4
+ * c-basic-offset: 4
+ * End:
+ * vim600: noet sw=4 ts=4 fdm=marker
+ * vim<600: noet sw=4 ts=4
+ */

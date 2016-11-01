@@ -1,13 +1,28 @@
+/*
+ * Copyright (c) 2016, Abel Lucas <ylilt71@gmail.com>
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+
 /* $Id$ */
 
-/**
- * When using automake the bison parser file "xyz.yy" is processed by the
- * ylwrap script. It calls bison in a separate directory, which outputs source
- * to the default names "y.tab.c" and "y.tab.h". The ylwrap script then renames
- * these files into "xyz.cc" and "xyz.h" and tries to update include references
- * using sed. However this does not work for the C++ parser skeleton, so the
- * source file "xyz.cc" still refers to the default "y.tab.h". The easiest
- * work-around is to use this forwarding include file.
- */
 #include "scanner.h"
 
+/*
+ * Local variables:
+ * tab-width: 4
+ * c-basic-offset: 4
+ * End:
+ * vim600: noet sw=4 ts=4 fdm=marker
+ * vim<600: noet sw=4 ts=4
+ */

@@ -16,40 +16,52 @@
 
 /* $Id$ */
 
-#ifndef _SCANNER_H
-#define _SCANNER_H
+#ifndef _AST_H
+#define _AST_H
 
-#ifndef YY_DECL
-#define  YY_DECL            \
-    ddc::parser::token_type        \
-    ddc::scanner::lex(        \
-  ddc::parser::semantic_type* yylval,    \
-  ddc::parser::location_type* yylloc    \
-    )
-#endif
-
-#ifndef __FLEX_LEXER_H
-#define yyFlexLexer ddcFlexLexer
-#include "FlexLexer.h"
-#undef yyFlexLexer
-#endif
-
-#include "parser.hh"
+#include <string>
+#include <vector>
 
 namespace ddc {
+  using namespace std;
 
-  class scanner : public ddcFlexLexer {
+  typedef class {
+    int token;
+  } node_t;
+
+  typedef class _identifier_t : public node_t {
   public:
-    scanner(std::istream *arg_yyin = 0, std::ostream *arg_yyout = 0);
+    string id;
 
-    virtual ~scanner();
-    virtual parser::token_type lex(parser::semantic_type *yylval, parser::location_type *yylloc);
-    void set_debug(bool b);
-  };
+    _identifier_t(const string &id);
+  } identifier_t;
 
+  typedef class _type_t : public node_t {
+  public:
+    identifier_t id;
+
+    _type_t(const identifier_t &id);
+  } type_t;
+
+  typedef class _signature_t : public node_t {
+  public:
+    type_t type;
+    _signature_t *parent;
+    vector<node_t> context;
+
+    _signature_t(const type_t &type);
+  } signature_t;
+
+  typedef class _declaration_t : public node_t {
+  public:
+    identifier_t identifier;
+    signature_t signature;
+
+    _declaration_t(const identifier_t &identifier, const signature_t &signature);
+  } declaration_t;
 }
 
-#endif /* _SCANNER_H */
+#endif /* _AST_H */
 
 /*
  * Local variables:

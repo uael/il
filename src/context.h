@@ -16,40 +16,29 @@
 
 /* $Id$ */
 
-#ifndef _SCANNER_H
-#define _SCANNER_H
+#ifndef _CONTEXT_H
+#define _CONTEXT_H
 
-#ifndef YY_DECL
-#define  YY_DECL            \
-    ddc::parser::token_type        \
-    ddc::scanner::lex(        \
-  ddc::parser::semantic_type* yylval,    \
-  ddc::parser::location_type* yylloc    \
-    )
-#endif
-
-#ifndef __FLEX_LEXER_H
-#define yyFlexLexer ddcFlexLexer
-#include "FlexLexer.h"
-#undef yyFlexLexer
-#endif
-
-#include "parser.hh"
+#include "ast.h"
+#include <map>
+#include <exception>
 
 namespace ddc {
-
-  class scanner : public ddcFlexLexer {
+  class context {
   public:
-    scanner(std::istream *arg_yyin = 0, std::ostream *arg_yyout = 0);
+    std::map<std::string, double> variables;
+    std::vector<node_t *> nodes;
+    std::vector<node_t *> declarations;
 
-    virtual ~scanner();
-    virtual parser::token_type lex(parser::semantic_type *yylval, parser::location_type *yylloc);
-    void set_debug(bool b);
+    ~context();
+
+    void clearExpressions();
+    bool existsVariable(const std::string &varname) const;
+    double getVariable(const std::string &varname) const;
   };
-
 }
 
-#endif /* _SCANNER_H */
+#endif /* _CONTEXT_H */
 
 /*
  * Local variables:

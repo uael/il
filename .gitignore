@@ -9,14 +9,9 @@ Makefile.in
 /aclocal.m4
 /config.*
 /configure
-/m4/
 
-depcomp
-install-sh
 libtool
 ltmain.sh
-missing
-ylwrap
 stamp-h?
 
 .deps/
@@ -47,13 +42,13 @@ stamp-h?
 /doxygen-html/
 
 # src
-src/parser.cc
-src/scanner.cc
 *.hh
 
 # binary
 ddc
 
 # usr
+/build
 CMakeLists.txt
 .idea/
+scripts/

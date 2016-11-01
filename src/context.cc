@@ -16,40 +16,38 @@
 
 /* $Id$ */
 
-#ifndef _SCANNER_H
-#define _SCANNER_H
-
-#ifndef YY_DECL
-#define  YY_DECL            \
-    ddc::parser::token_type        \
-    ddc::scanner::lex(        \
-  ddc::parser::semantic_type* yylval,    \
-  ddc::parser::location_type* yylloc    \
-    )
-#endif
-
-#ifndef __FLEX_LEXER_H
-#define yyFlexLexer ddcFlexLexer
-#include "FlexLexer.h"
-#undef yyFlexLexer
-#endif
-
-#include "parser.hh"
+#include <stdexcept>
+#include "context.h"
 
 namespace ddc {
 
-  class scanner : public ddcFlexLexer {
-  public:
-    scanner(std::istream *arg_yyin = 0, std::ostream *arg_yyout = 0);
+  context::~context() {
+    clearExpressions();
+  }
 
-    virtual ~scanner();
-    virtual parser::token_type lex(parser::semantic_type *yylval, parser::location_type *yylloc);
-    void set_debug(bool b);
-  };
+  void context::clearExpressions() {
+    for (unsigned int i = 0; i < nodes.size(); ++i) {
+      delete nodes[i];
+    }
+    nodes.clear();
+    for (unsigned int i = 0; i < declarations.size(); ++i) {
+      delete declarations[i];
+    }
+    declarations.clear();
+  }
 
+  bool context::existsVariable(const std::string &varname) const {
+    return variables.find(varname) != variables.end();
+  }
+
+  double context::getVariable(const std::string &varname) const {
+    std::map<std::string, double>::const_iterator vi = variables.find(varname);
+    if (vi == variables.end())
+      throw (std::runtime_error("Unknown variable."));
+    else
+      return vi->second;
+  }
 }
-
-#endif /* _SCANNER_H */
 
 /*
  * Local variables:

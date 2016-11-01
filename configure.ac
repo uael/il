@@ -1,20 +1,24 @@
-# $Id$
-
-AC_PREREQ(2.59)
-
-AC_INIT([ddc], [0.0.1])
-AC_CONFIG_SRCDIR([src/driver.cc])
+AC_INIT([ddc], [0.1], [https://github.com/dotdry/ddc/issues])
 AC_CONFIG_AUX_DIR([scripts])
+AC_CONFIG_SRCDIR([src/driver.cc])
 
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 
-# Checks for programs.
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_RANLIB
-AC_PROG_LEX
+AM_PROG_LEX
 AC_PROG_YACC
 
-# Create the Makefiles
+DX_HTML_FEATURE(ON)
+DX_CHM_FEATURE(OFF)
+DX_CHI_FEATURE(OFF)
+DX_MAN_FEATURE(OFF)
+DX_RTF_FEATURE(OFF)
+DX_XML_FEATURE(OFF)
+DX_PDF_FEATURE(OFF)
+DX_PS_FEATURE(OFF)
+DX_INIT_DOXYGEN(ddc, doxygen.cfg, doc)
+
 AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT

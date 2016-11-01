@@ -1,4 +1,6 @@
 /*
+ *  MIT License
+ *
  * Copyright (c) 2016, Abel Lucas <ylilt71@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any

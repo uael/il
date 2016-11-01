@@ -25,18 +25,16 @@
 namespace ddc {
 
   _type_t::_type_t(const identifier_t &id)
-    : id(id) { std::cout << "type : " << id.id << std::endl; }
+    : id(id) { }
 
   _signature_t::_signature_t(const type_t &type)
-    : type(type) { std::cout << "signature : " << type.id.id << std::endl; }
+    : type(type) { }
 
   _identifier_t::_identifier_t(const std::string &id)
-    : id(id) { std::cout << "identifier : " << id << std::endl; }
+    : id(id) { }
 
   _declaration_t::_declaration_t(const identifier_t &identifier, const signature_t &signature)
-    : identifier(identifier), signature(signature) {
-    std::cout << "declaration : " << identifier.id << " " << signature.type.id.id << std::endl;
-  }
+    : identifier(identifier), signature(signature) { }
 }
 
 /*

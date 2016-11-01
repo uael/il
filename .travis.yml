@@ -1,0 +1,15 @@
+language: cpp
+
+compiler:
+  - gcc
+  - clang
+
+install:
+  - ./autogen.sh
+
+before_script:
+  - mkdir build
+  - cd build
+  - ../configure
+
+script: make

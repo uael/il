@@ -31,12 +31,17 @@
 #endif
 
 #ifndef __FLEX_LEXER_H
-#define yyFlexLexer ddcFlexLexer
-#include "FlexLexer.h"
-#undef yyFlexLexer
+#  define yyFlexLexer ddcFlexLexer
+#  include "FlexLexer.h"
+#  undef yyFlexLexer
 #endif
 
-#include "parser.hh"
+#include "config.h"
+#ifdef BISON_USE_PARSER_H_EXTENSION
+#  include "parser.h"
+#else
+#  include "parser.hh"
+#endif
 
 namespace ddc {
 

@@ -1,14 +1,17 @@
 AC_INIT([ddc], [0.1], [https://github.com/dotdry/ddc/issues])
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_SRCDIR([src/driver.cc])
+AC_CONFIG_HEADERS([config.h])
 
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_RANLIB
+AC_PROG_LEX
 AM_PROG_LEX
 AC_PROG_YACC
+AC_PROG_BISON(3.0)
 
 DX_HTML_FEATURE(ON)
 DX_CHM_FEATURE(OFF)

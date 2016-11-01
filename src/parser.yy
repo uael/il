@@ -26,11 +26,10 @@
 %}
 
 %skeleton "lalr1.cc"
-%require "3.0"
 %debug
 %defines
-%define api.namespace {ddc}
-%define parser_class_name {parser}
+%name-prefix="ddc"
+%define "parser_class_name" "parser"
 
 %parse-param { class driver &driver }
 

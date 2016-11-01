@@ -23,6 +23,7 @@
 
 #include <string>
 #include <vector>
+#include "ddc.h"
 
 namespace ddc {
   using namespace std;

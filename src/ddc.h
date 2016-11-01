@@ -1,7 +1,5 @@
 /*
- *  MIT License
- *
- * Copyright (c) 2016 .DRY (Don't Repeat Yourself)
+ * Copyright (c) 2016, Abel Lucas <ylilt71@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -18,44 +16,12 @@
 
 /* $Id$ */
 
-#ifndef _SCANNER_H
-#define _SCANNER_H
+#ifndef _DDC_H
+#define _DDC_H
 
-#ifndef YY_DECL
-#define  YY_DECL            \
-    ddc::parser::token_type        \
-    ddc::scanner::lex(        \
-  ddc::parser::semantic_type* yylval,    \
-  ddc::parser::location_type* yylloc    \
-    )
-#endif
+#include "config.h"
 
-#ifndef __FLEX_LEXER_H
-#  define yyFlexLexer ddcFlexLexer
-#  include "FlexLexer.h"
-#  undef yyFlexLexer
-#endif
-
-#ifdef BISON_USE_PARSER_H_EXTENSION
-#  include "parser.h"
-#else
-#  include "parser.hh"
-#endif
-
-namespace ddc {
-
-  class scanner : public ddcFlexLexer {
-  public:
-    scanner(std::istream *arg_yyin = 0, std::ostream *arg_yyout = 0);
-
-    virtual ~scanner();
-    virtual parser::token_type lex(parser::semantic_type *yylval, parser::location_type *yylloc);
-    void set_debug(bool b);
-  };
-
-}
-
-#endif /* _SCANNER_H */
+#endif /* _DDC_H */
 
 /*
  * Local variables:

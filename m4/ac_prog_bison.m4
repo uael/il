@@ -1,6 +1,6 @@
 dnl
 dnl Check Bison version
-dnl AC_PROG_BISON([MIN_VERSION=3.0])
+dnl AC_PROG_BISON([MIN_VERSION=2.4])
 dnl
 dnl Will define BISON_USE_PARSER_H_EXTENSION if Automake is < 1.11
 dnl for use with .h includes.

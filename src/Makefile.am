@@ -16,4 +16,4 @@ bin_PROGRAMS = ddc
 ddc_SOURCES = main.cc
 ddc_DEPENDENCIES = libdcc.a
 
-pkginclude_HEADERS = ast.h
+pkginclude_HEADERS = ddc.h

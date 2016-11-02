@@ -5,9 +5,8 @@ AM_LFLAGS = -o$(LEX_OUTPUT_ROOT).c
 noinst_LIBRARIES = libdcc.a
 
 libdcc_a_SOURCES = \
-	parser.yy scanner.ll parser.hh scanner.h y.tab.h \
-	location.hh position.hh stack.hh \
-	driver.cc driver.h ast.cc context.cc
+	parser.yy scanner.ll y.tab.h \
+	driver.cc ast.cc context.cc
 
 LIBS = libdcc.a
 

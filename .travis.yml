@@ -13,18 +13,19 @@ addons:
     packages:
       - gcc-5
       - g++-5
-      - clang-3.4
-      - clang++-3.4
+      - clang-3.5
       - bison
       - flex
 
 before_install:
+  - wget --no-check-certificate http://ftp.gnu.org/gnu/bison/bison-3.0.4.tar.gz
+  - mkdir $HOME/bison
+  - tar -xf bison-3.0.4.tar.gz; cd bison-3.0.4; ./configure --prefix=$HOME/bison; make -j 4 install; cd $PWD/..;
+  - export PATH=$HOME/bison/bin:$PATH
   - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
-  - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.4" CC="clang-3.4"; fi
+  - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.5" CC="clang-3.5"; fi
 
 install:
-  - ${CC} --version ; ${CXX} --version;
-  - bison --version
   - ./autogen.sh
 
 before_script:
@@ -32,4 +33,8 @@ before_script:
   - cd build
   - ../configure
 
-script: make
+script:
+  - ${CC} --version
+  - ${CXX} --version
+  - bison --version
+  - make

@@ -36,6 +36,10 @@
 #  undef yyFlexLexer
 #endif
 
+#if __cplusplus > 199711L
+#  define register
+#endif
+
 #ifdef BISON_USE_PARSER_H_EXTENSION
 #  include "parser.h"
 #else

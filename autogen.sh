@@ -1,2 +1,2 @@
 #!/bin/sh
-autoreconf -i -I m4
+autoreconf -vi -I m4

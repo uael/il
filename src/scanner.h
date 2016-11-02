@@ -36,7 +36,11 @@
 #  undef yyFlexLexer
 #endif
 
-#include "parser.hh"
+#ifdef __clang__
+#  include "parser.h"
+#else
+#  include "parser.hh"
+#endif
 
 namespace ddc {
 

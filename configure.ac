@@ -5,6 +5,10 @@ AC_CONFIG_HEADERS([config.h])
 
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 
+AC_LANG([C++])
+AX_CXX_COMPILE_STDCXX(11, noext, mandatory)
+AC_LANG([C])
+
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_RANLIB

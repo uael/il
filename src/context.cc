@@ -36,6 +36,10 @@ namespace ddc {
       delete declarations[i];
     }
     declarations.clear();
+    for (unsigned int i = 0; i < classes.size(); ++i) {
+      delete classes[i];
+    }
+    classes.clear();
   }
 
   bool context::existsVariable(const std::string &varname) const {

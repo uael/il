@@ -46,11 +46,15 @@ int main(int argc, char *argv[]) {
       calc.clearExpressions();
       bool result = driver.parse_stream(infile, argv[ai]);
       if (result) {
-        std::cout << "Expressions:" << std::endl;
+        std::cout << "Functions:" << std::endl;
         for (unsigned int ei = 0; ei < calc.declarations.size(); ++ei) {
           std::cout << "[" << ei << "]:" << std::endl;
-          std::cout << "tree:" << std::endl;
-          std::cout << typeid(calc.declarations[ei]).name() << std::endl;
+          std::cout << calc.declarations[ei]->to_string() << std::endl;
+        }
+        std::cout << "Classes:" << std::endl;
+        for (unsigned int ei = 0; ei < calc.classes.size(); ++ei) {
+          std::cout << "[" << ei << "]:" << std::endl;
+          std::cout << calc.classes[ei]->to_string() << std::endl;
         }
       }
 
@@ -70,9 +74,15 @@ int main(int argc, char *argv[]) {
     bool result = driver.parse_string(line, "input");
 
     if (result) {
+      std::cout << "Functions:" << std::endl;
       for (unsigned int ei = 0; ei < calc.declarations.size(); ++ei) {
-        std::cout << "tree:" << std::endl;
-        std::cout << typeid(calc.declarations[ei]).name() << std::endl;
+        std::cout << "[" << ei << "]:" << std::endl;
+        std::cout << calc.declarations[ei]->to_string() << std::endl;
+      }
+      std::cout << "Classes:" << std::endl;
+      for (unsigned int ei = 0; ei < calc.classes.size(); ++ei) {
+        std::cout << "[" << ei << "]:" << std::endl;
+        std::cout << calc.classes[ei]->to_string() << std::endl;
       }
     }
   }

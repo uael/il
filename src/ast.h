@@ -29,7 +29,6 @@ namespace ddc {
   using namespace std;
 
   typedef class {
-    int token;
   } node_t;
 
   typedef class _identifier_t : public node_t {
@@ -37,6 +36,10 @@ namespace ddc {
     string id;
 
     _identifier_t(const string &id);
+
+    virtual string to_string() const {
+      return id;
+    }
   } identifier_t;
 
   typedef class _type_t : public node_t {
@@ -44,6 +47,10 @@ namespace ddc {
     identifier_t id;
 
     _type_t(const identifier_t &id);
+
+    virtual string to_string() const {
+      return id.to_string();
+    }
   } type_t;
 
   typedef class _signature_t : public node_t {
@@ -53,6 +60,10 @@ namespace ddc {
     vector<node_t> context;
 
     _signature_t(const type_t &type);
+
+    virtual string to_string() const {
+      return type.to_string();
+    }
   } signature_t;
 
   typedef class _declaration_t : public node_t {
@@ -61,7 +72,88 @@ namespace ddc {
     signature_t signature;
 
     _declaration_t(const identifier_t &identifier, const signature_t &signature);
+
+    virtual string to_string() const {
+      return signature.to_string() + " " + identifier.to_string();
+    }
   } declaration_t;
+
+  typedef vector<declaration_t *> arguments_t;
+
+  typedef class _function_decl_t : public declaration_t {
+  public:
+    arguments_t arguments;
+
+    _function_decl_t(
+      const identifier_t &identifier,
+      const arguments_t &arguments
+    );
+
+    _function_decl_t(
+      const identifier_t &identifier,
+      const signature_t &signature,
+      const arguments_t &arguments
+    );
+
+    virtual string to_string() const {
+      string ret = signature.to_string() + " " + identifier.to_string() + "(";
+      for(auto it = this->arguments.begin(); it != this->arguments.end(); ++it) {
+        if (it != this->arguments.begin()) {
+          ret += ", ";
+        }
+        ret += (*it)->to_string();
+      }
+      return ret + ")";
+    }
+  } function_decl_t;
+
+  typedef vector<_function_decl_t *> functions_t;
+
+  typedef class _function_t : public _function_decl_t {
+  public:
+    string code;
+
+    _function_t(
+      const _function_decl_t &function_decl,
+      const string &code
+    ) : _function_decl_t(function_decl.identifier, function_decl.signature, function_decl.arguments),
+      code(code) { }
+
+    virtual string to_string() const {
+      string ret = signature.to_string() + " " + identifier.to_string() + "(";
+      for(auto it = this->arguments.begin(); it != this->arguments.end(); ++it) {
+        if (it != this->arguments.begin()) {
+          ret += ", ";
+        }
+        ret += (*it)->to_string();
+      }
+      return _function_decl_t::to_string() + "{ }";
+    }
+  } function_t;
+
+  typedef class _class_t : public declaration_t {
+  public:
+    functions_t functions;
+
+    _class_t(
+      const identifier_t &identifier,
+      const signature_t &signature,
+      const functions_t &functions
+    ) : _declaration_t(identifier, signature), functions(functions) { }
+
+    _class_t(
+      const identifier_t &identifier,
+      const functions_t &functions
+    ) : _declaration_t(identifier, _signature_t(_type_t(_identifier_t("void")))), functions(functions) { }
+
+    virtual string to_string() const {
+      string ret = "class " + identifier.to_string() + "{\n";
+      for(auto it = this->functions.begin(); it != this->functions.end(); ++it) {
+        ret += "  " + (*it)->to_string() + "\n";
+      }
+      return ret + "}";
+    }
+  } class_t;
 }
 
 #endif /* _AST_H */

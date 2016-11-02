@@ -24,7 +24,11 @@
 
 typedef ddc::parser::token token;
 
-#define yyterminate() return token::END
+#define STEP yylloc->step()
+#define YY_USER_ACTION STEP; yylloc->columns(yyleng);
+#define T(t) token::t
+#define SAVE_STRING yylval->_string = new std::string(yytext, yyleng)
+#define yyterminate() return T(END)
 #define YY_NO_UNISTD_H
 %}
 
@@ -32,19 +36,24 @@ typedef ddc::parser::token token;
 %option prefix="ddc"
 %option batch
 %option debug
+%option noyywrap
 %option yywrap nounput
 %option stack
 
-%{
-#define YY_USER_ACTION  yylloc->step(); yylloc->columns(yyleng);
-#define TOKEN(t) token::TOKEN_##t
-#define SAVE_TOKEN yylval->_string = new std::string(yytext, yyleng)
-%}
-
 %%
 
-:               return TOKEN(COLON);
-[A-Za-z0-9_]*   SAVE_TOKEN; return TOKEN(IDENTIFIER);
+":"             return T(COLON);
+";"             return T(SEMICOLON);
+","             return T(COMMA);
+"("             return T(LPAR);
+")"             return T(RPAR);
+"{"             return T(LBRA);
+"}"             return T(RBRA);
+"=>"            return T(INLINE);
+"class"         SAVE_STRING; return T(KCLASS);
+[A-Za-z0-9_]*   SAVE_STRING; return T(IDENTIFIER);
+[ \t\r]+        STEP;
+[\n]+           STEP;
 
 %%
 

@@ -30,7 +30,8 @@ namespace ddc {
   public:
     std::map<std::string, double> variables;
     std::vector<node_t *> nodes;
-    std::vector<node_t *> declarations;
+    std::vector<function_decl_t *> declarations;
+    std::vector<class_t *> classes;
 
     ~context();
 

@@ -1,7 +1,7 @@
 language: cpp
 
 compiler:
-  - gcc
+  - g++
   - clang
 
 before_install:
@@ -9,6 +9,7 @@ before_install:
   - mkdir $HOME/bison
   - tar -xf bison-3.0.4.tar.gz; cd bison-3.0.4; ./configure --prefix=$HOME/bison; make -j 4 install; cd $PWD/..;
   - export PATH=$HOME/bison/bin:$PATH
+  - sudo unlink /usr/bin/g++ && sudo ln -s /usr/bin/g++-5 /usr/bin/g++
 
 install:
   - ./autogen.sh

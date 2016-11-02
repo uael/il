@@ -13,7 +13,6 @@ addons:
     packages:
       - gcc-5
       - g++-5
-      - clang-3.5
       - bison
       - flex
 
@@ -23,7 +22,6 @@ before_install:
   - tar -xf bison-3.0.4.tar.gz; cd bison-3.0.4; ./configure --prefix=$HOME/bison; make -j 4 install; cd $PWD/..;
   - export PATH=$HOME/bison/bin:$PATH
   - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
-  - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.5" CC="clang-3.5"; fi
 
 install:
   - ./autogen.sh

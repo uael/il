@@ -1,5 +1,3 @@
-sudo: false
-
 language: cpp
 
 compiler:
@@ -24,7 +22,7 @@ before_install:
   - tar -xf bison-3.0.4.tar.gz; cd bison-3.0.4; ./configure --prefix=$HOME/bison; make -j 4 install; cd $PWD/..;
   - export PATH=$HOME/bison/bin:$PATH
   - wget http://ftp.gnu.org/gnu/automake/automake-1.15.tar.xz
-  - tar xvf automake-1.15.tar.xz; cd automake-1.15; ./configure --prefix=/usr && make; make install; cd $PWD/..;
+  - tar xvf automake-1.15.tar.xz; cd automake-1.15; ./configure --prefix=/usr && make; sudo make install; cd $PWD/..;
   - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
 
 install:

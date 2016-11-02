@@ -13,6 +13,10 @@ addons:
     packages:
       - gcc-5
       - g++-5
+      - make
+      - libtool
+      - autoconf
+      - automake-1.15
 
 before_install:
   - wget --no-check-certificate http://ftp.gnu.org/gnu/bison/bison-3.0.4.tar.gz

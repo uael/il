@@ -149,6 +149,7 @@ declaration
     : identifier COLON signature
         { MAKE($$, declaration, *$1, *$3); }
     | function_decl
+        { $$ = $1; }
     ;
 
 signature

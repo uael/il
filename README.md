@@ -1,4 +1,4 @@
-# ddc
+# ddc - under dev
 [![Build Status](https://img.shields.io/travis/dotdry/ddc/master.svg?style=flat-square)](https://travis-ci.org/dotdry/ddc)
 
 ##Installation

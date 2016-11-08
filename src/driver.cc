@@ -25,8 +25,8 @@
 
 namespace ddc {
 
-  driver::driver(class context &_context)
-    : trace_scanning(false), trace_parsing(false), context(_context) { }
+  driver::driver()
+    : trace_scanning(false), trace_parsing(false) { }
 
   bool driver::parse_stream(std::istream &in, const std::string &sname) {
     streamname = sname;

@@ -19,15 +19,22 @@
 /* $Id$ */
 
 %{
-#include "ast.h"
+#include "ddc.h"
 #include "scanner.h"
+
+using namespace ddc::ast;
 
 typedef ddc::parser::token token;
 
 #define STEP yylloc->step()
 #define YY_USER_ACTION STEP; yylloc->columns(yyleng);
 #define T(t) token::t
-#define SAVE_STRING yylval->_string = new std::string(yytext, yyleng)
+#define RET(t) return T(t)
+#define SAVE_ID yylval->_id = new string(yytext, yyleng)
+#define SAVE_RET_MODIFIER(t) yylval->_modifier = modifier_t::t; RET(t)
+#define SAVE_RET_SCALAR(t) yylval->_value = new val_t<scalar_t>(&scalar::t, new string(yytext, yyleng)); RET(t)
+#define SAVE_RET_OP(t) yylval->_op = op_t::t; RET(t)
+#define SAVE_RET_CMP(t) yylval->_cmp = cmp_t::t; RET(t)
 #define yyterminate() return T(END)
 #define YY_NO_UNISTD_H
 %}
@@ -42,16 +49,32 @@ typedef ddc::parser::token token;
 
 %%
 
-":"             return T(COLON);
-";"             return T(SEMICOLON);
-","             return T(COMMA);
-"("             return T(LPAR);
-")"             return T(RPAR);
-"{"             return T(LBRA);
-"}"             return T(RBRA);
-"=>"            return T(INLINE);
-"class"         SAVE_STRING; return T(KCLASS);
-[A-Za-z0-9_]*   SAVE_STRING; return T(IDENTIFIER);
+":"             RET(COLON);
+";"             RET(SEMICOLON);
+","             RET(COMMA);
+"("             RET(LPAR);
+")"             RET(RPAR);
+"{"             RET(LBRA);
+"}"             RET(RBRA);
+"=>"            RET(INLINE);
+"="             RET(ASSIGN);
+"+"             SAVE_RET_OP(ADD);
+"-"             SAVE_RET_OP(SUB);
+"*"             SAVE_RET_OP(MUL);
+"/"             SAVE_RET_OP(DIV);
+"=="            SAVE_RET_CMP(EQ);
+"!="            SAVE_RET_CMP(NEQ);
+"<"             SAVE_RET_CMP(LT);
+"<="            SAVE_RET_CMP(LE);
+">"             SAVE_RET_CMP(GT);
+">="            SAVE_RET_CMP(GE);
+"class"         RET(KCLASS);
+"public"        SAVE_RET_MODIFIER(PUBLIC);
+"private"       SAVE_RET_MODIFIER(PRIVATE);
+"protected"     SAVE_RET_MODIFIER(PROTECTED);
+"int"           RET(KINT);
+[A-Za-z0-9_]*   SAVE_ID; RET(ID);
+[0-9]+          SAVE_RET_SCALAR(INT);
 [ \t\r]+        STEP;
 [\n]+           STEP;
 

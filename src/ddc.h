@@ -22,6 +22,7 @@
 #define _DDC_H
 
 #include "config.h"
+#include "ast.h"
 
 #endif /* _DDC_H */
 

@@ -19,7 +19,9 @@
 /* $Id$ */
 
 %{
-#include "ast.h"
+#include "ddc.h"
+
+using namespace ddc::ast;
 
 #include <cstdio>
 #include <cstdlib>
@@ -32,38 +34,149 @@
 %define api.namespace {ddc}
 %define parser_class_name {parser}
 
-%parse-param { class driver &driver }
+%parse-param {class driver &driver}
 
 %locations
 
 %union {
-  ddc::identifier_t *_identifier;
-  ddc::type_t *_type;
-  ddc::signature_t *_signature;
-  ddc::declaration_t *_declaration;
-  ddc::function_decl_t *_function_decl;
-  ddc::function_t *_function;
-  ddc::functions_t *_functions;
-  ddc::arguments_t *_arguments;
-  ddc::class_t *_class;
-  std::string *_string;
+  id_t *_id;
+  ids_t *_ids;
+
+  modifier_t _modifier;
+  op_t _op;
+  cmp_t _cmp;
+
+  node_t *_node;
+  nodes_t *_nodes;
+
+  stmt_t *_stmt;
+  stmts_t *_stmts;
+
+  expr_t *_expr;
+  exprs_t *_exprs;
+
+  decl_t *_decl;
+  decls_t *_decls;
+
+  sign_t *_sign;
+  signs_t *_signs;
+
+  ival_t *_val;
+  vals_t *_vals;
+
+  scalar_t *_scalar;
+  scalars_t *_scalars;
+  scalar_decl_t *_scalar_decl;
+  scalar_decls_t *_scalar_decls;
+
+  class_t *_class;
+  classs_t *_classs;
+  class_decl_t *_class_decl;
+  class_decls_t *_class_decls;
+  
+  iface_t *_iface;
+  ifaces_t *_ifaces;
+  iface_decl_t *_iface_decl;
+  iface_decls_t *_iface_decls;
+  
+  ivar_t *_var;
+  vars_t *_vars;
+  ivar_decl_t *_var_decl;
+  var_decls_t *_var_decls;
+  
+  iconst_t *_const;
+  consts_t *_consts;
+  iconst_decl_t *_const_decl;
+  const_decls_t *_const_decls;
+  
+  iarg_t *_arg;
+  args_t *_args;
+  iarg_decl_t *_arg_decl;
+  arg_decls_t *_arg_decls;
+  
+  ifunc_t *_func;
+  funcs_t *_funcs;
+  ifunc_decl_t *_func_decl;
+  func_decls_t *_func_decls;
+  
+  imeth_t *_meth;
+  meths_t *_meths;
+  imeth_decl_t *_meth_decl;
+  meth_decls_t *_meth_decls;
+  
+  iprop_t *_prop;
+  props_t *_props;
+  iprop_decl_t *_prop_decl;
+  prop_decls_t *_prop_decls;
+
+  program_t *_program;
 }
 
 %token END 0 "end of file"
 %token EOL "end of line"
-%token <_string> IDENTIFIER KCLASS
-%token COLON SEMICOLON COMMA LPAR RPAR LBRA RBRA INLINE
+%token <_id> ID KCLASS KINT
+%token <_modifier> PUBLIC PRIVATE PROTECTED
+%token <_op> ADD SUB MUL DIV
+%token <_cmp> EQ NEQ LT LE GT GE
+%token <_val> INT
+%token COLON SEMICOLON COMMA LPAR RPAR LBRA RBRA INLINE ASSIGN
 
-%type <_identifier> identifier
-%type <_type> type
-%type <_signature> signature
-%type <_declaration> declaration
-%type <_function_decl> function_decl
-%type <_function> function
-%type <_arguments> arguments arguments_list
-%type <_functions> functions
+%type <_id> id
+%type <_ids> ids
+%type <_modifier> modifier
+%type <_op> op
+%type <_cmp> cmp
+%type <_node> node
+%type <_nodes> nodes
+%type <_stmt> stmt
+%type <_stmts> stmts
+%type <_expr> expr
+%type <_exprs> exprs
+%type <_decl> decl
+%type <_decls> decls
+%type <_sign> sign
+%type <_signs> signs
+%type <_val> val
+%type <_vals> vals
+%type <_scalar> scalar
+%type <_scalars> scalars
+%type <_scalar_decl> scalar_decl
+%type <_scalar_decls> scalar_decls
 %type <_class> class
-%type <_string> closure
+%type <_classs> classs
+%type <_class_decl> class_decl
+%type <_class_decls> class_decls
+%type <_iface> iface
+%type <_ifaces> ifaces
+%type <_iface_decl> iface_decl
+%type <_iface_decls> iface_decls
+%type <_var> var
+%type <_vars> vars
+%type <_var_decl> var_decl
+%type <_var_decls> var_decls
+%type <_const> const
+%type <_consts> consts
+%type <_const_decl> const_decl
+%type <_const_decls> const_decls
+%type <_arg> arg
+%type <_args> args
+%type <_arg_decl> arg_decl
+%type <_arg_decls> arg_decls
+%type <_func> func
+%type <_funcs> funcs
+%type <_func_decl> func_decl
+%type <_func_decls> func_decls
+%type <_meth> meth
+%type <_meths> meths
+%type <_meth_decl> meth_decl
+%type <_meth_decls> meth_decls
+%type <_prop> prop
+%type <_props> props
+%type <_prop_decl> prop_decl
+%type <_prop_decls> prop_decls
+%type <_program> program
+
+%destructor { delete $$; } ID KCLASS KINT INT
 
 %{
 #include "driver.h"
@@ -82,86 +195,36 @@
 %%
 
 program
-    : stmts
+    : func_decls class_decls
+        { MAKE($$, program, *$1, *$2); }
     ;
 
-stmts
-    : stmt
-    | stmts stmt
-    ;
-
-stmt
-    : function_decl SEMICOLON
-        { driver.context.declarations.push_back($1); }
-    | class
-        { driver.context.classes.push_back($1); }
-    ;
-
-class
-    : KCLASS identifier COLON signature LBRA functions RBRA
-        { MAKE($$, class, *$2, *$4, *$6); }
-    | KCLASS identifier LBRA functions RBRA
-        { MAKE($$, class, *$2, *$4); }
-    ;
-
-functions
+class_decls
     : /* empty */
-        { MAKE($$, functions); }
-    | function
-        { MAKE($$, functions); PUSH($$, $1); }
-    | functions function
-        { PUSH($1, $2); $$ = $1; }
+        { MAKE($$, class_decls); }
+    | class
+        { MAKE($$, class_decls); PUSH($$, *$1); }
+    | class_decls class
+        { PUSH($1, *$2); $$ = $1; }
     ;
 
-function
-    : function_decl closure
-        { MAKE($$, function, *$1, *$2); }
+func_decls
+    : /* empty */
+        { MAKE($$, func_decls); }
+    | func
+        { MAKE($$, func_decls); PUSH($$, *$1); }
+    | funcs func
+        { PUSH($1, *$2); $$ = $1; }
     ;
 
-closure
-    : INLINE IDENTIFIER SEMICOLON
-        { $$ = $2; }
-    | LBRA IDENTIFIER RBRA
-        { $$ = $2; }
+class_decl
+    : KCLASS ID LBRA consts props funcs RBRA
+        { MAKE($$, class, *$2, *$3); }
     ;
 
-function_decl
-    : identifier arguments
-        { MAKE($$, function_decl, *$1, *$2); }
-    | identifier arguments COLON signature
-        { MAKE($$, function_decl, *$1, *$4, *$2); }
-    ;
-
-arguments
-    : LPAR RPAR
-        { MAKE($$, arguments); }
-    | LPAR arguments_list RPAR
-        { $$ = $2; }
-
-arguments_list
-    : declaration
-        { MAKE($$, arguments); PUSH($$, $1); }
-    | arguments_list COMMA declaration
-        { PUSH($1, $3); $$ = $1; }
-    ;
-
-declaration
-    : identifier COLON signature
-        { MAKE($$, declaration, *$1, *$3); }
-    | function_decl
-        { $$ = $1; }
-    ;
-
-signature
-    : type { $$ = new ddc::signature_t(*$1); }
-    ;
-
-type
-    : identifier { $$ = new ddc::type_t(*$1); }
-    ;
-
-identifier
-    : IDENTIFIER { $$ = new ddc::identifier_t(*$1); }
+func_decl
+    : func_pt closure
+        { MAKE($$, func, $1->id, $2->sign, *$3); }
     ;
 
 %%

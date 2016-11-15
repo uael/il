@@ -72,6 +72,13 @@ using namespace ddc::ast;
 
 %%
 
+/* ----------------------- COMMON ----------------------- */
+
+ids
+  : ID
+  | ids COMMA ID
+  ;
+
 program
   : /* empty */
   | program iface_decl
@@ -79,11 +86,6 @@ program
   ;
 
 /* ----------------------- TYPE ----------------------- */
-
-ids
-  : ID
-  | ids COMMA ID
-  ;
 
 typed_ids
   : ids COLON type_spec
@@ -147,8 +149,7 @@ struct_specs
 
 struct_spec
   : braced_struct_spec
-  | ID
-  | ID LT type_specs GT
+  | ID generics
   ;
 
 braced_struct_spec
@@ -159,21 +160,12 @@ braced_struct_spec
   ;
 
 lambda_spec
-  : type_spec LPAR RPAR
-  | type_spec LT type_specs GT LPAR RPAR
-  | type_spec LPAR type_specs RPAR
-  | type_spec LT type_specs GT LPAR type_specs RPAR
-  | LPAR RPAR
-  | LT type_specs GT LPAR RPAR
-  | LPAR type_specs RPAR
-  | LT type_specs GT LPAR type_specs RPAR
+  : generics args
+  | type_spec generics args
   ;
 
 signed_arguments_lambda_spec
-  : type_spec LPAR RPAR
-  | type_spec LT type_specs GT LPAR RPAR
-  | type_spec LPAR typed_ids_list RPAR
-  | type_spec LT type_specs GT LPAR typed_ids_list RPAR
+  : type_spec generics LPAR RPAR
   ;
 
 enum_spec
@@ -374,67 +366,62 @@ jump_stmt
 
 /* ----------------------- DECLARATIONS ----------------------- */
 
-Ts_decl
+generics
   : /* empty */
-  | LT Ts_decl_list GT
+  | LT type_specs GT
   ;
 
-Ts_decl_list
-  : T_decl
-  | Ts_decl_list COMMA T_decl
+generics_decl
+  : /* empty */
+  | LT generic_decls GT
   ;
 
-T_decl
-  : ids
-  | typed_ids
+generic_decl
+  : typed_ids
+  ;
+
+generic_decls
+  : generic_decl
+  | generic_decls COMMA generic_decl
+  ;
+
+sign
+  : /* empty */
+  | COLON type_spec
+  ;
+
+struct_sign
+  : /* empty */
+  | COLON struct_specs
+  ;
+
+args
+  : LPAR RPAR
+  | LPAR type_specs RPAR
   ;
 
 iface_decl
-  : IFACE ID Ts_decl LBRA iface_body RBRA
-  | IFACE ID Ts_decl COLON struct_specs LBRA iface_body RBRA
+  : IFACE ID generics_decl struct_sign LBRA iface_body RBRA
   ;
 
 struct_decl
-  : STRUCT ID Ts_decl LBRA struct_body RBRA
-  | STRUCT ID Ts_decl COLON struct_specs LBRA struct_body RBRA
+  : STRUCT ID generics_decl struct_sign LBRA struct_body RBRA
   ;
 
 iface_body
   : /* empty */
-  | iface_body prop_proto
-  | iface_body method_proto
+  | iface_body ids sign SEMICOLON
+  | iface_body ids COLON braced_type_spec
+  | iface_body ids generics args sign SEMICOLON
   ;
 
 struct_body
   : /* empty */
-  | iface_body method_decl
+  | struct_body ids generics_decl args sign INLINE compound_stmt
   ;
 
 enum_body
   :
-  ;
-
-prop_proto
-  : ids COLON type_spec SEMICOLON
-  | ids COLON braced_type_spec
-  ;
-
-method_proto
-  : ids LPAR RPAR COLON type_spec SEMICOLON
-  | ids LT type_specs GT LPAR RPAR COLON type_spec SEMICOLON
-  | ids LPAR type_specs RPAR COLON type_spec SEMICOLON
-  | ids LT type_specs GT LPAR type_specs RPAR COLON type_spec SEMICOLON
-  ;
-
-method_decl
-  : ids LPAR RPAR COLON type_spec INLINE compound_stmt
-  | ids LT type_specs GT LPAR RPAR COLON type_spec INLINE compound_stmt
-  | ids LPAR type_specs RPAR COLON type_spec INLINE compound_stmt
-  | ids LT type_specs GT LPAR type_specs RPAR COLON type_spec INLINE compound_stmt
-  | ids LPAR RPAR INLINE compound_stmt
-  | ids LT type_specs GT LPAR RPAR INLINE compound_stmt
-  | ids LPAR type_specs RPAR INLINE compound_stmt
-  | ids LT type_specs GT LPAR type_specs RPAR INLINE compound_stmt
   ;
 
 %%

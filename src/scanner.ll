@@ -18,9 +18,32 @@
 
 /* $Id$ */
 
+%e  1019
+%p  2807
+%n  371
+%k  284
+%a  1213
+%o  1117
+
+O   [0-7]
+D   [0-9]
+NZ  [1-9]
+L   [a-zA-Z_]
+A   [a-zA-Z_0-9]
+H   [a-fA-F0-9]
+HP  (0[xX])
+E   ([Ee][+-]?{D}+)
+P   ([Pp][+-]?{D}+)
+FS  (f|F|l|L)
+IS  (((u|U)(l|L|ll|LL)?)|((l|L|ll|LL)(u|U)?))
+CP  (u|U|L)
+SP  (u8|u|U|L)
+ES  (\\(['"\?\\abfnrtv]|[0-7]{1,3}|x[a-fA-F0-9]+))
+WS  [ \t\v\n\f]
+
 %{
 #include "ddc.h"
-#include "scanner.h"
+#include "y.tab.h"
 
 using namespace ddc::ast;
 
@@ -30,11 +53,7 @@ typedef ddc::parser::token token;
 #define YY_USER_ACTION STEP; yylloc->columns(yyleng);
 #define T(t) token::t
 #define RET(t) return T(t)
-#define SAVE_ID yylval->_id = new string(yytext, yyleng)
-#define SAVE_RET_MODIFIER(t) yylval->_modifier = modifier_t::t; RET(t)
-#define SAVE_RET_SCALAR(t) yylval->_value = new val_t<scalar_t>(&scalar::t, new string(yytext, yyleng)); RET(t)
-#define SAVE_RET_OP(t) yylval->_op = op_t::t; RET(t)
-#define SAVE_RET_CMP(t) yylval->_cmp = cmp_t::t; RET(t)
+#define SAVE_STRING yylval->_string = new string(yytext, yyleng)
 #define yyterminate() return T(END)
 #define YY_NO_UNISTD_H
 %}
@@ -49,46 +68,117 @@ typedef ddc::parser::token token;
 
 %%
 
-":"             RET(COLON);
-";"             RET(SEMICOLON);
-","             RET(COMMA);
-"("             RET(LPAR);
-")"             RET(RPAR);
-"{"             RET(LBRA);
-"}"             RET(RBRA);
-"=>"            RET(INLINE);
-"="             RET(ASSIGN);
-"+"             SAVE_RET_OP(ADD);
-"-"             SAVE_RET_OP(SUB);
-"*"             SAVE_RET_OP(MUL);
-"/"             SAVE_RET_OP(DIV);
-"=="            SAVE_RET_CMP(EQ);
-"!="            SAVE_RET_CMP(NEQ);
-"<"             SAVE_RET_CMP(LT);
-"<="            SAVE_RET_CMP(LE);
-">"             SAVE_RET_CMP(GT);
-">="            SAVE_RET_CMP(GE);
-"class"         RET(KCLASS);
-"public"        SAVE_RET_MODIFIER(PUBLIC);
-"private"       SAVE_RET_MODIFIER(PRIVATE);
-"protected"     SAVE_RET_MODIFIER(PROTECTED);
-"int"           RET(KINT);
-[A-Za-z0-9_]*   SAVE_ID; RET(ID);
-[0-9]+          SAVE_RET_SCALAR(INT);
-[ \t\r]+        STEP;
-[\n]+           STEP;
+"..."					                    RET(ELLIPSIS);
+
+">>="					                    RET(RIGHT_ASSIGN);
+"<<="					                    RET(LEFT_ASSIGN);
+"+="					                    RET(ADD_ASSIGN);
+"-="					                    RET(SUB_ASSIGN);
+"*="					                    RET(MUL_ASSIGN);
+"/="					                    RET(DIV_ASSIGN);
+"%="					                    RET(MOD_ASSIGN);
+"&="					                    RET(AND_ASSIGN);
+"^="					                    RET(XOR_ASSIGN);
+"|="					                    RET(OR_ASSIGN);
+
+"."                               RET(DOT);
+"->"                              RET(ACCESS);
+"!"                               RET(NOT);
+"?"                               RET(COND);
+":"                               RET(COLON);
+";"                               RET(SEMICOLON);
+","                               RET(COMMA);
+"("                               RET(LPAR);
+")"                               RET(RPAR);
+"["                               RET(LSQU);
+"]"                               RET(RSQU);
+"{"                               RET(LBRA);
+"}"                               RET(RBRA);
+"=>"                              RET(INLINE);
+
+"="                               RET(ASSIGN);
+"~"                               RET(TID);
+"&"                               RET(AND);
+"^"                               RET(XOR);
+"|"                               RET(OR);
+"+"                               RET(ADD);
+"-"                               RET(SUB);
+"*"                               RET(MUL);
+"/"                               RET(DIV);
+"%"                               RET(MOD);
+
+"&&"                              RET(LAND);
+"||"                              RET(LOR);
+"=="                              RET(EQ);
+"!="                              RET(NEQ);
+"<"                               RET(LT);
+"<="                              RET(LE);
+">"                               RET(GT);
+">="                              RET(GE);
+"<<"                              RET(LS);
+">>"                              RET(RS);
+
+"++"                              RET(INC);
+"--"                              RET(DEC);
+
+"enum"                            RET(ENUM);
+"struct"                          RET(STRUCT);
+"interface"                       RET(IFACE);
+
+"as"                              RET(AS);
+"case"                            RET(CASE);
+"default"                         RET(DEFAULT);
+"if"                              RET(IF);
+"else"                              RET(ELSE);
+"switch"                          RET(SWITCH);
+"while"                           RET(WHILE);
+"for"                             RET(FOR);
+"do"                              RET(DO);
+"goto"                            RET(GOTO);
+"continue"                        RET(CONTINUE);
+"break"                           RET(BREAK);
+"return"                          RET(RETURN);
+
+"void"                            RET(VOID);
+"bool"                            RET(BOOL);
+"char"                            RET(CHAR);
+"int"                             RET(INT);
+"unsigned int"                    RET(UINT);
+"signed int"                      RET(SINT);
+"short"                           RET(SHORT);
+"unsigned short"                  RET(USHORT);
+"signed short"                    RET(SSHORT);
+"float"                           RET(FLOAT);
+"unsigned float"                  RET(UFLOAT);
+"signed float"                    RET(SFLOAT);
+"double"                          RET(DOUBLE);
+"unsigned double"                 RET(UDOUBLE);
+"signed double"                   RET(SDOUBLE);
+
+{L}{A}*					                  SAVE_STRING; RET(ID);
+
+{HP}{H}+{IS}?				              SAVE_STRING; RET(INT_CONST);
+{NZ}{D}*{IS}?				              SAVE_STRING; RET(INT_CONST);
+"0"{O}*{IS}?				              SAVE_STRING; RET(INT_CONST);
+{CP}?"'"([^'\\\n]|{ES})+"'"       SAVE_STRING; RET(INT_CONST);
+{D}+{E}{FS}?				              SAVE_STRING; RET(FLOAT_CONST);
+{D}*"."{D}+{E}?{FS}?			        SAVE_STRING; RET(FLOAT_CONST);
+{D}+"."{E}?{FS}?			            SAVE_STRING; RET(FLOAT_CONST);
+{HP}{H}+{P}{FS}?			            SAVE_STRING; RET(FLOAT_CONST);
+{HP}{H}*"."{H}+{P}{FS}?			      SAVE_STRING; RET(FLOAT_CONST);
+{HP}{H}+"."{P}{FS}?			          SAVE_STRING; RET(FLOAT_CONST);
+({SP}?\"([^"\\\n]|{ES})*\"{WS}*)+ SAVE_STRING; RET(STRING_CONST);
+
+[ \t\r]+                          STEP;
+[\n]+                             STEP;
+{WS}+                             STEP;
 
 %%
 
 namespace ddc {
-    scanner::scanner(std::istream* in, std::ostream* out)
-        : yyFlexLexer(in, out) { }
-
-    scanner::~scanner() { }
-
-    void scanner::set_debug(bool b) {
-        yy_flex_debug = b;
-    }
+  scanner::scanner(std::istream* in, std::ostream* out) : yyFlexLexer(in, out) { }
+  scanner::~scanner() { }
+  void scanner::set_debug(bool b) { yy_flex_debug = b; }
 }
 
 #ifdef yylex
@@ -96,12 +186,12 @@ namespace ddc {
 #endif
 
 int yyFlexLexer::yylex() {
-    std::cerr << "in yyFlexLexer::yylex() !" << std::endl;
-    return 0;
+  std::cerr << "in yyFlexLexer::yylex() !" << std::endl;
+  return 0;
 }
 
 int yyFlexLexer::yywrap() {
-    return 1;
+  return 1;
 }
 
 /*

@@ -1,0 +1,20 @@
+interface Foo<T, U : interface { t : char; }> : Bar, Rab {
+  baz : interface {
+    quz, main(bool, int) : T;
+    zuq, rue : unsigned int;
+  }
+}
+
+struct Program {
+  main() : int => {
+    std.cout << "Hello World";
+    return 0;
+  }
+}
+
+interface Foo<T, U : interface { t : char; }> : Bar, Rab {
+  baz : interface {
+    quz, main(bool, int) : T;
+    zuq, rue : unsigned int;
+  }
+}

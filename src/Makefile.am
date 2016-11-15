@@ -6,7 +6,7 @@ noinst_LIBRARIES = libdcc.a
 
 libdcc_a_SOURCES = \
 	parser.yy scanner.ll y.tab.h \
-	driver.cc context.cc
+	driver.cc
 
 LIBS = libdcc.a
 

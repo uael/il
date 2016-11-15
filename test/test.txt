@@ -1,6 +1,6 @@
 interface Foo<T, U : interface { t : char; }> : Bar, Rab {
   baz : interface {
-    quz, main(bool, int) : T;
+    quz, main(bool, int(short)) : T;
     zuq, rue : unsigned int;
   }
 }

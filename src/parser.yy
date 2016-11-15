@@ -45,7 +45,7 @@ using namespace ddc::ast;
 %token END 0 "end of file"
 %token EOL "end of line"
 %token <_string> ID INT_CONST FLOAT_CONST STRING_CONST
-%token STRUCT ENUM IFACE
+%token STRUCT ENUM INTERFACE
 %token VOID BOOL CHAR INT UINT SINT SHORT USHORT SSHORT FLOAT UFLOAT SFLOAT DOUBLE UDOUBLE SDOUBLE
 %token GT LT ADD SUB MUL DIV EQ NEQ LE GE
 %token COLON SEMICOLON COMMA LPAR RPAR LBRA RBRA INLINE ASSIGN
@@ -81,7 +81,7 @@ ids
 
 program
   : /* empty */
-  | program iface_decl
+  | program interface_decl
   | program struct_decl
   ;
 
@@ -155,8 +155,8 @@ struct_spec
 braced_struct_spec
   : STRUCT LBRA struct_body RBRA
   | STRUCT COLON struct_specs LBRA struct_body RBRA
-  | IFACE LBRA iface_body RBRA
-  | IFACE COLON struct_specs LBRA iface_body RBRA
+  | INTERFACE LBRA interface_body RBRA
+  | INTERFACE COLON struct_specs LBRA interface_body RBRA
   ;
 
 lambda_spec
@@ -400,19 +400,19 @@ args
   | LPAR type_specs RPAR
   ;
 
-iface_decl
-  : IFACE ID generics_decl struct_sign LBRA iface_body RBRA
+interface_decl
+  : INTERFACE ID generics_decl struct_sign LBRA interface_body RBRA
   ;
 
 struct_decl
   : STRUCT ID generics_decl struct_sign LBRA struct_body RBRA
   ;
 
-iface_body
+interface_body
   : /* empty */
-  | iface_body ids sign SEMICOLON
-  | iface_body ids COLON braced_type_spec
-  | iface_body ids generics args sign SEMICOLON
+  | interface_body ids sign SEMICOLON
+  | interface_body ids COLON braced_type_spec
+  | interface_body ids generics args sign SEMICOLON
   ;
 
 struct_body

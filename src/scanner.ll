@@ -123,7 +123,7 @@ typedef ddc::parser::token token;
 
 "enum"                            RET(ENUM);
 "struct"                          RET(STRUCT);
-"interface"                       RET(IFACE);
+"interface"                       RET(INTERFACE);
 
 "as"                              RET(AS);
 "case"                            RET(CASE);

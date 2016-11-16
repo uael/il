@@ -94,7 +94,7 @@ typedef ddc::parser::token token;
 "]"                               RET(RSQU);
 "{"                               RET(LBRA);
 "}"                               RET(RBRA);
-"=>"                              RET(INLINE);
+"=>"                              RET(ARROW);
 
 "="                               RET(ASSIGN);
 "~"                               RET(TID);
@@ -125,11 +125,31 @@ typedef ddc::parser::token token;
 "struct"                          RET(STRUCT);
 "interface"                       RET(INTERFACE);
 
+"private"                         RET(PRIVATE);
+"protected"                       RET(PROTECTED);
+"const"                           RET(CONST);
+"volatile"                        RET(VOLATILE);
+"abstract"                        RET(ABSTRACT);
+"static"                          RET(STATIC);
+"virtual"                         RET(VIRTUAL);
+"final"                           RET(FINAL);
+"inline"                          RET(INLINE);
+
+"var"                             RET(VAR);
+"new"                             RET(NEW);
+"sizeof"                          RET(SIZEOF);
+"typeof"                          RET(TYPEOF);
+"assert"                          RET(ASSERT);
+"try"                             RET(TRY);
+"catch"                           RET(CATCH);
+"self"                            RET(SELF);
+"this"                            RET(THIS);
+
 "as"                              RET(AS);
 "case"                            RET(CASE);
 "default"                         RET(DEFAULT);
 "if"                              RET(IF);
-"else"                              RET(ELSE);
+"else"                            RET(ELSE);
 "switch"                          RET(SWITCH);
 "while"                           RET(WHILE);
 "for"                             RET(FOR);
@@ -169,9 +189,7 @@ typedef ddc::parser::token token;
 {HP}{H}+"."{P}{FS}?			          SAVE_STRING; RET(FLOAT_CONST);
 ({SP}?\"([^"\\\n]|{ES})*\"{WS}*)+ SAVE_STRING; RET(STRING_CONST);
 
-[ \t\r]+                          STEP;
-[\n]+                             STEP;
-{WS}+                             STEP;
+{WS}+                             { }
 
 %%
 

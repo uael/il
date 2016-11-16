@@ -1,20 +1,22 @@
-interface Foo<T, U : interface { t : char; }> : Bar, Rab {
-  baz : interface {
-    quz, main(bool, int(short)) : T;
-    zuq, rue : unsigned int;
-  }
+interface IProgram<TResult : int, TArg> {
+  main<TArg2>(arg : TArg, arg2 : TArg2) : TResult;
 }
 
-struct Program {
-  main() : int => {
-    std.cout << "Hello World";
-    return 0;
-  }
-}
+final struct Program
+  : IProgram<int, char>,
+    interface { main_func : int<TArg2>(char, short, TArg2); } {
 
-interface Foo<T, U : interface { t : char; }> : Bar, Rab {
-  baz : interface {
-    quz, main(bool, int) : T;
-    zuq, rue : unsigned int;
+  main_func : int(char, short) = (c, b) => {
+    return Task.run<int>(() => {
+      var i = 0,
+        j = c,
+        mul = <T>(x, y : T) : T => x * y;
+      std.cout << mul<double>(i, j) ? "oops" : "Hello World";
+      return 0;
+    });
+  };
+
+  main(arg : char, arg2 : short) : int => {
+    return main_func(arg, true);
   }
 }

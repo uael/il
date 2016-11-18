@@ -52,3 +52,6 @@ ddc
 CMakeLists.txt
 .idea/
 scripts/
+
+# m4
+m4/l*.m4

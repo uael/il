@@ -11,7 +11,6 @@ AC_LANG([C])
 
 AC_PROG_CC
 AC_PROG_CXX
-AC_PROG_RANLIB
 AC_PROG_LEX
 AM_PROG_LEX
 AC_PROG_YACC
@@ -27,5 +26,8 @@ DX_PDF_FEATURE(OFF)
 DX_PS_FEATURE(OFF)
 DX_INIT_DOXYGEN(ddc, doxygen.cfg, doc)
 
-AC_CONFIG_FILES([Makefile src/Makefile])
+LT_INIT
+AC_CONFIG_MACRO_DIRS([m4])
+
+AC_CONFIG_FILES([Makefile lib/Makefile src/Makefile tests/Makefile])
 AC_OUTPUT

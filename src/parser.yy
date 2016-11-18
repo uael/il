@@ -368,7 +368,8 @@ stmt
 	;
 
 stmts
-  : stmt
+  : /* empty */
+  | stmt
   | stmts stmt
   | stmts var_declaration
   ;
@@ -400,8 +401,10 @@ iter_stmt
 	| DO stmt WHILE LPAR expr RPAR SEMICOLON
 	| FOR LPAR expr_stmt expr_stmt RPAR stmt
 	| FOR LPAR expr_stmt expr_stmt expr RPAR stmt
-	| /* FOR LPAR declaration expr_stmt RPAR stmt */
-	| /* FOR LPAR declaration expr_stmt expr RPAR stmt */
+	| FOR LPAR expr_stmt expr_stmt compound_stmt RPAR stmt
+	| FOR LPAR var_declaration expr_stmt RPAR stmt
+	| FOR LPAR var_declaration expr_stmt expr RPAR stmt
+	| FOR LPAR var_declaration expr_stmt compound_stmt RPAR stmt
 	;
 
 jump_stmt
@@ -445,7 +448,7 @@ struct_declaration
 
 interface_body
   : /* empty */
-  | interface_body ids signature_or_empty SEMICOLON
+  | interface_body ids signature SEMICOLON
   | interface_body ids COLON braced_type_specifier
   | interface_body ids generics_declaration_or_empty signed_or_not_args_declaration signature_or_empty SEMICOLON
   ;
@@ -453,8 +456,9 @@ interface_body
 struct_body
   : /* empty */
   | struct_body meth_declaration
-  | struct_body ids signature_or_empty
-  | struct_body ids signature_or_empty ASSIGN expr_stmt
+  | struct_body ids signature
+  | struct_body ids signature ASSIGN expr_stmt
+  | struct_body ids signature ASSIGN typed_or_not_lambda_const
   ;
 
 meth_declaration

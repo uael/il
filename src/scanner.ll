@@ -18,16 +18,42 @@
 
 /* $Id$ */
 
+%e  1019
+%p  2807
+%n  371
+%k  284
+%a  1213
+%o  1117
+
+O   [0-7]
+D   [0-9]
+NZ  [1-9]
+L   [a-zA-Z_]
+A   [a-zA-Z_0-9]
+H   [a-fA-F0-9]
+HP  (0[xX])
+E   ([Ee][+-]?{D}+)
+P   ([Pp][+-]?{D}+)
+FS  (f|F|l|L)
+IS  (((u|U)(l|L|ll|LL)?)|((l|L|ll|LL)(u|U)?))
+CP  (u|U|L)
+SP  (u8|u|U|L)
+ES  (\\(['"\?\\abfnrtv]|[0-7]{1,3}|x[a-fA-F0-9]+))
+WS  [ \t\v\n\f]
+
 %{
-#include "ast.h"
-#include "scanner.h"
+#include "ddc.h"
+#include "y.tab.h"
+
+using namespace ddc::ast;
 
 typedef ddc::parser::token token;
 
 #define STEP yylloc->step()
 #define YY_USER_ACTION STEP; yylloc->columns(yyleng);
 #define T(t) token::t
-#define SAVE_STRING yylval->_string = new std::string(yytext, yyleng)
+#define RET(t) return T(t)
+#define SAVE_STRING yylval->_string = new string(yytext, yyleng)
 #define yyterminate() return T(END)
 #define YY_NO_UNISTD_H
 %}
@@ -42,30 +68,135 @@ typedef ddc::parser::token token;
 
 %%
 
-":"             return T(COLON);
-";"             return T(SEMICOLON);
-","             return T(COMMA);
-"("             return T(LPAR);
-")"             return T(RPAR);
-"{"             return T(LBRA);
-"}"             return T(RBRA);
-"=>"            return T(INLINE);
-"class"         SAVE_STRING; return T(KCLASS);
-[A-Za-z0-9_]*   SAVE_STRING; return T(IDENTIFIER);
-[ \t\r]+        STEP;
-[\n]+           STEP;
+"..."					                    RET(ELLIPSIS);
+
+">>="					                    RET(RIGHT_ASSIGN);
+"<<="					                    RET(LEFT_ASSIGN);
+"+="					                    RET(ADD_ASSIGN);
+"-="					                    RET(SUB_ASSIGN);
+"*="					                    RET(MUL_ASSIGN);
+"/="					                    RET(DIV_ASSIGN);
+"%="					                    RET(MOD_ASSIGN);
+"&="					                    RET(AND_ASSIGN);
+"^="					                    RET(XOR_ASSIGN);
+"|="					                    RET(OR_ASSIGN);
+
+"."                               RET(DOT);
+"->"                              RET(ACCESS);
+"!"                               RET(NOT);
+"?"                               RET(COND);
+":"                               RET(COLON);
+";"                               RET(SEMICOLON);
+","                               RET(COMMA);
+"("                               RET(LPAR);
+")"                               RET(RPAR);
+"["                               RET(LSQU);
+"]"                               RET(RSQU);
+"{"                               RET(LBRA);
+"}"                               RET(RBRA);
+"=>"                              RET(ARROW);
+
+"="                               RET(ASSIGN);
+"~"                               RET(TID);
+"&"                               RET(AND);
+"^"                               RET(XOR);
+"|"                               RET(OR);
+"+"                               RET(ADD);
+"-"                               RET(SUB);
+"*"                               RET(MUL);
+"/"                               RET(DIV);
+"%"                               RET(MOD);
+
+"&&"                              RET(LAND);
+"||"                              RET(LOR);
+"=="                              RET(EQ);
+"!="                              RET(NEQ);
+"<"                               RET(LT);
+"<="                              RET(LE);
+">"                               RET(GT);
+">="                              RET(GE);
+"<<"                              RET(LS);
+">>"                              RET(RS);
+
+"++"                              RET(INC);
+"--"                              RET(DEC);
+
+"enum"                            RET(ENUM);
+"struct"                          RET(STRUCT);
+"interface"                       RET(INTERFACE);
+
+"private"                         RET(PRIVATE);
+"protected"                       RET(PROTECTED);
+"const"                           RET(CONST);
+"volatile"                        RET(VOLATILE);
+"abstract"                        RET(ABSTRACT);
+"static"                          RET(STATIC);
+"virtual"                         RET(VIRTUAL);
+"final"                           RET(FINAL);
+"inline"                          RET(INLINE);
+
+"var"                             RET(VAR);
+"new"                             RET(NEW);
+"sizeof"                          RET(SIZEOF);
+"typeof"                          RET(TYPEOF);
+"assert"                          RET(ASSERT);
+"try"                             RET(TRY);
+"catch"                           RET(CATCH);
+"self"                            RET(SELF);
+"this"                            RET(THIS);
+
+"as"                              RET(AS);
+"case"                            RET(CASE);
+"default"                         RET(DEFAULT);
+"if"                              RET(IF);
+"else"                            RET(ELSE);
+"switch"                          RET(SWITCH);
+"while"                           RET(WHILE);
+"for"                             RET(FOR);
+"do"                              RET(DO);
+"goto"                            RET(GOTO);
+"continue"                        RET(CONTINUE);
+"break"                           RET(BREAK);
+"return"                          RET(RETURN);
+
+"void"                            RET(VOID);
+"bool"                            RET(BOOL);
+"char"                            RET(CHAR);
+"int"                             RET(INT);
+"unsigned int"                    RET(UINT);
+"signed int"                      RET(SINT);
+"short"                           RET(SHORT);
+"unsigned short"                  RET(USHORT);
+"signed short"                    RET(SSHORT);
+"float"                           RET(FLOAT);
+"unsigned float"                  RET(UFLOAT);
+"signed float"                    RET(SFLOAT);
+"double"                          RET(DOUBLE);
+"unsigned double"                 RET(UDOUBLE);
+"signed double"                   RET(SDOUBLE);
+
+{L}{A}*					                  SAVE_STRING; RET(ID);
+
+{HP}{H}+{IS}?				              SAVE_STRING; RET(INT_CONST);
+{NZ}{D}*{IS}?				              SAVE_STRING; RET(INT_CONST);
+"0"{O}*{IS}?				              SAVE_STRING; RET(INT_CONST);
+{CP}?"'"([^'\\\n]|{ES})+"'"       SAVE_STRING; RET(INT_CONST);
+{D}+{E}{FS}?				              SAVE_STRING; RET(FLOAT_CONST);
+{D}*"."{D}+{E}?{FS}?			        SAVE_STRING; RET(FLOAT_CONST);
+{D}+"."{E}?{FS}?			            SAVE_STRING; RET(FLOAT_CONST);
+{HP}{H}+{P}{FS}?			            SAVE_STRING; RET(FLOAT_CONST);
+{HP}{H}*"."{H}+{P}{FS}?			      SAVE_STRING; RET(FLOAT_CONST);
+{HP}{H}+"."{P}{FS}?			          SAVE_STRING; RET(FLOAT_CONST);
+({SP}?\"([^"\\\n]|{ES})*\"{WS}*)+ SAVE_STRING; RET(STRING_CONST);
+
+{WS}+                             { }
 
 %%
 
 namespace ddc {
-    scanner::scanner(std::istream* in, std::ostream* out)
-        : yyFlexLexer(in, out) { }
-
-    scanner::~scanner() { }
-
-    void scanner::set_debug(bool b) {
-        yy_flex_debug = b;
-    }
+  scanner::scanner(std::istream* in, std::ostream* out) : yyFlexLexer(in, out) { }
+  scanner::~scanner() { }
+  void scanner::set_debug(bool b) { yy_flex_debug = b; }
 }
 
 #ifdef yylex
@@ -73,12 +204,12 @@ namespace ddc {
 #endif
 
 int yyFlexLexer::yylex() {
-    std::cerr << "in yyFlexLexer::yylex() !" << std::endl;
-    return 0;
+  std::cerr << "in yyFlexLexer::yylex() !" << std::endl;
+  return 0;
 }
 
 int yyFlexLexer::yywrap() {
-    return 1;
+  return 1;
 }
 
 /*

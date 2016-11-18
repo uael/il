@@ -23,7 +23,6 @@
 
 #include <string>
 #include <vector>
-#include "context.h"
 #include "scanner.h"
 
 namespace ddc {
@@ -35,9 +34,8 @@ namespace ddc {
     std::string streamname;
 
     class scanner *lexer;
-    class context &context;
 
-    driver(class context &calc);
+    driver();
 
     bool parse_stream(std::istream &in, const std::string &sname = "stream input");
     bool parse_string(const std::string &input, const std::string &sname = "string stream");

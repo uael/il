@@ -25,8 +25,7 @@
 #include "driver.h"
 
 int main(int argc, char *argv[]) {
-  ddc::context calc;
-  ddc::driver driver(calc);
+  ddc::driver driver = ddc::driver();
   bool readfile = false;
 
   for (int ai = 1; ai < argc; ++ai) {
@@ -43,19 +42,9 @@ int main(int argc, char *argv[]) {
         return 0;
       }
 
-      calc.clearExpressions();
       bool result = driver.parse_stream(infile, argv[ai]);
       if (result) {
-        std::cout << "Functions:" << std::endl;
-        for (unsigned int ei = 0; ei < calc.declarations.size(); ++ei) {
-          std::cout << "[" << ei << "]:" << std::endl;
-          std::cout << calc.declarations[ei]->to_string() << std::endl;
-        }
-        std::cout << "Classes:" << std::endl;
-        for (unsigned int ei = 0; ei < calc.classes.size(); ++ei) {
-          std::cout << "[" << ei << "]:" << std::endl;
-          std::cout << calc.classes[ei]->to_string() << std::endl;
-        }
+
       }
 
       readfile = true;
@@ -70,20 +59,10 @@ int main(int argc, char *argv[]) {
   while (std::cout << "input: " &&
          std::getline(std::cin, line) &&
          !line.empty()) {
-    calc.clearExpressions();
     bool result = driver.parse_string(line, "input");
 
     if (result) {
-      std::cout << "Functions:" << std::endl;
-      for (unsigned int ei = 0; ei < calc.declarations.size(); ++ei) {
-        std::cout << "[" << ei << "]:" << std::endl;
-        std::cout << calc.declarations[ei]->to_string() << std::endl;
-      }
-      std::cout << "Classes:" << std::endl;
-      for (unsigned int ei = 0; ei < calc.classes.size(); ++ei) {
-        std::cout << "[" << ei << "]:" << std::endl;
-        std::cout << calc.classes[ei]->to_string() << std::endl;
-      }
+
     }
   }
 }

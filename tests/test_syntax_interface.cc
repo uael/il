@@ -18,30 +18,25 @@
 
 /* $Id$ */
 
-#ifndef _CONTEXT_H
-#define _CONTEXT_H
+#include <iostream>
+#include <fstream>
+#include "driver.h"
+#include "gtest/gtest.h"
+#include "test_syntax.h"
 
-#include "ast.h"
-#include <map>
-#include <exception>
+SYNTAX_TEST(interface000, false, "1.1-9: syntax error\n",
+  "interface"
+);
 
-namespace ddc {
-  class context {
-  public:
-    std::map<std::string, double> variables;
-    std::vector<node_t *> nodes;
-    std::vector<function_decl_t *> declarations;
-    std::vector<class_t *> classes;
+SYNTAX_TEST(interface001, false, "1.11: syntax error\n",
+  "interface { }"
+);
 
-    ~context();
+SYNTAX_TEST(interface002, true, "",
+  "interface IInterface { }"
+);
 
-    void clearExpressions();
-    bool existsVariable(const std::string &varname) const;
-    double getVariable(const std::string &varname) const;
-  };
-}
-
-#endif /* _CONTEXT_H */
+RUN;
 
 /*
  * Local variables:

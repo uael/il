@@ -21,4 +21,4 @@ script:
   - ${CXX} --version
   - bison --version
   - automake --version
-  - make
+  - make check

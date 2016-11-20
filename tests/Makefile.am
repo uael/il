@@ -6,6 +6,6 @@ AM_CPPFLAGS = \
   -I$(top_srcdir)/tests
 
 check_PROGRAMS = \
-  test_syntax_interface
+  interface
 
 TESTS = $(check_PROGRAMS)

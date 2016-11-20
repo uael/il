@@ -86,16 +86,10 @@ ids
 
 /* ----------------------- QUALIFIER ----------------------- */
 
-modifier
+qualifier_modifier
   : /* empty */
   | PRIVATE
   | PROTECTED
-  ;
-
-qualifier_type
-  : /* empty */
-  | qualifier_type CONST
-  | qualifier_type VOLATILE
   ;
 
 qualifier_struct
@@ -104,17 +98,23 @@ qualifier_struct
   | ABSTRACT
   ;
 
-qualifier_meth
-  : qualifier_meth qualifier_function
-  | qualifier_meth ABSTRACT
-  | qualifier_meth STATIC
-  | qualifier_meth VIRTUAL
-  | qualifier_meth FINAL
+qualifier_type
+  : /* empty */
+  | qualifier_type FINAL
+  | qualifier_type VOLATILE
   ;
 
 qualifier_function
   : /* empty */
-  | INLINE
+  | qualifier_function qualifier_type
+  | qualifier_function INLINE
+  ;
+
+qualifier_method
+  : /* empty */
+  | qualifier_method qualifier_function
+  | qualifier_method ABSTRACT
+  | qualifier_method STATIC
   ;
 
 /* ----------------------- TYPE ----------------------- */
@@ -435,7 +435,7 @@ decl_signed_or_not_args
 
 decl_signed_args
   : LPAR RPAR
-  | LPAR typed_ids_list RPAR
+  | LPAR var_declarators RPAR
   ;
 
 decl_generics
@@ -466,14 +466,18 @@ body_interface
 
 body_struct
   : /* empty */
-  | body_struct decl_function
+  | body_struct decl_method
   | body_struct ids signature
   | body_struct ids signature ASSIGN stmt_expr
   | body_struct ids signature ASSIGN prototype_typed_or_not_lambda stmt_closure
   ;
 
 decl_function
-  : ids prototype_typed_lambda stmt_closure
+  : qualifier_function ids prototype_typed_lambda stmt_closure
+  ;
+
+decl_method
+  : qualifier_method decl_function
   ;
 
 decl_var
@@ -486,8 +490,8 @@ var_declarators
   ;
 
 var_declarator
-  : ID signature
-  | ID signature_or_empty ASSIGN expr_cond
+  : qualifier_type ids signature
+  | qualifier_type ids signature_or_empty ASSIGN expr_cond
   ;
 
 body_enum

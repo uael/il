@@ -24,56 +24,60 @@
 #include "gtest/gtest.h"
 #include "test.h"
 
-SYNTAX_TEST(func000, false, "1.8-10: syntax error\n",
+SYNTAX_TEST(function000, false, "1.8-10: syntax error\n",
   "main():int"
 );
 
-SYNTAX_TEST(func001, false, "1.11: syntax error\n",
+SYNTAX_TEST(function001, false, "1.11: syntax error\n",
   "main():int;"
 );
 
-SYNTAX_TEST(func002, true, "",
+SYNTAX_TEST(function002, true, "",
   "main():int { }"
 );
 
-SYNTAX_TEST(func003, true, "",
+SYNTAX_TEST(function003, true, "",
   "main():int => { }"
 );
 
-SYNTAX_TEST(func004, false, "1.15: syntax error\n",
+SYNTAX_TEST(function004, false, "1.15: syntax error\n",
   "main():int => 0"
 );
 
-SYNTAX_TEST(func005, false, "1.15: syntax error\n",
+SYNTAX_TEST(function005, false, "1.15: syntax error\n",
   "main():int => ;"
 );
 
-SYNTAX_TEST(func006, true, "",
+SYNTAX_TEST(function006, true, "",
   "main():int => 0;"
 );
 
-SYNTAX_TEST(func007, false, "1.15-20: syntax error\n",
+SYNTAX_TEST(function007, false, "1.15-20: syntax error\n",
   "main():int => return 0;"
 );
 
-SYNTAX_TEST(func008, true, "",
+SYNTAX_TEST(function008, true, "",
   "main():int => 0 * 0;"
 );
 
-SYNTAX_TEST(func009, false, "1.7: syntax error\n",
+SYNTAX_TEST(function009, false, "1.7: syntax error\n",
   "main(x):int => 0;"
 );
 
-SYNTAX_TEST(func010, true, "",
+SYNTAX_TEST(function010, true, "",
   "main(x:double):int => 0;"
 );
 
-SYNTAX_TEST(func011, false, "1.9: syntax error\n",
+SYNTAX_TEST(function011, false, "1.9: syntax error\n",
   "main(x,y):int => 0;"
 );
 
-SYNTAX_TEST(func012, true, "",
+SYNTAX_TEST(function012, true, "",
   "main(x,y:double):int => 0;"
+);
+
+SYNTAX_TEST(function013, true, "",
+  "main(x,y:double = 0.0):int => x*y;"
 );
 
 RUN;

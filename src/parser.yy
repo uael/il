@@ -45,7 +45,7 @@ using namespace ddc::ast;
 %token END 0 "end of file"
 %token EOL "end of line"
 %token <_string> ID INT_CONST FLOAT_CONST STRING_CONST
-%token STRUCT ENUM INTERFACE
+%token STRUCT ENUM INTERFACE CLASS
 %token VOID BOOL CHAR INT UINT SINT SHORT USHORT SSHORT FLOAT UFLOAT SFLOAT DOUBLE UDOUBLE SDOUBLE
 %token GT LT ADD SUB MUL DIV EQ NEQ LE GE
 %token COLON SEMICOLON COMMA LPAR RPAR LBRA RBRA ARROW ASSIGN
@@ -72,9 +72,10 @@ using namespace ddc::ast;
 
 program
   : /* empty */
+  | program decl_function
   | program decl_interface
   | program decl_struct
-  | program decl_function
+  | program decl_class
   ;
 
 /* ----------------------- COMMON ----------------------- */
@@ -98,6 +99,10 @@ qualifier_struct
   | ABSTRACT
   ;
 
+qualifier_class
+  : qualifier_modifier qualifier_struct
+  ;
+
 qualifier_type
   : /* empty */
   | qualifier_type FINAL
@@ -106,13 +111,13 @@ qualifier_type
 
 qualifier_function
   : /* empty */
-  | qualifier_function qualifier_type
+  | qualifier_type
   | qualifier_function INLINE
   ;
 
 qualifier_method
   : /* empty */
-  | qualifier_method qualifier_function
+  | qualifier_function
   | qualifier_method ABSTRACT
   | qualifier_method STATIC
   ;
@@ -126,11 +131,6 @@ signature
 signature_or_empty
   : /* empty */
   | signature
-  ;
-
-typed_ids_list
-  : ids signature
-  | typed_ids_list COMMA ids signature
   ;
 
 typed_or_not_ids_list
@@ -231,10 +231,6 @@ prototype_typed_lambda
 
 typed_or_not_lambda_const
   : prototype_typed_or_not_lambda expr_closure
-  ;
-
-typed_lambda_const
-  : prototype_typed_lambda expr_closure
   ;
 
 expr_primary
@@ -457,6 +453,11 @@ decl_struct
   | qualifier_struct STRUCT ID decl_generics_or_empty COLON specifier_structs LBRA body_struct RBRA
   ;
 
+decl_class
+  : qualifier_class CLASS ID decl_generics_or_empty LBRA body_class RBRA
+  | qualifier_class CLASS ID decl_generics_or_empty COLON specifier_structs LBRA body_class RBRA
+  ;
+
 body_interface
   : /* empty */
   | body_interface ids signature SEMICOLON
@@ -470,6 +471,14 @@ body_struct
   | body_struct ids signature
   | body_struct ids signature ASSIGN stmt_expr
   | body_struct ids signature ASSIGN prototype_typed_or_not_lambda stmt_closure
+  ;
+
+body_class
+  : /* empty */
+  | body_class qualifier_modifier decl_method
+  | body_class qualifier_modifier ids signature
+  | body_class qualifier_modifier ids signature ASSIGN stmt_expr
+  | body_class qualifier_modifier ids signature ASSIGN prototype_typed_or_not_lambda stmt_closure
   ;
 
 decl_function

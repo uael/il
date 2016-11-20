@@ -123,6 +123,7 @@ typedef ddc::parser::token token;
 
 "enum"                            RET(ENUM);
 "struct"                          RET(STRUCT);
+"class"                           RET(CLASS);
 "interface"                       RET(INTERFACE);
 
 "private"                         RET(PRIVATE);

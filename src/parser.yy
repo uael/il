@@ -78,6 +78,7 @@ program
   : /* empty */
   | program interface_declaration
   | program struct_declaration
+  | program func_declaration
   ;
 
 /* ----------------------- COMMON ----------------------- */
@@ -223,14 +224,22 @@ const
   | typed_or_not_lambda_const
   ;
 
+typed_or_not_lambda_prototype
+  : typed_lambda_prototype
+  | LPAR RPAR
+  | LPAR ids RPAR
+  ;
+
+typed_lambda_prototype
+  : generics_declaration_or_empty signed_args_declaration signature_or_empty
+  ;
+
 typed_or_not_lambda_const
-  : typed_lambda_const
-  | LPAR RPAR ARROW closure_expr
-  | LPAR ids RPAR ARROW closure_expr
+  : typed_or_not_lambda_prototype closure_expr
   ;
 
 typed_lambda_const
-  : generics_declaration_or_empty signed_args_declaration signature_or_empty ARROW closure_expr
+  : typed_lambda_prototype closure_expr
   ;
 
 prim_expr
@@ -348,8 +357,9 @@ assign_expr
   ;
 
 closure_expr
-  : expr
+  : ARROW expr
   | compound_stmt
+  | ARROW compound_stmt
   ;
 
 expr
@@ -415,6 +425,12 @@ jump_stmt
   | RETURN expr SEMICOLON
   ;
 
+closure_stmt
+  : ARROW expr SEMICOLON
+  | compound_stmt
+  | ARROW compound_stmt
+  ;
+
 /* ----------------------- DECLARATIONS ----------------------- */
 
 signed_or_not_args_declaration
@@ -458,11 +474,11 @@ struct_body
   | struct_body func_declaration
   | struct_body ids signature
   | struct_body ids signature ASSIGN expr_stmt
-  | struct_body ids signature ASSIGN typed_or_not_lambda_const
+  | struct_body ids signature ASSIGN typed_or_not_lambda_prototype closure_stmt
   ;
 
 func_declaration
-  : ids typed_lambda_const
+  : ids typed_lambda_prototype closure_stmt
   ;
 
 var_declaration

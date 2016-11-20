@@ -6,6 +6,6 @@ AM_CPPFLAGS = \
   -I$(top_srcdir)/tests
 
 check_PROGRAMS = \
-  interface
+  interface func
 
 TESTS = $(check_PROGRAMS)

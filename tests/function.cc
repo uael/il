@@ -32,7 +32,7 @@ SYNTAX_TEST(function001, false, "1.11: syntax error\n",
   "main():int;"
 );
 
-SYNTAX_TEST(function002, true, "",
+SYNTAX_TEST(function002, false, "1.14: syntax error\n",
   "main():int { }"
 );
 

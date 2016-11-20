@@ -86,6 +86,7 @@ typedef ddc::parser::token token;
 "!"                               RET(NOT);
 "?"                               RET(COND);
 ":"                               RET(COLON);
+"::"                              RET(DOUBLE_COLON);
 ";"                               RET(SEMICOLON);
 ","                               RET(COMMA);
 "("                               RET(LPAR);

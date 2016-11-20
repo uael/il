@@ -48,7 +48,7 @@ using namespace ddc::ast;
 %token STRUCT ENUM INTERFACE CLASS
 %token VOID BOOL CHAR INT UINT SINT SHORT USHORT SSHORT FLOAT UFLOAT SFLOAT DOUBLE UDOUBLE SDOUBLE
 %token GT LT ADD SUB MUL DIV EQ NEQ LE GE
-%token COLON SEMICOLON COMMA LPAR RPAR LBRA RBRA ARROW ASSIGN
+%token COLON DOUBLE_COLON SEMICOLON COMMA LPAR RPAR LBRA RBRA ARROW ASSIGN
 %token COND MOD ACCESS AND INC DEC LS LSQU RS RSQU NOT DOT TID OR XOR LAND LOR
 %token ELLIPSIS RIGHT_ASSIGN LEFT_ASSIGN ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN
 %token MOD_ASSIGN AND_ASSIGN XOR_ASSIGN OR_ASSIGN
@@ -73,6 +73,7 @@ using namespace ddc::ast;
 program
   : /* empty */
   | program decl_function
+  | program decl_enum
   | program decl_interface
   | program decl_struct
   | program decl_class
@@ -80,9 +81,9 @@ program
 
 /* ----------------------- COMMON ----------------------- */
 
-ids
+id_list
   : ID
-  | ids COMMA ID
+  | id_list COMMA ID
   ;
 
 /* ----------------------- QUALIFIER ----------------------- */
@@ -122,38 +123,23 @@ qualifier_method
   | qualifier_method STATIC
   ;
 
-/* ----------------------- TYPE ----------------------- */
+/* ----------------------- SPECIFIER ----------------------- */
 
-signature
-  : COLON specifier_type
-  ;
-
-signature_or_empty
-  : /* empty */
-  | signature
-  ;
-
-typed_or_not_ids_list
-  : ID signature_or_empty
-  | typed_or_not_ids_list COMMA ID signature_or_empty
-  ;
-
-specifier_types
-  : specifier_type
-  | specifier_types COMMA specifier_type
-  ;
-
-specifier_type
+signed_specifier
   : ID
   | specifier_scalar
+  | specifier_in_struct
+  | specifier_type
   | specifier_lambda
-  | specifier_struct
-  | specifier_enum
-  | specifier_braced_struct
+  | specifier_nested
   ;
 
-specifier_braced_type
-  : specifier_braced_struct
+specifier
+  : signed_specifier
+  | specifier_enum
+  | specifier_interface
+  | specifier_struct
+  | specifier_class
   ;
 
 specifier_scalar
@@ -174,22 +160,9 @@ specifier_scalar
   | SDOUBLE
   ;
 
-specifier_structs
-  : specifier_struct
-  | specifier_structs COMMA specifier_struct
-  ;
-
-specifier_struct
-  : specifier_braced_struct
-  | ID
-  | ID LT specifier_types GT
-  ;
-
-specifier_braced_struct
-  : STRUCT LBRA body_struct RBRA
-  | STRUCT COLON specifier_structs LBRA body_struct RBRA
-  | INTERFACE LBRA body_interface RBRA
-  | INTERFACE COLON specifier_structs LBRA body_interface RBRA
+specifier_in_struct
+  : STATIC
+  | SELF
   ;
 
 specifier_enum
@@ -197,56 +170,104 @@ specifier_enum
   | ENUM LBRA body_enum RBRA
   ;
 
+specifier_type
+  : ID
+  | ID LT specifier_list GT
+  ;
+
+specifier_interface
+  : specifier_type
+  | INTERFACE
+  | INTERFACE LBRA body_interface RBRA
+  | INTERFACE COLON specifier_interface_list LBRA body_interface RBRA
+  ;
+
+specifier_struct
+  : specifier_type
+  | STRUCT
+  | STRUCT LBRA body_struct RBRA
+  | STRUCT COLON specifier_struct_list LBRA body_struct RBRA
+  ;
+
+specifier_class
+  : specifier_type
+  | CLASS
+  | CLASS LBRA body_class RBRA
+  | CLASS COLON specifier_class_list LBRA body_class RBRA
+  ;
+
 specifier_lambda
   : decl_generics_or_empty LPAR RPAR
-  | decl_generics_or_empty LPAR specifier_types RPAR
-  | specifier_type decl_generics_or_empty LPAR RPAR
-  | specifier_type decl_generics_or_empty LPAR specifier_types RPAR
+  | decl_generics_or_empty LPAR specifier_list RPAR
+  | specifier decl_generics_or_empty LPAR RPAR
+  | specifier decl_generics_or_empty LPAR specifier_list RPAR
   ;
 
-/* ----------------------- EXPRESSIONS ----------------------- */
+specifier_nested
+  : signed_specifier DOUBLE_COLON signed_specifier
+  | specifier_nested DOUBLE_COLON signed_specifier
+  ;
+  
+specifier_list
+  : specifier
+  | specifier_list COMMA specifier
+  ;
 
-expr_comma_list
+specifier_interface_list
+  : specifier_interface
+  | specifier_interface_list COMMA specifier_interface
+  ;
+
+specifier_struct_list
+  : specifier_struct
+  | specifier_struct_list COMMA specifier_struct
+  ;
+
+specifier_class_list
+  : specifier_class
+  | specifier_class_list COMMA specifier_class
+  | specifier_class_list COMMA specifier_struct
+  ;
+
+/* ----------------------- SIGNATURE ----------------------- */
+
+signature
+  : COLON specifier
+  | COLON signed_specifier LBRA RBRA
+  | COLON signed_specifier LBRA body_class RBRA
+  ;
+
+signature_or_empty
   : /* empty */
-  | expr
-  | expr_comma_list COMMA expr
+  | signature
   ;
 
-const
+/* ----------------------- EXPRESSION ----------------------- */
+
+expr_const
   : INT_CONST
   | FLOAT_CONST
   | STRING_CONST
-  | typed_or_not_lambda_const
-  ;
-
-prototype_typed_or_not_lambda
-  : prototype_typed_lambda
-  | LPAR RPAR
-  | LPAR ids RPAR
-  ;
-
-prototype_typed_lambda
-  : decl_generics_or_empty decl_signed_args signature_or_empty
-  ;
-
-typed_or_not_lambda_const
-  : prototype_typed_or_not_lambda expr_closure
+  | NEW signed_specifier
+  | prototype_typed_or_not_lambda expr_closure
   ;
 
 expr_primary
   : ID
-  | const
+  | THIS
+  | expr_const
   | LPAR expr RPAR
   ;
 
 expr_postfix
   : expr_primary
-  | expr_postfix DOT ID /* namespace access */
-  | expr_postfix ACCESS ID /* access */
-  | expr_postfix LSQU RSQU /* array add */
-  | expr_postfix LSQU expr RSQU /* array access */
-  | expr_postfix LPAR expr_comma_list RPAR /* function call */
-  | expr_postfix LT specifier_types GT LPAR expr_comma_list RPAR /* function call generic */
+  | expr_postfix DOT expr_postfix
+  | expr_postfix ACCESS expr_postfix
+  | expr_postfix LSQU RSQU
+  | expr_postfix LSQU expr RSQU
+  | expr_postfix LPAR expr_comma_list RPAR
+  | expr_postfix LT specifier_list GT LPAR expr_comma_list RPAR
+  | expr_postfix LBRA body_class RBRA
   | expr_postfix INC
   | expr_postfix DEC
   ;
@@ -265,8 +286,8 @@ expr_prefix
 
 expr_cast
   : expr_prefix
-  | LPAR specifier_type RPAR expr_cast
-  | expr_cast AS specifier_type
+  | LPAR specifier RPAR expr_cast
+  | expr_cast AS specifier
   ;
 
 expr_mul
@@ -349,12 +370,17 @@ expr_assign
 
 expr_closure
   : ARROW expr
-  | stmt_compound
   | ARROW stmt_compound
   ;
 
 expr
   : expr_assign
+  ;
+  
+expr_comma_list
+  : /* empty */
+  | expr
+  | expr_comma_list COMMA expr
   ;
   
 /* ----------------------- STATEMENTS ----------------------- */
@@ -366,14 +392,8 @@ stmt
 	| stmt_select
 	| stmt_iter
 	| stmt_jump
+	| stmt_var
 	;
-
-stmt_list
-  : /* empty */
-  | stmt
-  | stmt_list stmt
-  | stmt_list decl_var
-  ;
 
 stmt_expr
   : SEMICOLON
@@ -403,9 +423,9 @@ stmt_iter
 	| FOR LPAR stmt_expr stmt_expr RPAR stmt
 	| FOR LPAR stmt_expr stmt_expr expr RPAR stmt
 	| FOR LPAR stmt_expr stmt_expr stmt_compound RPAR stmt
-	| FOR LPAR decl_var stmt_expr RPAR stmt
-	| FOR LPAR decl_var stmt_expr expr RPAR stmt
-	| FOR LPAR decl_var stmt_expr stmt_compound RPAR stmt
+	| FOR LPAR stmt_var stmt_expr RPAR stmt
+	| FOR LPAR stmt_var stmt_expr expr RPAR stmt
+	| FOR LPAR stmt_var stmt_expr stmt_compound RPAR stmt
 	;
 
 stmt_jump
@@ -416,26 +436,54 @@ stmt_jump
   | RETURN expr SEMICOLON
   ;
 
+stmt_var
+  : VAR decl_var_list SEMICOLON
+  ;
+
 stmt_closure
   : ARROW expr SEMICOLON
-  | stmt_compound
   | ARROW stmt_compound
   ;
 
-/* ----------------------- DECLARATIONS ----------------------- */
-
-decl_signed_or_not_args
-  : decl_signed_args
-  | LPAR specifier_types RPAR
+stmt_list
+  : /* empty */
+  | stmt
+  | stmt_list stmt
   ;
 
-decl_signed_args
-  : LPAR RPAR
-  | LPAR var_declarators RPAR
+/* ----------------------- PROTOTYPE ----------------------- */
+
+prototype_typed_or_not_lambda
+  : prototype_typed_lambda
+  | LPAR RPAR
+  | LPAR id_list RPAR
   ;
 
+prototype_typed_lambda
+  : decl_generics_or_empty decl_signed_args signature_or_empty
+  ;
+
+prototype_property
+  : id_list signature
+  ;
+
+prototype_function
+  : id_list decl_generics_or_empty decl_signed_or_not_args signature_or_empty
+  ;
+
+/* ----------------------- DECLARATION ----------------------- */
+
+decl_generic
+  : ID signature_or_empty
+  ;
+  
+decl_generic_list
+  : decl_generic
+  | decl_generic_list decl_generic
+  ;
+  
 decl_generics
-  : LT typed_or_not_ids_list GT
+  : LT decl_generic_list GT
   ;
 
 decl_generics_or_empty
@@ -443,68 +491,100 @@ decl_generics_or_empty
   | decl_generics
   ;
 
+decl_var
+  : qualifier_type id_list signature
+  | qualifier_type id_list signature_or_empty ASSIGN expr_cond
+  ;
+
+decl_var_list
+  : decl_var
+  | decl_var_list COMMA decl_var
+  ;
+
+decl_signed_or_not_args
+  : decl_signed_args
+  | LPAR specifier_list RPAR
+  ;
+
+decl_signed_args
+  : LPAR RPAR
+  | LPAR decl_var_list RPAR
+  ;
+
+decl_enum
+  : ENUM ID LBRA body_enum RBRA
+  ;
+
 decl_interface
-  : INTERFACE ID decl_generics_or_empty LBRA body_interface RBRA
-  | INTERFACE ID decl_generics_or_empty COLON specifier_structs LBRA body_interface RBRA
+  : INTERFACE ID decl_generics_or_empty SEMICOLON
+  | INTERFACE ID decl_generics_or_empty LBRA body_interface RBRA
+  | INTERFACE ID decl_generics_or_empty COLON specifier_interface_list SEMICOLON
+  | INTERFACE ID decl_generics_or_empty COLON specifier_interface_list LBRA body_interface RBRA
   ;
 
 decl_struct
-  : qualifier_struct STRUCT ID decl_generics_or_empty LBRA body_struct RBRA
-  | qualifier_struct STRUCT ID decl_generics_or_empty COLON specifier_structs LBRA body_struct RBRA
+  : qualifier_struct STRUCT ID decl_generics_or_empty SEMICOLON
+  | qualifier_struct STRUCT ID decl_generics_or_empty LBRA body_struct RBRA
+  | qualifier_struct STRUCT ID decl_generics_or_empty COLON specifier_struct_list SEMICOLON
+  | qualifier_struct STRUCT ID decl_generics_or_empty COLON specifier_struct_list LBRA body_struct RBRA
   ;
 
 decl_class
-  : qualifier_class CLASS ID decl_generics_or_empty LBRA body_class RBRA
-  | qualifier_class CLASS ID decl_generics_or_empty COLON specifier_structs LBRA body_class RBRA
+  : qualifier_class CLASS ID decl_generics_or_empty SEMICOLON
+  | qualifier_class CLASS ID decl_generics_or_empty LBRA body_class RBRA
+  | qualifier_class CLASS ID decl_generics_or_empty COLON specifier_class_list SEMICOLON
+  | qualifier_class CLASS ID decl_generics_or_empty COLON specifier_class_list LBRA body_class RBRA
   ;
 
-body_interface
-  : /* empty */
-  | body_interface ids signature SEMICOLON
-  | body_interface ids COLON specifier_braced_type
-  | body_interface ids decl_generics_or_empty decl_signed_or_not_args signature_or_empty SEMICOLON
-  ;
-
-body_struct
-  : /* empty */
-  | body_struct decl_method
-  | body_struct ids signature
-  | body_struct ids signature ASSIGN stmt_expr
-  | body_struct ids signature ASSIGN prototype_typed_or_not_lambda stmt_closure
-  ;
-
-body_class
-  : /* empty */
-  | body_class qualifier_modifier decl_method
-  | body_class qualifier_modifier ids signature
-  | body_class qualifier_modifier ids signature ASSIGN stmt_expr
-  | body_class qualifier_modifier ids signature ASSIGN prototype_typed_or_not_lambda stmt_closure
+decl_property
+  : prototype_property SEMICOLON
+  | prototype_property ASSIGN stmt_expr
   ;
 
 decl_function
-  : qualifier_function ids prototype_typed_lambda stmt_closure
+  : qualifier_function id_list prototype_typed_lambda stmt_closure
   ;
 
 decl_method
   : qualifier_method decl_function
   ;
 
-decl_var
-  : VAR var_declarators SEMICOLON
+decl_method_override
+  : qualifier_method id_list stmt_closure
   ;
 
-var_declarators
-  : var_declarator
-  | var_declarators COMMA var_declarator
+decl_property_override
+  : id_list ASSIGN stmt_expr
   ;
 
-var_declarator
-  : qualifier_type ids signature
-  | qualifier_type ids signature_or_empty ASSIGN expr_cond
+/* ----------------------- BODY ----------------------- */
+
+body_interface
+  : /* empty */
+  | body_interface prototype_property SEMICOLON
+  | body_interface prototype_function SEMICOLON
+  ;
+
+body_struct
+  : /* empty */
+  | body_struct decl_property
+  | body_struct decl_property_override
+  | body_struct decl_method
+  | body_struct decl_method_override
+  ;
+
+body_class
+  : /* empty */
+  | body_class qualifier_modifier decl_method
+  | body_class qualifier_modifier decl_method_override
+  | body_class qualifier_modifier decl_property
+  | body_class qualifier_modifier decl_property_override
   ;
 
 body_enum
-  :
+  : /* empty */
+  | body_enum ID SEMICOLON
+  | body_enum ID ASSIGN stmt_expr
   ;
 
 %%

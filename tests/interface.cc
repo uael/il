@@ -36,6 +36,34 @@ SYNTAX_TEST(interface002, true, "",
   "interface IInterface { }"
 );
 
+SYNTAX_TEST(interface003, true, "",
+  "interface IInterface;"
+);
+
+SYNTAX_TEST(interface004, true, "",
+  "interface IInterface<T>;"
+);
+
+SYNTAX_TEST(interface005, true, "",
+  "interface IInterface<T : Foo>;"
+);
+
+SYNTAX_TEST(interface006, true, "",
+  "interface IInterface<T : interface>;"
+);
+
+SYNTAX_TEST(interface007, true, "",
+  "interface IInterface<T : interface { }>;"
+);
+
+SYNTAX_TEST(interface008, true, "",
+  "interface IInterface<T> : ParentInterface;"
+);
+
+SYNTAX_TEST(interface009, true, "",
+  "interface IInterface<T> : ParentInterface<T, U, V>;"
+);
+
 RUN;
 
 /*

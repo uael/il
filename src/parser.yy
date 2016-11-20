@@ -455,13 +455,13 @@ interface_body
 
 struct_body
   : /* empty */
-  | struct_body meth_declaration
+  | struct_body func_declaration
   | struct_body ids signature
   | struct_body ids signature ASSIGN expr_stmt
   | struct_body ids signature ASSIGN typed_or_not_lambda_const
   ;
 
-meth_declaration
+func_declaration
   : ids typed_lambda_const
   ;
 

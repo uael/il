@@ -64,10 +64,6 @@ using namespace ddc::ast;
 
 #undef yylex
 #define yylex driver.lexer->lex
-
-#define MAKE(v, type, ...) v = new ddc::type##_t(__VA_ARGS__)
-#define MAKE_FUNCTION_DECL(v, ...) MAKE(v, decl_function, __VA_ARGS__);
-#define PUSH(v, arg) v->push_back(arg)
 %}
 
 %start program
@@ -78,7 +74,7 @@ program
   : /* empty */
   | program decl_interface
   | program decl_struct
-  | program decl_func
+  | program decl_function
   ;
 
 /* ----------------------- COMMON ----------------------- */
@@ -109,14 +105,14 @@ qualifier_struct
   ;
 
 qualifier_meth
-  : qualifier_meth qualifier_func
+  : qualifier_meth qualifier_function
   | qualifier_meth ABSTRACT
   | qualifier_meth STATIC
   | qualifier_meth VIRTUAL
   | qualifier_meth FINAL
   ;
 
-qualifier_func
+qualifier_function
   : /* empty */
   | INLINE
   ;
@@ -253,8 +249,8 @@ expr_postfix
   | expr_postfix ACCESS ID /* access */
   | expr_postfix LSQU RSQU /* array add */
   | expr_postfix LSQU expr RSQU /* array access */
-  | expr_postfix LPAR expr_comma_list RPAR /* func call */
-  | expr_postfix LT specifier_types GT LPAR expr_comma_list RPAR /* func call generic */
+  | expr_postfix LPAR expr_comma_list RPAR /* function call */
+  | expr_postfix LT specifier_types GT LPAR expr_comma_list RPAR /* function call generic */
   | expr_postfix INC
   | expr_postfix DEC
   ;
@@ -470,13 +466,13 @@ body_interface
 
 body_struct
   : /* empty */
-  | body_struct decl_func
+  | body_struct decl_function
   | body_struct ids signature
   | body_struct ids signature ASSIGN stmt_expr
   | body_struct ids signature ASSIGN prototype_typed_or_not_lambda stmt_closure
   ;
 
-decl_func
+decl_function
   : ids prototype_typed_lambda stmt_closure
   ;
 

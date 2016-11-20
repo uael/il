@@ -66,7 +66,7 @@ using namespace ddc::ast;
 #define yylex driver.lexer->lex
 
 #define MAKE(v, type, ...) v = new ddc::type##_t(__VA_ARGS__)
-#define MAKE_FUNCTION_DECL(v, ...) MAKE(v, function_declaration, __VA_ARGS__);
+#define MAKE_FUNCTION_DECL(v, ...) MAKE(v, decl_function, __VA_ARGS__);
 #define PUSH(v, arg) v->push_back(arg)
 %}
 
@@ -76,9 +76,9 @@ using namespace ddc::ast;
 
 program
   : /* empty */
-  | program interface_declaration
-  | program struct_declaration
-  | program func_declaration
+  | program decl_interface
+  | program decl_struct
+  | program decl_func
   ;
 
 /* ----------------------- COMMON ----------------------- */
@@ -96,27 +96,27 @@ modifier
   | PROTECTED
   ;
 
-type_qualifier
+qualifier_type
   : /* empty */
-  | type_qualifier CONST
-  | type_qualifier VOLATILE
+  | qualifier_type CONST
+  | qualifier_type VOLATILE
   ;
 
-struct_qualifier
+qualifier_struct
   : /* empty */
   | FINAL
   | ABSTRACT
   ;
 
-meth_qualifier
-  : meth_qualifier func_qualifier
-  | meth_qualifier ABSTRACT
-  | meth_qualifier STATIC
-  | meth_qualifier VIRTUAL
-  | meth_qualifier FINAL
+qualifier_meth
+  : qualifier_meth qualifier_func
+  | qualifier_meth ABSTRACT
+  | qualifier_meth STATIC
+  | qualifier_meth VIRTUAL
+  | qualifier_meth FINAL
   ;
 
-func_qualifier
+qualifier_func
   : /* empty */
   | INLINE
   ;
@@ -124,14 +124,13 @@ func_qualifier
 /* ----------------------- TYPE ----------------------- */
 
 signature
-  : COLON type_specifier
+  : COLON specifier_type
   ;
 
 signature_or_empty
   : /* empty */
   | signature
   ;
-
 
 typed_ids_list
   : ids signature
@@ -143,25 +142,25 @@ typed_or_not_ids_list
   | typed_or_not_ids_list COMMA ID signature_or_empty
   ;
 
-type_specifiers
-  : type_specifier
-  | type_specifiers COMMA type_specifier
+specifier_types
+  : specifier_type
+  | specifier_types COMMA specifier_type
   ;
 
-type_specifier
+specifier_type
   : ID
-  | scalar_specifier
-  | lambda_specifier
-  | struct_specifier
-  | enum_specifier
-  | braced_struct_specifier
+  | specifier_scalar
+  | specifier_lambda
+  | specifier_struct
+  | specifier_enum
+  | specifier_braced_struct
   ;
 
-braced_type_specifier
-  : braced_struct_specifier
+specifier_braced_type
+  : specifier_braced_struct
   ;
 
-scalar_specifier
+specifier_scalar
   : VOID
   | BOOL
   | CHAR
@@ -179,42 +178,42 @@ scalar_specifier
   | SDOUBLE
   ;
 
-struct_specifiers
-  : struct_specifier
-  | struct_specifiers COMMA struct_specifier
+specifier_structs
+  : specifier_struct
+  | specifier_structs COMMA specifier_struct
   ;
 
-struct_specifier
-  : braced_struct_specifier
+specifier_struct
+  : specifier_braced_struct
   | ID
-  | ID LT type_specifiers GT
+  | ID LT specifier_types GT
   ;
 
-braced_struct_specifier
-  : STRUCT LBRA struct_body RBRA
-  | STRUCT COLON struct_specifiers LBRA struct_body RBRA
-  | INTERFACE LBRA interface_body RBRA
-  | INTERFACE COLON struct_specifiers LBRA interface_body RBRA
+specifier_braced_struct
+  : STRUCT LBRA body_struct RBRA
+  | STRUCT COLON specifier_structs LBRA body_struct RBRA
+  | INTERFACE LBRA body_interface RBRA
+  | INTERFACE COLON specifier_structs LBRA body_interface RBRA
   ;
 
-enum_specifier
+specifier_enum
   : ID
-  | ENUM LBRA enum_body RBRA
+  | ENUM LBRA body_enum RBRA
   ;
 
-lambda_specifier
-  : generics_declaration_or_empty LPAR RPAR
-  | generics_declaration_or_empty LPAR type_specifiers RPAR
-  | type_specifier generics_declaration_or_empty LPAR RPAR
-  | type_specifier generics_declaration_or_empty LPAR type_specifiers RPAR
+specifier_lambda
+  : decl_generics_or_empty LPAR RPAR
+  | decl_generics_or_empty LPAR specifier_types RPAR
+  | specifier_type decl_generics_or_empty LPAR RPAR
+  | specifier_type decl_generics_or_empty LPAR specifier_types RPAR
   ;
 
 /* ----------------------- EXPRESSIONS ----------------------- */
 
-comma_exprs
+expr_comma_list
   : /* empty */
   | expr
-  | comma_exprs COMMA expr
+  | expr_comma_list COMMA expr
   ;
 
 const
@@ -224,200 +223,200 @@ const
   | typed_or_not_lambda_const
   ;
 
-typed_or_not_lambda_prototype
-  : typed_lambda_prototype
+prototype_typed_or_not_lambda
+  : prototype_typed_lambda
   | LPAR RPAR
   | LPAR ids RPAR
   ;
 
-typed_lambda_prototype
-  : generics_declaration_or_empty signed_args_declaration signature_or_empty
+prototype_typed_lambda
+  : decl_generics_or_empty decl_signed_args signature_or_empty
   ;
 
 typed_or_not_lambda_const
-  : typed_or_not_lambda_prototype closure_expr
+  : prototype_typed_or_not_lambda expr_closure
   ;
 
 typed_lambda_const
-  : typed_lambda_prototype closure_expr
+  : prototype_typed_lambda expr_closure
   ;
 
-prim_expr
+expr_primary
   : ID
   | const
   | LPAR expr RPAR
   ;
 
-post_expr
-  : prim_expr
-  | post_expr DOT ID /* namespace access */
-  | post_expr ACCESS ID /* access */
-  | post_expr LSQU RSQU /* array add */
-  | post_expr LSQU expr RSQU /* array access */
-  | post_expr LPAR comma_exprs RPAR /* func call */
-  | post_expr LT type_specifiers GT LPAR comma_exprs RPAR /* func call generic */
-  | post_expr INC
-  | post_expr DEC
+expr_postfix
+  : expr_primary
+  | expr_postfix DOT ID /* namespace access */
+  | expr_postfix ACCESS ID /* access */
+  | expr_postfix LSQU RSQU /* array add */
+  | expr_postfix LSQU expr RSQU /* array access */
+  | expr_postfix LPAR expr_comma_list RPAR /* func call */
+  | expr_postfix LT specifier_types GT LPAR expr_comma_list RPAR /* func call generic */
+  | expr_postfix INC
+  | expr_postfix DEC
   ;
 
-pre_expr
-  : post_expr
-  | INC pre_expr
-  | DEC pre_expr
-  | AND pre_expr
-  | ADD pre_expr
-  | SUB pre_expr
-  | MUL pre_expr
-  | NOT pre_expr
-  | TID pre_expr
+expr_prefix
+  : expr_postfix
+  | INC expr_prefix
+  | DEC expr_prefix
+  | AND expr_prefix
+  | ADD expr_prefix
+  | SUB expr_prefix
+  | MUL expr_prefix
+  | NOT expr_prefix
+  | TID expr_prefix
   ;
 
-cast_expr
-  : pre_expr
-  | LPAR type_specifier RPAR cast_expr
-  | cast_expr AS type_specifier
+expr_cast
+  : expr_prefix
+  | LPAR specifier_type RPAR expr_cast
+  | expr_cast AS specifier_type
   ;
 
-mul_expr
-  : cast_expr
-  | mul_expr MUL cast_expr
-  | mul_expr DIV cast_expr
-  | mul_expr MOD cast_expr
+expr_mul
+  : expr_cast
+  | expr_mul MUL expr_cast
+  | expr_mul DIV expr_cast
+  | expr_mul MOD expr_cast
   ;
 
-add_expr
-  : mul_expr
-  | add_expr ADD mul_expr
-  | add_expr SUB mul_expr
+expr_add
+  : expr_mul
+  | expr_add ADD expr_mul
+  | expr_add SUB expr_mul
   ;
 
-shift_expr
-  : add_expr
-  | shift_expr LS add_expr
-  | shift_expr RS add_expr
+expr_shift
+  : expr_add
+  | expr_shift LS expr_add
+  | expr_shift RS expr_add
   ;
 
-rel_expr
-  : shift_expr
-  | rel_expr LT shift_expr
-  | rel_expr GT shift_expr
-  | rel_expr LE shift_expr
-  | rel_expr GE shift_expr
+expr_relational
+  : expr_shift
+  | expr_relational LT expr_shift
+  | expr_relational GT expr_shift
+  | expr_relational LE expr_shift
+  | expr_relational GE expr_shift
   ;
 
-equal_expr
-  : rel_expr
-  | equal_expr EQ rel_expr
-  | equal_expr NEQ rel_expr
+expr_equal
+  : expr_relational
+  | expr_equal EQ expr_relational
+  | expr_equal NEQ expr_relational
   ;
 
-and_expr
-  : equal_expr
-  | and_expr AND equal_expr
+expr_and
+  : expr_equal
+  | expr_and AND expr_equal
   ;
 
-xor_expr
-  : and_expr
-  | xor_expr XOR and_expr
+expr_xor
+  : expr_and
+  | expr_xor XOR expr_and
   ;
 
-or_expr
-  : xor_expr
-  | or_expr OR xor_expr
+expr_or
+  : expr_xor
+  | expr_or OR expr_xor
   ;
 
-land_expr
-  : or_expr
-  | land_expr LAND or_expr
+expr_land
+  : expr_or
+  | expr_land LAND expr_or
   ;
 
-lor_expr
-  : land_expr
-  | lor_expr LOR land_expr
+expr_lor
+  : expr_land
+  | expr_lor LOR expr_land
   ;
 
-cond_expr
-  : lor_expr
-  | lor_expr COND expr COLON cond_expr
+expr_cond
+  : expr_lor
+  | expr_lor COND expr COLON expr_cond
   ;
 
-assign_expr
-  : cond_expr
-  | pre_expr ASSIGN assign_expr
-  | pre_expr MUL_ASSIGN assign_expr
-  | pre_expr DIV_ASSIGN assign_expr
-  | pre_expr MOD_ASSIGN assign_expr
-  | pre_expr ADD_ASSIGN assign_expr
-  | pre_expr SUB_ASSIGN assign_expr
-  | pre_expr LEFT_ASSIGN assign_expr
-  | pre_expr RIGHT_ASSIGN assign_expr
-  | pre_expr AND_ASSIGN assign_expr
-  | pre_expr XOR_ASSIGN assign_expr
-  | pre_expr OR_ASSIGN assign_expr
+expr_assign
+  : expr_cond
+  | expr_prefix ASSIGN expr_assign
+  | expr_prefix MUL_ASSIGN expr_assign
+  | expr_prefix DIV_ASSIGN expr_assign
+  | expr_prefix MOD_ASSIGN expr_assign
+  | expr_prefix ADD_ASSIGN expr_assign
+  | expr_prefix SUB_ASSIGN expr_assign
+  | expr_prefix LEFT_ASSIGN expr_assign
+  | expr_prefix RIGHT_ASSIGN expr_assign
+  | expr_prefix AND_ASSIGN expr_assign
+  | expr_prefix XOR_ASSIGN expr_assign
+  | expr_prefix OR_ASSIGN expr_assign
   ;
 
-closure_expr
+expr_closure
   : ARROW expr
-  | compound_stmt
-  | ARROW compound_stmt
+  | stmt_compound
+  | ARROW stmt_compound
   ;
 
 expr
-  : assign_expr
+  : expr_assign
   ;
   
 /* ----------------------- STATEMENTS ----------------------- */
   
 stmt
-	: expr_stmt
-	| label_stmt
-	| compound_stmt
-	| select_stmt
-	| iter_stmt
-	| jump_stmt
+	: stmt_expr
+	| stmt_label
+	| stmt_compound
+	| stmt_select
+	| stmt_iter
+	| stmt_jump
 	;
 
-stmts
+stmt_list
   : /* empty */
   | stmt
-  | stmts stmt
-  | stmts var_declaration
+  | stmt_list stmt
+  | stmt_list decl_var
   ;
 
-expr_stmt
+stmt_expr
   : SEMICOLON
   | expr SEMICOLON
   ;
 
-label_stmt
+stmt_label
   : ID COLON stmt
-  | CASE cond_expr COLON stmt
+  | CASE expr_cond COLON stmt
   | DEFAULT COLON stmt
   ;
 
-compound_stmt
+stmt_compound
   : LBRA RBRA
-  | LBRA stmts RBRA
+  | LBRA stmt_list RBRA
   ;
 
-select_stmt
+stmt_select
   : IF LPAR expr RPAR stmt ELSE stmt
   | IF LPAR expr RPAR stmt
   | SWITCH LPAR expr RPAR stmt
   ;
 
-iter_stmt
+stmt_iter
 	: WHILE LPAR expr RPAR stmt
 	| DO stmt WHILE LPAR expr RPAR SEMICOLON
-	| FOR LPAR expr_stmt expr_stmt RPAR stmt
-	| FOR LPAR expr_stmt expr_stmt expr RPAR stmt
-	| FOR LPAR expr_stmt expr_stmt compound_stmt RPAR stmt
-	| FOR LPAR var_declaration expr_stmt RPAR stmt
-	| FOR LPAR var_declaration expr_stmt expr RPAR stmt
-	| FOR LPAR var_declaration expr_stmt compound_stmt RPAR stmt
+	| FOR LPAR stmt_expr stmt_expr RPAR stmt
+	| FOR LPAR stmt_expr stmt_expr expr RPAR stmt
+	| FOR LPAR stmt_expr stmt_expr stmt_compound RPAR stmt
+	| FOR LPAR decl_var stmt_expr RPAR stmt
+	| FOR LPAR decl_var stmt_expr expr RPAR stmt
+	| FOR LPAR decl_var stmt_expr stmt_compound RPAR stmt
 	;
 
-jump_stmt
+stmt_jump
   : GOTO ID SEMICOLON
   | CONTINUE SEMICOLON
   | BREAK SEMICOLON
@@ -425,63 +424,63 @@ jump_stmt
   | RETURN expr SEMICOLON
   ;
 
-closure_stmt
+stmt_closure
   : ARROW expr SEMICOLON
-  | compound_stmt
-  | ARROW compound_stmt
+  | stmt_compound
+  | ARROW stmt_compound
   ;
 
 /* ----------------------- DECLARATIONS ----------------------- */
 
-signed_or_not_args_declaration
-  : signed_args_declaration
-  | LPAR type_specifiers RPAR
+decl_signed_or_not_args
+  : decl_signed_args
+  | LPAR specifier_types RPAR
   ;
 
-signed_args_declaration
+decl_signed_args
   : LPAR RPAR
   | LPAR typed_ids_list RPAR
   ;
 
-generics_declaration
+decl_generics
   : LT typed_or_not_ids_list GT
   ;
 
-generics_declaration_or_empty
+decl_generics_or_empty
   : /* empty */
-  | generics_declaration
+  | decl_generics
   ;
 
-interface_declaration
-  : INTERFACE ID generics_declaration_or_empty LBRA interface_body RBRA
-  | INTERFACE ID generics_declaration_or_empty COLON struct_specifiers LBRA interface_body RBRA
+decl_interface
+  : INTERFACE ID decl_generics_or_empty LBRA body_interface RBRA
+  | INTERFACE ID decl_generics_or_empty COLON specifier_structs LBRA body_interface RBRA
   ;
 
-struct_declaration
-  : struct_qualifier STRUCT ID generics_declaration_or_empty LBRA struct_body RBRA
-  | struct_qualifier STRUCT ID generics_declaration_or_empty COLON struct_specifiers LBRA struct_body RBRA
+decl_struct
+  : qualifier_struct STRUCT ID decl_generics_or_empty LBRA body_struct RBRA
+  | qualifier_struct STRUCT ID decl_generics_or_empty COLON specifier_structs LBRA body_struct RBRA
   ;
 
-interface_body
+body_interface
   : /* empty */
-  | interface_body ids signature SEMICOLON
-  | interface_body ids COLON braced_type_specifier
-  | interface_body ids generics_declaration_or_empty signed_or_not_args_declaration signature_or_empty SEMICOLON
+  | body_interface ids signature SEMICOLON
+  | body_interface ids COLON specifier_braced_type
+  | body_interface ids decl_generics_or_empty decl_signed_or_not_args signature_or_empty SEMICOLON
   ;
 
-struct_body
+body_struct
   : /* empty */
-  | struct_body func_declaration
-  | struct_body ids signature
-  | struct_body ids signature ASSIGN expr_stmt
-  | struct_body ids signature ASSIGN typed_or_not_lambda_prototype closure_stmt
+  | body_struct decl_func
+  | body_struct ids signature
+  | body_struct ids signature ASSIGN stmt_expr
+  | body_struct ids signature ASSIGN prototype_typed_or_not_lambda stmt_closure
   ;
 
-func_declaration
-  : ids typed_lambda_prototype closure_stmt
+decl_func
+  : ids prototype_typed_lambda stmt_closure
   ;
 
-var_declaration
+decl_var
   : VAR var_declarators SEMICOLON
   ;
 
@@ -492,10 +491,10 @@ var_declarators
 
 var_declarator
   : ID signature
-  | ID signature_or_empty ASSIGN cond_expr
+  | ID signature_or_empty ASSIGN expr_cond
   ;
 
-enum_body
+body_enum
   :
   ;
 

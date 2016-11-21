@@ -2,8 +2,9 @@ AC_INIT([ddc], [0.1], [https://github.com/dotdry/ddc/issues])
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_SRCDIR([src/driver.cc])
 AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_MACRO_DIRS([m4])
 
-AM_INIT_AUTOMAKE([foreign subdir-objects])
+AM_INIT_AUTOMAKE([foreign subdir-objects serial-tests])
 
 AC_LANG([C++])
 AX_CXX_COMPILE_STDCXX(11, noext, mandatory)
@@ -16,18 +17,7 @@ AM_PROG_LEX
 AC_PROG_YACC
 AC_PROG_BISON
 
-DX_HTML_FEATURE(ON)
-DX_CHM_FEATURE(OFF)
-DX_CHI_FEATURE(OFF)
-DX_MAN_FEATURE(OFF)
-DX_RTF_FEATURE(OFF)
-DX_XML_FEATURE(OFF)
-DX_PDF_FEATURE(OFF)
-DX_PS_FEATURE(OFF)
-DX_INIT_DOXYGEN(ddc, doxygen.cfg, doc)
-
 LT_INIT
-AC_CONFIG_MACRO_DIRS([m4])
 
 AC_CONFIG_FILES([Makefile lib/Makefile src/Makefile tests/Makefile])
 AC_OUTPUT

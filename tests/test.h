@@ -22,7 +22,7 @@
 #define _SYNTAX_H
 
 #define SYNTAX_TEST(index, ex_status, ex_cerr, code) \
-  TEST(syntax, syntax##index) { \
+  TEST(syntax, index) { \
     ddc::driver driver = ddc::driver(); \
     testing::internal::CaptureStderr(); \
     ASSERT_EQ(ex_status, driver.parse_string(code)); \
@@ -40,9 +40,9 @@
 
 /*
  * Local variables:
- * tab-width: 4
- * c-basic-offset: 4
+ * tab-width: 2
+ * c-basic-offset: 2
  * End:
- * vim600: noet sw=4 ts=4 fdm=marker
- * vim<600: noet sw=4 ts=4
+ * vim600: noet sw=2 ts=2 fdm=marker
+ * vim<600: noet sw=2 ts=2
  */

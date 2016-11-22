@@ -22,7 +22,7 @@
 #include <fstream>
 #include "driver.h"
 #include "gtest/gtest.h"
-#include "test_syntax.h"
+#include "test.h"
 
 SYNTAX_TEST(interface000, false, "1.1-9: syntax error\n",
   "interface"
@@ -36,13 +36,41 @@ SYNTAX_TEST(interface002, true, "",
   "interface IInterface { }"
 );
 
+SYNTAX_TEST(interface003, true, "",
+  "interface IInterface;"
+);
+
+SYNTAX_TEST(interface004, true, "",
+  "interface IInterface<T>;"
+);
+
+SYNTAX_TEST(interface005, true, "",
+  "interface IInterface<T : Foo>;"
+);
+
+SYNTAX_TEST(interface006, true, "",
+  "interface IInterface<T : interface>;"
+);
+
+SYNTAX_TEST(interface007, true, "",
+  "interface IInterface<T : interface { }>;"
+);
+
+SYNTAX_TEST(interface008, true, "",
+  "interface IInterface<T> : ParentInterface;"
+);
+
+SYNTAX_TEST(interface009, true, "",
+  "interface IInterface<T> : ParentInterface<T, U, V>;"
+);
+
 RUN;
 
 /*
  * Local variables:
- * tab-width: 4
- * c-basic-offset: 4
+ * tab-width: 2
+ * c-basic-offset: 2
  * End:
- * vim600: noet sw=4 ts=4 fdm=marker
- * vim<600: noet sw=4 ts=4
+ * vim600: noet sw=2 ts=2 fdm=marker
+ * vim<600: noet sw=2 ts=2
  */

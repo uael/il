@@ -86,6 +86,7 @@ typedef ddc::parser::token token;
 "!"                               RET(NOT);
 "?"                               RET(COND);
 ":"                               RET(COLON);
+"::"                              RET(DOUBLE_COLON);
 ";"                               RET(SEMICOLON);
 ","                               RET(COMMA);
 "("                               RET(LPAR);
@@ -123,6 +124,7 @@ typedef ddc::parser::token token;
 
 "enum"                            RET(ENUM);
 "struct"                          RET(STRUCT);
+"class"                           RET(CLASS);
 "interface"                       RET(INTERFACE);
 
 "private"                         RET(PRIVATE);
@@ -214,9 +216,9 @@ int yyFlexLexer::yywrap() {
 
 /*
  * Local variables:
- * tab-width: 4
- * c-basic-offset: 4
+ * tab-width: 2
+ * c-basic-offset: 2
  * End:
- * vim600: noet sw=4 ts=4 fdm=marker
- * vim<600: noet sw=4 ts=4
+ * vim600: noet sw=2 ts=2 fdm=marker
+ * vim<600: noet sw=2 ts=2
  */

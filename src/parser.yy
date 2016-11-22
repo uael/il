@@ -167,7 +167,7 @@ specifier_in_struct
 
 specifier_enum
   : ID
-  | ENUM LBRA body_enum RBRA
+  | decl_enum
   ;
 
 specifier_type
@@ -177,23 +177,20 @@ specifier_type
 
 specifier_interface
   : specifier_type
-  | INTERFACE
-  | INTERFACE LBRA body_interface RBRA
-  | INTERFACE COLON specifier_interface_list LBRA body_interface RBRA
+  | type_interface_empty
+  | type_interface_non_empty
   ;
 
 specifier_struct
   : specifier_type
-  | STRUCT
-  | STRUCT LBRA body_struct RBRA
-  | STRUCT COLON specifier_struct_list LBRA body_struct RBRA
+  | type_struct_empty
+  | type_struct_non_empty
   ;
 
 specifier_class
   : specifier_type
-  | CLASS
-  | CLASS LBRA body_class RBRA
-  | CLASS COLON specifier_class_list LBRA body_class RBRA
+  | type_class_empty
+  | type_class_non_empty
   ;
 
 specifier_lambda
@@ -471,6 +468,35 @@ prototype_function
   : id_list decl_generics_or_empty decl_signed_or_not_args signature_or_empty
   ;
 
+/* ----------------------- TYPE ----------------------- */
+
+type_interface_empty
+  : INTERFACE ID decl_generics_or_empty
+  | INTERFACE ID decl_generics_or_empty COLON specifier_interface_list
+  ;
+  
+type_struct_empty
+  : qualifier_struct STRUCT ID decl_generics_or_empty
+  | qualifier_struct STRUCT ID decl_generics_or_empty COLON specifier_struct_list
+  ;
+  
+type_class_empty
+  : qualifier_class CLASS ID decl_generics_or_empty
+  | qualifier_class CLASS ID decl_generics_or_empty COLON specifier_class_list
+  ;
+
+type_interface_non_empty
+  : type_interface_empty LBRA body_interface RBRA
+  ;
+
+type_struct_non_empty
+  : type_struct_empty LBRA body_struct RBRA
+  ;
+
+type_class_non_empty
+  : type_class_empty LBRA body_class RBRA
+  ;
+
 /* ----------------------- DECLARATION ----------------------- */
 
 decl_generic
@@ -479,7 +505,7 @@ decl_generic
   
 decl_generic_list
   : decl_generic
-  | decl_generic_list decl_generic
+  | decl_generic_list COMMA decl_generic
   ;
   
 decl_generics
@@ -516,24 +542,18 @@ decl_enum
   ;
 
 decl_interface
-  : INTERFACE ID decl_generics_or_empty SEMICOLON
-  | INTERFACE ID decl_generics_or_empty LBRA body_interface RBRA
-  | INTERFACE ID decl_generics_or_empty COLON specifier_interface_list SEMICOLON
-  | INTERFACE ID decl_generics_or_empty COLON specifier_interface_list LBRA body_interface RBRA
+  : type_interface_empty SEMICOLON
+  | type_interface_non_empty
   ;
 
 decl_struct
-  : qualifier_struct STRUCT ID decl_generics_or_empty SEMICOLON
-  | qualifier_struct STRUCT ID decl_generics_or_empty LBRA body_struct RBRA
-  | qualifier_struct STRUCT ID decl_generics_or_empty COLON specifier_struct_list SEMICOLON
-  | qualifier_struct STRUCT ID decl_generics_or_empty COLON specifier_struct_list LBRA body_struct RBRA
+  : type_struct_empty SEMICOLON
+  | type_struct_non_empty
   ;
 
 decl_class
-  : qualifier_class CLASS ID decl_generics_or_empty SEMICOLON
-  | qualifier_class CLASS ID decl_generics_or_empty LBRA body_class RBRA
-  | qualifier_class CLASS ID decl_generics_or_empty COLON specifier_class_list SEMICOLON
-  | qualifier_class CLASS ID decl_generics_or_empty COLON specifier_class_list LBRA body_class RBRA
+  : type_class_empty SEMICOLON
+  | type_class_non_empty
   ;
 
 decl_property

@@ -33,35 +33,39 @@ SYNTAX_TEST(interface001, false, "1.11: syntax error\n",
 );
 
 SYNTAX_TEST(interface002, true, "",
-  "interface IInterface { }"
+  "interface Foo { }"
 );
 
 SYNTAX_TEST(interface003, true, "",
-  "interface IInterface;"
+  "interface Foo;"
 );
 
 SYNTAX_TEST(interface004, true, "",
-  "interface IInterface<T>;"
+  "interface Foo<T>;"
 );
 
 SYNTAX_TEST(interface005, true, "",
-  "interface IInterface<T : Foo>;"
+  "interface Foo<T : Foo>;"
 );
 
 SYNTAX_TEST(interface006, true, "",
-  "interface IInterface<T : interface>;"
+  "interface Foo<T : interface Bar>;"
 );
 
 SYNTAX_TEST(interface007, true, "",
-  "interface IInterface<T : interface { }>;"
+  "interface Foo<T : interface Bar { }>;"
 );
 
 SYNTAX_TEST(interface008, true, "",
-  "interface IInterface<T> : ParentInterface;"
+  "interface Foo<T> : Bar;"
 );
 
 SYNTAX_TEST(interface009, true, "",
-  "interface IInterface<T> : ParentInterface<T, U, V>;"
+  "interface Foo<T> : Bar<T, U, V>;"
+);
+
+SYNTAX_TEST(interface010, true, "",
+  "interface Foo<T : interface Bar, U : Foo::Bar>;"
 );
 
 RUN;

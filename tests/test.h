@@ -21,8 +21,8 @@
 #ifndef _SYNTAX_H
 #define _SYNTAX_H
 
-#define SYNTAX_TEST(index, ex_status, ex_cerr, code) \
-  TEST(syntax, index) { \
+#define SYNTAX_TEST(prefix, postfix, ex_status, ex_cerr, code) \
+  TEST(prefix, postfix) { \
     ddc::driver driver = ddc::driver(); \
     testing::internal::CaptureStderr(); \
     ASSERT_EQ(ex_status, driver.parse_string(code)); \

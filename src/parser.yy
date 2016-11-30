@@ -66,58 +66,71 @@ using namespace ddc::ast;
 #define yylex driver.lexer->lex
 %}
 
-%start program
+%start decl_list
 
 %%
 
-/* ----------------------- PROGRAM ----------------------- */
-
-program
-  : /* empty */
-  | program decl_property SEMICOLON
-  | program decl_function_expr SEMICOLON
-  | program decl_function_compound
+id
+  : ID
   ;
-
-/* ----------------------- COMMON ----------------------- */
 
 id_list
-  : ID
-  | id_list COMMA ID
+  : id
+  | id_list COMMA id
   ;
-
-/* ----------------------- DECL ---------------------------- */
-
-decl_generic_list
+  
+generic
   : GENERIC
   | GENERIC COLON type_specifier
-  | decl_generic_list COMMA GENERIC
-  | decl_generic_list COMMA GENERIC COLON type_specifier
+  ;
+  
+generic_list
+  : generic
+  | generic_list COMMA generic
   ;
 
-decl_generics
+generics
   : /* empty */
-  | LT decl_generic_list GT
+  | LT generic_list GT
   ;
 
-decl_property
+decl_list
+  : /* empty */
+  | decl_list decl
+  ;
+
+decl
+  : decl_property_expr SEMICOLON
+  | decl_property_compound
+  | decl_function_expr SEMICOLON
+  | decl_function_compound
+  ;
+
+decl_property_expr
   : id_list COLON type_specifier
   | id_list ASSIGN expr_cond
   | id_list COLON type_specifier ASSIGN expr_cond
+  | id_list COLON type_specifier ARROW expr_cond
+  ;
+
+decl_property_compound
+  : id_list ARROW stmt_compound
+  | id_list COLON type_specifier ARROW stmt_compound
   ;
 
 decl_function_expr
-  : id_list decl_generics decl_args ARROW expr
-  | id_list decl_generics decl_args COLON type_specifier ARROW expr
+  : id_list generics decl_args ARROW expr_cond
+  | id_list generics decl_args COLON type_specifier ARROW expr_cond
   ;
 
 decl_function_compound
-  : id_list decl_generics decl_args ARROW stmt_compound
-  | id_list decl_generics decl_args COLON type_specifier ARROW stmt_compound
+  : id_list generics decl_args ARROW stmt_compound
+  | id_list generics decl_args COLON type_specifier ARROW stmt_compound
   ;
 
 decl_var
-  : decl_property
+  : decl_property_expr
+  | decl_property_compound
   | decl_function_expr
   | decl_function_compound
   ;
@@ -132,9 +145,26 @@ decl_args
   : LPAR decl_var_list RPAR
   ;
 
-/* ----------------------- SPECIFIER --------------------- */
-
 type_specifier
+  : type
+  | MUL type_specifier
+  | type_specifier LSQU RSQU
+  | type_specifier LPAR type_specifier_list RPAR
+  | type_specifier LBRA decl_list RBRA
+  ;
+
+type_specifier_list
+  : /* empty */
+  | type_specifier
+  | type_specifier_list COMMA type_specifier
+  ;
+
+type
+  : type_scalar
+  | type_generic
+  ;
+
+type_scalar
   : VOID
   | BOOL
   | CHAR
@@ -150,23 +180,21 @@ type_specifier
   | DOUBLE
   | UDOUBLE
   | SDOUBLE
-  | GENERIC
-  | MUL type_specifier
-  | type_specifier LSQU RSQU
-  | type_specifier LPAR type_specifier_list RPAR
   ;
 
-type_specifier_list
-  : /* empty */
-  | type_specifier
-  | type_specifier_list COMMA type_specifier
+type_generic
+  : GENERIC
   ;
-  
-/* ----------------------- STATEMENTS ----------------------- */
-  
+
+stmt_list
+  : /* empty */
+  | stmt
+  | stmt_list stmt
+  ;
+
 stmt
 	: stmt_expr
-	| stmt_label
+	| stmt_stmt
 	| stmt_compound
 	| stmt_select
 	| stmt_iter
@@ -179,8 +207,8 @@ stmt_expr
   | expr SEMICOLON
   ;
 
-stmt_label
-  : ID COLON stmt
+stmt_stmt
+  : id COLON stmt
   | CASE expr_cond COLON stmt
   | DEFAULT COLON stmt
   ;
@@ -208,7 +236,7 @@ stmt_iter
 	;
 
 stmt_jump
-  : GOTO ID SEMICOLON
+  : GOTO id SEMICOLON
   | CONTINUE SEMICOLON
   | BREAK SEMICOLON
   | RETURN SEMICOLON
@@ -217,16 +245,14 @@ stmt_jump
 
 stmt_decl
   : VAR decl_var_list SEMICOLON
-  | VAR LBRA program RBRA
+  | VAR LBRA decl_list RBRA
   ;
 
-stmt_list
+expr_list
   : /* empty */
-  | stmt
-  | stmt_list stmt
+  | expr
+  | expr_list COMMA expr
   ;
-
-/* ----------------------- EXPRESSION ----------------------- */
 
 expr_const
   : INT_CONST
@@ -237,7 +263,7 @@ expr_const
   ;
 
 expr_primary
-  : ID
+  : id
   | expr_const
   | LPAR expr RPAR
   ;
@@ -349,12 +375,6 @@ expr_assign
 
 expr
   : expr_assign
-  ;
-
-expr_list
-  : /* empty */
-  | expr
-  | expr_list COMMA expr
   ;
 
 %%

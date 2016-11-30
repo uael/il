@@ -28,7 +28,69 @@ using namespace std;
 
 namespace ddc {
   namespace ast {
+    struct id_t;
+    typedef vector<id_t *> id_list_t;
 
+    struct generic_t;
+    typedef vector<generic_t *> generic_list_t;
+    struct closure_t;
+
+    struct decl_t;
+    typedef vector<decl_t *> decl_list_t;
+    struct decl_property_t;
+    struct decl_function_t;
+
+    struct type_specifier_t;
+    typedef vector<type_specifier_t *> type_specifier_list_t;
+    struct type_t;
+    struct type_scalar_t;
+    struct type_generic_t;
+
+    struct stmt_t;
+    typedef vector<stmt_t *> stmt_list_t;
+    struct stmt_expr_t;
+    struct stmt_stmt_t;
+    struct stmt_label_t;
+    struct stmt_case_t;
+    struct stmt_default_t;
+    struct stmt_compound_t;
+    struct stmt_select_t;
+    struct stmt_if_t;
+    struct stmt_switch_t;
+    struct stmt_iter_t;
+    struct stmt_while_t;
+    struct stmt_do_while_t;
+    struct stmt_for_t;
+    struct stmt_jump_t;
+    struct stmt_goto_t;
+    struct stmt_continue_t;
+    struct stmt_break_t;
+    struct stmt_return_t;
+    struct stmt_decl_t;
+
+    struct expr_t;
+    typedef vector<expr_t *> expr_list_t;
+    struct expr_const_t;
+    struct expr_const_value_t;
+    struct expr_lambda_t;
+    struct expr_primary_t;
+    struct expr_array_access_t;
+    struct expr_call_t;
+    struct expr_postfix_t;
+    struct expr_prefix_t;
+    struct expr_cast_t;
+    struct expr_mul_t;
+    struct expr_add_t;
+    struct expr_shift_t;
+    struct expr_relational_t;
+    struct expr_equal_t;
+    struct expr_and_t;
+    struct expr_xor_t;
+    struct expr_or_t;
+    struct expr_land_t;
+    struct expr_lor_t;
+    struct expr_cond_t;
+    struct expr_assign_t;
   }
 }
 

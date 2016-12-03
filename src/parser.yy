@@ -147,10 +147,10 @@ decl_args
 
 type_specifier
   : type
+  | type LBRA decl_list RBRA
   | MUL type_specifier
   | type_specifier LSQU RSQU
   | type_specifier LPAR type_specifier_list RPAR
-  | type_specifier LBRA decl_list RBRA
   ;
 
 type_specifier_list
@@ -194,7 +194,7 @@ stmt_list
 
 stmt
 	: stmt_expr
-	| stmt_stmt
+	| stmt_label
 	| stmt_compound
 	| stmt_select
 	| stmt_iter
@@ -207,7 +207,7 @@ stmt_expr
   | expr SEMICOLON
   ;
 
-stmt_stmt
+stmt_label
   : id COLON stmt
   | CASE expr_cond COLON stmt
   | DEFAULT COLON stmt

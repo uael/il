@@ -23,13 +23,13 @@
 
 #include <vector>
 #include <string>
+#include <tuple>
 
 using namespace std;
 
 namespace ddc {
   namespace ast {
-    struct id_t;
-    typedef vector<id_t *> id_list_t;
+    typedef vector<string *> id_list_t;
 
     struct generic_t;
     typedef vector<generic_t *> generic_list_t;
@@ -49,33 +49,17 @@ namespace ddc {
     struct stmt_t;
     typedef vector<stmt_t *> stmt_list_t;
     struct stmt_expr_t;
-    struct stmt_stmt_t;
     struct stmt_label_t;
-    struct stmt_case_t;
-    struct stmt_default_t;
     struct stmt_compound_t;
     struct stmt_select_t;
-    struct stmt_if_t;
-    struct stmt_switch_t;
     struct stmt_iter_t;
-    struct stmt_while_t;
-    struct stmt_do_while_t;
-    struct stmt_for_t;
     struct stmt_jump_t;
-    struct stmt_goto_t;
-    struct stmt_continue_t;
-    struct stmt_break_t;
-    struct stmt_return_t;
     struct stmt_decl_t;
 
     struct expr_t;
     typedef vector<expr_t *> expr_list_t;
     struct expr_const_t;
-    struct expr_const_value_t;
-    struct expr_lambda_t;
     struct expr_primary_t;
-    struct expr_array_access_t;
-    struct expr_call_t;
     struct expr_postfix_t;
     struct expr_prefix_t;
     struct expr_cast_t;
@@ -91,6 +75,314 @@ namespace ddc {
     struct expr_lor_t;
     struct expr_cond_t;
     struct expr_assign_t;
+
+    struct generic_t {
+      string *value;
+      type_specifier_t *type_specifier;
+
+      generic_t(string *value, type_specifier_t *type_specifier)
+        : value(value), type_specifier(type_specifier) {}
+    };
+
+    struct closure_t {};
+
+    struct decl_t {
+      id_list_t *ids;
+      type_specifier_t *type_specifier;
+      closure_t *closure;
+
+      decl_t(id_list_t *ids, type_specifier_t *type_specifier, closure_t *closure)
+        : ids(ids), type_specifier(type_specifier), closure(closure) {}
+    };
+
+    struct decl_property_t : decl_t {
+      bool assigned;
+
+      decl_property_t(id_list_t *ids, type_specifier_t *type_specifier,
+                      closure_t *closure, bool assigned)
+        : decl_t(ids, type_specifier, closure), assigned(assigned) {}
+    };
+
+    struct decl_function_t : decl_t {
+      generic_list_t *generics;
+      decl_list_t *args;
+
+      decl_function_t(id_list_t *ids, generic_list_t *generics, decl_list_t *args,
+                      type_specifier_t *type_specifier, closure_t *closure)
+        : decl_t(ids, type_specifier, closure), generics(generics), args(args) {}
+    };
+
+    struct type_specifier_t {
+      type_t *type;
+      vector<type_specifier_list_t *> call_chain;
+      decl_list_t *decls;
+      int ptr_lvl;
+      int array_lvl;
+
+      type_specifier_t(type_t *type)
+        : type(type) {}
+
+      type_specifier_t(type_t *type, decl_list_t *decls)
+        : type(type), decls(decls) {}
+    };
+
+    struct type_t {};
+
+    struct type_scalar_t : type_t {
+      enum kind_t {
+        VOID, BOOL, CHAR, INT, UINT, SINT, SHORT, USHORT,
+        SSHORT, FLOAT, UFLOAT, SFLOAT, DOUBLE, UDOUBLE, SDOUBLE
+      } kind;
+
+      type_scalar_t(kind_t kind)
+        : kind(kind) {}
+    };
+
+    struct type_generic_t : type_t {
+      string *id;
+
+      type_generic_t(string *id)
+        : id(id) {}
+    };
+
+    struct stmt_t {};
+
+    struct stmt_expr_t : stmt_t {
+      expr_t *expr;
+
+      stmt_expr_t() {}
+      stmt_expr_t(expr_t *expr)
+        : expr(expr) {}
+    };
+
+    struct stmt_label_t : stmt_t {
+      enum kind_t {
+        LABEL, CASE, DEFAULT
+      } kind;
+      string *id;
+      stmt_t *stmt;
+      expr_cond_t *cond;
+
+      stmt_label_t(stmt_t *stmt)
+        : kind(DEFAULT), stmt(stmt) {}
+      stmt_label_t(string *id, stmt_t *stmt)
+        : kind(LABEL), id(id), stmt(stmt) {}
+      stmt_label_t(expr_cond_t *cond, stmt_t *stmt)
+        : kind(CASE), stmt(stmt), cond(cond) {}
+    };
+
+    struct stmt_compound_t : stmt_t, closure_t {
+      stmt_list_t *stmts;
+
+      stmt_compound_t() {}
+      stmt_compound_t(stmt_list_t *stmts)
+        : stmts(stmts) {}
+    };
+
+    struct stmt_select_t : stmt_t {
+      enum kind_t {
+        IF, SWITCH
+      } kind;
+      expr_t *cond;
+      stmt_t *stmt;
+      stmt_t *else_stmt;
+
+      stmt_select_t() {}
+      stmt_select_t(kind_t kind, expr_t *cond, stmt_t *stmt)
+        : kind(kind), cond(cond), stmt(stmt) {}
+      stmt_select_t(expr_t *cond, stmt_t *stmt, stmt_t *else_stmt)
+        : kind(IF), cond(cond), stmt(stmt), else_stmt(else_stmt) {}
+    };
+
+    struct stmt_iter_t : stmt_t {
+      enum kind_t {
+        WHILE, DO_WHILE, FOR
+      } kind;
+      stmt_t *decls;
+      expr_t *cond;
+      closure_t *step;
+      stmt_t *stmt;
+
+      stmt_iter_t(expr_t *cond, stmt_t *stmt)
+        : kind(WHILE), cond(cond), stmt(stmt) {}
+      stmt_iter_t(stmt_t *stmt, expr_t *cond)
+        : kind(DO_WHILE), cond(cond), stmt(stmt) {}
+      stmt_iter_t(expr_t *cond, closure_t *step, stmt_t *stmt)
+        : kind(FOR), cond(cond), step(step), stmt(stmt) {}
+      stmt_iter_t(stmt_t *decls, expr_t *cond, closure_t *step, stmt_t *stmt)
+        : kind(FOR), decls(decls), cond(cond), step(step), stmt(stmt) {}
+    };
+
+    struct stmt_jump_t : stmt_t {
+      enum kind_t {
+        GOTO, CONTINUE, BREAK, RETURN
+      } kind;
+      string *id;
+      expr_t *expr;
+
+      stmt_jump_t(kind_t kind)
+        : kind(kind) {}
+      stmt_jump_t(string *id)
+        : kind(GOTO), id(id) {}
+      stmt_jump_t(expr_t *expr)
+        : kind(RETURN), expr(expr) {}
+    };
+
+    struct stmt_decl_t : stmt_t {
+      decl_list_t *decls;
+
+      stmt_decl_t() {}
+      stmt_decl_t(decl_list_t *decls)
+        : decls(decls) {}
+    };
+
+    struct expr_t : closure_t {};
+
+    struct expr_assign_t : expr_t {
+      vector<expr_prefix_t *> assign_chain;
+      vector<expr_prefix_t *> mul_assign_chain;
+      vector<expr_prefix_t *> div_assign_chain;
+      vector<expr_prefix_t *> mod_assign_chain;
+      vector<expr_prefix_t *> add_assign_chain;
+      vector<expr_prefix_t *> sub_assign_chain;
+      vector<expr_prefix_t *> left_assign_chain;
+      vector<expr_prefix_t *> right_assign_chain;
+      vector<expr_prefix_t *> and_assign_chain;
+      vector<expr_prefix_t *> xor_assign_chain;
+      vector<expr_prefix_t *> or_assign_chain;
+
+      expr_assign_t() {}
+    };
+
+    struct expr_cond_t : expr_assign_t {
+      vector<tuple<expr_lor_t *, expr_t *>> ternary_chain;
+
+      expr_cond_t() {}
+    };
+
+    struct expr_lor_t : expr_cond_t {
+      vector<expr_land_t *> lor_chain;
+
+      expr_lor_t() {}
+    };
+
+    struct expr_land_t : expr_lor_t {
+      vector<expr_or_t *> land_chain;
+
+      expr_land_t() {}
+    };
+
+    struct expr_or_t : expr_land_t {
+      vector<expr_xor_t *> or_chain;
+
+      expr_or_t() {}
+    };
+
+    struct expr_xor_t : expr_or_t {
+      vector<expr_and_t *> xor_chain;
+
+      expr_xor_t() {}
+    };
+
+    struct expr_and_t : expr_xor_t {
+      vector<expr_equal_t *> and_chain;
+
+      expr_and_t() {}
+    };
+
+    struct expr_equal_t : expr_and_t {
+      vector<expr_relational_t *> eq_chain;
+      vector<expr_relational_t *> neq_chain;
+
+      expr_equal_t() {}
+    };
+
+    struct expr_relational_t : expr_equal_t {
+      vector<expr_shift_t *> lt_chain;
+      vector<expr_shift_t *> gt_chain;
+      vector<expr_shift_t *> le_chain;
+      vector<expr_shift_t *> ge_chain;
+
+      expr_relational_t() {}
+    };
+
+    struct expr_shift_t : expr_relational_t {
+      vector<expr_add_t *> ls_chain;
+      vector<expr_add_t *> rs_chain;
+
+      expr_shift_t() {}
+    };
+
+    struct expr_add_t : expr_shift_t {
+      vector<expr_mul_t *> add_chain;
+      vector<expr_mul_t *> sub_chain;
+
+      expr_add_t() {}
+    };
+
+    struct expr_mul_t : expr_add_t {
+      vector<expr_cast_t *> mul_chain;
+      vector<expr_cast_t *> div_chain;
+      vector<expr_cast_t *> mod_chain;
+
+      expr_mul_t() {}
+    };
+
+    struct expr_cast_t : expr_mul_t {
+      vector<type_specifier_t *> cast_chain;
+
+      expr_cast_t() {}
+    };
+
+    struct expr_prefix_t : expr_cast_t {
+      int inc_lvl;
+      int dec_lvl;
+      int and_lvl;
+      int add_lvl;
+      int sub_lvl;
+      int mul_lvl;
+      int not_lvl;
+      int tid_lvl;
+
+      expr_prefix_t() {}
+    };
+
+    struct expr_postfix_t : expr_prefix_t {
+      vector<expr_t *> position_chain;
+      vector<expr_list_t *> call_chain;
+      int post_inc_lvl = 0;
+      int post_dec_lvl = 0;
+
+      expr_postfix_t() {}
+    };
+
+    struct expr_primary_t : expr_postfix_t {
+      string *id;
+      expr_const_t *const_expr;
+      expr_t *expr;
+
+      expr_primary_t() {}
+      expr_primary_t(string *id)
+        : id(id) {}
+      expr_primary_t(expr_const_t *const_expr)
+        : const_expr(const_expr) {}
+      expr_primary_t(expr_t *expr)
+        : expr(expr) {}
+    };
+
+    struct expr_const_t {
+      enum kind_t {
+        INT, FLOAT, STRING, LAMBDA
+      } kind;
+      string *value;
+      id_list_t *args;
+      closure_t *closure;
+
+      expr_const_t(kind_t kind, string *value)
+        : kind(kind), value(value) {}
+      expr_const_t(id_list_t *args, closure_t *closure)
+        : kind(LAMBDA), args(args), closure(closure) {}
+    };
   }
 }
 

@@ -21,6 +21,9 @@
 #ifndef _SCANNER_H
 #define _SCANNER_H
 
+#include "ddc.h"
+using namespace ddc::ast;
+
 #ifndef YY_DECL
 #define  YY_DECL            \
     ddc::parser::token_type        \

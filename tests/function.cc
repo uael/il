@@ -24,60 +24,68 @@
 #include "gtest/gtest.h"
 #include "test.h"
 
-SYNTAX_TEST(function000, false, "1.8-10: syntax error\n",
-  "main():int"
+SYNTAX_TEST(func, fibonacci, true, "",
+  "fibonacci(n:int):int => {"
+  "  if (n==0) {"
+  "    return 0;"
+  "  } else if (n == 1) {"
+  "    return 1;"
+  "  } else {"
+  "    return fibonacci(n-1)+fibonacci(n-2);"
+  "  }"
+  "}"
 );
 
-SYNTAX_TEST(function001, false, "1.11: syntax error\n",
-  "main():int;"
+SYNTAX_TEST(func, sort, true, "",
+  "sort<T>(array : T[]) => {"
+  "  var swap(i, j : T) => {"
+  "      var t = array[i];"
+  "      array[i] = array[j];"
+  "      array[j] = t;"
+  "    },"
+  "    sort(l, r : T) => {"
+  "      var p = array[(l + r) / 2], i = l, j = r;"
+  "      while (i <= j) {"
+  "        while (array[i] < p) i += 1;"
+  "        while (array[i] < p) l -= 1;"
+  "        if (i <= j) {"
+  "          swap(i, j);"
+  "          i += 1;"
+  "          j -= 1;"
+  "        }"
+  "      }"
+  "      if (l < j) sort(l, j);"
+  "      if (j < r) sort(i, r);"
+  "    };"
+  "  sort1(0, count(array) - 1);"
+  "}"
 );
 
-SYNTAX_TEST(function002, false, "1.14: syntax error\n",
-  "main():int { }"
-);
-
-SYNTAX_TEST(function003, true, "",
-  "main():int => { }"
-);
-
-SYNTAX_TEST(function004, false, "1.15: syntax error\n",
-  "main():int => 0"
-);
-
-SYNTAX_TEST(function005, false, "1.15: syntax error\n",
-  "main():int => ;"
-);
-
-SYNTAX_TEST(function006, true, "",
-  "main():int => 0;"
-);
-
-SYNTAX_TEST(function007, false, "1.15-20: syntax error\n",
-  "main():int => return 0;"
-);
-
-SYNTAX_TEST(function008, true, "",
-  "main():int => 0 * 0;"
-);
-
-SYNTAX_TEST(function009, false, "1.7: syntax error\n",
-  "main(x):int => 0;"
-);
-
-SYNTAX_TEST(function010, true, "",
-  "main(x:double):int => 0;"
-);
-
-SYNTAX_TEST(function011, false, "1.9: syntax error\n",
-  "main(x,y):int => 0;"
-);
-
-SYNTAX_TEST(function012, true, "",
-  "main(x,y:double):int => 0;"
-);
-
-SYNTAX_TEST(function013, true, "",
-  "main(x,y:double = 0.0):int => x*y;"
+SYNTAX_TEST(func, sort2, true, "",
+  "sort<T>(array : T[]) => {"
+  "  var {"
+  "    swap(i, j : T) => {"
+  "      var { t = array[i]; }"
+  "      array[i] = array[j];"
+  "      array[j] = t;"
+  "    }"
+  "    sort(l, r : T) => {"
+  "      var { p = array[(l + r) / 2]; i = l; j = r; }"
+  "      while (i <= j) {"
+  "        while (array[i] < p) i += 1;"
+  "        while (array[i] < p) l -= 1;"
+  "        if (i <= j) {"
+  "          swap(i, j);"
+  "          i += 1;"
+  "          j -= 1;"
+  "        }"
+  "      }"
+  "      if (l < j) sort(l, j);"
+  "      if (j < r) sort(i, r);"
+  "    }"
+  "  }"
+  "  sort1(0, count(array) - 1);"
+  "}"
 );
 
 RUN;

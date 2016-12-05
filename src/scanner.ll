@@ -177,7 +177,8 @@ typedef ddc::parser::token token;
 "unsigned double"                 RET(UDOUBLE);
 "signed double"                   RET(SDOUBLE);
 
-{L}{A}*					                  SAVE_STRING; RET(ID);
+[a-z_][a-z0-9_]*	                SAVE_STRING; RET(ID);
+[A-Z]([A-Z]+[a-z0-9])*            SAVE_STRING; RET(GENERIC);
 
 {HP}{H}+{IS}?				              SAVE_STRING; RET(INT_CONST);
 {NZ}{D}*{IS}?				              SAVE_STRING; RET(INT_CONST);
@@ -191,7 +192,7 @@ typedef ddc::parser::token token;
 {HP}{H}+"."{P}{FS}?			          SAVE_STRING; RET(FLOAT_CONST);
 ({SP}?\"([^"\\\n]|{ES})*\"{WS}*)+ SAVE_STRING; RET(STRING_CONST);
 
-{WS}+                             { }
+{WS}+                             STEP;
 
 %%
 

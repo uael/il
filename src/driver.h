@@ -33,6 +33,8 @@ namespace ddc {
     bool trace_parsing;
     std::string streamname;
 
+    ddc::ast::decl_list_t program = ddc::ast::decl_list_t();
+
     class scanner *lexer;
 
     driver();

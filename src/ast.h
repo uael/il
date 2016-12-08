@@ -57,7 +57,6 @@ namespace ddc {
     struct stmt_decl_t;
 
     struct expr_t;
-    typedef vector<expr_t *> expr_list_t;
     struct expr_const_t;
     struct expr_primary_t;
     struct expr_postfix_t;
@@ -219,14 +218,14 @@ namespace ddc {
         GOTO, CONTINUE, BREAK, RETURN
       } kind;
       string *id;
-      expr_list_t *exprs;
+      expr_t *expr;
 
       stmt_jump_t(kind_t kind)
         : kind(kind) {}
       stmt_jump_t(string *id)
         : kind(GOTO), id(id) {}
-      stmt_jump_t(expr_list_t *exprs)
-        : kind(RETURN), exprs(exprs) {}
+      stmt_jump_t(expr_t *expr)
+        : kind(RETURN), expr(expr) {}
     };
 
     struct stmt_decl_t : stmt_t {
@@ -237,7 +236,11 @@ namespace ddc {
         : decls(decls) {}
     };
 
-    struct expr_t : closure_t {};
+    struct expr_t : closure_t {
+      expr_t *next;
+
+      expr_t() {}
+    };
 
     struct expr_assign_t : expr_t {
       vector<expr_prefix_t *> assign_chain;
@@ -350,7 +353,7 @@ namespace ddc {
 
     struct expr_postfix_t : expr_prefix_t {
       vector<expr_t *> position_chain;
-      vector<expr_list_t *> call_chain;
+      vector<expr_t *> call_chain;
       int post_inc_lvl = 0;
       int post_dec_lvl = 0;
 
@@ -358,22 +361,19 @@ namespace ddc {
     };
 
     struct expr_primary_t : expr_postfix_t {
-      string *id;
       expr_const_t *const_expr;
-      expr_list_t *exprs;
+      expr_t *expr;
 
       expr_primary_t() {}
-      expr_primary_t(string *id)
-        : id(id) {}
       expr_primary_t(expr_const_t *const_expr)
         : const_expr(const_expr) {}
-      expr_primary_t(expr_list_t *exprs)
-        : exprs(exprs) {}
+      expr_primary_t(expr_t *expr)
+        : expr(expr) {}
     };
 
     struct expr_const_t {
       enum kind_t {
-        INT, FLOAT, STRING, LAMBDA
+        INT, FLOAT, STRING, LAMBDA, ID
       } kind;
       string *value;
       id_list_t *args;

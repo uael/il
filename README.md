@@ -1,5 +1,5 @@
-# ddc - under development 
-[![Build Status](https://img.shields.io/travis/dotdry/ddc/master.svg)](https://travis-ci.org/dotdry/ddc)
+# dyc - under development 
+[![Build Status](https://img.shields.io/travis/dotdry/dyc/master.svg)](https://travis-ci.org/dotdry/dyc)
 
 ##Installation
 ```bash

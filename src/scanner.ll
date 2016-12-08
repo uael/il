@@ -122,6 +122,7 @@ typedef ddc::parser::token token;
 "++"                              RET(INC);
 "--"                              RET(DEC);
 
+"tuple"                           RET(TUPLE);
 "enum"                            RET(ENUM);
 "struct"                          RET(STRUCT);
 "class"                           RET(CLASS);

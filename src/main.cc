@@ -21,8 +21,22 @@
 #include <iostream>
 #include <fstream>
 #include <typeinfo>
+#include <sstream>
 
 #include "driver.h"
+
+struct writer {
+  std::string stream;
+  int indent_lvl;
+
+  writer *operator<<(const string &str) {
+    for (int i = 0; i < indent_lvl; i++) {
+      this->stream += "\t";
+    }
+    this->stream += str + "\r\n";
+    return this;
+  }
+};
 
 int main(int argc, char *argv[]) {
   ddc::driver driver = ddc::driver();

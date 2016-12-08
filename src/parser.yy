@@ -67,7 +67,6 @@ using namespace ddc::ast;
   stmt_decl_t *_stmt_decl;
 
   expr_t *_expr;
-  expr_list_t *_expr_list;
   expr_const_t *_expr_const;
   expr_primary_t *_expr_primary;
   expr_postfix_t *_expr_postfix;
@@ -90,7 +89,7 @@ using namespace ddc::ast;
 %token END 0 "end of file"
 %token EOL "end of line"
 %token <_string> ID GENERIC INT_CONST FLOAT_CONST STRING_CONST
-%token STRUCT ENUM INTERFACE CLASS
+%token TUPLE ENUM STRUCT INTERFACE CLASS
 %token VOID BOOL CHAR INT UINT SINT SHORT USHORT SSHORT FLOAT UFLOAT SFLOAT DOUBLE UDOUBLE SDOUBLE
 %token GT LT ADD SUB MUL DIV EQ NEQ LE GE
 %token COLON DOUBLE_COLON SEMICOLON COMMA LPAR RPAR LBRA RBRA ARROW ASSIGN
@@ -114,7 +113,7 @@ using namespace ddc::ast;
 %type <_decl_property> decl_property_expr decl_property_compound
 %type <_decl_function> decl_function_expr decl_function_compound
 
-%type <_type_specifier> type_specifier
+%type <_type_specifier> type_specifier type_specifier_unit type_specifier_linked_list
 %type <_type_specifier_list> type_specifier_list
 %type <_type> type
 %type <_type_scalar> type_scalar
@@ -130,8 +129,7 @@ using namespace ddc::ast;
 %type <_stmt_jump> stmt_jump
 %type <_stmt_decl> stmt_decl
 
-%type <_expr> expr
-%type <_expr_list> expr_list
+%type <_expr> expr expr_linked_list
 %type <_expr_assign> expr_assign
 %type <_expr_cond> expr_cond
 %type <_expr_lor> expr_lor
@@ -148,7 +146,7 @@ using namespace ddc::ast;
 %type <_expr_prefix> expr_prefix
 %type <_expr_postfix> expr_postfix
 %type <_expr_primary> expr_primary
-%type <_expr_const> expr_const
+%type <_expr_const> expr_const expr_const_base
 
 %{
 #include "driver.h"
@@ -165,7 +163,7 @@ using namespace ddc::ast;
 %destructor { if ($$) delete $$; $$ = nullptr; } type_specifier type_specifier_list type type_scalar type_generic
 %destructor { if ($$) delete $$; $$ = nullptr; } stmt stmt_list stmt_expr stmt_label stmt_compound stmt_select stmt_iter
 %destructor { if ($$) delete $$; $$ = nullptr; } stmt_jump stmt_decl
-%destructor { if ($$) delete $$; $$ = nullptr; } expr expr_list expr_assign expr_cond expr_lor expr_land expr_or
+%destructor { if ($$) delete $$; $$ = nullptr; } expr expr_assign expr_cond expr_lor expr_land expr_or
 %destructor { if ($$) delete $$; $$ = nullptr; } expr_xor expr_and expr_equal expr_relational expr_shift expr_add
 %destructor { if ($$) delete $$; $$ = nullptr; } expr_mul
 
@@ -200,7 +198,7 @@ generic
   : GENERIC {
       $$ = new generic_t($1, nullptr);
     }
-  | GENERIC COLON type_specifier {
+  | GENERIC COLON type_specifier_unit {
       $$ = new generic_t($1, $3);
     }
   ;
@@ -255,16 +253,16 @@ decl_list
   ;
 
 decl_property_expr
-  : id_list COLON type_specifier {
+  : id_list COLON type_specifier_unit {
       $$ = new decl_property_t($1, $3, nullptr, false);
     }
   | id_list ASSIGN expr_cond {
       $$ = new decl_property_t($1, nullptr, $3, true);
     }
-  | id_list COLON type_specifier ASSIGN expr_cond {
+  | id_list COLON type_specifier_unit ASSIGN expr_cond {
       $$ = new decl_property_t($1, $3, $5, true);
     }
-  | id_list COLON type_specifier ARROW expr_cond {
+  | id_list COLON type_specifier_unit ARROW expr_cond {
       $$ = new decl_property_t($1, $3, $5, false);
     }
   ;
@@ -332,22 +330,38 @@ decl_args
   ;
 
 type_specifier
+  : type_specifier_linked_list {
+      $$ = $1;
+    }
+  ;
+
+type_specifier_unit
   : type {
       $$ = new type_specifier_t($1);
     }
-  | type LBRA decl_list RBRA {
-      $$ = new type_specifier_t($1, $3);
-    }
-  | MUL type_specifier {
+  | MUL type_specifier_unit {
       $2->ptr_lvl++;
       $$ = $2;
     }
-  | type_specifier LSQU RSQU {
+  | type_specifier_unit LSQU RSQU {
       $1->array_lvl++;
       $$ = $1;
     }
-  | type_specifier LPAR type_specifier_list RPAR {
+  | type_specifier_unit LPAR type_specifier_list RPAR {
       $1->call_chain.push_back($3);
+      $$ = $1;
+    }
+  | TUPLE LT type_specifier_linked_list GT {
+      $$ = $3;
+    }
+  ;
+
+type_specifier_linked_list
+  : type_specifier_unit {
+      $$ = $1;
+    }
+  | type_specifier_linked_list COMMA type_specifier_unit {
+      $1->next = $3;
       $$ = $1;
     }
   ;
@@ -489,10 +503,7 @@ stmt_label
   ;
 
 stmt_compound
-  : LBRA RBRA {
-      $$ = new stmt_compound_t();
-    }
-  | LBRA stmt_list RBRA {
+  : LBRA stmt_list RBRA {
       $$ = new stmt_compound_t($2);
     }
   ;
@@ -561,7 +572,7 @@ stmt_jump
   | RETURN SEMICOLON {
       $$ = new stmt_jump_t(stmt_jump_t::kind_t::RETURN);
     }
-  | RETURN expr SEMICOLON {
+  | RETURN expr_linked_list SEMICOLON {
       $$ = new stmt_jump_t($2);
     }
   ;
@@ -569,9 +580,6 @@ stmt_jump
 stmt_decl
   : VAR decl_comma_list SEMICOLON {
       $$ = new stmt_decl_t($2);
-    }
-  | VAR LBRA decl_list RBRA {
-      $$ = new stmt_decl_t($3);
     }
   ;
 
@@ -581,16 +589,15 @@ expr
     }
   ;
 
-expr_list
+expr_linked_list
   : /* empty */ {
       $$ = nullptr;
     }
   | expr {
-      $$ = new expr_list_t();
-      $$->push_back($1);
+      $$ = $1;
     }
-  | expr_list COMMA expr {
-      $1->push_back($3);
+  | expr_linked_list COMMA expr {
+      $1->next = $3;
       $$ = $1;
     }
   ;
@@ -851,7 +858,7 @@ expr_postfix
       $1->position_chain.push_back($3);
       $$ = $1;
     }
-  | expr_postfix LPAR expr_list RPAR {
+  | expr_postfix LPAR expr_linked_list RPAR {
       $1->call_chain.push_back($3);
       $$ = $1;
     }
@@ -869,17 +876,26 @@ expr_primary
   : expr_const {
       $$ = new expr_primary_t($1);
     }
-  | id {
-      $$ = new expr_primary_t($1);
-    }
-  | LPAR expr RPAR {
+  | LPAR expr_linked_list RPAR {
       $$ = new expr_primary_t($2);
     }
   ;
 
 expr_const
-  : INT_CONST {
-      $$ = new expr_const_t(expr_const_t::kind_t::INT, $1);
+  : expr_const_base {
+      $$ = $1;
+    }
+  | LPAR id_list RPAR ARROW expr {
+      $$ = new expr_const_t($2, $5);
+    }
+  | LPAR id_list RPAR ARROW stmt_compound {
+      $$ = new expr_const_t($2, $5);
+    }
+  ;
+
+expr_const_base
+  : id {
+      $$ = new expr_const_t(expr_const_t::kind_t::ID, $1);
     }
   | FLOAT_CONST {
       $$ = new expr_const_t(expr_const_t::kind_t::FLOAT, $1);
@@ -887,11 +903,8 @@ expr_const
   | STRING_CONST {
       $$ = new expr_const_t(expr_const_t::kind_t::STRING, $1);
     }
-  | LPAR id_list RPAR ARROW expr {
-      $$ = new expr_const_t($2, $5);
-    }
-  | LPAR id_list RPAR ARROW stmt_compound {
-      $$ = new expr_const_t($2, $5);
+  | INT_CONST {
+      $$ = new expr_const_t(expr_const_t::kind_t::INT, $1);
     }
   ;
 

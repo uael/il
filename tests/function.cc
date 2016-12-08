@@ -69,6 +69,10 @@ SYNTAX_TEST(func, tuple1, true, "",
   "func(n : int) : int, tuple<*double, bool> => { return 1, &2.0, true; }"
 );
 
+SYNTAX_TEST(func, tuple3, true, "",
+  "func(n : int) : int, tuple<*double, bool> => { return 1, (&2.0, true); }"
+);
+
 RUN;
 
 /*

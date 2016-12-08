@@ -61,31 +61,12 @@ SYNTAX_TEST(func, sort, true, "",
   "}"
 );
 
-SYNTAX_TEST(func, sort2, true, "",
-  "sort<T>(array : T[]) => {"
-  "  var {"
-  "    swap(i, j : T) => {"
-  "      var { t = array[i]; }"
-  "      array[i] = array[j];"
-  "      array[j] = t;"
-  "    }"
-  "    sort(l, r : T) => {"
-  "      var { p = array[(l + r) / 2]; i = l; j = r; }"
-  "      while (i <= j) {"
-  "        while (array[i] < p) i += 1;"
-  "        while (array[i] < p) l -= 1;"
-  "        if (i <= j) {"
-  "          swap(i, j);"
-  "          i += 1;"
-  "          j -= 1;"
-  "        }"
-  "      }"
-  "      if (l < j) sort(l, j);"
-  "      if (j < r) sort(i, r);"
-  "    }"
-  "  }"
-  "  sort1(0, count(array) - 1);"
-  "}"
+SYNTAX_TEST(func, tuple, true, "",
+  "func(n : int) : int, *double => { return 1, &2.0; }"
+);
+
+SYNTAX_TEST(func, tuple1, true, "",
+  "func(n : int) : int, tuple<*double, bool> => { return 1, &2.0, true; }"
 );
 
 RUN;

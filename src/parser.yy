@@ -90,7 +90,7 @@ using namespace ddc::ast;
 %token END 0 "end of file"
 %token EOL "end of line"
 %token <_string> ID GENERIC INT_CONST FLOAT_CONST STRING_CONST
-%token STRUCT ENUM INTERFACE CLASS
+%token TUPLE ENUM STRUCT INTERFACE CLASS
 %token VOID BOOL CHAR INT UINT SINT SHORT USHORT SSHORT FLOAT UFLOAT SFLOAT DOUBLE UDOUBLE SDOUBLE
 %token GT LT ADD SUB MUL DIV EQ NEQ LE GE
 %token COLON DOUBLE_COLON SEMICOLON COMMA LPAR RPAR LBRA RBRA ARROW ASSIGN
@@ -114,7 +114,7 @@ using namespace ddc::ast;
 %type <_decl_property> decl_property_expr decl_property_compound
 %type <_decl_function> decl_function_expr decl_function_compound
 
-%type <_type_specifier> type_specifier
+%type <_type_specifier> type_specifier type_specifier_unit type_specifier_linked_list
 %type <_type_specifier_list> type_specifier_list
 %type <_type> type
 %type <_type_scalar> type_scalar
@@ -200,7 +200,7 @@ generic
   : GENERIC {
       $$ = new generic_t($1, nullptr);
     }
-  | GENERIC COLON type_specifier {
+  | GENERIC COLON type_specifier_unit {
       $$ = new generic_t($1, $3);
     }
   ;
@@ -255,16 +255,16 @@ decl_list
   ;
 
 decl_property_expr
-  : id_list COLON type_specifier {
+  : id_list COLON type_specifier_unit {
       $$ = new decl_property_t($1, $3, nullptr, false);
     }
   | id_list ASSIGN expr_cond {
       $$ = new decl_property_t($1, nullptr, $3, true);
     }
-  | id_list COLON type_specifier ASSIGN expr_cond {
+  | id_list COLON type_specifier_unit ASSIGN expr_cond {
       $$ = new decl_property_t($1, $3, $5, true);
     }
-  | id_list COLON type_specifier ARROW expr_cond {
+  | id_list COLON type_specifier_unit ARROW expr_cond {
       $$ = new decl_property_t($1, $3, $5, false);
     }
   ;
@@ -332,22 +332,38 @@ decl_args
   ;
 
 type_specifier
+  : type_specifier_linked_list {
+      $$ = $1;
+    }
+  ;
+
+type_specifier_unit
   : type {
       $$ = new type_specifier_t($1);
     }
-  | type LBRA decl_list RBRA {
-      $$ = new type_specifier_t($1, $3);
-    }
-  | MUL type_specifier {
+  | MUL type_specifier_unit {
       $2->ptr_lvl++;
       $$ = $2;
     }
-  | type_specifier LSQU RSQU {
+  | type_specifier_unit LSQU RSQU {
       $1->array_lvl++;
       $$ = $1;
     }
-  | type_specifier LPAR type_specifier_list RPAR {
+  | type_specifier_unit LPAR type_specifier_list RPAR {
       $1->call_chain.push_back($3);
+      $$ = $1;
+    }
+  | TUPLE LT type_specifier_linked_list GT {
+      $$ = $3;
+    }
+  ;
+
+type_specifier_linked_list
+  : type_specifier_unit {
+      $$ = $1;
+    }
+  | type_specifier_linked_list COMMA type_specifier_unit {
+      $1->next = $3;
       $$ = $1;
     }
   ;
@@ -561,7 +577,7 @@ stmt_jump
   | RETURN SEMICOLON {
       $$ = new stmt_jump_t(stmt_jump_t::kind_t::RETURN);
     }
-  | RETURN expr SEMICOLON {
+  | RETURN expr_list SEMICOLON {
       $$ = new stmt_jump_t($2);
     }
   ;
@@ -569,9 +585,6 @@ stmt_jump
 stmt_decl
   : VAR decl_comma_list SEMICOLON {
       $$ = new stmt_decl_t($2);
-    }
-  | VAR LBRA decl_list RBRA {
-      $$ = new stmt_decl_t($3);
     }
   ;
 
@@ -872,7 +885,7 @@ expr_primary
   | id {
       $$ = new expr_primary_t($1);
     }
-  | LPAR expr RPAR {
+  | LPAR expr_list RPAR {
       $$ = new expr_primary_t($2);
     }
   ;

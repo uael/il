@@ -116,6 +116,7 @@ namespace ddc {
       type_t *type;
       vector<type_specifier_list_t *> call_chain;
       decl_list_t *decls;
+      type_specifier_t *next;
       int ptr_lvl;
       int array_lvl;
 
@@ -218,14 +219,14 @@ namespace ddc {
         GOTO, CONTINUE, BREAK, RETURN
       } kind;
       string *id;
-      expr_t *expr;
+      expr_list_t *exprs;
 
       stmt_jump_t(kind_t kind)
         : kind(kind) {}
       stmt_jump_t(string *id)
         : kind(GOTO), id(id) {}
-      stmt_jump_t(expr_t *expr)
-        : kind(RETURN), expr(expr) {}
+      stmt_jump_t(expr_list_t *exprs)
+        : kind(RETURN), exprs(exprs) {}
     };
 
     struct stmt_decl_t : stmt_t {
@@ -359,15 +360,15 @@ namespace ddc {
     struct expr_primary_t : expr_postfix_t {
       string *id;
       expr_const_t *const_expr;
-      expr_t *expr;
+      expr_list_t *exprs;
 
       expr_primary_t() {}
       expr_primary_t(string *id)
         : id(id) {}
       expr_primary_t(expr_const_t *const_expr)
         : const_expr(const_expr) {}
-      expr_primary_t(expr_t *expr)
-        : expr(expr) {}
+      expr_primary_t(expr_list_t *exprs)
+        : exprs(exprs) {}
     };
 
     struct expr_const_t {

@@ -185,7 +185,7 @@ using namespace dyc::ast;
 
 program
   : decl_list {
-      driver.context = dyc::context_t($1);
+      driver.ast = dyc::ast::ast_t($1);
     }
   ;
 

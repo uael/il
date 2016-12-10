@@ -21,8 +21,8 @@
 #include "generator.h"
 
 namespace dyc {
-  generator_t::generator_t(context_t *context)
-    : context(context) {}
+  generator_t::generator_t(ast::ast_t *ast)
+    : ast(ast) {}
 
   bool generator_t::generate() {
     return false;

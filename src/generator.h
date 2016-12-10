@@ -21,19 +21,23 @@
 #ifndef _GENERATOR_H
 #define _GENERATOR_H
 
-#include "context.h"
+#include <string>
 
 namespace dyc {
+  namespace ast {
+    struct ast_t;
+  }
+
   struct generator_t {
-    context_t *context;
-    generator_t(context_t *context);
+    ast::ast_t *ast;
+    generator_t(ast::ast_t *ast);
     bool generate();
 
     struct writer_t {
       std::string stream;
       int indent_lvl;
 
-      writer_t *operator<<(const string &str) {
+      writer_t *operator<<(const std::string &str) {
         for (int i = 0; i < indent_lvl; i++) {
           this->stream += "  ";
         }

@@ -24,7 +24,6 @@
 #include <string>
 #include <vector>
 #include "scanner.h"
-#include "context.h"
 
 namespace dyc {
 
@@ -34,7 +33,7 @@ namespace dyc {
     bool trace_parsing;
     std::string streamname;
 
-    dyc::context_t context;
+    dyc::ast::ast_t ast;
 
     class scanner *lexer;
 

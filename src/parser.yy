@@ -40,6 +40,7 @@ using namespace dyc::ast;
 %union {
   std::string *_string;
 
+  identifier_t *_id;
   id_list_t *_id_list;
 
   generic_t *_generic;
@@ -108,7 +109,7 @@ using namespace dyc::ast;
 
 %destructor { delete $$; } ID INT_CONST FLOAT_CONST STRING_CONST
 
-%type <_string> id
+%type <_id> id
 %type <_id_list> id_list
 
 %type <_generic> generic
@@ -191,7 +192,7 @@ program
 
 id
   : ID {
-      $$ = $1;
+      $$ = new identifier_t($1);
     }
   ;
 
@@ -503,7 +504,7 @@ stmt_expr
   ;
 
 stmt_label
-  : id COLON stmt {
+  : ID COLON stmt {
       $$ = new stmt_label_t($1, $3);
     }
   | CASE expr_cond COLON stmt {
@@ -572,7 +573,7 @@ stmt_iter
 	;
 
 stmt_jump
-  : GOTO id SEMICOLON {
+  : GOTO ID SEMICOLON {
       $$ = new stmt_jump_t($2);
     }
   | CONTINUE SEMICOLON {
@@ -894,7 +895,10 @@ expr_primary
   ;
 
 expr_const
-  : const_value {
+  : id {
+      $$ = $1;
+    }
+  | const_value {
       $$ = $1;
     }
   | const_lambda {
@@ -906,10 +910,7 @@ expr_const
   ;
 
 const_value
-  : id {
-      $$ = new const_value_t(const_value_t::kind_t::ID, $1);
-    }
-  | FLOAT_CONST {
+  : FLOAT_CONST {
       $$ = new const_value_t(const_value_t::kind_t::FLOAT, $1);
     }
   | STRING_CONST {

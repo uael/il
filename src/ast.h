@@ -31,7 +31,8 @@ using namespace std;
 
 namespace dyc {
   namespace ast {
-    typedef vector<string *> id_list_t;
+    struct identifier_t;
+    typedef vector<identifier_t *> id_list_t;
 
     struct generic_t;
     typedef vector<generic_t *> generic_list_t;
@@ -516,7 +517,7 @@ namespace dyc {
 
     struct const_value_t : expr_const_t {
       enum kind_t {
-        INT, FLOAT, STRING, ID
+        INT, FLOAT, STRING
       } kind;
       string *value;
 
@@ -551,6 +552,17 @@ namespace dyc {
 
       bool write(generator_t::writer_t *writer, ast_t *ast) override {
         return expr_const_t::write(writer, ast);
+      }
+    };
+
+    struct identifier_t : expr_const_t {
+      string *value;
+      string uk_value;
+
+      identifier_t(string *value) : value(value) {}
+
+      bool write(generator_t::writer_t *writer, ast_t *ast) override {
+        return node_t::write(writer, ast);
       }
     };
   }

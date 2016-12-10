@@ -73,6 +73,32 @@ SYNTAX_TEST(func, tuple3, true, "",
   "func(n : int) : int, tuple<*double, bool> => { return 1, (&2.0, true); }"
 );
 
+SYNTAX_TEST(func, initializer, true, "",
+  "func() : int[] => {"
+  "  return [0, 1, 2, 3, 4, 5, 6 * 5 ? 5 : 8];"
+  "}"
+);
+
+SYNTAX_TEST(func, initializer2, true, "",
+  "func() : int[][] => {"
+  "  return [[0, 1, 2, 3],[0, 1, 2, 3],[0, 1, 2, 3],[0, 1, 2, 3]];"
+  "}"
+);
+
+SYNTAX_TEST(func, initializer3, true, "",
+  "func() => {"
+  "  var map = {"
+  "    foo: [0, 1, 2, 3],"
+  "    \"bar\": {"
+  "      0: [0, 1, 2, 3],"
+  "      1: [0, 1, 2, 3],"
+  "      2: [0, 1, 2, 3],"
+  "      3 * 1: [0, 1, 2, 3]"
+  "    }"
+  "  };"
+  "}"
+);
+
 RUN;
 
 /*

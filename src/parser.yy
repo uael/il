@@ -84,6 +84,12 @@ using namespace ddc::ast;
   expr_lor_t *_expr_lor;
   expr_cond_t *_expr_cond;
   expr_assign_t *_expr_assign;
+
+  const_value_t *_const_value;
+  const_lambda_t *_const_lambda;
+  const_initializer_t *_const_initializer;
+
+  ds_map_t *_ds_map;
 }
 
 %token END 0 "end of file"
@@ -146,7 +152,13 @@ using namespace ddc::ast;
 %type <_expr_prefix> expr_prefix
 %type <_expr_postfix> expr_postfix
 %type <_expr_primary> expr_primary
-%type <_expr_const> expr_const expr_const_base
+%type <_expr_const> expr_const
+
+%type <_const_value> const_value
+%type <_const_lambda> const_lambda
+%type <_const_initializer> const_initializer
+
+%type <_ds_map> ds_map
 
 %{
 #include "driver.h"
@@ -458,28 +470,28 @@ stmt_list
   ;
 
 stmt
-	: stmt_expr {
-	    $$ = $1;
-	  }
-	| stmt_label {
-	    $$ = $1;
-	  }
-	| stmt_compound {
-	    $$ = $1;
-	  }
-	| stmt_select {
-	    $$ = $1;
-	  }
-	| stmt_iter {
-	    $$ = $1;
-	  }
-	| stmt_jump {
+  : stmt_expr {
       $$ = $1;
     }
-	| stmt_decl {
+  | stmt_label {
       $$ = $1;
     }
-	;
+  | stmt_compound {
+      $$ = $1;
+    }
+  | stmt_select {
+      $$ = $1;
+    }
+  | stmt_iter {
+      $$ = $1;
+    }
+  | stmt_jump {
+      $$ = $1;
+    }
+  | stmt_decl {
+      $$ = $1;
+    }
+  ;
 
 stmt_expr
   : SEMICOLON {
@@ -882,29 +894,61 @@ expr_primary
   ;
 
 expr_const
-  : expr_const_base {
+  : const_value {
       $$ = $1;
     }
-  | LPAR id_list RPAR ARROW expr {
-      $$ = new expr_const_t($2, $5);
+  | const_lambda {
+      $$ = $1;
     }
-  | LPAR id_list RPAR ARROW stmt_compound {
-      $$ = new expr_const_t($2, $5);
+  | const_initializer {
+      $$ = $1;
     }
   ;
 
-expr_const_base
+const_value
   : id {
-      $$ = new expr_const_t(expr_const_t::kind_t::ID, $1);
+      $$ = new const_value_t(const_value_t::kind_t::ID, $1);
     }
   | FLOAT_CONST {
-      $$ = new expr_const_t(expr_const_t::kind_t::FLOAT, $1);
+      $$ = new const_value_t(const_value_t::kind_t::FLOAT, $1);
     }
   | STRING_CONST {
-      $$ = new expr_const_t(expr_const_t::kind_t::STRING, $1);
+      $$ = new const_value_t(const_value_t::kind_t::STRING, $1);
     }
   | INT_CONST {
-      $$ = new expr_const_t(expr_const_t::kind_t::INT, $1);
+      $$ = new const_value_t(const_value_t::kind_t::INT, $1);
+    }
+  ;
+
+const_lambda
+  : LPAR id_list RPAR ARROW expr {
+      $$ = new const_lambda_t($2, $5);
+    }
+  | LPAR id_list RPAR ARROW stmt_compound {
+      $$ = new const_lambda_t($2, $5);
+    }
+  ;
+
+const_initializer
+  : LSQU expr_linked_list RSQU {
+      $$ = new const_initializer_t($2);
+    }
+  | LBRA ds_map RBRA {
+      $$ = new const_initializer_t($2);
+    }
+  ;
+
+ds_map
+  : /* empty */ {
+      $$ = nullptr;
+    }
+  | expr_cond COLON expr {
+      $$ = new ds_map_t();
+      (*$$)[$1] = $3;
+    }
+  | ds_map COMMA expr_cond COLON expr {
+      (*$1)[$3] = $5;
+      $$ = $1;
     }
   ;
 

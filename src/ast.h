@@ -530,11 +530,14 @@ namespace dyc {
     };
 
     struct const_lambda_t : expr_const_t {
+      identifier_t *arg;
       id_list_t *args;
       closure_t *closure;
 
       const_lambda_t(id_list_t *args, closure_t *closure)
         : args(args), closure(closure) {}
+      const_lambda_t(identifier_t *arg, closure_t *closure)
+        : arg(arg), closure(closure) {}
 
       bool write(generator_t::writer_t *writer, ast_t *ast) override {
         return expr_const_t::write(writer, ast);

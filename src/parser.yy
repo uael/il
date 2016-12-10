@@ -928,6 +928,12 @@ const_lambda
   | LPAR id_list RPAR ARROW stmt_compound {
       $$ = new const_lambda_t($2, $5);
     }
+  | id ARROW expr {
+      $$ = new const_lambda_t($1, $3);
+    }
+  | id ARROW stmt_compound {
+      $$ = new const_lambda_t($1, $3);
+    }
   ;
 
 const_initializer

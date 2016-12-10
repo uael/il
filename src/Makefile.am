@@ -8,10 +8,10 @@ libdcc_la_SOURCES = \
 	parser.yy scanner.ll y.tab.h \
 	driver.cc
 
-bin_PROGRAMS = ddc
+bin_PROGRAMS = dyc
 
-ddc_SOURCES = main.cc
-ddc_LDFLAGS = libdcc.la
-ddc_DEPENDENCIES = libdcc.la
+dyc_SOURCES = main.cc
+dyc_LDFLAGS = libdcc.la
+dyc_DEPENDENCIES = libdcc.la
 
-pkginclude_HEADERS = ddc.h
+pkginclude_HEADERS = dyc.h

@@ -39,7 +39,7 @@ struct writer {
 };
 
 int main(int argc, char *argv[]) {
-  ddc::driver driver = ddc::driver();
+  dyc::driver driver = dyc::driver();
   bool readfile = false;
 
   for (int ai = 1; ai < argc; ++ai) {

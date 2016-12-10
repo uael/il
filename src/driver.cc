@@ -23,7 +23,7 @@
 #include <iostream>
 #include "driver.h"
 
-namespace ddc {
+namespace dyc {
 
   driver::driver()
     : trace_scanning(false), trace_parsing(false) { }

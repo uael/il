@@ -18,13 +18,13 @@
 
 /* $Id$ */
 
-#ifndef _DDC_H
-#define _DDC_H
+#ifndef _DYC_H
+#define _DYC_H
 
 #include "config.h"
 #include "ast.h"
 
-#endif /* _DDC_H */
+#endif /* _DYC_H */
 
 /*
  * Local variables:

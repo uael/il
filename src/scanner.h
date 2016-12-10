@@ -21,20 +21,20 @@
 #ifndef _SCANNER_H
 #define _SCANNER_H
 
-#include "ddc.h"
-using namespace ddc::ast;
+#include "dyc.h"
+using namespace dyc::ast;
 
 #ifndef YY_DECL
 #define  YY_DECL            \
-    ddc::parser::token_type        \
-    ddc::scanner::lex(        \
-  ddc::parser::semantic_type* yylval,    \
-  ddc::parser::location_type* yylloc    \
+    dyc::parser::token_type        \
+    dyc::scanner::lex(        \
+  dyc::parser::semantic_type* yylval,    \
+  dyc::parser::location_type* yylloc    \
     )
 #endif
 
 #ifndef __FLEX_LEXER_H
-#  define yyFlexLexer ddcFlexLexer
+#  define yyFlexLexer dycFlexLexer
 #  include "FlexLexer.h"
 #  undef yyFlexLexer
 #endif
@@ -49,9 +49,9 @@ using namespace ddc::ast;
 #  include "parser.hh"
 #endif
 
-namespace ddc {
+namespace dyc {
 
-  class scanner : public ddcFlexLexer {
+  class scanner : public dycFlexLexer {
   public:
     scanner(std::istream *arg_yyin = 0, std::ostream *arg_yyout = 0);
 

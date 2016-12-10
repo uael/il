@@ -25,7 +25,7 @@
 #include <vector>
 #include "scanner.h"
 
-namespace ddc {
+namespace dyc {
 
   class driver {
   public:
@@ -33,7 +33,7 @@ namespace ddc {
     bool trace_parsing;
     std::string streamname;
 
-    ddc::ast::decl_list_t program = ddc::ast::decl_list_t();
+    dyc::ast::decl_list_t program = dyc::ast::decl_list_t();
 
     class scanner *lexer;
 

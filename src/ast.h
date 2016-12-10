@@ -28,7 +28,7 @@
 
 using namespace std;
 
-namespace ddc {
+namespace dyc {
   namespace ast {
     typedef vector<string *> id_list_t;
 

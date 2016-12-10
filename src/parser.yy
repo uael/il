@@ -19,8 +19,8 @@
 /* $Id$ */
 
 %{
-#include "ddc.h"
-using namespace ddc::ast;
+#include "dyc.h"
+using namespace dyc::ast;
 
 #include <cstdio>
 #include <cstdlib>
@@ -30,7 +30,7 @@ using namespace ddc::ast;
 %require "3.0"
 %debug
 %defines
-%define api.namespace {ddc}
+%define api.namespace {dyc}
 %define parser_class_name {parser}
 
 %parse-param {class driver &driver}
@@ -954,7 +954,7 @@ ds_map
 
 %%
 
-void ddc::parser::error(const ddc::parser::location_type& l, const std::string& m) {
+void dyc::parser::error(const dyc::parser::location_type& l, const std::string& m) {
   driver.error(l, m);
 }
 

@@ -16,6 +16,7 @@ Currently support functionnal parsing only :
 ##Deps
 ```bash
 $ sudo apt install build-essential make autoconf automake libtool g++ bison flex 
+$ git submodule update --init
 ```
 
 ##Installation

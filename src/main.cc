@@ -25,19 +25,6 @@
 
 #include "driver.h"
 
-struct writer {
-  std::string stream;
-  int indent_lvl;
-
-  writer *operator<<(const string &str) {
-    for (int i = 0; i < indent_lvl; i++) {
-      this->stream += "\t";
-    }
-    this->stream += str + "\r\n";
-    return this;
-  }
-};
-
 int main(int argc, char *argv[]) {
   dyc::driver driver = dyc::driver();
   bool readfile = false;
@@ -48,8 +35,6 @@ int main(int argc, char *argv[]) {
     } else if (argv[ai] == std::string("-s")) {
       driver.trace_scanning = true;
     } else {
-      // read a file with nodes
-
       std::fstream infile(argv[ai]);
       if (!infile.good()) {
         std::cerr << "Could not open file: " << argv[ai] << std::endl;

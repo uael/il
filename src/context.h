@@ -18,37 +18,22 @@
 
 /* $Id$ */
 
-#ifndef _DRIVER_H
-#define _DRIVER_H
+#ifndef _CONTEXT_H
+#define _CONTEXT_H
 
-#include <string>
-#include <vector>
-#include "scanner.h"
-#include "context.h"
+#include "ast.h"
+
+using namespace dyc::ast;
 
 namespace dyc {
-
-  class driver {
-  public:
-    bool trace_scanning;
-    bool trace_parsing;
-    std::string streamname;
-
-    dyc::context_t context;
-
-    class scanner *lexer;
-
-    driver();
-
-    bool parse_stream(std::istream &in, const std::string &sname = "stream input");
-    bool parse_string(const std::string &input, const std::string &sname = "string stream");
-    bool parse_file(const std::string &filename);
-    void error(const class location &l, const std::string &m);
-    void error(const std::string &m);
+  struct context_t {
+    decl_list_t *decls;
+    context_t();
+    context_t(decl_list_t *decls);
   };
 }
 
-#endif /* _DRIVER_H */
+#endif /* _CONTEXT_H */
 
 /*
  * Local variables:

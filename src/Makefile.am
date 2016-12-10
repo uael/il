@@ -6,7 +6,7 @@ noinst_LTLIBRARIES = libdcc.la
 
 libdcc_la_SOURCES = \
 	parser.yy scanner.ll y.tab.h \
-	driver.cc
+	driver.cc context.cc generator.cc
 
 bin_PROGRAMS = dyc
 

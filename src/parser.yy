@@ -458,28 +458,28 @@ stmt_list
   ;
 
 stmt
-	: stmt_expr {
-	    $$ = $1;
-	  }
-	| stmt_label {
-	    $$ = $1;
-	  }
-	| stmt_compound {
-	    $$ = $1;
-	  }
-	| stmt_select {
-	    $$ = $1;
-	  }
-	| stmt_iter {
-	    $$ = $1;
-	  }
-	| stmt_jump {
+  : stmt_expr {
       $$ = $1;
     }
-	| stmt_decl {
+  | stmt_label {
       $$ = $1;
     }
-	;
+  | stmt_compound {
+      $$ = $1;
+    }
+  | stmt_select {
+      $$ = $1;
+    }
+  | stmt_iter {
+      $$ = $1;
+    }
+  | stmt_jump {
+      $$ = $1;
+    }
+  | stmt_decl {
+      $$ = $1;
+    }
+  ;
 
 stmt_expr
   : SEMICOLON {

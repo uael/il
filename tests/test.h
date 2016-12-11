@@ -23,7 +23,7 @@
 
 #define SYNTAX_TEST(prefix, postfix, ex_status, ex_cerr, code) \
   TEST(prefix, postfix) { \
-    ddc::driver driver = ddc::driver(); \
+    dyc::driver driver = dyc::driver(); \
     testing::internal::CaptureStderr(); \
     ASSERT_EQ(ex_status, driver.parse_string(code)); \
     std::string output = testing::internal::GetCapturedStderr(); \

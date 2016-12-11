@@ -19,8 +19,8 @@
 /* $Id$ */
 
 %{
-#include "ddc.h"
-using namespace ddc::ast;
+#include "dyc.h"
+using namespace dyc::ast;
 
 #include <cstdio>
 #include <cstdlib>
@@ -30,7 +30,7 @@ using namespace ddc::ast;
 %require "3.0"
 %debug
 %defines
-%define api.namespace {ddc}
+%define api.namespace {dyc}
 %define parser_class_name {parser}
 
 %parse-param {class driver &driver}
@@ -38,26 +38,22 @@ using namespace ddc::ast;
 %locations
 
 %union {
-  std::string *_string;
+  string *_string;
 
-  id_list_t *_id_list;
+  identifier_t *_id;
 
   generic_t *_generic;
-  generic_list_t *_generic_list;
 
   decl_t *_decl;
-  decl_list_t *_decl_list;
   decl_property_t *_decl_property;
   decl_function_t *_decl_function;
 
   type_specifier_t *_type_specifier;
-  type_specifier_list_t *_type_specifier_list;
   type_t *_type;
   type_scalar_t *_type_scalar;
   type_generic_t *_type_generic;
 
   stmt_t *_stmt;
-  stmt_list_t *_stmt_list;
   stmt_expr_t *_stmt_expr;
   stmt_label_t *_stmt_label;
   stmt_compound_t *_stmt_compound;
@@ -106,27 +102,22 @@ using namespace ddc::ast;
 %token PRIVATE PROTECTED CONST VOLATILE ABSTRACT STATIC VIRTUAL FINAL INLINE
 %token VAR NEW SIZEOF TYPEOF ASSERT TRY CATCH SELF THIS
 
-%destructor { delete $$; } ID INT_CONST FLOAT_CONST STRING_CONST
+%destructor { if ($$) delete $$; $$ = nullptr; } ID INT_CONST FLOAT_CONST STRING_CONST
 
-%type <_string> id
-%type <_id_list> id_list
+%type <_id> id id_list
 
-%type <_generic> generic
-%type <_generic_list> generic_list generics
+%type <_generic> generic generic_list generics
 
-%type <_decl> decl decl_var
-%type <_decl_list> decl_list decl_args decl_comma_list
+%type <_decl> decl decl_var decl_list decl_args decl_comma_list
 %type <_decl_property> decl_property_expr decl_property_compound
 %type <_decl_function> decl_function_expr decl_function_compound
 
-%type <_type_specifier> type_specifier type_specifier_unit type_specifier_linked_list
-%type <_type_specifier_list> type_specifier_list
+%type <_type_specifier> type_specifier type_specifier_list type_specifier_unit
 %type <_type> type
 %type <_type_scalar> type_scalar
 %type <_type_generic> type_generic
 
-%type <_stmt> stmt
-%type <_stmt_list> stmt_list
+%type <_stmt> stmt stmt_list
 %type <_stmt_expr> stmt_expr
 %type <_stmt_label> stmt_label
 %type <_stmt_compound> stmt_compound
@@ -135,7 +126,7 @@ using namespace ddc::ast;
 %type <_stmt_jump> stmt_jump
 %type <_stmt_decl> stmt_decl
 
-%type <_expr> expr expr_linked_list
+%type <_expr> expr expr_list
 %type <_expr_assign> expr_assign
 %type <_expr_cond> expr_cond
 %type <_expr_lor> expr_lor
@@ -169,15 +160,51 @@ using namespace ddc::ast;
 %}
 
 %destructor { if ($$) delete $$; $$ = nullptr; } id id_list
-%destructor { if ($$) delete $$; $$ = nullptr; } generic generic_list
-%destructor { if ($$) delete $$; $$ = nullptr; } decl decl_list decl_property_expr decl_function_expr
-%destructor { if ($$) delete $$; $$ = nullptr; } decl_property_compound decl_function_compound
-%destructor { if ($$) delete $$; $$ = nullptr; } type_specifier type_specifier_list type type_scalar type_generic
-%destructor { if ($$) delete $$; $$ = nullptr; } stmt stmt_list stmt_expr stmt_label stmt_compound stmt_select stmt_iter
-%destructor { if ($$) delete $$; $$ = nullptr; } stmt_jump stmt_decl
-%destructor { if ($$) delete $$; $$ = nullptr; } expr expr_assign expr_cond expr_lor expr_land expr_or
-%destructor { if ($$) delete $$; $$ = nullptr; } expr_xor expr_and expr_equal expr_relational expr_shift expr_add
+
+%destructor { if ($$) delete $$; $$ = nullptr; } generic generic_list generics
+
+%destructor { if ($$) delete $$; $$ = nullptr; } decl decl_var decl_list decl_args decl_comma_list
+%destructor { if ($$) delete $$; $$ = nullptr; } decl_property_expr decl_property_compound
+%destructor { if ($$) delete $$; $$ = nullptr; } decl_function_expr decl_function_compound
+
+%destructor { if ($$) delete $$; $$ = nullptr; } type_specifier type_specifier_list type_specifier_unit
+%destructor { if ($$) delete $$; $$ = nullptr; } type
+%destructor { if ($$) delete $$; $$ = nullptr; } type_scalar
+%destructor { if ($$) delete $$; $$ = nullptr; } type_generic
+
+%destructor { if ($$) delete $$; $$ = nullptr; } stmt stmt_list
+%destructor { if ($$) delete $$; $$ = nullptr; } stmt_expr
+%destructor { if ($$) delete $$; $$ = nullptr; } stmt_label
+%destructor { if ($$) delete $$; $$ = nullptr; } stmt_compound
+%destructor { if ($$) delete $$; $$ = nullptr; } stmt_select
+%destructor { if ($$) delete $$; $$ = nullptr; } stmt_iter
+%destructor { if ($$) delete $$; $$ = nullptr; } stmt_jump
+%destructor { if ($$) delete $$; $$ = nullptr; } stmt_decl
+
+%destructor { if ($$) delete $$; $$ = nullptr; } expr expr_list
+%destructor { if ($$) delete $$; $$ = nullptr; } expr_assign
+%destructor { if ($$) delete $$; $$ = nullptr; } expr_cond
+%destructor { if ($$) delete $$; $$ = nullptr; } expr_lor
+%destructor { if ($$) delete $$; $$ = nullptr; } expr_land
+%destructor { if ($$) delete $$; $$ = nullptr; } expr_or
+%destructor { if ($$) delete $$; $$ = nullptr; } expr_xor
+%destructor { if ($$) delete $$; $$ = nullptr; } expr_and
+%destructor { if ($$) delete $$; $$ = nullptr; } expr_equal
+%destructor { if ($$) delete $$; $$ = nullptr; } expr_relational
+%destructor { if ($$) delete $$; $$ = nullptr; } expr_shift
+%destructor { if ($$) delete $$; $$ = nullptr; } expr_add
 %destructor { if ($$) delete $$; $$ = nullptr; } expr_mul
+%destructor { if ($$) delete $$; $$ = nullptr; } expr_cast
+%destructor { if ($$) delete $$; $$ = nullptr; } expr_prefix
+%destructor { if ($$) delete $$; $$ = nullptr; } expr_postfix
+%destructor { if ($$) delete $$; $$ = nullptr; } expr_primary
+%destructor { if ($$) delete $$; $$ = nullptr; } expr_const
+
+%destructor { if ($$) delete $$; $$ = nullptr; } const_value
+%destructor { if ($$) delete $$; $$ = nullptr; } const_lambda
+%destructor { if ($$) delete $$; $$ = nullptr; } const_initializer
+
+%destructor { if ($$) delete $$; $$ = nullptr; } ds_map
 
 %start program
 
@@ -185,24 +212,24 @@ using namespace ddc::ast;
 
 program
   : decl_list {
-      driver.program = *$1;
+      driver.ast = dyc::ast::ast_t($1);
     }
   ;
 
 id
   : ID {
-      $$ = $1;
+      $$ = new identifier_t($1);
     }
   ;
 
 id_list
   : id {
-      $$ = new id_list_t();
-      $$->push_back($1);
+      $$ = $1;
     }
   | id_list COMMA id {
-      $1->push_back($3);
-      $$ = $1;
+      $1->next = $3;
+      $3->prev = $1;
+      $$ = $3;
     }
   ;
   
@@ -210,19 +237,19 @@ generic
   : GENERIC {
       $$ = new generic_t($1, nullptr);
     }
-  | GENERIC COLON type_specifier_unit {
+  | GENERIC COLON type_specifier {
       $$ = new generic_t($1, $3);
     }
   ;
   
 generic_list
   : generic {
-      $$ = new generic_list_t();
-      $$->push_back($1);
+      $$ = $1;
     }
   | generic_list COMMA generic {
-      $1->push_back($3);
-      $$ = $1;
+      $1->next = $3;
+      $3->prev = $1;
+      $$ = $3;
     }
   ;
 
@@ -255,26 +282,26 @@ decl_list
       $$ = nullptr;
     }
   | decl {
-      $$ = new decl_list_t();
-      $$->push_back($1);
+      $$ = $1;
     }
   | decl_list decl {
-      $1->push_back($2);
-      $$ = $1;
+      $1->next = $2;
+      $2->prev = $1;
+      $$ = $2;
     }
   ;
 
 decl_property_expr
-  : id_list COLON type_specifier_unit {
+  : id_list COLON type_specifier {
       $$ = new decl_property_t($1, $3, nullptr, false);
     }
   | id_list ASSIGN expr_cond {
       $$ = new decl_property_t($1, nullptr, $3, true);
     }
-  | id_list COLON type_specifier_unit ASSIGN expr_cond {
+  | id_list COLON type_specifier ASSIGN expr_cond {
       $$ = new decl_property_t($1, $3, $5, true);
     }
-  | id_list COLON type_specifier_unit ARROW expr_cond {
+  | id_list COLON type_specifier ARROW expr_cond {
       $$ = new decl_property_t($1, $3, $5, false);
     }
   ;
@@ -283,7 +310,7 @@ decl_property_compound
   : id_list ARROW stmt_compound {
       $$ = new decl_property_t($1, nullptr, $3, false);
     }
-  | id_list COLON type_specifier ARROW stmt_compound {
+  | id_list COLON type_specifier_list ARROW stmt_compound {
       $$ = new decl_property_t($1, $3, $5, false);
     }
   ;
@@ -292,7 +319,7 @@ decl_function_expr
   : id_list generics decl_args ARROW expr_cond {
       $$ = new decl_function_t($1, $2, $3, nullptr, $5);
     }
-  | id_list generics decl_args COLON type_specifier ARROW expr_cond {
+  | id_list generics decl_args COLON type_specifier_list ARROW expr_cond {
       $$ = new decl_function_t($1, $2, $3, $5, $7);
     }
   ;
@@ -301,7 +328,7 @@ decl_function_compound
   : id_list generics decl_args ARROW stmt_compound {
       $$ = new decl_function_t($1, $2, $3, nullptr, $5);
     }
-  | id_list generics decl_args COLON type_specifier ARROW stmt_compound {
+  | id_list generics decl_args COLON type_specifier_list ARROW stmt_compound {
       $$ = new decl_function_t($1, $2, $3, $5, $7);
     }
   ;
@@ -326,12 +353,12 @@ decl_comma_list
       $$ = nullptr;
     }
   | decl_var {
-      $$ = new decl_list_t();
-      $$->push_back($1);
+      $$ = $1;
     }
   | decl_comma_list COMMA decl_var {
-      $1->push_back($3);
-      $$ = $1;
+      $1->next = $3;
+      $3->prev = $1;
+      $$ = $3;
     }
   ;
 
@@ -342,8 +369,22 @@ decl_args
   ;
 
 type_specifier
-  : type_specifier_linked_list {
+  : type_specifier_unit {
       $$ = $1;
+    }
+  | TUPLE LT type_specifier_list GT {
+      $$ = $3;
+    }
+  ;
+
+type_specifier_list
+  : type_specifier {
+      $$ = $1;
+    }
+  | type_specifier_list COMMA type_specifier {
+      $1->next = $3;
+      $3->prev = $1;
+      $$ = $3;
     }
   ;
 
@@ -363,31 +404,8 @@ type_specifier_unit
       $1->call_chain.push_back($3);
       $$ = $1;
     }
-  | TUPLE LT type_specifier_linked_list GT {
-      $$ = $3;
-    }
-  ;
-
-type_specifier_linked_list
-  : type_specifier_unit {
-      $$ = $1;
-    }
-  | type_specifier_linked_list COMMA type_specifier_unit {
-      $1->next = $3;
-      $$ = $1;
-    }
-  ;
-
-type_specifier_list
-  : /* empty */ {
-      $$ = nullptr;
-    }
-  | type_specifier {
-      $$ = new type_specifier_list_t();
-      $$->push_back($1);
-    }
-  | type_specifier_list COMMA type_specifier {
-      $1->push_back($3);
+  | type_specifier_unit LPAR RPAR {
+      $1->call_chain.push_back(nullptr);
       $$ = $1;
     }
   ;
@@ -455,20 +473,6 @@ type_generic
     }
   ;
 
-stmt_list
-  : /* empty */ {
-      $$ = nullptr;
-    }
-  | stmt {
-      $$ = new stmt_list_t();
-      $$->push_back($1);
-    }
-  | stmt_list stmt {
-      $1->push_back($2);
-      $$ = $1;
-    }
-  ;
-
 stmt
   : stmt_expr {
       $$ = $1;
@@ -493,6 +497,20 @@ stmt
     }
   ;
 
+stmt_list
+  : /* empty */ {
+      $$ = nullptr;
+    }
+  | stmt {
+      $$ = $1;
+    }
+  | stmt_list stmt {
+      $1->next = $2;
+      $2->prev = $1;
+      $$ = $2;
+    }
+  ;
+
 stmt_expr
   : SEMICOLON {
       $$ = new stmt_expr_t();
@@ -503,7 +521,7 @@ stmt_expr
   ;
 
 stmt_label
-  : id COLON stmt {
+  : ID COLON stmt {
       $$ = new stmt_label_t($1, $3);
     }
   | CASE expr_cond COLON stmt {
@@ -572,7 +590,7 @@ stmt_iter
 	;
 
 stmt_jump
-  : GOTO id SEMICOLON {
+  : GOTO ID SEMICOLON {
       $$ = new stmt_jump_t($2);
     }
   | CONTINUE SEMICOLON {
@@ -584,7 +602,7 @@ stmt_jump
   | RETURN SEMICOLON {
       $$ = new stmt_jump_t(stmt_jump_t::kind_t::RETURN);
     }
-  | RETURN expr_linked_list SEMICOLON {
+  | RETURN expr_list SEMICOLON {
       $$ = new stmt_jump_t($2);
     }
   ;
@@ -601,16 +619,17 @@ expr
     }
   ;
 
-expr_linked_list
+expr_list
   : /* empty */ {
       $$ = nullptr;
     }
   | expr {
       $$ = $1;
     }
-  | expr_linked_list COMMA expr {
+  | expr_list COMMA expr {
       $1->next = $3;
-      $$ = $1;
+      $3->prev = $1;
+      $$ = $3;
     }
   ;
 
@@ -870,7 +889,7 @@ expr_postfix
       $1->position_chain.push_back($3);
       $$ = $1;
     }
-  | expr_postfix LPAR expr_linked_list RPAR {
+  | expr_postfix LPAR expr_list RPAR {
       $1->call_chain.push_back($3);
       $$ = $1;
     }
@@ -888,13 +907,16 @@ expr_primary
   : expr_const {
       $$ = new expr_primary_t($1);
     }
-  | LPAR expr_linked_list RPAR {
+  | LPAR expr_list RPAR {
       $$ = new expr_primary_t($2);
     }
   ;
 
 expr_const
-  : const_value {
+  : id {
+      $$ = $1;
+    }
+  | const_value {
       $$ = $1;
     }
   | const_lambda {
@@ -906,10 +928,7 @@ expr_const
   ;
 
 const_value
-  : id {
-      $$ = new const_value_t(const_value_t::kind_t::ID, $1);
-    }
-  | FLOAT_CONST {
+  : FLOAT_CONST {
       $$ = new const_value_t(const_value_t::kind_t::FLOAT, $1);
     }
   | STRING_CONST {
@@ -927,10 +946,16 @@ const_lambda
   | LPAR id_list RPAR ARROW stmt_compound {
       $$ = new const_lambda_t($2, $5);
     }
+  | id ARROW expr {
+      $$ = new const_lambda_t($1, $3);
+    }
+  | id ARROW stmt_compound {
+      $$ = new const_lambda_t($1, $3);
+    }
   ;
 
 const_initializer
-  : LSQU expr_linked_list RSQU {
+  : LSQU expr_list RSQU {
       $$ = new const_initializer_t($2);
     }
   | LBRA ds_map RBRA {
@@ -954,7 +979,7 @@ ds_map
 
 %%
 
-void ddc::parser::error(const ddc::parser::location_type& l, const std::string& m) {
+void dyc::parser::error(const dyc::parser::location_type& l, const std::string& m) {
   driver.error(l, m);
 }
 

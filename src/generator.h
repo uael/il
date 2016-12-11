@@ -18,36 +18,37 @@
 
 /* $Id$ */
 
-#ifndef _DRIVER_H
-#define _DRIVER_H
+#ifndef _GENERATOR_H
+#define _GENERATOR_H
 
 #include <string>
-#include <vector>
-#include "scanner.h"
 
 namespace dyc {
+  namespace ast {
+    struct ast_t;
+  }
 
-  class driver {
-  public:
-    bool trace_scanning;
-    bool trace_parsing;
-    std::string streamname;
+  struct generator_t {
+    ast::ast_t *ast;
+    generator_t(ast::ast_t *ast);
+    bool generate();
 
-    dyc::ast::ast_t ast;
+    struct writer_t {
+      std::string stream;
+      int indent_lvl;
 
-    class scanner *lexer;
-
-    driver();
-
-    bool parse_stream(std::istream &in, const std::string &sname = "stream input");
-    bool parse_string(const std::string &input, const std::string &sname = "string stream");
-    bool parse_file(const std::string &filename);
-    void error(const class location &l, const std::string &m);
-    void error(const std::string &m);
+      writer_t *operator<<(const std::string &str) {
+        for (int i = 0; i < indent_lvl; i++) {
+          this->stream += "  ";
+        }
+        this->stream += str + "\r\n";
+        return this;
+      }
+    };
   };
 }
 
-#endif /* _DRIVER_H */
+#endif /* _GENERATOR_H */
 
 /*
  * Local variables:

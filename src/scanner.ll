@@ -42,12 +42,12 @@ ES  (\\(['"\?\\abfnrtv]|[0-7]{1,3}|x[a-fA-F0-9]+))
 WS  [ \t\v\n\f]
 
 %{
-#include "ddc.h"
+#include "dyc.h"
 #include "y.tab.h"
 
-using namespace ddc::ast;
+using namespace dyc::ast;
 
-typedef ddc::parser::token token;
+typedef dyc::parser::token token;
 
 #define STEP yylloc->step()
 #define YY_USER_ACTION STEP; yylloc->columns(yyleng);
@@ -59,7 +59,7 @@ typedef ddc::parser::token token;
 %}
 
 %option c++
-%option prefix="ddc"
+%option prefix="dyc"
 %option batch
 %option debug
 %option noyywrap
@@ -197,7 +197,7 @@ typedef ddc::parser::token token;
 
 %%
 
-namespace ddc {
+namespace dyc {
   scanner::scanner(std::istream* in, std::ostream* out) : yyFlexLexer(in, out) { }
   scanner::~scanner() { }
   void scanner::set_debug(bool b) { yy_flex_debug = b; }

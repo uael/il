@@ -1,7 +1,7 @@
 /*
  *  MIT License
  *
- * Copyright (c) 2016 .DRY (Don't Repeat Yourself)
+ * Copyright (c) 2016, Abel Lucas <ylilt71@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -18,36 +18,13 @@
 
 /* $Id$ */
 
-#ifndef _DRIVER_H
-#define _DRIVER_H
+#ifndef _DYC_H
+#define _DYC_H
 
-#include <string>
-#include <vector>
-#include "scanner.h"
+#include "config.h"
+#include "ast.h"
 
-namespace dyc {
-
-  class driver {
-  public:
-    bool trace_scanning;
-    bool trace_parsing;
-    std::string streamname;
-
-    dyc::ast::ast_t ast;
-
-    class scanner *lexer;
-
-    driver();
-
-    bool parse_stream(std::istream &in, const std::string &sname = "stream input");
-    bool parse_string(const std::string &input, const std::string &sname = "string stream");
-    bool parse_file(const std::string &filename);
-    void error(const class location &l, const std::string &m);
-    void error(const std::string &m);
-  };
-}
-
-#endif /* _DRIVER_H */
+#endif /* _DYC_H */
 
 /*
  * Local variables:

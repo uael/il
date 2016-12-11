@@ -1,7 +1,7 @@
 /*
  *  MIT License
  *
- * Copyright (c) 2016, Abel Lucas <ylilt71@gmail.com>
+ * Copyright (c) 2016 .DRY (Don't Repeat Yourself)
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -18,13 +18,16 @@
 
 /* $Id$ */
 
-#ifndef _DDC_H
-#define _DDC_H
+#include "generator.h"
 
-#include "config.h"
-#include "ast.h"
+namespace dyc {
+  generator_t::generator_t(ast::ast_t *ast)
+    : ast(ast) {}
 
-#endif /* _DDC_H */
+  bool generator_t::generate() {
+    return false;
+  }
+}
 
 /*
  * Local variables:

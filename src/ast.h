@@ -86,24 +86,60 @@ namespace dyc {
 
     struct ast_t {
       decl_list_t *decls;
+
       ast_t() {};
       ast_t(decl_list_t *decls) : decls(decls) {};
     };
 
     struct node_t {
+      node_t *scope;
+
       virtual ~node_t() {}
 
       virtual bool write(generator_t::writer_t *writer, ast_t *ast) {
         return false;
       };
+
+      template <typename T>
+      static void set_scope(T node, node_t *scope) {
+        if (node) {
+          node->scope = scope;
+        }
+      }
+
+      template <typename T>
+      static void set_scope(vector<T> *node, node_t *scope) {
+        if (node) {
+          for (T &item : *node) {
+            if (item) {
+              item->scope = scope;
+            }
+          }
+        }
+      }
+
+      template <typename K, typename V>
+      static void set_scope(map<K, V> *node, node_t *scope) {
+        if (node) {
+          for (auto &kv : *node) {
+            if (kv.first) {
+              kv.first->scope = scope;
+            }
+            if (kv.second) {
+              kv.second->scope = scope;
+            }
+          }
+        }
+      }
     };
 
     struct generic_t : node_t {
       string *value;
       type_specifier_t *type_specifier;
 
-      generic_t(string *value, type_specifier_t *type_specifier)
-        : value(value), type_specifier(type_specifier) {}
+      generic_t(string *value, type_specifier_t *type_specifier) : value(value), type_specifier(type_specifier) {
+        node_t::set_scope(type_specifier, this);
+      }
 
       bool write(generator_t::writer_t *writer, ast_t *ast) override {
         return node_t::write(writer, ast);
@@ -118,7 +154,11 @@ namespace dyc {
       closure_t *closure;
 
       decl_t(id_list_t *ids, type_specifier_t *type_specifier, closure_t *closure)
-        : ids(ids), type_specifier(type_specifier), closure(closure) {}
+        : ids(ids), type_specifier(type_specifier), closure(closure) {
+        node_t::set_scope(ids, this);
+        node_t::set_scope(type_specifier, this);
+        node_t::set_scope(closure, this);
+      }
     };
 
     struct decl_property_t : decl_t {
@@ -138,7 +178,10 @@ namespace dyc {
 
       decl_function_t(id_list_t *ids, generic_list_t *generics, decl_list_t *args, type_specifier_t *type_specifier,
                       closure_t *closure)
-        : decl_t(ids, type_specifier, closure), generics(generics), args(args) {}
+        : decl_t(ids, type_specifier, closure), generics(generics), args(args) {
+        node_t::set_scope(generics, this);
+        node_t::set_scope(args, this);
+      }
 
       bool write(generator_t::writer_t *writer, ast_t *ast) override {
         return decl_t::write(writer, ast);
@@ -153,11 +196,13 @@ namespace dyc {
       int ptr_lvl;
       int array_lvl;
 
-      type_specifier_t(type_t *type)
-        : type(type) {}
-
-      type_specifier_t(type_t *type, decl_list_t *decls)
-        : type(type), decls(decls) {}
+      type_specifier_t(type_t *type) : type(type) {
+        node_t::set_scope(type, this);
+      }
+      type_specifier_t(type_t *type, decl_list_t *decls) : type(type), decls(decls) {
+        node_t::set_scope(type, this);
+        node_t::set_scope(decls, this);
+      }
 
       bool write(generator_t::writer_t *writer, ast_t *ast) override {
         return node_t::write(writer, ast);
@@ -172,8 +217,7 @@ namespace dyc {
         SSHORT, FLOAT, UFLOAT, SFLOAT, DOUBLE, UDOUBLE, SDOUBLE
       } kind;
 
-      type_scalar_t(kind_t kind)
-        : kind(kind) {}
+      type_scalar_t(kind_t kind) : kind(kind) {}
 
       bool write(generator_t::writer_t *writer, ast_t *ast) override {
         return type_t::write(writer, ast);
@@ -183,8 +227,7 @@ namespace dyc {
     struct type_generic_t : type_t {
       string *id;
 
-      type_generic_t(string *id)
-        : id(id) {}
+      type_generic_t(string *id) : id(id) {}
 
       bool write(generator_t::writer_t *writer, ast_t *ast) override {
         return type_t::write(writer, ast);
@@ -197,8 +240,9 @@ namespace dyc {
       expr_t *expr;
 
       stmt_expr_t() {}
-      stmt_expr_t(expr_t *expr)
-        : expr(expr) {}
+      stmt_expr_t(expr_t *expr) : expr(expr) {
+        node_t::set_scope(expr, this);
+      }
 
       bool write(generator_t::writer_t *writer, ast_t *ast) override {
         return stmt_t::write(writer, ast);
@@ -213,12 +257,16 @@ namespace dyc {
       stmt_t *stmt;
       expr_cond_t *cond;
 
-      stmt_label_t(stmt_t *stmt)
-        : kind(DEFAULT), stmt(stmt) {}
-      stmt_label_t(string *id, stmt_t *stmt)
-        : kind(LABEL), id(id), stmt(stmt) {}
-      stmt_label_t(expr_cond_t *cond, stmt_t *stmt)
-        : kind(CASE), stmt(stmt), cond(cond) {}
+      stmt_label_t(stmt_t *stmt) : kind(DEFAULT), stmt(stmt) {
+        node_t::set_scope(stmt, this);
+      }
+      stmt_label_t(string *id, stmt_t *stmt) : kind(LABEL), id(id), stmt(stmt) {
+        node_t::set_scope(stmt, this);
+      }
+      stmt_label_t(expr_cond_t *cond, stmt_t *stmt) : kind(CASE), stmt(stmt), cond(cond) {
+        node_t::set_scope(cond, this);
+        node_t::set_scope(stmt, this);
+      }
 
       bool write(generator_t::writer_t *writer, ast_t *ast) override {
         return stmt_t::write(writer, ast);
@@ -229,8 +277,9 @@ namespace dyc {
       stmt_list_t *stmts;
 
       stmt_compound_t() {}
-      stmt_compound_t(stmt_list_t *stmts)
-        : stmts(stmts) {}
+      stmt_compound_t(stmt_list_t *stmts) : stmts(stmts) {
+        node_t::set_scope(stmts, (stmt_t *) this);
+      }
 
       bool write(generator_t::writer_t *writer, ast_t *ast) override {
         return stmt_t::write(writer, ast);
@@ -246,10 +295,16 @@ namespace dyc {
       stmt_t *else_stmt;
 
       stmt_select_t() {}
-      stmt_select_t(kind_t kind, expr_t *cond, stmt_t *stmt)
-        : kind(kind), cond(cond), stmt(stmt) {}
+      stmt_select_t(kind_t kind, expr_t *cond, stmt_t *stmt) : kind(kind), cond(cond), stmt(stmt) {
+        node_t::set_scope(cond, this);
+        node_t::set_scope(stmt, this);
+      }
       stmt_select_t(expr_t *cond, stmt_t *stmt, stmt_t *else_stmt)
-        : kind(IF), cond(cond), stmt(stmt), else_stmt(else_stmt) {}
+        : kind(IF), cond(cond), stmt(stmt), else_stmt(else_stmt) {
+        node_t::set_scope(cond, this);
+        node_t::set_scope(stmt, this);
+        node_t::set_scope(else_stmt, this);
+      }
 
       bool write(generator_t::writer_t *writer, ast_t *ast) override {
         return stmt_t::write(writer, ast);
@@ -265,14 +320,26 @@ namespace dyc {
       closure_t *step;
       stmt_t *stmt;
 
-      stmt_iter_t(expr_t *cond, stmt_t *stmt)
-        : kind(WHILE), cond(cond), stmt(stmt) {}
-      stmt_iter_t(stmt_t *stmt, expr_t *cond)
-        : kind(DO_WHILE), cond(cond), stmt(stmt) {}
-      stmt_iter_t(expr_t *cond, closure_t *step, stmt_t *stmt)
-        : kind(FOR), cond(cond), step(step), stmt(stmt) {}
+      stmt_iter_t(expr_t *cond, stmt_t *stmt) : kind(WHILE), cond(cond), stmt(stmt) {
+        node_t::set_scope(cond, this);
+        node_t::set_scope(stmt, this);
+      }
+      stmt_iter_t(stmt_t *stmt, expr_t *cond) : kind(DO_WHILE), cond(cond), stmt(stmt) {
+        node_t::set_scope(stmt, this);
+        node_t::set_scope(cond, this);
+      }
+      stmt_iter_t(expr_t *cond, closure_t *step, stmt_t *stmt) : kind(FOR), cond(cond), step(step), stmt(stmt) {
+        node_t::set_scope(cond, this);
+        node_t::set_scope(step, this);
+        node_t::set_scope(stmt, this);
+      }
       stmt_iter_t(stmt_t *decls, expr_t *cond, closure_t *step, stmt_t *stmt)
-        : kind(FOR), decls(decls), cond(cond), step(step), stmt(stmt) {}
+        : kind(FOR), decls(decls), cond(cond), step(step), stmt(stmt) {
+        node_t::set_scope(decls, this);
+        node_t::set_scope(cond, this);
+        node_t::set_scope(step, this);
+        node_t::set_scope(stmt, this);
+      }
 
       bool write(generator_t::writer_t *writer, ast_t *ast) override {
         return stmt_t::write(writer, ast);
@@ -286,12 +353,11 @@ namespace dyc {
       string *id;
       expr_t *expr;
 
-      stmt_jump_t(kind_t kind)
-        : kind(kind) {}
-      stmt_jump_t(string *id)
-        : kind(GOTO), id(id) {}
-      stmt_jump_t(expr_t *expr)
-        : kind(RETURN), expr(expr) {}
+      stmt_jump_t(kind_t kind) : kind(kind) {}
+      stmt_jump_t(string *id) : kind(GOTO), id(id) {}
+      stmt_jump_t(expr_t *expr) : kind(RETURN), expr(expr) {
+        node_t::set_scope(expr, this);
+      }
 
       bool write(generator_t::writer_t *writer, ast_t *ast) override {
         return stmt_t::write(writer, ast);
@@ -302,8 +368,9 @@ namespace dyc {
       decl_list_t *decls;
 
       stmt_decl_t() {}
-      stmt_decl_t(decl_list_t *decls)
-        : decls(decls) {}
+      stmt_decl_t(decl_list_t *decls) : decls(decls) {
+        node_t::set_scope(decls, this);
+      }
 
       bool write(generator_t::writer_t *writer, ast_t *ast) override {
         return stmt_t::write(writer, ast);
@@ -503,10 +570,12 @@ namespace dyc {
       expr_t *expr;
 
       expr_primary_t() {}
-      expr_primary_t(expr_const_t *const_expr)
-        : const_expr(const_expr) {}
-      expr_primary_t(expr_t *expr)
-        : expr(expr) {}
+      expr_primary_t(expr_const_t *const_expr) : const_expr(const_expr) {
+        node_t::set_scope(const_expr, this);
+      }
+      expr_primary_t(expr_t *expr) : expr(expr) {
+        node_t::set_scope(expr, this);
+      }
 
       bool write(generator_t::writer_t *writer, ast_t *ast) override {
         return expr_postfix_t::write(writer, ast);
@@ -521,8 +590,7 @@ namespace dyc {
       } kind;
       string *value;
 
-      const_value_t(kind_t kind, string *value)
-       : kind(kind), value(value) {}
+      const_value_t(kind_t kind, string *value) : kind(kind), value(value) {}
 
       bool write(generator_t::writer_t *writer, ast_t *ast) override {
         return expr_const_t::write(writer, ast);
@@ -534,10 +602,14 @@ namespace dyc {
       id_list_t *args;
       closure_t *closure;
 
-      const_lambda_t(id_list_t *args, closure_t *closure)
-        : args(args), closure(closure) {}
-      const_lambda_t(identifier_t *arg, closure_t *closure)
-        : arg(arg), closure(closure) {}
+      const_lambda_t(id_list_t *args, closure_t *closure) : args(args), closure(closure) {
+        node_t::set_scope(args, this);
+        node_t::set_scope(closure, this);
+      }
+      const_lambda_t(identifier_t *arg, closure_t *closure) : arg(arg), closure(closure) {
+        node_t::set_scope(arg, this);
+        node_t::set_scope(closure, this);
+      }
 
       bool write(generator_t::writer_t *writer, ast_t *ast) override {
         return expr_const_t::write(writer, ast);
@@ -548,10 +620,12 @@ namespace dyc {
       expr_t *list;
       ds_map_t *map;
 
-      const_initializer_t(expr_t *list)
-        : list(list) {}
-      const_initializer_t(ds_map_t *map)
-        : map(map) {}
+      const_initializer_t(expr_t *list) : list(list) {
+        node_t::set_scope(list, this);
+      }
+      const_initializer_t(ds_map_t *map) : map(map) {
+        node_t::set_scope(map, this);
+      }
 
       bool write(generator_t::writer_t *writer, ast_t *ast) override {
         return expr_const_t::write(writer, ast);

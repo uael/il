@@ -93,7 +93,7 @@ namespace dyc {
       node_t *prev = nullptr;
       node_t *next = nullptr;
 
-      virtual ~node_t() {}
+      virtual ~node_t();
       virtual bool write(generator_t::writer_t *writer, ast_t *ast);
       virtual void accept(node_t *scope);
       virtual std::string dump(unsigned long lvl = 0);

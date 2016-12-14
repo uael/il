@@ -22,6 +22,8 @@
 
 namespace dyc {
   namespace ast {
+    closure_t::~closure_t() {}
+
     node_t *closure_t::as_node() {
       return dynamic_cast<node_t *>(this);
     }

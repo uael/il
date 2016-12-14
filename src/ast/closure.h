@@ -26,7 +26,7 @@
 namespace dyc {
   namespace ast {
     struct closure_t {
-      virtual ~closure_t() {}
+      virtual ~closure_t();
       node_t *as_node();
     };
   }

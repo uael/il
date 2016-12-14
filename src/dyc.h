@@ -21,7 +21,9 @@
 #ifndef _DYC_H
 #define _DYC_H
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#  include "config.h"
+#endif
 #include "ast.h"
 
 #endif /* _DYC_H */

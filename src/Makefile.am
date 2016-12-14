@@ -5,8 +5,8 @@ AM_LFLAGS = -o$(LEX_OUTPUT_ROOT).c
 noinst_LTLIBRARIES = libdyc.la
 
 libdyc_la_SOURCES = \
-	ast/const.cc ast/decl.cc ast/expr.cc ast/generic.cc ast/ident.cc \
-	ast/node.cc ast/stmt.cc ast/type.cc \
+	ast/closure.cc ast/const.cc ast/decl.cc ast/expr.cc ast/generic.cc \
+	ast/ident.cc ast/node.cc ast/stmt.cc ast/type.cc \
 	ast.cc \
 	parser.yy scanner.ll y.tab.h \
 	driver.cc generator.cc

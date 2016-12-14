@@ -21,7 +21,7 @@
 #include "generator.h"
 
 namespace dyc {
-  generator_t::generator_t(ast::ast_t *ast)
+  generator_t::generator_t(ast_t *ast)
     : ast(ast) {}
 
   bool generator_t::generate() {

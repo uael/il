@@ -32,17 +32,15 @@
 #include "ast/type.h"
 
 namespace dyc {
-  namespace ast {
-    struct ast_t : node_t {
-      decl_t *decls = nullptr;
+  struct ast_t : ast::node_t {
+    ast::decl_t *decls = nullptr;
 
-      ast_t();
-      ast_t(decl_t *decls);
+    ast_t();
+    ast_t(ast::decl_t *decls);
 
-      void accept(node_t *scope) override;
-      std::string dump(unsigned long lvl = 0) override;
-    };
-  }
+    void accept(ast::node_t *scope) override;
+    std::string dump(unsigned long lvl = 0) override;
+  };
 }
 
 #endif /* _AST_H */

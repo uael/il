@@ -93,7 +93,7 @@ namespace dyc {
       node_t *prev = nullptr;
       node_t *next = nullptr;
 
-      virtual ~node_t() {}
+      virtual ~node_t();
       virtual bool write(generator_t::writer_t *writer, ast_t *ast);
       virtual void accept(node_t *scope);
       virtual std::string dump(unsigned long lvl = 0);
@@ -110,12 +110,12 @@ namespace dyc {
         return dynamic_cast<T *>(this);
       }
     };
-
-    static std::string indent(std::string s, unsigned long lvl) {
-      s.insert(0, lvl, ' ');
-      return s;
-    }
   }
+}
+
+static std::string indent(std::string s, unsigned long lvl) {
+  s.insert(0, lvl, ' ');
+  return s;
 }
 
 #endif /* _AST_NODE_H */

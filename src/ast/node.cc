@@ -22,6 +22,8 @@
 
 namespace dyc {
   namespace ast {
+    node_t::~node_t() {}
+
     void node_t::accept(node_t *scope) {
       this->scope = scope;
       if (this->next) {

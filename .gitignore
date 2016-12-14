@@ -49,7 +49,6 @@ dyc
 
 # usr
 /build
-CMakeLists.txt
 .idea/
 scripts/
 

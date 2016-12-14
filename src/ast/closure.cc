@@ -18,35 +18,17 @@
 
 /* $Id$ */
 
-#ifndef _GENERATOR_H
-#define _GENERATOR_H
-
-#include <string>
+#include "closure.h"
 
 namespace dyc {
-  struct ast_t;
+  namespace ast {
+    closure_t::~closure_t() {}
 
-  struct generator_t {
-    ast_t *ast;
-    generator_t(ast_t *ast);
-    bool generate();
-
-    struct writer_t {
-      std::string stream;
-      int indent_lvl;
-
-      writer_t *operator<<(const std::string &str) {
-        for (int i = 0; i < indent_lvl; i++) {
-          this->stream += "  ";
-        }
-        this->stream += str + "\r\n";
-        return this;
-      }
-    };
-  };
+    node_t *closure_t::as_node() {
+      return dynamic_cast<node_t *>(this);
+    }
+  }
 }
-
-#endif /* _GENERATOR_H */
 
 /*
  * Local variables:

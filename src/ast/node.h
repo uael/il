@@ -110,12 +110,12 @@ namespace dyc {
         return dynamic_cast<T *>(this);
       }
     };
-
-    static std::string indent(std::string s, unsigned long lvl) {
-      s.insert(0, lvl, ' ');
-      return s;
-    }
   }
+}
+
+static std::string indent(std::string s, unsigned long lvl) {
+  s.insert(0, lvl, ' ');
+  return s;
 }
 
 #endif /* _AST_NODE_H */

@@ -214,7 +214,7 @@ using namespace dyc::ast;
 
 program
   : decl_list {
-      driver.ast = dyc::ast::ast_t($1);
+      driver.ast = dyc::ast_t($1);
     }
   ;
 

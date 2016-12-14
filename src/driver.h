@@ -33,7 +33,7 @@ namespace dyc {
     bool trace_parsing;
     std::string streamname;
 
-    dyc::ast::ast_t ast;
+    dyc::ast_t ast;
 
     class scanner *lexer;
 

@@ -24,13 +24,11 @@
 #include <string>
 
 namespace dyc {
-  namespace ast {
-    struct ast_t;
-  }
+  struct ast_t;
 
   struct generator_t {
-    ast::ast_t *ast;
-    generator_t(ast::ast_t *ast);
+    ast_t *ast;
+    generator_t(ast_t *ast);
     bool generate();
 
     struct writer_t {

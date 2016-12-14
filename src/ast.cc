@@ -21,20 +21,18 @@
 #include "ast.h"
 
 namespace dyc {
-  namespace ast {
-    ast_t::ast_t() {}
-    ast_t::ast_t(decl_t *decls) : decls(decls) {}
+  ast_t::ast_t() {}
+  ast_t::ast_t(ast::decl_t *decls) : decls(decls) {}
 
-    void ast_t::accept(node_t *scope) {
-      node_t::accept(scope);
-      ACCEPT(decls);
-    }
+  void ast_t::accept(ast::node_t *scope) {
+    ast::node_t::accept(scope);
+    ACCEPT(decls);
+  }
 
-    std::string ast_t::dump(unsigned long lvl) {
-      DUMP_START("ast");
-      DUMP(decls);
-      DUMP_END();
-    }
+  std::string ast_t::dump(unsigned long lvl) {
+    DUMP_START("ast");
+    DUMP(decls);
+    DUMP_END();
   }
 }
 

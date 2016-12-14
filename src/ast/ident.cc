@@ -18,50 +18,28 @@
 
 /* $Id$ */
 
-#ifndef _SCANNER_H
-#define _SCANNER_H
-
-#include "dyc.h"
-
-#ifndef YY_DECL
-#define  YY_DECL            \
-    dyc::parser::token_type        \
-    dyc::scanner::lex(        \
-  dyc::parser::semantic_type* yylval,    \
-  dyc::parser::location_type* yylloc    \
-    )
-#endif
-
-#ifndef __FLEX_LEXER_H
-#  define yyFlexLexer dycFlexLexer
-#  include "FlexLexer.h"
-#  undef yyFlexLexer
-#endif
-
-#if __cplusplus > 199711L
-#  define register
-#endif
-
-#ifdef BISON_USE_PARSER_H_EXTENSION
-#  include "parser.h"
-#else
-#  include "parser.hh"
-#endif
+#include "ident.h"
 
 namespace dyc {
+  namespace ast {
+    identifier_t::identifier_t(std::string *value) : value(value) {}
 
-  class scanner : public dycFlexLexer {
-  public:
-    scanner(std::istream *arg_yyin = 0, std::ostream *arg_yyout = 0);
+    void identifier_t::accept(node_t *scope) {
+      node_t::accept(scope);
+      uk_value = *value;
+    }
 
-    virtual ~scanner();
-    virtual parser::token_type lex(parser::semantic_type *yylval, parser::location_type *yylloc);
-    void set_debug(bool b);
-  };
+    bool identifier_t::write(generator_t::writer_t *writer, ast_t *ast) {
+      return node_t::write(writer, ast);
+    }
 
+    std::string identifier_t::dump(unsigned long lvl) {
+      DUMP_START("id");
+      DUMP_SPTR(value);
+      DUMP_END();
+    }
+  }
 }
-
-#endif /* _SCANNER_H */
 
 /*
  * Local variables:

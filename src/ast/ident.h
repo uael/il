@@ -18,50 +18,28 @@
 
 /* $Id$ */
 
-#ifndef _SCANNER_H
-#define _SCANNER_H
+#ifndef _AST_IDENT_H
+#define _AST_IDENT_H
 
-#include "dyc.h"
-
-#ifndef YY_DECL
-#define  YY_DECL            \
-    dyc::parser::token_type        \
-    dyc::scanner::lex(        \
-  dyc::parser::semantic_type* yylval,    \
-  dyc::parser::location_type* yylloc    \
-    )
-#endif
-
-#ifndef __FLEX_LEXER_H
-#  define yyFlexLexer dycFlexLexer
-#  include "FlexLexer.h"
-#  undef yyFlexLexer
-#endif
-
-#if __cplusplus > 199711L
-#  define register
-#endif
-
-#ifdef BISON_USE_PARSER_H_EXTENSION
-#  include "parser.h"
-#else
-#  include "parser.hh"
-#endif
+#include "node.h"
+#include "expr.h"
 
 namespace dyc {
+  namespace ast {
+    struct identifier_t : expr_const_t {
+      std::string *value;
+      std::string uk_value;
 
-  class scanner : public dycFlexLexer {
-  public:
-    scanner(std::istream *arg_yyin = 0, std::ostream *arg_yyout = 0);
+      identifier_t(std::string *value);
 
-    virtual ~scanner();
-    virtual parser::token_type lex(parser::semantic_type *yylval, parser::location_type *yylloc);
-    void set_debug(bool b);
-  };
-
+      void accept(node_t *scope) override;
+      bool write(generator_t::writer_t *writer, ast_t *ast) override;
+      std::string dump(unsigned long lvl) override;
+    };
+  }
 }
 
-#endif /* _SCANNER_H */
+#endif /* _AST_IDENT_H */
 
 /*
  * Local variables:

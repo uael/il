@@ -18,34 +18,52 @@
 
 /* $Id$ */
 
-#ifndef _AST_H
-#define _AST_H
+#ifndef _AST_TYPE_H
+#define _AST_TYPE_H
 
-#include "ast/closure.h"
-#include "ast/const.h"
-#include "ast/decl.h"
-#include "ast/expr.h"
-#include "ast/generic.h"
-#include "ast/ident.h"
-#include "ast/node.h"
-#include "ast/stmt.h"
-#include "ast/type.h"
+#include <vector>
+#include "node.h"
 
 namespace dyc {
   namespace ast {
-    struct ast_t : node_t {
+    struct type_specifier_t : node_t {
+      type_t *type = nullptr;
+      std::vector<type_specifier_t *> call_chain;
       decl_t *decls = nullptr;
+      int ptr_lvl;
+      int array_lvl;
 
-      ast_t();
-      ast_t(decl_t *decls);
+      type_specifier_t(type_t *type);
+      type_specifier_t(type_t *type, decl_t *decls);
 
-      void accept(node_t *scope) override;
-      std::string dump(unsigned long lvl = 0) override;
+      virtual void accept(node_t *scope) override;
+      bool write(generator_t::writer_t *writer, ast_t *ast) override;
+    };
+
+    struct type_t : node_t {};
+
+    struct type_scalar_t : type_t {
+      enum kind_t {
+        VOID, BOOL, CHAR, INT, UINT, SINT, SHORT, USHORT,
+        SSHORT, FLOAT, UFLOAT, SFLOAT, DOUBLE, UDOUBLE, SDOUBLE
+      } kind;
+
+      type_scalar_t(kind_t kind);
+
+      bool write(generator_t::writer_t *writer, ast_t *ast) override;
+    };
+
+    struct type_generic_t : type_t {
+      std::string *id;
+
+      type_generic_t(std::string *id);
+
+      bool write(generator_t::writer_t *writer, ast_t *ast) override;
     };
   }
 }
 
-#endif /* _AST_H */
+#endif /* _AST_TYPE_H */
 
 /*
  * Local variables:

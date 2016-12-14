@@ -24,11 +24,11 @@
 #include <map>
 #include <generator.h>
 
-#define foreach(v, values) \
-  for (__typeof__(values) v = values; v; v = (__typeof__(values)) v->next)
+#define foreach(value, values) \
+  for (__typeof__(values) value = values; value; value = (__typeof__(values)) value->next)
 
-#define rforeach(v, values) \
-  for (__typeof__(values) v = values; v; v = (__typeof__(values)) v->prev)
+#define rforeach(value, values) \
+  for (__typeof__(values) value = values; value; value = (__typeof__(values)) value->prev)
 
 #define ACCEPT(node) if ((node)) (node)->accept(this)
 

@@ -100,10 +100,10 @@ namespace dyc {
 
       template<typename T>
       T *push(T *node) {
-        foreach(v, this) {
-          if (!v->next) {
-            v->next = node;
-            node->prev = v;
+        foreach(next, this) {
+          if (!next->next) {
+            next->next = node;
+            node->prev = next;
             break;
           }
         }

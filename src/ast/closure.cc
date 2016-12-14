@@ -18,21 +18,15 @@
 
 /* $Id$ */
 
-#ifndef _AST_CLOSURE_H
-#define _AST_CLOSURE_H
-
-#include "node.h"
+#include "closure.h"
 
 namespace dyc {
   namespace ast {
-    struct closure_t {
-      virtual ~closure_t() {}
-      node_t *as_node();
-    };
+    node_t *closure_t::as_node() {
+      return dynamic_cast<node_t *>(this);
+    }
   }
 }
-
-#endif /* _AST_CLOSURE_H */
 
 /*
  * Local variables:

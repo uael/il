@@ -18,50 +18,31 @@
 
 /* $Id$ */
 
-#ifndef _SCANNER_H
-#define _SCANNER_H
-
-#include "dyc.h"
-
-#ifndef YY_DECL
-#define  YY_DECL            \
-    dyc::parser::token_type        \
-    dyc::scanner::lex(        \
-  dyc::parser::semantic_type* yylval,    \
-  dyc::parser::location_type* yylloc    \
-    )
-#endif
-
-#ifndef __FLEX_LEXER_H
-#  define yyFlexLexer dycFlexLexer
-#  include "FlexLexer.h"
-#  undef yyFlexLexer
-#endif
-
-#if __cplusplus > 199711L
-#  define register
-#endif
-
-#ifdef BISON_USE_PARSER_H_EXTENSION
-#  include "parser.h"
-#else
-#  include "parser.hh"
-#endif
+#include "const.h"
+#include "closure.h"
 
 namespace dyc {
+  namespace ast {
+    const_value_t::const_value_t(const_value_t::kind_t kind, std::string *value) : kind(kind), value(value) {}
 
-  class scanner : public dycFlexLexer {
-  public:
-    scanner(std::istream *arg_yyin = 0, std::ostream *arg_yyout = 0);
+    bool const_value_t::write(generator_t::writer_t *writer, ast_t *ast) {
+      return expr_const_t::write(writer, ast);
+    }
 
-    virtual ~scanner();
-    virtual parser::token_type lex(parser::semantic_type *yylval, parser::location_type *yylloc);
-    void set_debug(bool b);
-  };
+    const_lambda_t::const_lambda_t(identifier_t *args, closure_t *closure) : args(args), closure(closure) {}
 
+    bool const_lambda_t::write(generator_t::writer_t *writer, ast_t *ast) {
+      return expr_const_t::write(writer, ast);
+    }
+
+    const_initializer_t::const_initializer_t(expr_t *list) : list(list) {}
+    const_initializer_t::const_initializer_t(ds_map_t *map) : map(map) {}
+
+    bool const_initializer_t::write(generator_t::writer_t *writer, ast_t *ast) {
+      return expr_const_t::write(writer, ast);
+    }
+  }
 }
-
-#endif /* _SCANNER_H */
 
 /*
  * Local variables:

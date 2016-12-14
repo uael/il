@@ -24,6 +24,9 @@
 #include "gtest/gtest.h"
 #include "test.h"
 
+using namespace dyc;
+using namespace dyc::ast;
+
 SYNTAX_TEST(args, empty_args, true, "",
   "foo()=>{}"
 );

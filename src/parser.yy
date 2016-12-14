@@ -20,7 +20,6 @@
 
 %{
 #include "dyc.h"
-using namespace dyc::ast;
 
 #include <cstdio>
 #include <cstdlib>
@@ -38,54 +37,54 @@ using namespace dyc::ast;
 %locations
 
 %union {
-  string *_string;
+  std::string *_string;
 
-  identifier_t *_id;
+  dyc::ast::identifier_t *_id;
 
-  generic_t *_generic;
+  dyc::ast::generic_t *_generic;
 
-  decl_t *_decl;
-  decl_property_t *_decl_property;
-  decl_function_t *_decl_function;
+  dyc::ast::decl_t *_decl;
+  dyc::ast::decl_property_t *_decl_property;
+  dyc::ast::decl_function_t *_decl_function;
 
-  type_specifier_t *_type_specifier;
-  type_t *_type;
-  type_scalar_t *_type_scalar;
-  type_generic_t *_type_generic;
+  dyc::ast::type_specifier_t *_type_specifier;
+  dyc::ast::type_t *_type;
+  dyc::ast::type_scalar_t *_type_scalar;
+  dyc::ast::type_generic_t *_type_generic;
 
-  stmt_t *_stmt;
-  stmt_expr_t *_stmt_expr;
-  stmt_label_t *_stmt_label;
-  stmt_compound_t *_stmt_compound;
-  stmt_select_t *_stmt_select;
-  stmt_iter_t *_stmt_iter;
-  stmt_jump_t *_stmt_jump;
-  stmt_decl_t *_stmt_decl;
+  dyc::ast::stmt_t *_stmt;
+  dyc::ast::stmt_expr_t *_stmt_expr;
+  dyc::ast::stmt_label_t *_stmt_label;
+  dyc::ast::stmt_compound_t *_stmt_compound;
+  dyc::ast::stmt_select_t *_stmt_select;
+  dyc::ast::stmt_iter_t *_stmt_iter;
+  dyc::ast::stmt_jump_t *_stmt_jump;
+  dyc::ast::stmt_decl_t *_stmt_decl;
 
-  expr_t *_expr;
-  expr_const_t *_expr_const;
-  expr_primary_t *_expr_primary;
-  expr_postfix_t *_expr_postfix;
-  expr_prefix_t *_expr_prefix;
-  expr_cast_t *_expr_cast;
-  expr_mul_t *_expr_mul;
-  expr_add_t *_expr_add;
-  expr_shift_t *_expr_shift;
-  expr_relational_t *_expr_relational;
-  expr_equal_t *_expr_equal;
-  expr_and_t *_expr_and;
-  expr_xor_t *_expr_xor;
-  expr_or_t *_expr_or;
-  expr_land_t *_expr_land;
-  expr_lor_t *_expr_lor;
-  expr_cond_t *_expr_cond;
-  expr_assign_t *_expr_assign;
+  dyc::ast::expr_t *_expr;
+  dyc::ast::expr_const_t *_expr_const;
+  dyc::ast::expr_primary_t *_expr_primary;
+  dyc::ast::expr_postfix_t *_expr_postfix;
+  dyc::ast::expr_prefix_t *_expr_prefix;
+  dyc::ast::expr_cast_t *_expr_cast;
+  dyc::ast::expr_mul_t *_expr_mul;
+  dyc::ast::expr_add_t *_expr_add;
+  dyc::ast::expr_shift_t *_expr_shift;
+  dyc::ast::expr_relational_t *_expr_relational;
+  dyc::ast::expr_equal_t *_expr_equal;
+  dyc::ast::expr_and_t *_expr_and;
+  dyc::ast::expr_xor_t *_expr_xor;
+  dyc::ast::expr_or_t *_expr_or;
+  dyc::ast::expr_land_t *_expr_land;
+  dyc::ast::expr_lor_t *_expr_lor;
+  dyc::ast::expr_cond_t *_expr_cond;
+  dyc::ast::expr_assign_t *_expr_assign;
 
-  const_value_t *_const_value;
-  const_lambda_t *_const_lambda;
-  const_initializer_t *_const_initializer;
+  dyc::ast::const_value_t *_const_value;
+  dyc::ast::const_lambda_t *_const_lambda;
+  dyc::ast::const_initializer_t *_const_initializer;
 
-  ds_map_t *_ds_map;
+  dyc::ast::ds_map_t *_ds_map;
 }
 
 %token END 0 "end of file"
@@ -154,6 +153,9 @@ using namespace dyc::ast;
 %{
 #include "driver.h"
 #include "scanner.h"
+
+using namespace std;
+using namespace dyc::ast;
 
 #undef yylex
 #define yylex driver.lexer->lex
@@ -227,9 +229,7 @@ id_list
       $$ = $1;
     }
   | id_list COMMA id {
-      $1->next = $3;
-      $3->prev = $1;
-      $$ = $3;
+      $$ = $1->push($3);
     }
   ;
   
@@ -247,9 +247,7 @@ generic_list
       $$ = $1;
     }
   | generic_list COMMA generic {
-      $1->next = $3;
-      $3->prev = $1;
-      $$ = $3;
+      $$ = $1->push($3);
     }
   ;
 
@@ -285,9 +283,7 @@ decl_list
       $$ = $1;
     }
   | decl_list decl {
-      $1->next = $2;
-      $2->prev = $1;
-      $$ = $2;
+      $$ = $1->push($2);
     }
   ;
 
@@ -356,9 +352,7 @@ decl_comma_list
       $$ = $1;
     }
   | decl_comma_list COMMA decl_var {
-      $1->next = $3;
-      $3->prev = $1;
-      $$ = $3;
+      $$ = $1->push($3);
     }
   ;
 
@@ -382,9 +376,7 @@ type_specifier_list
       $$ = $1;
     }
   | type_specifier_list COMMA type_specifier {
-      $1->next = $3;
-      $3->prev = $1;
-      $$ = $3;
+      $$ = $1->push($3);
     }
   ;
 
@@ -505,9 +497,7 @@ stmt_list
       $$ = $1;
     }
   | stmt_list stmt {
-      $1->next = $2;
-      $2->prev = $1;
-      $$ = $2;
+      $$ = $1->push($2);
     }
   ;
 
@@ -627,9 +617,7 @@ expr_list
       $$ = $1;
     }
   | expr_list COMMA expr {
-      $1->next = $3;
-      $3->prev = $1;
-      $$ = $3;
+      $$ = $1->push($3);
     }
   ;
 
@@ -638,47 +626,47 @@ expr_assign
       $$ = $1;
     }
   | expr_prefix ASSIGN expr_assign {
-      $3->assign_chain.push_back($1);
+      $3->assign_chain.push_back(tuple<expr_assign_t::kind_t, expr_prefix_t *>(expr_assign_t::kind_t::NONE, $1));
       $$ = $3;
     }
   | expr_prefix MUL_ASSIGN expr_assign {
-      $3->mul_assign_chain.push_back($1);
+      $3->assign_chain.push_back(tuple<expr_assign_t::kind_t, expr_prefix_t *>(expr_assign_t::kind_t::MUL, $1));
       $$ = $3;
     }
   | expr_prefix DIV_ASSIGN expr_assign {
-      $3->div_assign_chain.push_back($1);
+      $3->assign_chain.push_back(tuple<expr_assign_t::kind_t, expr_prefix_t *>(expr_assign_t::kind_t::DIV, $1));
       $$ = $3;
     }
   | expr_prefix MOD_ASSIGN expr_assign {
-      $3->mod_assign_chain.push_back($1);
+      $3->assign_chain.push_back(tuple<expr_assign_t::kind_t, expr_prefix_t *>(expr_assign_t::kind_t::MOD, $1));
       $$ = $3;
     }
   | expr_prefix ADD_ASSIGN expr_assign {
-      $3->add_assign_chain.push_back($1);
+      $3->assign_chain.push_back(tuple<expr_assign_t::kind_t, expr_prefix_t *>(expr_assign_t::kind_t::ADD, $1));
       $$ = $3;
     }
   | expr_prefix SUB_ASSIGN expr_assign {
-      $3->sub_assign_chain.push_back($1);
+      $3->assign_chain.push_back(tuple<expr_assign_t::kind_t, expr_prefix_t *>(expr_assign_t::kind_t::SUB, $1));
       $$ = $3;
     }
   | expr_prefix LEFT_ASSIGN expr_assign {
-      $3->left_assign_chain.push_back($1);
+      $3->assign_chain.push_back(tuple<expr_assign_t::kind_t, expr_prefix_t *>(expr_assign_t::kind_t::LEFT, $1));
       $$ = $3;
     }
   | expr_prefix RIGHT_ASSIGN expr_assign {
-      $3->right_assign_chain.push_back($1);
+      $3->assign_chain.push_back(tuple<expr_assign_t::kind_t, expr_prefix_t *>(expr_assign_t::kind_t::RIGHT, $1));
       $$ = $3;
     }
   | expr_prefix AND_ASSIGN expr_assign {
-      $3->and_assign_chain.push_back($1);
+      $3->assign_chain.push_back(tuple<expr_assign_t::kind_t, expr_prefix_t *>(expr_assign_t::kind_t::AND, $1));
       $$ = $3;
     }
   | expr_prefix XOR_ASSIGN expr_assign {
-      $3->xor_assign_chain.push_back($1);
+      $3->assign_chain.push_back(tuple<expr_assign_t::kind_t, expr_prefix_t *>(expr_assign_t::kind_t::XOR, $1));
       $$ = $3;
     }
   | expr_prefix OR_ASSIGN expr_assign {
-      $3->or_assign_chain.push_back($1);
+      $3->assign_chain.push_back(tuple<expr_assign_t::kind_t, expr_prefix_t *>(expr_assign_t::kind_t::OR, $1));
       $$ = $3;
     }
   ;

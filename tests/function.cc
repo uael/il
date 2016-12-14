@@ -24,6 +24,9 @@
 #include "gtest/gtest.h"
 #include "test.h"
 
+using namespace dyc;
+using namespace dyc::ast;
+
 SYNTAX_TEST(func, fibonacci, true, "",
   "fibonacci(n:int):int => {"
   "  if (n==0) {"
@@ -98,6 +101,16 @@ SYNTAX_TEST(func, initializer3, true, "",
   "  };"
   "}"
 );
+
+TEST(func, find) {
+  dyc::driver driver = dyc::driver();
+  ASSERT_EQ(true, driver.parse_string("main():int=>{}"));
+  driver.ast.accept(nullptr);
+  decl_function_t *main = driver.ast.decls->find<decl_function_t *>("main");
+  if (!main) {
+    FAIL();
+  }
+}
 
 RUN;
 

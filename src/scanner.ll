@@ -45,6 +45,7 @@ WS  [ \t\v\n\f]
 #include "dyc.h"
 #include "y.tab.h"
 
+using namespace std;
 using namespace dyc::ast;
 
 typedef dyc::parser::token token;

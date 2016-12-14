@@ -40,6 +40,7 @@ namespace dyc {
       ast_t(decl_t *decls);
 
       void accept(node_t *scope) override;
+      std::string dump(unsigned long lvl = 0) override;
     };
   }
 }

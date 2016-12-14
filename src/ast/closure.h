@@ -25,7 +25,12 @@
 
 namespace dyc {
   namespace ast {
-    struct closure_t {};
+    struct closure_t {
+      virtual ~closure_t() {}
+      node_t *as_node() {
+        return dynamic_cast<node_t *>(this);
+      }
+    };
   }
 }
 

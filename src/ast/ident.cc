@@ -32,6 +32,12 @@ namespace dyc {
     bool identifier_t::write(generator_t::writer_t *writer, ast_t *ast) {
       return node_t::write(writer, ast);
     }
+
+    std::string identifier_t::dump(unsigned long lvl) {
+      DUMP_START("id");
+      DUMP_SPTR(value);
+      DUMP_END();
+    }
   }
 }
 

@@ -34,6 +34,7 @@ namespace dyc {
 
       void accept(node_t *scope) override;
       bool write(generator_t::writer_t *writer, ast_t *ast) override;
+      std::string dump(unsigned long lvl) override;
     };
   }
 }

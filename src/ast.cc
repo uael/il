@@ -29,6 +29,12 @@ namespace dyc {
       node_t::accept(scope);
       ACCEPT(decls);
     }
+
+    std::string ast_t::dump(unsigned long lvl) {
+      DUMP_START("ast");
+      DUMP(decls);
+      DUMP_END();
+    }
   }
 }
 

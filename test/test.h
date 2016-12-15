@@ -18,8 +18,10 @@
 
 /* $Id$ */
 
-#ifndef _SYNTAX_H
-#define _SYNTAX_H
+#ifndef _TEST_H
+#define _TEST_H
+
+#include "gtest/gtest.h"
 
 #define SYNTAX_TEST(prefix, postfix, ex_status, ex_cerr, code) \
   TEST(prefix, postfix) { \
@@ -36,7 +38,7 @@
     return RUN_ALL_TESTS(); \
   }
 
-#endif /* _SYNTAX_H */
+#endif /* _TEST_H */
 
 /*
  * Local variables:

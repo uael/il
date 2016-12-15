@@ -21,7 +21,6 @@
 #include <iostream>
 #include <fstream>
 #include "driver.h"
-#include "gtest/gtest.h"
 #include "test.h"
 
 using namespace dyc;
@@ -112,7 +111,9 @@ TEST(func, find) {
   }
 }
 
-RUN;
+#ifdef HAVE_CONFIG_H
+RUN
+#endif
 
 /*
  * Local variables:

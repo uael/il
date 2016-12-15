@@ -21,7 +21,6 @@
 #include <iostream>
 #include <fstream>
 #include "driver.h"
-#include "gtest/gtest.h"
 #include "test.h"
 
 using namespace dyc;
@@ -91,7 +90,9 @@ SYNTAX_TEST(args, valued_typed_callable_args2, true, "",
   "foo(x(i:int,j:int):int=>i*j,y(i:int,j:int):int=>i*j)=>{}"
 );
 
-RUN;
+#ifdef HAVE_CONFIG_H
+RUN
+#endif
 
 /*
  * Local variables:

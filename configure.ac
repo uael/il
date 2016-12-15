@@ -19,5 +19,5 @@ AC_PROG_BISON
 
 LT_INIT
 
-AC_CONFIG_FILES([Makefile lib/Makefile src/Makefile tests/Makefile])
+AC_CONFIG_FILES([Makefile lib/Makefile src/Makefile test/Makefile])
 AC_OUTPUT

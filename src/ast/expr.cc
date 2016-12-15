@@ -22,79 +22,7 @@
 
 namespace dyc {
   namespace ast {
-    bool expr_assign_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return expr_t::write(writer, ast);
-    }
 
-    bool expr_cond_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return expr_assign_t::write(writer, ast);
-    }
-
-    bool expr_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return node_t::write(writer, ast);
-    }
-
-    bool expr_lor_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return expr_cond_t::write(writer, ast);
-    }
-
-    bool expr_land_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return expr_lor_t::write(writer, ast);
-    }
-
-    bool expr_or_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return expr_land_t::write(writer, ast);
-    }
-
-    bool expr_xor_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return expr_or_t::write(writer, ast);
-    }
-
-    bool expr_and_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return expr_xor_t::write(writer, ast);
-    }
-
-    bool expr_equal_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return expr_and_t::write(writer, ast);
-    }
-
-    bool expr_relational_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return expr_equal_t::write(writer, ast);
-    }
-
-    bool expr_shift_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return expr_relational_t::write(writer, ast);
-    }
-
-    bool expr_add_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return expr_shift_t::write(writer, ast);
-    }
-
-    bool expr_mul_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return expr_add_t::write(writer, ast);
-    }
-
-    bool expr_cast_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return expr_mul_t::write(writer, ast);
-    }
-
-    bool expr_prefix_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return expr_cast_t::write(writer, ast);
-    }
-
-    bool expr_postfix_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return expr_prefix_t::write(writer, ast);
-    }
-
-    expr_primary_t::expr_primary_t() {}
-
-    expr_primary_t::expr_primary_t(expr_const_t *const_expr) : const_expr(const_expr) {}
-
-    expr_primary_t::expr_primary_t(expr_t *expr) : expr(expr) {}
-
-    bool expr_primary_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return expr_postfix_t::write(writer, ast);
-    }
   }
 }
 

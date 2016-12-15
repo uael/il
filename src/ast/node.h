@@ -64,29 +64,12 @@ namespace dyc {
     struct stmt_decl_t;
 
     struct expr_t;
-    struct expr_assign_t;
-    struct expr_cond_t;
-    struct expr_lor_t;
-    struct expr_land_t;
-    struct expr_or_t;
-    struct expr_xor_t;
-    struct expr_and_t;
-    struct expr_relational_t;
-    struct expr_add_t;
-    struct expr_shift_t;
-    struct expr_mul_t;
-    struct expr_equal_t;
-    struct expr_cast_t;
-    struct expr_prefix_t;
-    struct expr_postfix_t;
-    struct expr_primary_t;
-    struct expr_const_t;
 
     struct const_value_t;
     struct const_lambda_t;
     struct const_initializer_t;
 
-    typedef std::map<expr_cond_t *, expr_t *> ds_map_t;
+    typedef std::map<expr_t *, expr_t *> ds_map_t;
 
     struct node_t {
       node_t *scope = nullptr;

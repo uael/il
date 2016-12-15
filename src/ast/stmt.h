@@ -44,11 +44,11 @@ namespace dyc {
       } kind;
       std::string *id;
       stmt_t *stmt = nullptr;
-      expr_cond_t *cond = nullptr;
+      expr_t *cond = nullptr;
 
       stmt_label_t(stmt_t *stmt);
       stmt_label_t(std::string *id, stmt_t *stmt);
-      stmt_label_t(expr_cond_t *cond, stmt_t *stmt);
+      stmt_label_t(expr_t *cond, stmt_t *stmt);
 
       virtual void accept(node_t *scope) override;
       bool write(generator_t::writer_t *writer, ast_t *ast) override;

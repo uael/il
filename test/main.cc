@@ -18,17 +18,9 @@
 
 /* $Id$ */
 
-#include "ast.h"
+#include "test.h"
 
-namespace dyc {
-  ast_t::ast_t() {}
-  ast_t::ast_t(ast::decl_t *decls) : decls(decls) {}
-
-  void ast_t::accept(ast::node_t *scope) {
-    ast::node_t::accept(scope);
-    ACCEPT(decls);
-  }
-}
+RUN
 
 /*
  * Local variables:

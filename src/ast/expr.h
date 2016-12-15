@@ -28,133 +28,39 @@
 
 namespace dyc {
   namespace ast {
-    struct expr_t : node_t, closure_t {
-      bool write(generator_t::writer_t *writer, ast_t *ast) override;
-    };
+    struct expr_t : node_t, closure_t {};
 
-    struct expr_assign_t : expr_t {
+    struct expr_op_t : expr_t {
       enum kind_t {
-        NONE, MUL, DIV, MOD, ADD, SUB, LEFT, RIGHT, AND, XOR, OR
-      };
-      std::vector<std::tuple<kind_t, expr_prefix_t *>> assign_chain;
+        INC_PRE, DEC_PRE, AND_PRE, ADD_PRE, SUB_PRE, MUL_PRE, NOT_PRE, TID_PRE, POS, CALL, INC_POST, DEC_POST, CONST,
+        ENCLOSE, ASSIGN, MUL_ASSIGN, DIV_ASSIGN, MOD_ASSIGN, ADD_ASSIGN, SUB_ASSIGN, LEFT_ASSIGN, RIGHT_ASSIGN,
+        AND_ASSIGN, XOR_ASSIGN, OR_ASSIGN, MUL, DIV, MOD, ADD, SUB, LEFT, RIGHT, AND, XOR, OR, LAND, LOR, EQ, NEQ, LT,
+        GT, LTE, GTE, TERNARY, CAST
+      } kind;
+      expr_t *op1 = nullptr;
 
-      bool write(generator_t::writer_t *writer, ast_t *ast) override;
+      expr_op_t(kind_t kind, expr_t *op1);
     };
 
-    struct expr_cond_t : expr_assign_t {
-      std::vector<std::tuple<expr_lor_t *, expr_t *>> ternary_chain;
+    struct expr_dop_t : expr_op_t {
+      expr_t *op2 = nullptr;
 
-      bool write(generator_t::writer_t *writer, ast_t *ast) override;
+      expr_dop_t(kind_t kind, expr_t *op1, expr_t *op2);
     };
 
-    struct expr_lor_t : expr_cond_t {
-      std::vector<expr_land_t *> lor_chain;
+    struct expr_ternary_t : expr_dop_t {
+      expr_t *cond = nullptr;
 
-      bool write(generator_t::writer_t *writer, ast_t *ast) override;
+      expr_ternary_t(expr_t *cond, expr_t *op1, expr_t *op2);
     };
 
-    struct expr_land_t : expr_lor_t {
-      std::vector<expr_or_t *> land_chain;
+    struct expr_cast_t : expr_op_t {
+      type_specifier_t *type = nullptr;
 
-      bool write(generator_t::writer_t *writer, ast_t *ast) override;
+      expr_cast_t(expr_t *op1, type_specifier_t *type);
     };
 
-    struct expr_or_t : expr_land_t {
-      std::vector<expr_xor_t *> or_chain;
-
-      bool write(generator_t::writer_t *writer, ast_t *ast) override;
-    };
-
-    struct expr_xor_t : expr_or_t {
-      std::vector<expr_and_t *> xor_chain;
-
-      bool write(generator_t::writer_t *writer, ast_t *ast) override;
-    };
-
-    struct expr_and_t : expr_xor_t {
-      std::vector<expr_equal_t *> and_chain;
-
-      bool write(generator_t::writer_t *writer, ast_t *ast) override;
-    };
-
-    struct expr_equal_t : expr_and_t {
-      std::vector<expr_relational_t *> eq_chain;
-      std::vector<expr_relational_t *> neq_chain;
-
-      bool write(generator_t::writer_t *writer, ast_t *ast) override;
-    };
-
-    struct expr_relational_t : expr_equal_t {
-      std::vector<expr_shift_t *> lt_chain;
-      std::vector<expr_shift_t *> gt_chain;
-      std::vector<expr_shift_t *> le_chain;
-      std::vector<expr_shift_t *> ge_chain;
-
-      bool write(generator_t::writer_t *writer, ast_t *ast) override;
-    };
-
-    struct expr_shift_t : expr_relational_t {
-      std::vector<expr_add_t *> ls_chain;
-      std::vector<expr_add_t *> rs_chain;
-
-      bool write(generator_t::writer_t *writer, ast_t *ast) override;
-    };
-
-    struct expr_add_t : expr_shift_t {
-      std::vector<expr_mul_t *> add_chain;
-      std::vector<expr_mul_t *> sub_chain;
-
-      bool write(generator_t::writer_t *writer, ast_t *ast) override;
-    };
-
-    struct expr_mul_t : expr_add_t {
-      std::vector<expr_cast_t *> mul_chain;
-      std::vector<expr_cast_t *> div_chain;
-      std::vector<expr_cast_t *> mod_chain;
-
-      bool write(generator_t::writer_t *writer, ast_t *ast) override;
-    };
-
-    struct expr_cast_t : expr_mul_t {
-      std::vector<type_specifier_t *> cast_chain;
-
-      bool write(generator_t::writer_t *writer, ast_t *ast) override;
-    };
-
-    struct expr_prefix_t : expr_cast_t {
-      int inc_lvl;
-      int dec_lvl;
-      int and_lvl;
-      int add_lvl;
-      int sub_lvl;
-      int mul_lvl;
-      int not_lvl;
-      int tid_lvl;
-
-      bool write(generator_t::writer_t *writer, ast_t *ast) override;
-    };
-
-    struct expr_postfix_t : expr_prefix_t {
-      std::vector<expr_t *> position_chain;
-      std::vector<expr_t *> call_chain;
-      int post_inc_lvl = 0;
-      int post_dec_lvl = 0;
-
-      bool write(generator_t::writer_t *writer, ast_t *ast) override;
-    };
-
-    struct expr_primary_t : expr_postfix_t {
-      expr_const_t *const_expr = nullptr;
-      expr_t *expr = nullptr;
-
-      expr_primary_t();
-      expr_primary_t(expr_const_t *const_expr);
-      expr_primary_t(expr_t *expr);
-
-      bool write(generator_t::writer_t *writer, ast_t *ast) override;
-    };
-
-    struct expr_const_t : node_t {};
+    struct expr_const_t : expr_t {};
   }
 }
 

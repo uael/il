@@ -29,12 +29,6 @@ namespace dyc {
       return expr_const_t::write(writer, ast);
     }
 
-    std::string const_value_t::dump(unsigned long lvl) {
-      DUMP_START("const_value");
-      DUMP_SPTR(value);
-      DUMP_END();
-    }
-
     const_lambda_t::const_lambda_t(identifier_t *args, closure_t *closure) : args(args), closure(closure) {}
 
     bool const_lambda_t::write(generator_t::writer_t *writer, ast_t *ast) {

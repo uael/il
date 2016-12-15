@@ -38,7 +38,7 @@ namespace dyc {
 
     stmt_label_t::stmt_label_t(stmt_t *stmt) : kind(DEFAULT), stmt(stmt) {}
     stmt_label_t::stmt_label_t(std::string *id, stmt_t *stmt) : kind(LABEL), id(id), stmt(stmt) {}
-    stmt_label_t::stmt_label_t(expr_cond_t *cond, stmt_t *stmt) : kind(CASE), stmt(stmt), cond(cond) {}
+    stmt_label_t::stmt_label_t(expr_t *cond, stmt_t *stmt) : kind(CASE), stmt(stmt), cond(cond) {}
 
     void stmt_label_t::accept(node_t *scope) {
       node_t::accept(scope);

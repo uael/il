@@ -21,7 +21,6 @@
 #include <iostream>
 #include <fstream>
 #include "driver.h"
-#include "gtest/gtest.h"
 #include "test.h"
 
 using namespace dyc;
@@ -39,30 +38,34 @@ SYNTAX_TEST(func, fibonacci, true, "",
   "}"
 );
 
-SYNTAX_TEST(func, sort, true, "",
-  "sort<T>(array : T[]) => {"
-  "  var swap(i, j : T) => {"
-  "      var t = array[i];"
-  "      array[i] = array[j];"
-  "      array[j] = t;"
-  "    },"
-  "    sort(l, r : T) => {"
-  "      var p = array[(l + r) / 2], i = l, j = r;"
-  "      while (i <= j) {"
-  "        while (array[i] < p) i += 1;"
-  "        while (array[i] < p) l -= 1;"
-  "        if (i <= j) {"
-  "          swap(i, j);"
-  "          i += 1;"
-  "          j -= 1;"
-  "        }"
-  "      }"
-  "      if (l < j) sort(l, j);"
-  "      if (j < r) sort(i, r);"
-  "    };"
-  "  sort1(0, count(array) - 1);"
-  "}"
-);
+TEST(func, sort) {
+  dyc::driver driver = dyc::driver();
+  ASSERT_TRUE(driver.parse_string(
+    "sort<T>(array : T[]) => {"
+    "  var swap(i, j : T) => {"
+    "      var t = array[i];"
+    "      array[i] = array[j];"
+    "      array[j] = t;"
+    "    },"
+    "    sort(l, r : T) => {"
+    "      var p = array[(l + r) / 2], i = l, j = r;"
+    "      while (i <= j) {"
+    "        while (array[i] < p) i += 1;"
+    "        while (array[i] < p) l -= 1;"
+    "        if (i <= j) {"
+    "          swap(i, j);"
+    "          i += 1;"
+    "          j -= 1;"
+    "        }"
+    "      }"
+    "      if (l < j) sort(l, j);"
+    "      if (j < r) sort(i, r);"
+    "    };"
+    "  sort1(0, count(array) - 1);"
+    "}"
+  ));
+  driver.ast.accept(nullptr);
+}
 
 SYNTAX_TEST(func, tuple, true, "",
   "func(n : int) : int, *double => { return 1, &2.0; }"
@@ -112,7 +115,9 @@ TEST(func, find) {
   }
 }
 
-RUN;
+#ifdef HAVE_CONFIG_H
+RUN
+#endif
 
 /*
  * Local variables:

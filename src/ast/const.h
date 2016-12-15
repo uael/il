@@ -34,7 +34,6 @@ namespace dyc {
       const_value_t(kind_t kind, std::string *value);
 
       bool write(generator_t::writer_t *writer, ast_t *ast) override;
-      std::string dump(unsigned long lvl = 0) override;
     };
 
     struct const_lambda_t : expr_const_t {

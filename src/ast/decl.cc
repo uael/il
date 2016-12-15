@@ -34,30 +34,12 @@ namespace dyc {
       node_t::accept(scope);
     }
 
-    std::string decl_t::dump(unsigned long lvl) {
-      DUMP_START("decl");
-      DUMP(ids);
-      DUMP(type_specifier);
-      node_t *closure = this->closure ? nullptr : this->closure->as_node();
-      DUMP(closure);
-      DUMP_END();
-    }
-
     decl_property_t::decl_property_t(
       identifier_t *ids, type_specifier_t *type_specifier, closure_t *closure, bool assigned)
       : decl_t(ids, type_specifier, closure), assigned(assigned) {}
 
     bool decl_property_t::write(generator_t::writer_t *writer, ast_t *ast) {
       return decl_t::write(writer, ast);
-    }
-
-    std::string decl_property_t::dump(unsigned long lvl) {
-      DUMP_START("decl_property");
-      DUMP(ids);
-      DUMP(type_specifier);
-      node_t *closure = this->closure ? nullptr : this->closure->as_node();
-      DUMP(closure);
-      DUMP_END();
     }
 
     decl_function_t::decl_function_t(
@@ -72,17 +54,6 @@ namespace dyc {
 
     bool decl_function_t::write(generator_t::writer_t *writer, ast_t *ast) {
       return decl_t::write(writer, ast);
-    }
-
-    std::string decl_function_t::dump(unsigned long lvl) {
-      DUMP_START("decl_function");
-      DUMP(ids);
-      DUMP(type_specifier);
-      DUMP(generics);
-      DUMP(args);
-      node_t *closure = this->closure ? nullptr : this->closure->as_node();
-      DUMP(closure);
-      DUMP_END();
     }
   }
 }

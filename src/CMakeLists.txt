@@ -24,7 +24,7 @@ set(libdyc_SOURCES
         scanner.ll
         y.tab.h
         driver.cc
-        generator.cc)
+        writer.cc)
 
 add_library(libdyc ${libdyc_SOURCES})
 

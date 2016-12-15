@@ -31,7 +31,7 @@ namespace dyc {
 
       generic_t(std::string *value, type_specifier_t *type_specifier);
 
-      bool write(generator_t::writer_t *writer, ast_t *ast) override;
+      void write(writer_t *writer) override;
     };
   }
 }

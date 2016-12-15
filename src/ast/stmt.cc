@@ -32,8 +32,8 @@ namespace dyc {
       ACCEPT(expr);
     }
 
-    bool stmt_expr_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return stmt_t::write(writer, ast);
+    void stmt_expr_t::write(writer_t *writer) {
+      stmt_t::write(writer);
     }
 
     stmt_label_t::stmt_label_t(stmt_t *stmt) : kind(DEFAULT), stmt(stmt) {}
@@ -46,8 +46,8 @@ namespace dyc {
       ACCEPT(cond);
     }
 
-    bool stmt_label_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return stmt_t::write(writer, ast);
+    void stmt_label_t::write(writer_t *writer) {
+      stmt_t::write(writer);
     }
 
     stmt_compound_t::stmt_compound_t(stmt_t *stmts) : stmts(stmts) {}
@@ -58,8 +58,8 @@ namespace dyc {
       if (stmts) stmts->accept(this);
     }
 
-    bool stmt_compound_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return stmt_t::write(writer, ast);
+    void stmt_compound_t::write(writer_t *writer) {
+      stmt_t::write(writer);
     }
 
     stmt_select_t::stmt_select_t() {}
@@ -75,8 +75,8 @@ namespace dyc {
       ACCEPT(else_stmt);
     }
 
-    bool stmt_select_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return stmt_t::write(writer, ast);
+    void stmt_select_t::write(writer_t *writer) {
+      stmt_t::write(writer);
     }
 
     stmt_iter_t::stmt_iter_t(expr_t *cond, stmt_t *stmt) : kind(WHILE), cond(cond), stmt(stmt) {}
@@ -94,8 +94,8 @@ namespace dyc {
       ACCEPT(stmt);
     }
 
-    bool stmt_iter_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return stmt_t::write(writer, ast);
+    void stmt_iter_t::write(writer_t *writer) {
+      stmt_t::write(writer);
     }
 
     stmt_jump_t::stmt_jump_t(stmt_jump_t::kind_t kind) : kind(kind) {}
@@ -107,8 +107,8 @@ namespace dyc {
       ACCEPT(expr);
     }
 
-    bool stmt_jump_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return stmt_t::write(writer, ast);
+    void stmt_jump_t::write(writer_t *writer) {
+      stmt_t::write(writer);
     }
 
     stmt_decl_t::stmt_decl_t() {}
@@ -119,8 +119,8 @@ namespace dyc {
       ACCEPT(decls);
     }
 
-    bool stmt_decl_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return stmt_t::write(writer, ast);
+    void stmt_decl_t::write(writer_t *writer) {
+      stmt_t::write(writer);
     }
   }
 }

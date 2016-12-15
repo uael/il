@@ -33,7 +33,7 @@ namespace dyc {
 
       const_value_t(kind_t kind, std::string *value);
 
-      bool write(generator_t::writer_t *writer, ast_t *ast) override;
+      void write(writer_t *writer) override;
     };
 
     struct const_lambda_t : expr_const_t {
@@ -42,7 +42,7 @@ namespace dyc {
 
       const_lambda_t(identifier_t *args, closure_t *closure);
 
-      bool write(generator_t::writer_t *writer, ast_t *ast) override;
+      void write(writer_t *writer) override;
     };
 
     struct const_initializer_t : expr_const_t {
@@ -52,7 +52,7 @@ namespace dyc {
       const_initializer_t(expr_t *list);
       const_initializer_t(ds_map_t *map);
 
-      bool write(generator_t::writer_t *writer, ast_t *ast) override;
+      void write(writer_t *writer) override;
     };
   }
 }

@@ -29,8 +29,8 @@ namespace dyc {
       uk_value = *value;
     }
 
-    bool identifier_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return node_t::write(writer, ast);
+    void identifier_t::write(writer_t *writer) {
+      node_t::write(writer);
     }
   }
 }

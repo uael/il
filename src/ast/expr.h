@@ -40,24 +40,34 @@ namespace dyc {
       expr_t *op1 = nullptr;
 
       expr_op_t(kind_t kind, expr_t *op1);
+
+      std::string op();
+
+      void write(writer_t *writer) override;
     };
 
     struct expr_dop_t : expr_op_t {
       expr_t *op2 = nullptr;
 
       expr_dop_t(kind_t kind, expr_t *op1, expr_t *op2);
+
+      void write(writer_t *writer) override;
     };
 
     struct expr_ternary_t : expr_dop_t {
       expr_t *cond = nullptr;
 
       expr_ternary_t(expr_t *cond, expr_t *op1, expr_t *op2);
+
+      void write(writer_t *writer) override;
     };
 
     struct expr_cast_t : expr_op_t {
       type_specifier_t *type = nullptr;
 
       expr_cast_t(expr_t *op1, type_specifier_t *type);
+
+      void write(writer_t *writer) override;
     };
 
     struct expr_const_t : expr_t {};

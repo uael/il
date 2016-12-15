@@ -35,20 +35,20 @@ namespace dyc {
       }
     }
 
-    bool type_specifier_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return node_t::write(writer, ast);
+    void type_specifier_t::write(writer_t *writer) {
+      node_t::write(writer);
     }
 
     type_scalar_t::type_scalar_t(type_scalar_t::kind_t kind) : kind(kind) {}
 
-    bool type_scalar_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return type_t::write(writer, ast);
+    void type_scalar_t::write(writer_t *writer) {
+      type_t::write(writer);
     }
 
     type_generic_t::type_generic_t(std::string *id) : id(id) {}
 
-    bool type_generic_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return type_t::write(writer, ast);
+    void type_generic_t::write(writer_t *writer) {
+      type_t::write(writer);
     }
   }
 }

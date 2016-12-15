@@ -18,35 +18,33 @@
 
 /* $Id$ */
 
-#ifndef _GENERATOR_H
-#define _GENERATOR_H
+#ifndef _WRITER_H
+#define _WRITER_H
 
 #include <string>
 
 namespace dyc {
   struct ast_t;
+  namespace ast {
+    struct node_t;
+  }
 
-  struct generator_t {
+  struct writer_t {
     ast_t *ast;
-    generator_t(ast_t *ast);
-    bool generate();
+    std::string stream;
+    int indent_lvl;
 
-    struct writer_t {
-      std::string stream;
-      int indent_lvl;
+    writer_t(ast_t *ast);
 
-      writer_t *operator<<(const std::string &str) {
-        for (int i = 0; i < indent_lvl; i++) {
-          this->stream += "  ";
-        }
-        this->stream += str + "\r\n";
-        return this;
-      }
-    };
+    writer_t &operator<<(ast::node_t *node);
+
+    writer_t &operator<<(const char *string);
+
+    writer_t &operator<<(const std::string &str);
   };
 }
 
-#endif /* _GENERATOR_H */
+#endif /* _WRITER_H */
 
 /*
  * Local variables:

@@ -34,7 +34,6 @@ namespace dyc {
       decl_t(identifier_t *ids, type_specifier_t *type_specifier, closure_t *closure);
 
       virtual void accept(node_t *scope) override;
-      std::string dump(unsigned long lvl = 0) override;
 
       template<typename T>
       T find(std::string ukid) {
@@ -58,7 +57,6 @@ namespace dyc {
       decl_property_t(identifier_t *ids, type_specifier_t *type_specifier, closure_t *closure, bool assigned);
 
       bool write(generator_t::writer_t *writer, ast_t *ast) override;
-      std::string dump(unsigned long lvl = 0) override;
     };
 
     struct decl_function_t : decl_t {
@@ -70,7 +68,6 @@ namespace dyc {
 
       virtual void accept(node_t *scope) override;
       bool write(generator_t::writer_t *writer, ast_t *ast) override;
-      std::string dump(unsigned long lvl = 0) override;
     };
   }
 }

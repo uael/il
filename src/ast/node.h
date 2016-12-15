@@ -32,13 +32,6 @@
 
 #define ACCEPT(node) if ((node)) (node)->accept(this)
 
-#define DUMP_START(name) std::string ret = "\n" + indent(name" {\n", lvl)
-#define DUMP(node) ret += node ? indent(#node" = {"+node->dump(lvl+2)+"\n"+indent("}\n",lvl+1), lvl+1) : ""
-#define DUMP_SPTR(sptr) ret += sptr ? indent(#sptr": "+(*(sptr))+"\n", lvl+1) : ""
-#define DUMP_END() ret += indent("}", lvl); \
-  if (this->next) ret += "," + indent(this->next->dump(lvl), lvl); \
-  return ret
-
 namespace dyc {
   namespace ast {
     struct identifier_t;
@@ -79,7 +72,6 @@ namespace dyc {
       virtual ~node_t();
       virtual bool write(generator_t::writer_t *writer, ast_t *ast);
       virtual void accept(node_t *scope);
-      virtual std::string dump(unsigned long lvl = 0);
 
       template<typename T>
       T *push(T *node) {
@@ -94,11 +86,6 @@ namespace dyc {
       }
     };
   }
-}
-
-static std::string indent(std::string s, unsigned long lvl) {
-  s.insert(0, lvl, ' ');
-  return s;
 }
 
 #endif /* _AST_NODE_H */

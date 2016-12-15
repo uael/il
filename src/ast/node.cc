@@ -34,11 +34,6 @@ namespace dyc {
     bool node_t::write(generator_t::writer_t *writer, ast_t *ast) {
       return false;
     }
-
-    std::string node_t::dump(unsigned long lvl) {
-      DUMP_START("node");
-      DUMP_END();
-    }
   }
 }
 

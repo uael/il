@@ -22,7 +22,13 @@
 
 namespace dyc {
   namespace ast {
+    expr_op_t::expr_op_t(expr_op_t::kind_t kind, expr_t *op1) : kind(kind), op1(op1) {}
 
+    expr_dop_t::expr_dop_t(expr_op_t::kind_t kind, expr_t *op1, expr_t *op2) : expr_op_t(kind, op1), op2(op2) {}
+
+    expr_ternary_t::expr_ternary_t(expr_t *cond, expr_t *op1, expr_t *op2) : expr_dop_t(TERNARY, op1, op2), cond(cond) {}
+
+    expr_cast_t::expr_cast_t(expr_t *op1, type_specifier_t *type) : expr_op_t(CAST, op1), type(type) {}
   }
 }
 

@@ -39,25 +39,25 @@ namespace dyc {
       } kind;
       expr_t *op1 = nullptr;
 
-      expr_op_t(kind_t kind, expr_t *op1) : kind(kind), op1(op1) {}
+      expr_op_t(kind_t kind, expr_t *op1);
     };
 
     struct expr_dop_t : expr_op_t {
       expr_t *op2 = nullptr;
 
-      expr_dop_t(kind_t kind, expr_t *op1, expr_t *op2) : expr_op_t(kind, op1), op2(op2) {}
+      expr_dop_t(kind_t kind, expr_t *op1, expr_t *op2);
     };
 
     struct expr_ternary_t : expr_dop_t {
       expr_t *cond = nullptr;
 
-      expr_ternary_t(expr_t *cond, expr_t *op1, expr_t *op2) : expr_dop_t(TERNARY, op1, op2), cond(cond) {}
+      expr_ternary_t(expr_t *cond, expr_t *op1, expr_t *op2);
     };
 
     struct expr_cast_t : expr_op_t {
       type_specifier_t *type = nullptr;
 
-      expr_cast_t(expr_t *op1, type_specifier_t *type) : expr_op_t(CAST, op1), type(type) {}
+      expr_cast_t(expr_t *op1, type_specifier_t *type);
     };
 
     struct expr_const_t : expr_t {};

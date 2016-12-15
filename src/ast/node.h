@@ -57,6 +57,11 @@ namespace dyc {
     struct stmt_decl_t;
 
     struct expr_t;
+    struct expr_op_t;
+    struct expr_dop_t;
+    struct expr_ternary_t;
+    struct expr_cast_t;
+    struct expr_const_t;
 
     struct const_value_t;
     struct const_lambda_t;

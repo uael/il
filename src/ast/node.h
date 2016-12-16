@@ -66,13 +66,12 @@ namespace dyc {
     struct expr_prefix_t;
     struct expr_postfix_t;
     struct expr_primary_t;
+    struct expr_kvp_t;
     struct expr_const_t;
 
     struct const_value_t;
     struct const_lambda_t;
     struct const_initializer_t;
-
-    typedef std::map<expr_t *, expr_t *> ds_map_t;
 
     struct node_t {
       node_t *scope = nullptr;

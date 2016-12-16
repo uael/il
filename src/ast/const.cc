@@ -19,7 +19,7 @@
 /* $Id$ */
 
 #include "const.h"
-#include "closure.h"
+#include "ident.h"
 
 namespace dyc {
   namespace ast {
@@ -35,11 +35,21 @@ namespace dyc {
       expr_const_t::write(writer);
     }
 
-    const_initializer_t::const_initializer_t(expr_t *list) : list(list) {}
-    const_initializer_t::const_initializer_t(ds_map_t *map) : map(map) {}
+    void const_lambda_t::accept(node_t *scope) {
+      ACCEPT(args);
+      ACCEPT((node_t *) closure);
+      node_t::accept(scope);
+    }
+
+    const_initializer_t::const_initializer_t(expr_t *exprs) : exprs(exprs) {}
 
     void const_initializer_t::write(writer_t *writer) {
       expr_const_t::write(writer);
+    }
+
+    void const_initializer_t::accept(node_t *scope) {
+      ACCEPT(exprs);
+      node_t::accept(scope);
     }
   }
 }

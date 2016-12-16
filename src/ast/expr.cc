@@ -25,10 +25,6 @@ namespace dyc {
   namespace ast {
     expr_op_t::expr_op_t(expr_op_t::kind_t kind, expr_t *op1) : kind(kind), op1(op1) {}
 
-    void expr_op_t::accept(node_t *scope) {
-      node_t::accept(scope);
-    }
-
     std::string expr_op_t::op() {
       switch (kind) {
         case INC_PRE:
@@ -108,10 +104,20 @@ namespace dyc {
       }
     }
 
+    void expr_op_t::accept(node_t *scope) {
+      ACCEPT(op1);
+      node_t::accept(scope);
+    }
+
     expr_dop_t::expr_dop_t(expr_op_t::kind_t kind, expr_t *op1, expr_t *op2) : expr_op_t(kind, op1), op2(op2) {}
 
     void expr_dop_t::write(writer_t *writer) {
       *writer << "(" << op1 << op() << op2 << ")";
+    }
+
+    void expr_dop_t::accept(node_t *scope) {
+      ACCEPT(op2);
+      expr_op_t::accept(scope);
     }
 
     expr_ternary_t::expr_ternary_t(expr_t *cond, expr_t *op1, expr_t *op2) : expr_dop_t(TERNARY, op1, op2),cond(cond) {}
@@ -120,10 +126,20 @@ namespace dyc {
       *writer << "(" << cond << "?" << op1 << ":" << op2 << ")";
     }
 
+    void expr_ternary_t::accept(node_t *scope) {
+      ACCEPT(cond);
+      expr_dop_t::accept(scope);
+    }
+
     expr_cast_t::expr_cast_t(expr_t *op1, type_specifier_t *type) : expr_op_t(CAST, op1), type(type) {}
 
     void expr_cast_t::write(writer_t *writer) {
       *writer << "(" << type << ")" << op1;
+    }
+
+    void expr_cast_t::accept(node_t *scope) {
+      ACCEPT(type);
+      expr_op_t::accept(scope);
     }
 
     expr_call_t::expr_call_t(expr_t *op1, expr_t *op2) : expr_dop_t(CALL, op1, op2) {}
@@ -159,6 +175,8 @@ namespace dyc {
         *writer << op1;
       }
     }
+
+    expr_kvp_t::expr_kvp_t(expr_t *op1, expr_t *op2) : expr_dop_t(KVP, op1, op2) {}
   }
 }
 

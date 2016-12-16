@@ -66,8 +66,6 @@
   dyc::ast::const_value_t *_const_value;
   dyc::ast::const_lambda_t *_const_lambda;
   dyc::ast::const_initializer_t *_const_initializer;
-
-  dyc::ast::ds_map_t *_ds_map;
 }
 
 %token END 0 "end of file"
@@ -121,17 +119,16 @@
 %type <_expr> expr_shift
 %type <_expr> expr_add
 %type <_expr> expr_mul
-%type <_expr> expr_const
 %type <_expr> expr_cast
 %type <_expr> expr_prefix
 %type <_expr> expr_postfix
 %type <_expr> expr_primary
+%type <_expr> expr_kvp expr_kvp_list
+%type <_expr> expr_const
 
 %type <_const_value> const_value
 %type <_const_lambda> const_lambda
 %type <_const_initializer> const_initializer
-
-%type <_ds_map> ds_map
 
 %{
 #include "driver.h"
@@ -189,7 +186,7 @@ using namespace dyc::ast;
 %destructor { if ($$) delete $$; $$ = nullptr; } const_lambda
 %destructor { if ($$) delete $$; $$ = nullptr; } const_initializer
 
-%destructor { if ($$) delete $$; $$ = nullptr; } ds_map
+%destructor { if ($$) delete $$; $$ = nullptr; } expr_kvp expr_kvp_list
 
 %start program
 
@@ -838,6 +835,24 @@ expr_primary
     }
   ;
 
+expr_kvp
+  : expr_cond COLON expr {
+      $$ = new expr_kvp_t($1, $3);
+    }
+  ;
+
+expr_kvp_list
+  : /* empty */ {
+      $$ = nullptr;
+    }
+  | expr_kvp {
+      $$ = $1;
+    }
+  | expr_kvp_list COMMA expr_kvp {
+      $$ = $1->push($3);
+    }
+  ;
+
 expr_const
   : id {
       $$ = $1;
@@ -884,22 +899,8 @@ const_initializer
   : LSQU expr_list RSQU {
       $$ = new const_initializer_t($2);
     }
-  | LBRA ds_map RBRA {
+  | LBRA expr_kvp_list RBRA {
       $$ = new const_initializer_t($2);
-    }
-  ;
-
-ds_map
-  : /* empty */ {
-      $$ = nullptr;
-    }
-  | expr_cond COLON expr {
-      $$ = new ds_map_t();
-      (*$$)[$1] = $3;
-    }
-  | ds_map COMMA expr_cond COLON expr {
-      (*$1)[$3] = $5;
-      $$ = $1;
     }
   ;
 

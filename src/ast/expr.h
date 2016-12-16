@@ -33,7 +33,7 @@ namespace dyc {
         INC_PRE, DEC_PRE, AND_PRE, ADD_PRE, SUB_PRE, MUL_PRE, NOT_PRE, TID_PRE, POS, CALL, INC_POST, DEC_POST, CONST,
         ENCLOSE, ASSIGN, MUL_ASSIGN, DIV_ASSIGN, MOD_ASSIGN, ADD_ASSIGN, SUB_ASSIGN, LEFT_ASSIGN, RIGHT_ASSIGN,
         AND_ASSIGN, XOR_ASSIGN, OR_ASSIGN, MUL, DIV, MOD, ADD, SUB, LEFT, RIGHT, AND, XOR, OR, LAND, LOR, EQ, NEQ, LT,
-        GT, LTE, GTE, TERNARY, CAST
+        GT, LTE, GTE, TERNARY, CAST, KVP
       };
     };
 
@@ -53,6 +53,7 @@ namespace dyc {
       expr_dop_t(kind_t kind, expr_t *op1, expr_t *op2);
 
       void write(writer_t *writer) override;
+      void accept(node_t *scope) override;
     };
 
     struct expr_ternary_t : expr_dop_t {
@@ -61,6 +62,7 @@ namespace dyc {
       expr_ternary_t(expr_t *cond, expr_t *op1, expr_t *op2);
 
       void write(writer_t *writer) override;
+      void accept(node_t *scope) override;
     };
 
     struct expr_cast_t : expr_op_t {
@@ -69,6 +71,7 @@ namespace dyc {
       expr_cast_t(expr_t *op1, type_specifier_t *type);
 
       void write(writer_t *writer) override;
+      void accept(node_t *scope) override;
     };
 
     struct expr_call_t : expr_dop_t {
@@ -99,6 +102,10 @@ namespace dyc {
       expr_primary_t(kind_t kind, expr_t *op1);
 
       void write(writer_t *writer) override;
+    };
+
+    struct expr_kvp_t : expr_dop_t {
+      expr_kvp_t(expr_t *op1, expr_t *op2);
     };
 
     struct expr_const_t : expr_t {};

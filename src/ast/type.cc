@@ -54,9 +54,9 @@ namespace dyc {
       type_t::write(writer);
     }
 
-    type_generic_t::type_generic_t(std::string *id) : id(id) {}
+    type_userdef_t::type_userdef_t(std::string *id) : id(id) {}
 
-    void type_generic_t::write(writer_t *writer) {
+    void type_userdef_t::write(writer_t *writer) {
       type_t::write(writer);
     }
   }

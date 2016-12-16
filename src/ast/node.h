@@ -47,7 +47,7 @@ namespace dyc {
     struct type_specifier_t;
     struct type_t;
     struct type_scalar_t;
-    struct type_generic_t;
+    struct type_userdef_t;
 
     struct stmt_t;
     struct stmt_expr_t;

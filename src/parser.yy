@@ -50,7 +50,7 @@
   dyc::ast::type_specifier_t *_type_specifier;
   dyc::ast::type_t *_type;
   dyc::ast::type_scalar_t *_type_scalar;
-  dyc::ast::type_generic_t *_type_generic;
+  dyc::ast::type_userdef_t *_type_userdef;
 
   dyc::ast::stmt_t *_stmt;
   dyc::ast::stmt_expr_t *_stmt_expr;
@@ -70,7 +70,7 @@
 
 %token END 0 "end of file"
 %token EOL "end of line"
-%token <_string> ID GENERIC INT_CONST FLOAT_CONST STRING_CONST
+%token <_string> ID USERDEF INT_CONST FLOAT_CONST STRING_CONST
 %token TUPLE ENUM STRUCT INTERFACE CLASS
 %token VOID BOOL CHAR INT UINT SINT SHORT USHORT SSHORT FLOAT UFLOAT SFLOAT DOUBLE UDOUBLE SDOUBLE
 %token GT LT ADD SUB MUL DIV EQ NEQ LE GE
@@ -95,7 +95,7 @@
 %type <_type_specifier> type_specifier type_specifier_list type_specifier_unit
 %type <_type> type
 %type <_type_scalar> type_scalar
-%type <_type_generic> type_generic
+%type <_type_userdef> type_userdef
 
 %type <_stmt> stmt stmt_list
 %type <_stmt_expr> stmt_expr
@@ -154,7 +154,7 @@ using namespace dyc::ast;
 %destructor { if ($$) delete $$; $$ = nullptr; } type_specifier type_specifier_list type_specifier_unit
 %destructor { if ($$) delete $$; $$ = nullptr; } type
 %destructor { if ($$) delete $$; $$ = nullptr; } type_scalar
-%destructor { if ($$) delete $$; $$ = nullptr; } type_generic
+%destructor { if ($$) delete $$; $$ = nullptr; } type_userdef
 
 %destructor { if ($$) delete $$; $$ = nullptr; } stmt stmt_list
 %destructor { if ($$) delete $$; $$ = nullptr; } stmt_expr
@@ -216,10 +216,10 @@ id_list
   ;
   
 generic
-  : GENERIC {
+  : USERDEF {
       MAKE($$, @$, generic_t, $1, nullptr);
     }
-  | GENERIC COLON type_specifier {
+  | USERDEF COLON type_specifier {
       MAKE($$, @$, generic_t, $1, $3);
     }
   ;
@@ -384,7 +384,7 @@ type
   : type_scalar {
       $$ = $1;
     }
-  | type_generic {
+  | type_userdef {
       $$ = $1;
     }
   ;
@@ -437,9 +437,9 @@ type_scalar
     }
   ;
 
-type_generic
-  : GENERIC {
-      MAKE($$, @$, type_generic_t, $1);
+type_userdef
+  : USERDEF {
+      MAKE($$, @$, type_userdef_t, $1);
     }
   ;
 

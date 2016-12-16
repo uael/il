@@ -180,7 +180,7 @@ typedef dyc::parser::token token;
 "signed double"                   RET(SDOUBLE);
 
 [a-z_][a-z0-9_]*	                SAVE_STRING; RET(ID);
-[A-Z]([A-Z]+[a-z0-9])*            SAVE_STRING; RET(GENERIC);
+[A-Z]([A-Z]+[a-z0-9])*            SAVE_STRING; RET(USERDEF);
 
 {HP}{H}+{IS}?				              SAVE_STRING; RET(INT_CONST);
 {NZ}{D}*{IS}?				              SAVE_STRING; RET(INT_CONST);

@@ -61,10 +61,10 @@ namespace dyc {
       void write(writer_t *writer) override;
     };
 
-    struct type_generic_t : type_t {
+    struct type_userdef_t : type_t {
       std::string *id;
 
-      type_generic_t(std::string *id);
+      type_userdef_t(std::string *id);
 
       void write(writer_t *writer) override;
     };

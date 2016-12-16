@@ -72,7 +72,7 @@
 %token EOL "end of line"
 %token <_string> ID USERDEF INT_CONST FLOAT_CONST STRING_CONST
 %token TUPLE ENUM STRUCT INTERFACE CLASS
-%token VOID BOOL CHAR INT UINT SINT SHORT USHORT SSHORT FLOAT UFLOAT SFLOAT DOUBLE UDOUBLE SDOUBLE
+%token VOID BOOL CHAR INT STRING UINT SINT SHORT USHORT SSHORT FLOAT UFLOAT SFLOAT DOUBLE UDOUBLE SDOUBLE
 %token GT LT ADD SUB MUL DIV EQ NEQ LE GE
 %token COLON DOUBLE_COLON SEMICOLON COMMA LPAR RPAR LBRA RBRA ARROW ASSIGN
 %token COND MOD ACCESS AND INC DEC LS LSQU RS RSQU NOT DOT TID OR XOR LAND LOR
@@ -401,6 +401,9 @@ type_internal
     }
   | INT {
       MAKE($$, @$, type_internal_t, type_internal_t::kind_t::INT);
+    }
+  | STRING {
+      MAKE($$, @$, type_internal_t, type_internal_t::kind_t::STRING);
     }
   | UINT {
       MAKE($$, @$, type_internal_t, type_internal_t::kind_t::UINT);

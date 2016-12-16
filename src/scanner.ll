@@ -167,6 +167,7 @@ typedef dyc::parser::token token;
 "bool"                            RET(BOOL);
 "char"                            RET(CHAR);
 "int"                             RET(INT);
+"string"                          RET(STRING);
 "unsigned int"                    RET(UINT);
 "signed int"                      RET(SINT);
 "short"                           RET(SHORT);

@@ -67,15 +67,15 @@ TEST(func, sort) {
 }
 
 SYNTAX_TEST(func, tuple, true, "",
-  "func(n : int) : int, *double => { return 1, &2.0; }"
+  "func(n : int) : int, double[] => { return 1, [2.0]; }"
 );
 
 SYNTAX_TEST(func, tuple1, true, "",
-  "func(n : int) : int, tuple<*double, bool> => { return 1, &2.0, true; }"
+  "func(n : int) : int, tuple<double[], bool> => { return 1, [2.0], true; }"
 );
 
 SYNTAX_TEST(func, tuple3, true, "",
-  "func(n : int) : int, tuple<*double, bool> => { return 1, (&2.0, true); }"
+  "func(n : int) : int, tuple<double[], bool> => { return 1, ([2.0], true); }"
 );
 
 SYNTAX_TEST(func, initializer, true, "",
@@ -106,7 +106,7 @@ SYNTAX_TEST(func, initializer3, true, "",
 
 TEST(func, find) {
   dyc::driver driver = dyc::driver();
-  ASSERT_EQ(true, driver.parse_string("main,oops(argc:int,argv:*char[]):int=>{return 0;}"));
+  ASSERT_EQ(true, driver.parse_string("main,oops(argc:int,argv:char[]):int=>{return 0;}"));
   decl_function_t *main = driver.ast.decls->find<decl_function_t *>("main");
   if (!main) {
     FAIL();

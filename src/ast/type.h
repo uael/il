@@ -30,7 +30,6 @@ namespace dyc {
       type_t *type = nullptr;
       std::vector<type_specifier_t *> call_chain;
       decl_t *decls = nullptr;
-      int ptr_lvl;
       int array_lvl;
 
       type_specifier_t(type_t *type);

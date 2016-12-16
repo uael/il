@@ -366,10 +366,6 @@ type_specifier_unit
   : type {
       MAKE($$, @$, type_specifier_t, $1);
     }
-  | MUL type_specifier_unit {
-      $2->ptr_lvl++;
-      $$ = $2;
-    }
   | type_specifier_unit LSQU RSQU {
       $1->array_lvl++;
       $$ = $1;
@@ -787,17 +783,11 @@ expr_prefix
   | DEC expr_prefix {
       MAKE($$, @$, expr_prefix_t, expr_t::kind_t::DEC_PRE, $2);
     }
-  | AND expr_prefix {
-      MAKE($$, @$, expr_prefix_t, expr_t::kind_t::AND_PRE, $2);
-    }
   | ADD expr_prefix {
       MAKE($$, @$, expr_prefix_t, expr_t::kind_t::ADD_PRE, $2);
     }
   | SUB expr_prefix {
       MAKE($$, @$, expr_prefix_t, expr_t::kind_t::SUB_PRE, $2);
-    }
-  | MUL expr_prefix {
-      MAKE($$, @$, expr_prefix_t, expr_t::kind_t::MUL_PRE, $2);
     }
   | NOT expr_prefix {
       MAKE($$, @$, expr_prefix_t, expr_t::kind_t::NOT_PRE, $2);

@@ -71,7 +71,7 @@
 %token END 0 "end of file"
 %token EOL "end of line"
 %token <_string> ID USERDEF INT_CONST FLOAT_CONST STRING_CONST
-%token TUPLE ENUM STRUCT INTERFACE CLASS
+%token NAMESPACE TUPLE ENUM STRUCT INTERFACE CLASS
 %token VOID BOOL CHAR INT STRING UINT SINT SHORT USHORT SSHORT FLOAT UFLOAT SFLOAT DOUBLE UDOUBLE SDOUBLE
 %token GT LT ADD SUB MUL DIV EQ NEQ LE GE
 %token COLON DOUBLE_COLON SEMICOLON COMMA LPAR RPAR LBRA RBRA ARROW ASSIGN
@@ -84,7 +84,7 @@
 
 %destructor { if ($$) delete $$; $$ = nullptr; } ID INT_CONST FLOAT_CONST STRING_CONST
 
-%type <_id> id id_list
+%type <_id> id id_list id_dot_list
 
 %type <_generic> generic generic_list generics
 
@@ -143,7 +143,7 @@ using namespace dyc::ast;
 #define MAKE(n, l, t, ...) do { n = new t(__VA_ARGS__); n->loc = &l; } while(0)
 %}
 
-%destructor { if ($$) delete $$; $$ = nullptr; } id id_list
+%destructor { if ($$) delete $$; $$ = nullptr; } id id_list id_dot_list
 
 %destructor { if ($$) delete $$; $$ = nullptr; } generic generic_list generics
 
@@ -214,6 +214,15 @@ id_list
       $$ = $1->push($3);
     }
   ;
+
+id_dot_list
+  : id {
+      $$ = $1;
+    }
+  | id_dot_list DOT id {
+      $$ = $1->push($3);
+    }
+  ;
   
 generic
   : USERDEF {
@@ -243,7 +252,10 @@ generics
   ;
 
 decl
-  : decl_property_expr SEMICOLON {
+  : NAMESPACE id_dot_list LBRA decl_list RBRA {
+      MAKE($$, @$, decl_namespace_t, $2, $4);
+    }
+  | decl_property_expr SEMICOLON {
       $$ = $1;
     }
   | decl_property_compound {

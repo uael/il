@@ -123,6 +123,7 @@ typedef dyc::parser::token token;
 "++"                              RET(INC);
 "--"                              RET(DEC);
 
+"namespace"                       RET(NAMESPACE);
 "tuple"                           RET(TUPLE);
 "enum"                            RET(ENUM);
 "struct"                          RET(STRUCT);

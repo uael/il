@@ -26,32 +26,28 @@
 
 namespace dyc {
   namespace ast {
-    struct decl_t : node_t {
+    struct decl_t : node_t {};
+
+    struct decl_namespace_t : decl_t {
+      identifier_t *name = nullptr;
+      decl_t *decls = nullptr;
+
+      decl_namespace_t(identifier_t *name, decl_t *decls);
+
+      void accept(node_t *scope) override;
+    };
+
+    struct decl_member_t : decl_t {
       identifier_t *ids = nullptr;
       type_specifier_t *type_specifier = nullptr;
       closure_t *closure = nullptr;
 
-      decl_t(identifier_t *ids, type_specifier_t *type_specifier, closure_t *closure);
+      decl_member_t(identifier_t *ids, type_specifier_t *type_specifier, closure_t *closure);
 
       virtual void accept(node_t *scope) override;
-
-      template<typename T>
-      T find(std::string ukid) {
-        T ret;
-        foreach (decl, this) {
-          if ((ret = dynamic_cast<T>(decl))) {
-            foreach (id, decl->ids) {
-              if (ukid == id->uk_value) {
-                return ret;
-              }
-            }
-          }
-        }
-        return nullptr;
-      }
     };
 
-    struct decl_property_t : decl_t {
+    struct decl_property_t : decl_member_t {
       bool assigned;
 
       decl_property_t(identifier_t *ids, type_specifier_t *type_specifier, closure_t *closure, bool assigned);
@@ -59,7 +55,7 @@ namespace dyc {
       void write(writer_t *writer) override;
     };
 
-    struct decl_function_t : decl_t {
+    struct decl_function_t : decl_member_t {
       generic_t *generics = nullptr;
       decl_t *args = nullptr;
 

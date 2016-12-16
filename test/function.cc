@@ -38,6 +38,20 @@ SYNTAX_TEST(func, fibonacci, true, "",
   "}"
 );
 
+SYNTAX_TEST(func, ns_fibonacci, true, "",
+  "namespace math.lol {"
+  "  fibonacci(n:int):int => {"
+  "    if (n==0) {"
+  "      return 0;"
+  "    } else if (n == 1) {"
+  "      return 1;"
+  "    } else {"
+  "      return fibonacci(n-1)+fibonacci(n-2);"
+  "    }"
+  "  }"
+  "}"
+);
+
 TEST(func, sort) {
   dyc::driver driver = dyc::driver();
   ASSERT_TRUE(driver.parse_string(
@@ -103,15 +117,6 @@ SYNTAX_TEST(func, initializer3, true, "",
   "  };"
   "}"
 );
-
-TEST(func, find) {
-  dyc::driver driver = dyc::driver();
-  ASSERT_EQ(true, driver.parse_string("main,oops(args:string[]):int=>{return 0;}"));
-  decl_function_t *main = driver.ast.decls->find<decl_function_t *>("main");
-  if (!main) {
-    FAIL();
-  }
-}
 
 #ifdef HAVE_CONFIG_H
 RUN

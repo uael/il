@@ -24,10 +24,17 @@
 
 namespace dyc {
   namespace ast {
-    decl_t::decl_t(identifier_t *ids, type_specifier_t *type_specifier, closure_t *closure)
+    decl_namespace_t::decl_namespace_t(identifier_t *name, decl_t *decls) : name(name), decls(decls) {}
+
+    void decl_namespace_t::accept(node_t *scope) {
+      ACCEPT(name);
+      node_t::accept(scope);
+    }
+
+    decl_member_t::decl_member_t(identifier_t *ids, type_specifier_t *type_specifier, closure_t *closure)
       : ids(ids), type_specifier(type_specifier), closure(closure) {}
 
-    void decl_t::accept(node_t *scope) {
+    void decl_member_t::accept(node_t *scope) {
       ACCEPT(ids);
       ACCEPT(type_specifier);
       ACCEPT(closure);
@@ -36,24 +43,24 @@ namespace dyc {
 
     decl_property_t::decl_property_t(
       identifier_t *ids, type_specifier_t *type_specifier, closure_t *closure, bool assigned)
-      : decl_t(ids, type_specifier, closure), assigned(assigned) {}
+      : decl_member_t(ids, type_specifier, closure), assigned(assigned) {}
 
     void decl_property_t::write(writer_t *writer) {
-      decl_t::write(writer);
+      decl_member_t::write(writer);
     }
 
     decl_function_t::decl_function_t(
       identifier_t *ids, generic_t *generics, decl_t *args, type_specifier_t *type_specifier, closure_t *closure)
-      : decl_t(ids, type_specifier, closure), generics(generics), args(args) {}
+      : decl_member_t(ids, type_specifier, closure), generics(generics), args(args) {}
 
     void decl_function_t::accept(node_t *scope) {
       ACCEPT(generics);
       ACCEPT(args);
-      decl_t::accept(scope);
+      decl_member_t::accept(scope);
     }
 
     void decl_function_t::write(writer_t *writer) {
-      decl_t::write(writer);
+      decl_member_t::write(writer);
     }
   }
 }

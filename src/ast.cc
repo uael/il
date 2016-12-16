@@ -19,6 +19,7 @@
 /* $Id$ */
 
 #include "ast.h"
+#include "ast/decl.h"
 
 namespace dyc {
   ast_t::ast_t() {}

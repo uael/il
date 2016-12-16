@@ -19,27 +19,37 @@
 /* $Id$ */
 
 #include "const.h"
-#include "closure.h"
+#include "ident.h"
 
 namespace dyc {
   namespace ast {
     const_value_t::const_value_t(const_value_t::kind_t kind, std::string *value) : kind(kind), value(value) {}
 
-    bool const_value_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return expr_const_t::write(writer, ast);
+    void const_value_t::write(writer_t *writer) {
+      expr_const_t::write(writer);
     }
 
     const_lambda_t::const_lambda_t(identifier_t *args, closure_t *closure) : args(args), closure(closure) {}
 
-    bool const_lambda_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return expr_const_t::write(writer, ast);
+    void const_lambda_t::write(writer_t *writer) {
+      expr_const_t::write(writer);
     }
 
-    const_initializer_t::const_initializer_t(expr_t *list) : list(list) {}
-    const_initializer_t::const_initializer_t(ds_map_t *map) : map(map) {}
+    void const_lambda_t::accept(node_t *scope) {
+      ACCEPT(args);
+      ACCEPT(closure);
+      node_t::accept(scope);
+    }
 
-    bool const_initializer_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return expr_const_t::write(writer, ast);
+    const_initializer_t::const_initializer_t(expr_t *exprs) : exprs(exprs) {}
+
+    void const_initializer_t::write(writer_t *writer) {
+      expr_const_t::write(writer);
+    }
+
+    void const_initializer_t::accept(node_t *scope) {
+      ACCEPT(exprs);
+      node_t::accept(scope);
     }
   }
 }

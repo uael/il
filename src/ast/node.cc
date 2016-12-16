@@ -31,8 +31,7 @@ namespace dyc {
       }
     }
 
-    bool node_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return false;
+    void node_t::write(writer_t *writer) {
     }
   }
 }

@@ -22,7 +22,7 @@
 #define _AST_NODE_H
 
 #include <map>
-#include <generator.h>
+#include "writer.h"
 
 #define foreach(value, values) \
   for (__typeof__(values) value = values; value; value = (__typeof__(values)) value->next)
@@ -30,9 +30,11 @@
 #define rforeach(value, values) \
   for (__typeof__(values) value = values; value; value = (__typeof__(values)) value->prev)
 
-#define ACCEPT(node) if ((node)) (node)->accept(this)
+#define ACCEPT(node) if ((node)) (dynamic_cast<dyc::ast::node_t *>(node))->accept(this)
 
 namespace dyc {
+  class location;
+
   namespace ast {
     struct identifier_t;
     struct generic_t;
@@ -61,21 +63,26 @@ namespace dyc {
     struct expr_dop_t;
     struct expr_ternary_t;
     struct expr_cast_t;
+    struct expr_call_t;
+    struct expr_pos_t;
+    struct expr_prefix_t;
+    struct expr_postfix_t;
+    struct expr_primary_t;
+    struct expr_kvp_t;
     struct expr_const_t;
 
     struct const_value_t;
     struct const_lambda_t;
     struct const_initializer_t;
 
-    typedef std::map<expr_t *, expr_t *> ds_map_t;
-
     struct node_t {
       node_t *scope = nullptr;
       node_t *prev = nullptr;
       node_t *next = nullptr;
+      location *loc = nullptr;
 
       virtual ~node_t();
-      virtual bool write(generator_t::writer_t *writer, ast_t *ast);
+      virtual void write(writer_t *writer);
       virtual void accept(node_t *scope);
 
       template<typename T>

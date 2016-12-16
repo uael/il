@@ -30,7 +30,7 @@ namespace dyc {
     void decl_t::accept(node_t *scope) {
       ACCEPT(ids);
       ACCEPT(type_specifier);
-      ACCEPT(closure ? closure->as_node() : nullptr);
+      ACCEPT(closure);
       node_t::accept(scope);
     }
 
@@ -38,8 +38,8 @@ namespace dyc {
       identifier_t *ids, type_specifier_t *type_specifier, closure_t *closure, bool assigned)
       : decl_t(ids, type_specifier, closure), assigned(assigned) {}
 
-    bool decl_property_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return decl_t::write(writer, ast);
+    void decl_property_t::write(writer_t *writer) {
+      decl_t::write(writer);
     }
 
     decl_function_t::decl_function_t(
@@ -52,8 +52,8 @@ namespace dyc {
       decl_t::accept(scope);
     }
 
-    bool decl_function_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return decl_t::write(writer, ast);
+    void decl_function_t::write(writer_t *writer) {
+      decl_t::write(writer);
     }
   }
 }

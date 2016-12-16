@@ -32,8 +32,8 @@ namespace dyc {
       ACCEPT(expr);
     }
 
-    bool stmt_expr_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return stmt_t::write(writer, ast);
+    void stmt_expr_t::write(writer_t *writer) {
+      stmt_t::write(writer);
     }
 
     stmt_label_t::stmt_label_t(stmt_t *stmt) : kind(DEFAULT), stmt(stmt) {}
@@ -41,25 +41,25 @@ namespace dyc {
     stmt_label_t::stmt_label_t(expr_t *cond, stmt_t *stmt) : kind(CASE), stmt(stmt), cond(cond) {}
 
     void stmt_label_t::accept(node_t *scope) {
-      node_t::accept(scope);
       ACCEPT(stmt);
       ACCEPT(cond);
+      node_t::accept(scope);
     }
 
-    bool stmt_label_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return stmt_t::write(writer, ast);
+    void stmt_label_t::write(writer_t *writer) {
+      stmt_t::write(writer);
     }
 
     stmt_compound_t::stmt_compound_t(stmt_t *stmts) : stmts(stmts) {}
     stmt_compound_t::stmt_compound_t() {}
 
     void stmt_compound_t::accept(node_t *scope) {
+      ACCEPT(stmts);
       node_t::accept(scope);
-      if (stmts) stmts->accept(this);
     }
 
-    bool stmt_compound_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return stmt_t::write(writer, ast);
+    void stmt_compound_t::write(writer_t *writer) {
+      stmt_t::write(writer);
     }
 
     stmt_select_t::stmt_select_t() {}
@@ -69,14 +69,14 @@ namespace dyc {
       : kind(IF), cond(cond), stmt(stmt), else_stmt(else_stmt) {}
 
     void stmt_select_t::accept(node_t *scope) {
-      node_t::accept(scope);
       ACCEPT(cond);
       ACCEPT(stmt);
       ACCEPT(else_stmt);
+      node_t::accept(scope);
     }
 
-    bool stmt_select_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return stmt_t::write(writer, ast);
+    void stmt_select_t::write(writer_t *writer) {
+      stmt_t::write(writer);
     }
 
     stmt_iter_t::stmt_iter_t(expr_t *cond, stmt_t *stmt) : kind(WHILE), cond(cond), stmt(stmt) {}
@@ -87,15 +87,15 @@ namespace dyc {
       : kind(FOR), decls(decls), cond(cond), step(step), stmt(stmt) {}
 
     void stmt_iter_t::accept(node_t *scope) {
-      node_t::accept(scope);
       ACCEPT(decls);
       ACCEPT(cond);
-      ACCEPT((node_t *) step);
+      ACCEPT(step);
       ACCEPT(stmt);
+      node_t::accept(scope);
     }
 
-    bool stmt_iter_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return stmt_t::write(writer, ast);
+    void stmt_iter_t::write(writer_t *writer) {
+      stmt_t::write(writer);
     }
 
     stmt_jump_t::stmt_jump_t(stmt_jump_t::kind_t kind) : kind(kind) {}
@@ -103,24 +103,24 @@ namespace dyc {
     stmt_jump_t::stmt_jump_t(expr_t *expr) : kind(RETURN), expr(expr) {}
 
     void stmt_jump_t::accept(node_t *scope) {
-      node_t::accept(scope);
       ACCEPT(expr);
+      node_t::accept(scope);
     }
 
-    bool stmt_jump_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return stmt_t::write(writer, ast);
+    void stmt_jump_t::write(writer_t *writer) {
+      stmt_t::write(writer);
     }
 
     stmt_decl_t::stmt_decl_t() {}
     stmt_decl_t::stmt_decl_t(decl_t *decls) : decls(decls) {}
 
     void stmt_decl_t::accept(node_t *scope) {
-      node_t::accept(scope);
       ACCEPT(decls);
+      node_t::accept(scope);
     }
 
-    bool stmt_decl_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return stmt_t::write(writer, ast);
+    void stmt_decl_t::write(writer_t *writer) {
+      stmt_t::write(writer);
     }
   }
 }

@@ -37,7 +37,7 @@ namespace dyc {
       type_specifier_t(type_t *type, decl_t *decls);
 
       virtual void accept(node_t *scope) override;
-      bool write(generator_t::writer_t *writer, ast_t *ast) override;
+      void write(writer_t *writer) override;
     };
 
     struct type_t : node_t {};
@@ -50,7 +50,7 @@ namespace dyc {
 
       type_scalar_t(kind_t kind);
 
-      bool write(generator_t::writer_t *writer, ast_t *ast) override;
+      void write(writer_t *writer) override;
     };
 
     struct type_generic_t : type_t {
@@ -58,7 +58,7 @@ namespace dyc {
 
       type_generic_t(std::string *id);
 
-      bool write(generator_t::writer_t *writer, ast_t *ast) override;
+      void write(writer_t *writer) override;
     };
   }
 }

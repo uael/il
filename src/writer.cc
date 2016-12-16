@@ -18,14 +18,27 @@
 
 /* $Id$ */
 
-#include "generator.h"
+#include "writer.h"
+#include "ast/node.h"
 
 namespace dyc {
-  generator_t::generator_t(ast_t *ast)
+  writer_t::writer_t(ast_t *ast)
     : ast(ast) {}
 
-  bool generator_t::generate() {
-    return false;
+  writer_t &writer_t::operator<<(ast::node_t *node) {
+    if (node) {
+      node->write(this);
+    }
+    return *this;
+  }
+
+  writer_t &writer_t::operator<<(const char *string) {
+    return *this << std::string(string);
+  }
+
+  writer_t &writer_t::operator<<(const std::string &str) {
+    this->stream += str;
+    return *this;
   }
 }
 

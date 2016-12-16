@@ -25,8 +25,8 @@ namespace dyc {
     generic_t::generic_t(std::string *value, type_specifier_t *type_specifier)
       : value(value), type_specifier(type_specifier) {}
 
-    bool generic_t::write(generator_t::writer_t *writer, ast_t *ast) {
-      return node_t::write(writer, ast);
+    void generic_t::write(writer_t *writer) {
+      node_t::write(writer);
     }
   }
 }

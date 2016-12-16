@@ -49,7 +49,7 @@
 
   dyc::ast::type_specifier_t *_type_specifier;
   dyc::ast::type_t *_type;
-  dyc::ast::type_scalar_t *_type_scalar;
+  dyc::ast::type_internal_t *_type_internal;
   dyc::ast::type_userdef_t *_type_userdef;
 
   dyc::ast::stmt_t *_stmt;
@@ -94,7 +94,7 @@
 
 %type <_type_specifier> type_specifier type_specifier_list type_specifier_unit
 %type <_type> type
-%type <_type_scalar> type_scalar
+%type <_type_internal> type_internal
 %type <_type_userdef> type_userdef
 
 %type <_stmt> stmt stmt_list
@@ -153,7 +153,7 @@ using namespace dyc::ast;
 
 %destructor { if ($$) delete $$; $$ = nullptr; } type_specifier type_specifier_list type_specifier_unit
 %destructor { if ($$) delete $$; $$ = nullptr; } type
-%destructor { if ($$) delete $$; $$ = nullptr; } type_scalar
+%destructor { if ($$) delete $$; $$ = nullptr; } type_internal
 %destructor { if ($$) delete $$; $$ = nullptr; } type_userdef
 
 %destructor { if ($$) delete $$; $$ = nullptr; } stmt stmt_list
@@ -381,7 +381,7 @@ type_specifier_unit
   ;
 
 type
-  : type_scalar {
+  : type_internal {
       $$ = $1;
     }
   | type_userdef {
@@ -389,51 +389,51 @@ type
     }
   ;
 
-type_scalar
+type_internal
   : VOID {
-      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::VOID);
+      MAKE($$, @$, type_internal_t, type_internal_t::kind_t::VOID);
     }
   | BOOL {
-      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::BOOL);
+      MAKE($$, @$, type_internal_t, type_internal_t::kind_t::BOOL);
     }
   | CHAR {
-      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::CHAR);
+      MAKE($$, @$, type_internal_t, type_internal_t::kind_t::CHAR);
     }
   | INT {
-      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::INT);
+      MAKE($$, @$, type_internal_t, type_internal_t::kind_t::INT);
     }
   | UINT {
-      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::UINT);
+      MAKE($$, @$, type_internal_t, type_internal_t::kind_t::UINT);
     }
   | SINT {
-      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::SINT);
+      MAKE($$, @$, type_internal_t, type_internal_t::kind_t::SINT);
     }
   | SHORT {
-      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::SHORT);
+      MAKE($$, @$, type_internal_t, type_internal_t::kind_t::SHORT);
     }
   | USHORT {
-      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::USHORT);
+      MAKE($$, @$, type_internal_t, type_internal_t::kind_t::USHORT);
     }
   | SSHORT {
-      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::SSHORT);
+      MAKE($$, @$, type_internal_t, type_internal_t::kind_t::SSHORT);
     }
   | FLOAT {
-      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::FLOAT);
+      MAKE($$, @$, type_internal_t, type_internal_t::kind_t::FLOAT);
     }
   | UFLOAT {
-      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::UFLOAT);
+      MAKE($$, @$, type_internal_t, type_internal_t::kind_t::UFLOAT);
     }
   | SFLOAT {
-      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::SFLOAT);
+      MAKE($$, @$, type_internal_t, type_internal_t::kind_t::SFLOAT);
     }
   | DOUBLE {
-      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::DOUBLE);
+      MAKE($$, @$, type_internal_t, type_internal_t::kind_t::DOUBLE);
     }
   | UDOUBLE {
-      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::UDOUBLE);
+      MAKE($$, @$, type_internal_t, type_internal_t::kind_t::UDOUBLE);
     }
   | SDOUBLE {
-      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::SDOUBLE);
+      MAKE($$, @$, type_internal_t, type_internal_t::kind_t::SDOUBLE);
     }
   ;
 

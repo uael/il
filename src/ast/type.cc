@@ -48,9 +48,9 @@ namespace dyc {
       node_t::write(writer);
     }
 
-    type_scalar_t::type_scalar_t(type_scalar_t::kind_t kind) : kind(kind) {}
+    type_internal_t::type_internal_t(type_internal_t::kind_t kind) : kind(kind) {}
 
-    void type_scalar_t::write(writer_t *writer) {
+    void type_internal_t::write(writer_t *writer) {
       type_t::write(writer);
     }
 

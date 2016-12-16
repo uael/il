@@ -45,8 +45,10 @@ namespace dyc {
     struct decl_function_t;
 
     struct type_specifier_t;
+    struct type_callable_t;
+    struct type_array_t;
     struct type_t;
-    struct type_scalar_t;
+    struct type_internal_t;
     struct type_userdef_t;
 
     struct stmt_t;

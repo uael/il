@@ -50,13 +50,13 @@ namespace dyc {
 
     struct type_t : type_specifier_t {};
 
-    struct type_scalar_t : type_t {
+    struct type_internal_t : type_t {
       enum kind_t {
-        VOID, BOOL, CHAR, INT, UINT, SINT, SHORT, USHORT,
+        VOID, BOOL, CHAR, INT, UINT, SINT, SHORT, USHORT, STRING,
         SSHORT, FLOAT, UFLOAT, SFLOAT, DOUBLE, UDOUBLE, SDOUBLE
       } kind;
 
-      type_scalar_t(kind_t kind);
+      type_internal_t(kind_t kind);
 
       void write(writer_t *writer) override;
     };

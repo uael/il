@@ -139,6 +139,8 @@ using namespace dyc::ast;
 
 #undef yylex
 #define yylex driver.lexer->lex
+
+#define MAKE(n, l, t, ...) do { n = new t(__VA_ARGS__); n->loc = l; } while(0)
 %}
 
 %destructor { if ($$) delete $$; $$ = nullptr; } id id_list
@@ -200,7 +202,7 @@ program
 
 id
   : ID {
-      $$ = new identifier_t($1);
+      MAKE($$, @$, identifier_t, $1);
     }
   ;
 
@@ -215,10 +217,10 @@ id_list
   
 generic
   : GENERIC {
-      $$ = new generic_t($1, nullptr);
+      MAKE($$, @$, generic_t, $1, nullptr);
     }
   | GENERIC COLON type_specifier {
-      $$ = new generic_t($1, $3);
+      MAKE($$, @$, generic_t, $1, $3);
     }
   ;
   
@@ -269,43 +271,43 @@ decl_list
 
 decl_property_expr
   : id_list COLON type_specifier {
-      $$ = new decl_property_t($1, $3, nullptr, false);
+      MAKE($$, @$, decl_property_t, $1, $3, nullptr, false);
     }
   | id_list ASSIGN expr_cond {
-      $$ = new decl_property_t($1, nullptr, $3, true);
+      MAKE($$, @$, decl_property_t, $1, nullptr, $3, true);
     }
   | id_list COLON type_specifier ASSIGN expr_cond {
-      $$ = new decl_property_t($1, $3, $5, true);
+      MAKE($$, @$, decl_property_t, $1, $3, $5, true);
     }
   | id_list COLON type_specifier ARROW expr_cond {
-      $$ = new decl_property_t($1, $3, $5, false);
+      MAKE($$, @$, decl_property_t, $1, $3, $5, false);
     }
   ;
 
 decl_property_compound
   : id_list ARROW stmt_compound {
-      $$ = new decl_property_t($1, nullptr, $3, false);
+      MAKE($$, @$, decl_property_t, $1, nullptr, $3, false);
     }
   | id_list COLON type_specifier_list ARROW stmt_compound {
-      $$ = new decl_property_t($1, $3, $5, false);
+      MAKE($$, @$, decl_property_t, $1, $3, $5, false);
     }
   ;
 
 decl_function_expr
   : id_list generics decl_args ARROW expr_cond {
-      $$ = new decl_function_t($1, $2, $3, nullptr, $5);
+      MAKE($$, @$, decl_function_t, $1, $2, $3, nullptr, $5);
     }
   | id_list generics decl_args COLON type_specifier_list ARROW expr_cond {
-      $$ = new decl_function_t($1, $2, $3, $5, $7);
+      MAKE($$, @$, decl_function_t, $1, $2, $3, $5, $7);
     }
   ;
 
 decl_function_compound
   : id_list generics decl_args ARROW stmt_compound {
-      $$ = new decl_function_t($1, $2, $3, nullptr, $5);
+      MAKE($$, @$, decl_function_t, $1, $2, $3, nullptr, $5);
     }
   | id_list generics decl_args COLON type_specifier_list ARROW stmt_compound {
-      $$ = new decl_function_t($1, $2, $3, $5, $7);
+      MAKE($$, @$, decl_function_t, $1, $2, $3, $5, $7);
     }
   ;
 
@@ -362,7 +364,7 @@ type_specifier_list
 
 type_specifier_unit
   : type {
-      $$ = new type_specifier_t($1);
+      MAKE($$, @$, type_specifier_t, $1);
     }
   | MUL type_specifier_unit {
       $2->ptr_lvl++;
@@ -393,55 +395,55 @@ type
 
 type_scalar
   : VOID {
-      $$ = new type_scalar_t(type_scalar_t::kind_t::VOID);
+      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::VOID);
     }
   | BOOL {
-      $$ = new type_scalar_t(type_scalar_t::kind_t::BOOL);
+      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::BOOL);
     }
   | CHAR {
-      $$ = new type_scalar_t(type_scalar_t::kind_t::CHAR);
+      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::CHAR);
     }
   | INT {
-      $$ = new type_scalar_t(type_scalar_t::kind_t::INT);
+      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::INT);
     }
   | UINT {
-      $$ = new type_scalar_t(type_scalar_t::kind_t::UINT);
+      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::UINT);
     }
   | SINT {
-      $$ = new type_scalar_t(type_scalar_t::kind_t::SINT);
+      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::SINT);
     }
   | SHORT {
-      $$ = new type_scalar_t(type_scalar_t::kind_t::SHORT);
+      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::SHORT);
     }
   | USHORT {
-      $$ = new type_scalar_t(type_scalar_t::kind_t::USHORT);
+      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::USHORT);
     }
   | SSHORT {
-      $$ = new type_scalar_t(type_scalar_t::kind_t::SSHORT);
+      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::SSHORT);
     }
   | FLOAT {
-      $$ = new type_scalar_t(type_scalar_t::kind_t::FLOAT);
+      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::FLOAT);
     }
   | UFLOAT {
-      $$ = new type_scalar_t(type_scalar_t::kind_t::UFLOAT);
+      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::UFLOAT);
     }
   | SFLOAT {
-      $$ = new type_scalar_t(type_scalar_t::kind_t::SFLOAT);
+      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::SFLOAT);
     }
   | DOUBLE {
-      $$ = new type_scalar_t(type_scalar_t::kind_t::DOUBLE);
+      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::DOUBLE);
     }
   | UDOUBLE {
-      $$ = new type_scalar_t(type_scalar_t::kind_t::UDOUBLE);
+      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::UDOUBLE);
     }
   | SDOUBLE {
-      $$ = new type_scalar_t(type_scalar_t::kind_t::SDOUBLE);
+      MAKE($$, @$, type_scalar_t, type_scalar_t::kind_t::SDOUBLE);
     }
   ;
 
 type_generic
   : GENERIC {
-      $$ = new type_generic_t($1);
+      MAKE($$, @$, type_generic_t, $1);
     }
   ;
 
@@ -483,49 +485,49 @@ stmt_list
 
 stmt_expr
   : SEMICOLON {
-      $$ = new stmt_expr_t();
+      MAKE($$, @$, stmt_expr_t, );
     }
   | expr SEMICOLON {
-      $$ = new stmt_expr_t($1);
+      MAKE($$, @$, stmt_expr_t, $1);
     }
   ;
 
 stmt_label
   : ID COLON stmt {
-      $$ = new stmt_label_t($1, $3);
+      MAKE($$, @$, stmt_label_t, $1, $3);
     }
   | CASE expr_cond COLON stmt {
-      $$ = new stmt_label_t($2, $4);
+      MAKE($$, @$, stmt_label_t, $2, $4);
     }
   | DEFAULT COLON stmt {
-      $$ = new stmt_label_t($3);
+      MAKE($$, @$, stmt_label_t, $3);
     }
   ;
 
 stmt_compound
   : LBRA stmt_list RBRA {
-      $$ = new stmt_compound_t($2);
+      MAKE($$, @$, stmt_compound_t, $2);
     }
   ;
 
 stmt_select
   : IF LPAR expr RPAR stmt ELSE stmt {
-      $$ = new stmt_select_t($3, $5, $7);
+      MAKE($$, @$, stmt_select_t, $3, $5, $7);
     }
   | IF LPAR expr RPAR stmt {
-      $$ = new stmt_select_t(stmt_select_t::kind_t::IF, $3, $5);
+      MAKE($$, @$, stmt_select_t, stmt_select_t::kind_t::IF, $3, $5);
     }
   | SWITCH LPAR expr RPAR stmt {
-      $$ = new stmt_select_t(stmt_select_t::kind_t::SWITCH, $3, $5);
+      MAKE($$, @$, stmt_select_t, stmt_select_t::kind_t::SWITCH, $3, $5);
     }
   ;
 
 stmt_iter
 	: WHILE LPAR expr RPAR stmt {
-	    $$ = new stmt_iter_t($3, $5);
+	    MAKE($$, @$, stmt_iter_t, $3, $5);
 	  }
 	| DO stmt WHILE LPAR expr RPAR SEMICOLON {
-      $$ = new stmt_iter_t($2, $5);
+      MAKE($$, @$, stmt_iter_t, $2, $5);
     }
 	| FOR LPAR stmt_expr stmt_expr RPAR stmt {
       $$ = new stmt_iter_t(
@@ -561,25 +563,25 @@ stmt_iter
 
 stmt_jump
   : GOTO ID SEMICOLON {
-      $$ = new stmt_jump_t($2);
+      MAKE($$, @$, stmt_jump_t, $2);
     }
   | CONTINUE SEMICOLON {
-      $$ = new stmt_jump_t(stmt_jump_t::kind_t::CONTINUE);
+      MAKE($$, @$, stmt_jump_t, stmt_jump_t::kind_t::CONTINUE);
     }
   | BREAK SEMICOLON {
-      $$ = new stmt_jump_t(stmt_jump_t::kind_t::BREAK);
+      MAKE($$, @$, stmt_jump_t, stmt_jump_t::kind_t::BREAK);
     }
   | RETURN SEMICOLON {
-      $$ = new stmt_jump_t(stmt_jump_t::kind_t::RETURN);
+      MAKE($$, @$, stmt_jump_t, stmt_jump_t::kind_t::RETURN);
     }
   | RETURN expr_list SEMICOLON {
-      $$ = new stmt_jump_t($2);
+      MAKE($$, @$, stmt_jump_t, $2);
     }
   ;
 
 stmt_decl
   : VAR decl_comma_list SEMICOLON {
-      $$ = new stmt_decl_t($2);
+      MAKE($$, @$, stmt_decl_t, $2);
     }
   ;
 
@@ -606,37 +608,37 @@ expr_assign
       $$ = $1;
     }
   | expr_prefix ASSIGN expr_assign {
-      $$ = new expr_dop_t(expr_t::kind_t::ASSIGN, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::ASSIGN, $1, $3);
     }
   | expr_prefix MUL_ASSIGN expr_assign {
-      $$ = new expr_dop_t(expr_t::kind_t::MUL_ASSIGN, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::MUL_ASSIGN, $1, $3);
     }
   | expr_prefix DIV_ASSIGN expr_assign {
-      $$ = new expr_dop_t(expr_t::kind_t::DIV_ASSIGN, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::DIV_ASSIGN, $1, $3);
     }
   | expr_prefix MOD_ASSIGN expr_assign {
-      $$ = new expr_dop_t(expr_t::kind_t::MOD_ASSIGN, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::MOD_ASSIGN, $1, $3);
     }
   | expr_prefix ADD_ASSIGN expr_assign {
-      $$ = new expr_dop_t(expr_t::kind_t::ADD_ASSIGN, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::ADD_ASSIGN, $1, $3);
     }
   | expr_prefix SUB_ASSIGN expr_assign {
-      $$ = new expr_dop_t(expr_t::kind_t::SUB_ASSIGN, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::SUB_ASSIGN, $1, $3);
     }
   | expr_prefix LEFT_ASSIGN expr_assign {
-      $$ = new expr_dop_t(expr_t::kind_t::LEFT_ASSIGN, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::LEFT_ASSIGN, $1, $3);
     }
   | expr_prefix RIGHT_ASSIGN expr_assign {
-      $$ = new expr_dop_t(expr_t::kind_t::RIGHT_ASSIGN, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::RIGHT_ASSIGN, $1, $3);
     }
   | expr_prefix AND_ASSIGN expr_assign {
-      $$ = new expr_dop_t(expr_t::kind_t::AND_ASSIGN, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::AND_ASSIGN, $1, $3);
     }
   | expr_prefix XOR_ASSIGN expr_assign {
-      $$ = new expr_dop_t(expr_t::kind_t::XOR_ASSIGN, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::XOR_ASSIGN, $1, $3);
     }
   | expr_prefix OR_ASSIGN expr_assign {
-      $$ = new expr_dop_t(expr_t::kind_t::OR_ASSIGN, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::OR_ASSIGN, $1, $3);
     }
   ;
 
@@ -645,7 +647,7 @@ expr_cond
       $$ = $1;
     }
   | expr_lor COND expr COLON expr_cond {
-      $$ = new expr_ternary_t($1, $3, $5);
+      MAKE($$, @$, expr_ternary_t, $1, $3, $5);
     }
   ;
 
@@ -654,7 +656,7 @@ expr_lor
       $$ = $1;
     }
   | expr_lor LOR expr_land {
-      $$ = new expr_dop_t(expr_t::kind_t::LOR, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::LOR, $1, $3);
     }
   ;
 
@@ -663,7 +665,7 @@ expr_land
       $$ = $1;
     }
   | expr_land LAND expr_or {
-      $$ = new expr_dop_t(expr_t::kind_t::LAND, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::LAND, $1, $3);
     }
   ;
 
@@ -672,7 +674,7 @@ expr_or
       $$ = $1;
     }
   | expr_or OR expr_xor {
-      $$ = new expr_dop_t(expr_t::kind_t::OR, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::OR, $1, $3);
     }
   ;
 
@@ -681,7 +683,7 @@ expr_xor
       $$ = $1;
     }
   | expr_xor XOR expr_and {
-      $$ = new expr_dop_t(expr_t::kind_t::XOR, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::XOR, $1, $3);
     }
   ;
 
@@ -690,7 +692,7 @@ expr_and
       $$ = $1;
     }
   | expr_and AND expr_equal {
-      $$ = new expr_dop_t(expr_t::kind_t::AND, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::AND, $1, $3);
     }
   ;
 
@@ -699,10 +701,10 @@ expr_equal
       $$ = $1;
     }
   | expr_equal EQ expr_relational {
-      $$ = new expr_dop_t(expr_t::kind_t::EQ, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::EQ, $1, $3);
     }
   | expr_equal NEQ expr_relational {
-      $$ = new expr_dop_t(expr_t::kind_t::NEQ, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::NEQ, $1, $3);
     }
   ;
 
@@ -711,16 +713,16 @@ expr_relational
       $$ = $1;
     }
   | expr_relational LT expr_shift {
-      $$ = new expr_dop_t(expr_t::kind_t::LT, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::LT, $1, $3);
     }
   | expr_relational GT expr_shift {
-      $$ = new expr_dop_t(expr_t::kind_t::GT, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::GT, $1, $3);
     }
   | expr_relational LE expr_shift {
-      $$ = new expr_dop_t(expr_t::kind_t::LTE, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::LTE, $1, $3);
     }
   | expr_relational GE expr_shift {
-      $$ = new expr_dop_t(expr_t::kind_t::GTE, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::GTE, $1, $3);
     }
   ;
 
@@ -729,10 +731,10 @@ expr_shift
       $$ = $1;
     }
   | expr_shift LS expr_add {
-      $$ = new expr_dop_t(expr_t::kind_t::LEFT, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::LEFT, $1, $3);
     }
   | expr_shift RS expr_add {
-      $$ = new expr_dop_t(expr_t::kind_t::RIGHT, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::RIGHT, $1, $3);
     }
   ;
 
@@ -741,10 +743,10 @@ expr_add
       $$ = $1;
     }
   | expr_add ADD expr_mul {
-      $$ = new expr_dop_t(expr_t::kind_t::ADD, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::ADD, $1, $3);
     }
   | expr_add SUB expr_mul {
-      $$ = new expr_dop_t(expr_t::kind_t::SUB, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::SUB, $1, $3);
     }
   ;
 
@@ -753,13 +755,13 @@ expr_mul
       $$ = $1;
     }
   | expr_mul MUL expr_cast {
-      $$ = new expr_dop_t(expr_t::kind_t::MUL, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::MUL, $1, $3);
     }
   | expr_mul DIV expr_cast {
-      $$ = new expr_dop_t(expr_t::kind_t::DIV, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::DIV, $1, $3);
     }
   | expr_mul MOD expr_cast {
-      $$ = new expr_dop_t(expr_t::kind_t::MOD, $1, $3);
+      MAKE($$, @$, expr_dop_t, expr_t::kind_t::MOD, $1, $3);
     }
   ;
 
@@ -768,10 +770,10 @@ expr_cast
       $$ = $1;
     }
   | LPAR type_specifier RPAR expr_cast {
-      $$ = new expr_cast_t($4, $2);
+      MAKE($$, @$, expr_cast_t, $4, $2);
     }
   | expr_cast AS type_specifier {
-      $$ = new expr_cast_t($1, $3);
+      MAKE($$, @$, expr_cast_t, $1, $3);
     }
   ;
 
@@ -780,28 +782,28 @@ expr_prefix
       $$ = $1;
     }
   | INC expr_prefix {
-      $$ = new expr_prefix_t(expr_t::kind_t::INC_PRE, $2);
+      MAKE($$, @$, expr_prefix_t, expr_t::kind_t::INC_PRE, $2);
     }
   | DEC expr_prefix {
-      $$ = new expr_prefix_t(expr_t::kind_t::DEC_PRE, $2);
+      MAKE($$, @$, expr_prefix_t, expr_t::kind_t::DEC_PRE, $2);
     }
   | AND expr_prefix {
-      $$ = new expr_prefix_t(expr_t::kind_t::AND_PRE, $2);
+      MAKE($$, @$, expr_prefix_t, expr_t::kind_t::AND_PRE, $2);
     }
   | ADD expr_prefix {
-      $$ = new expr_prefix_t(expr_t::kind_t::ADD_PRE, $2);
+      MAKE($$, @$, expr_prefix_t, expr_t::kind_t::ADD_PRE, $2);
     }
   | SUB expr_prefix {
-      $$ = new expr_prefix_t(expr_t::kind_t::SUB_PRE, $2);
+      MAKE($$, @$, expr_prefix_t, expr_t::kind_t::SUB_PRE, $2);
     }
   | MUL expr_prefix {
-      $$ = new expr_prefix_t(expr_t::kind_t::MUL_PRE, $2);
+      MAKE($$, @$, expr_prefix_t, expr_t::kind_t::MUL_PRE, $2);
     }
   | NOT expr_prefix {
-      $$ = new expr_prefix_t(expr_t::kind_t::NOT_PRE, $2);
+      MAKE($$, @$, expr_prefix_t, expr_t::kind_t::NOT_PRE, $2);
     }
   | TID expr_prefix {
-      $$ = new expr_prefix_t(expr_t::kind_t::TID_PRE, $2);
+      MAKE($$, @$, expr_prefix_t, expr_t::kind_t::TID_PRE, $2);
     }
   ;
 
@@ -810,34 +812,34 @@ expr_postfix
       $$ = $1;
     }
   | expr_postfix LSQU RSQU {
-      $$ = new expr_pos_t($1, nullptr);
+      MAKE($$, @$, expr_pos_t, $1, nullptr);
     }
   | expr_postfix LSQU expr RSQU {
-      $$ = new expr_pos_t($1, $3);
+      MAKE($$, @$, expr_pos_t, $1, $3);
     }
   | expr_postfix LPAR expr_list RPAR {
-      $$ = new expr_call_t($1, $3);
+      MAKE($$, @$, expr_call_t, $1, $3);
     }
   | expr_postfix INC {
-      $$ = new expr_postfix_t(expr_t::kind_t::INC_POST, $1);
+      MAKE($$, @$, expr_postfix_t, expr_t::kind_t::INC_POST, $1);
     }
   | expr_postfix DEC {
-      $$ = new expr_postfix_t(expr_t::kind_t::DEC_POST, $1);
+      MAKE($$, @$, expr_postfix_t, expr_t::kind_t::DEC_POST, $1);
     }
   ;
 
 expr_primary
   : expr_const {
-      $$ = new expr_primary_t(expr_t::kind_t::CONST, $1);
+      MAKE($$, @$, expr_primary_t, expr_t::kind_t::CONST, $1);
     }
   | LPAR expr_list RPAR {
-      $$ = new expr_primary_t(expr_t::kind_t::ENCLOSE, $2);
+      MAKE($$, @$, expr_primary_t, expr_t::kind_t::ENCLOSE, $2);
     }
   ;
 
 expr_kvp
   : expr_cond COLON expr {
-      $$ = new expr_kvp_t($1, $3);
+      MAKE($$, @$, expr_kvp_t, $1, $3);
     }
   ;
 
@@ -870,37 +872,37 @@ expr_const
 
 const_value
   : FLOAT_CONST {
-      $$ = new const_value_t(const_value_t::kind_t::FLOAT, $1);
+      MAKE($$, @$, const_value_t, const_value_t::kind_t::FLOAT, $1);
     }
   | STRING_CONST {
-      $$ = new const_value_t(const_value_t::kind_t::STRING, $1);
+      MAKE($$, @$, const_value_t, const_value_t::kind_t::STRING, $1);
     }
   | INT_CONST {
-      $$ = new const_value_t(const_value_t::kind_t::INT, $1);
+      MAKE($$, @$, const_value_t, const_value_t::kind_t::INT, $1);
     }
   ;
 
 const_lambda
   : LPAR id_list RPAR ARROW expr {
-      $$ = new const_lambda_t($2, $5);
+      MAKE($$, @$, const_lambda_t, $2, $5);
     }
   | LPAR id_list RPAR ARROW stmt_compound {
-      $$ = new const_lambda_t($2, $5);
+      MAKE($$, @$, const_lambda_t, $2, $5);
     }
   | id ARROW expr {
-      $$ = new const_lambda_t($1, $3);
+      MAKE($$, @$, const_lambda_t, $1, $3);
     }
   | id ARROW stmt_compound {
-      $$ = new const_lambda_t($1, $3);
+      MAKE($$, @$, const_lambda_t, $1, $3);
     }
   ;
 
 const_initializer
   : LSQU expr_list RSQU {
-      $$ = new const_initializer_t($2);
+      MAKE($$, @$, const_initializer_t, $2);
     }
   | LBRA expr_kvp_list RBRA {
-      $$ = new const_initializer_t($2);
+      MAKE($$, @$, const_initializer_t, $2);
     }
   ;
 

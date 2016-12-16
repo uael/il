@@ -29,11 +29,9 @@ namespace dyc {
     struct type_specifier_t : node_t {
       type_t *type = nullptr;
       std::vector<type_specifier_t *> call_chain;
-      decl_t *decls = nullptr;
       int array_lvl;
 
       type_specifier_t(type_t *type);
-      type_specifier_t(type_t *type, decl_t *decls);
 
       virtual void accept(node_t *scope) override;
       void write(writer_t *writer) override;

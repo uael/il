@@ -24,11 +24,9 @@
 namespace dyc {
   namespace ast {
     type_specifier_t::type_specifier_t(type_t *type) : type(type) {}
-    type_specifier_t::type_specifier_t(type_t *type, decl_t *decls) : type(type), decls(decls) {}
 
     void type_specifier_t::accept(node_t *scope) {
       ACCEPT(type);
-      ACCEPT(decls);
       for (auto &t : call_chain) {
         ACCEPT(t);
       }

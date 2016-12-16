@@ -27,12 +27,12 @@ namespace dyc {
     type_specifier_t::type_specifier_t(type_t *type, decl_t *decls) : type(type), decls(decls) {}
 
     void type_specifier_t::accept(node_t *scope) {
-      node_t::accept(scope);
       ACCEPT(type);
       ACCEPT(decls);
       for (auto &t : call_chain) {
         ACCEPT(t);
       }
+      node_t::accept(scope);
     }
 
     void type_specifier_t::write(writer_t *writer) {

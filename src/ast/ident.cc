@@ -25,8 +25,8 @@ namespace dyc {
     identifier_t::identifier_t(std::string *value) : value(value) {}
 
     void identifier_t::accept(node_t *scope) {
-      node_t::accept(scope);
       uk_value = *value;
+      node_t::accept(scope);
     }
 
     void identifier_t::write(writer_t *writer) {

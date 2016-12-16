@@ -61,6 +61,11 @@ namespace dyc {
     struct expr_dop_t;
     struct expr_ternary_t;
     struct expr_cast_t;
+    struct expr_call_t;
+    struct expr_pos_t;
+    struct expr_prefix_t;
+    struct expr_postfix_t;
+    struct expr_primary_t;
     struct expr_const_t;
 
     struct const_value_t;

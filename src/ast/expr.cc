@@ -18,13 +18,16 @@
 
 /* $Id$ */
 
-#include <iostream>
 #include "expr.h"
 #include "type.h"
 
 namespace dyc {
   namespace ast {
     expr_op_t::expr_op_t(expr_op_t::kind_t kind, expr_t *op1) : kind(kind), op1(op1) {}
+
+    void expr_op_t::accept(node_t *scope) {
+      node_t::accept(scope);
+    }
 
     std::string expr_op_t::op() {
       switch (kind) {
@@ -69,7 +72,7 @@ namespace dyc {
         case AND_ASSIGN:
           return "&=";
         case XOR_ASSIGN:
-          return "=";
+          return "^=";
         case OR_ASSIGN:
           return "|=";
         case DIV:
@@ -81,7 +84,7 @@ namespace dyc {
         case RIGHT:
           return ">>";
         case XOR:
-          return "";
+          return "^";
         case OR:
           return "|";
         case LAND:
@@ -105,62 +108,10 @@ namespace dyc {
       }
     }
 
-    void expr_op_t::write(writer_t *writer) {
-      switch (kind) {
-        case INC_PRE:
-          *writer << "++" << op1;
-          break;
-        case DEC_PRE:
-          *writer << "--" << op1;
-          break;
-        case AND_PRE:
-          *writer << "&" << op1;
-          break;
-        case ADD_PRE:
-          *writer << "+" << op1;
-          break;
-        case SUB_PRE:
-          *writer << "-" << op1;
-          break;
-        case MUL_PRE:
-          *writer << "*" << op1;
-          break;
-        case NOT_PRE:
-          *writer << "!" << op1;
-          break;
-        case TID_PRE:
-          *writer << "~" << op1;
-          break;
-        case INC_POST:
-          *writer << op1 << "++";
-          break;
-        case DEC_POST:
-          *writer << op1 << "--";
-          break;
-        case CONST:
-          *writer << op1;
-          break;
-        case ENCLOSE:
-          *writer << "(" << op1 << ")";
-          break;
-        default:
-          break;
-      }
-    }
-
     expr_dop_t::expr_dop_t(expr_op_t::kind_t kind, expr_t *op1, expr_t *op2) : expr_op_t(kind, op1), op2(op2) {}
 
     void expr_dop_t::write(writer_t *writer) {
-      switch (kind) {
-        case POS:
-          *writer << op1 << "[" << op2 << "]";
-          break;
-        case CALL:
-          *writer << op1 << "(" << op2 << ")";
-          break;
-        default:
-          *writer << "(" << op1 << op() << op2 << ")";
-      }
+      *writer << "(" << op1 << op() << op2 << ")";
     }
 
     expr_ternary_t::expr_ternary_t(expr_t *cond, expr_t *op1, expr_t *op2) : expr_dop_t(TERNARY, op1, op2),cond(cond) {}
@@ -173,6 +124,40 @@ namespace dyc {
 
     void expr_cast_t::write(writer_t *writer) {
       *writer << "(" << type << ")" << op1;
+    }
+
+    expr_call_t::expr_call_t(expr_t *op1, expr_t *op2) : expr_dop_t(CALL, op1, op2) {}
+
+    void expr_call_t::write(writer_t *writer) {
+      *writer << op1 << "(" << op2 << ")";
+    }
+
+    expr_pos_t::expr_pos_t(expr_t *op1, expr_t *op2) : expr_dop_t(POS, op1, op2) {}
+
+    void expr_pos_t::write(writer_t *writer) {
+      *writer << op1 << "[" << op2 << "]";
+    }
+
+    expr_prefix_t::expr_prefix_t(expr_op_t::kind_t kind, expr_t *op1) : expr_op_t(kind, op1) {}
+
+    void expr_prefix_t::write(writer_t *writer) {
+      *writer << op() << op1;
+    }
+
+    expr_postfix_t::expr_postfix_t(expr_op_t::kind_t kind, expr_t *op1) : expr_op_t(kind, op1) {}
+
+    void expr_postfix_t::write(writer_t *writer) {
+      *writer  << op1 << op();
+    }
+
+    expr_primary_t::expr_primary_t(expr_op_t::kind_t kind, expr_t *op1) : expr_op_t(kind, op1) {}
+
+    void expr_primary_t::write(writer_t *writer) {
+      if (kind == ENCLOSE) {
+        *writer << "(" << op1 << ")";
+      } else {
+        *writer << op1;
+      }
     }
   }
 }

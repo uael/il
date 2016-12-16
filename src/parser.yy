@@ -609,37 +609,37 @@ expr_assign
       $$ = $1;
     }
   | expr_prefix ASSIGN expr_assign {
-      $$ = new expr_dop_t(expr_op_t::kind_t::ASSIGN, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::ASSIGN, $1, $3);
     }
   | expr_prefix MUL_ASSIGN expr_assign {
-      $$ = new expr_dop_t(expr_op_t::kind_t::MUL_ASSIGN, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::MUL_ASSIGN, $1, $3);
     }
   | expr_prefix DIV_ASSIGN expr_assign {
-      $$ = new expr_dop_t(expr_op_t::kind_t::DIV_ASSIGN, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::DIV_ASSIGN, $1, $3);
     }
   | expr_prefix MOD_ASSIGN expr_assign {
-      $$ = new expr_dop_t(expr_op_t::kind_t::MOD_ASSIGN, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::MOD_ASSIGN, $1, $3);
     }
   | expr_prefix ADD_ASSIGN expr_assign {
-      $$ = new expr_dop_t(expr_op_t::kind_t::ADD_ASSIGN, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::ADD_ASSIGN, $1, $3);
     }
   | expr_prefix SUB_ASSIGN expr_assign {
-      $$ = new expr_dop_t(expr_op_t::kind_t::SUB_ASSIGN, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::SUB_ASSIGN, $1, $3);
     }
   | expr_prefix LEFT_ASSIGN expr_assign {
-      $$ = new expr_dop_t(expr_op_t::kind_t::LEFT_ASSIGN, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::LEFT_ASSIGN, $1, $3);
     }
   | expr_prefix RIGHT_ASSIGN expr_assign {
-      $$ = new expr_dop_t(expr_op_t::kind_t::RIGHT_ASSIGN, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::RIGHT_ASSIGN, $1, $3);
     }
   | expr_prefix AND_ASSIGN expr_assign {
-      $$ = new expr_dop_t(expr_op_t::kind_t::AND_ASSIGN, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::AND_ASSIGN, $1, $3);
     }
   | expr_prefix XOR_ASSIGN expr_assign {
-      $$ = new expr_dop_t(expr_op_t::kind_t::XOR_ASSIGN, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::XOR_ASSIGN, $1, $3);
     }
   | expr_prefix OR_ASSIGN expr_assign {
-      $$ = new expr_dop_t(expr_op_t::kind_t::OR_ASSIGN, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::OR_ASSIGN, $1, $3);
     }
   ;
 
@@ -657,7 +657,7 @@ expr_lor
       $$ = $1;
     }
   | expr_lor LOR expr_land {
-      $$ = new expr_dop_t(expr_op_t::kind_t::LOR, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::LOR, $1, $3);
     }
   ;
 
@@ -666,7 +666,7 @@ expr_land
       $$ = $1;
     }
   | expr_land LAND expr_or {
-      $$ = new expr_dop_t(expr_op_t::kind_t::LAND, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::LAND, $1, $3);
     }
   ;
 
@@ -675,7 +675,7 @@ expr_or
       $$ = $1;
     }
   | expr_or OR expr_xor {
-      $$ = new expr_dop_t(expr_op_t::kind_t::OR, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::OR, $1, $3);
     }
   ;
 
@@ -684,7 +684,7 @@ expr_xor
       $$ = $1;
     }
   | expr_xor XOR expr_and {
-      $$ = new expr_dop_t(expr_op_t::kind_t::XOR, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::XOR, $1, $3);
     }
   ;
 
@@ -693,7 +693,7 @@ expr_and
       $$ = $1;
     }
   | expr_and AND expr_equal {
-      $$ = new expr_dop_t(expr_op_t::kind_t::AND, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::AND, $1, $3);
     }
   ;
 
@@ -702,10 +702,10 @@ expr_equal
       $$ = $1;
     }
   | expr_equal EQ expr_relational {
-      $$ = new expr_dop_t(expr_op_t::kind_t::EQ, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::EQ, $1, $3);
     }
   | expr_equal NEQ expr_relational {
-      $$ = new expr_dop_t(expr_op_t::kind_t::NEQ, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::NEQ, $1, $3);
     }
   ;
 
@@ -714,16 +714,16 @@ expr_relational
       $$ = $1;
     }
   | expr_relational LT expr_shift {
-      $$ = new expr_dop_t(expr_op_t::kind_t::LT, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::LT, $1, $3);
     }
   | expr_relational GT expr_shift {
-      $$ = new expr_dop_t(expr_op_t::kind_t::GT, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::GT, $1, $3);
     }
   | expr_relational LE expr_shift {
-      $$ = new expr_dop_t(expr_op_t::kind_t::LTE, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::LTE, $1, $3);
     }
   | expr_relational GE expr_shift {
-      $$ = new expr_dop_t(expr_op_t::kind_t::GTE, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::GTE, $1, $3);
     }
   ;
 
@@ -732,10 +732,10 @@ expr_shift
       $$ = $1;
     }
   | expr_shift LS expr_add {
-      $$ = new expr_dop_t(expr_op_t::kind_t::LEFT, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::LEFT, $1, $3);
     }
   | expr_shift RS expr_add {
-      $$ = new expr_dop_t(expr_op_t::kind_t::RIGHT, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::RIGHT, $1, $3);
     }
   ;
 
@@ -744,10 +744,10 @@ expr_add
       $$ = $1;
     }
   | expr_add ADD expr_mul {
-      $$ = new expr_dop_t(expr_op_t::kind_t::ADD, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::ADD, $1, $3);
     }
   | expr_add SUB expr_mul {
-      $$ = new expr_dop_t(expr_op_t::kind_t::SUB, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::SUB, $1, $3);
     }
   ;
 
@@ -756,13 +756,13 @@ expr_mul
       $$ = $1;
     }
   | expr_mul MUL expr_cast {
-      $$ = new expr_dop_t(expr_op_t::kind_t::MUL, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::MUL, $1, $3);
     }
   | expr_mul DIV expr_cast {
-      $$ = new expr_dop_t(expr_op_t::kind_t::DIV, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::DIV, $1, $3);
     }
   | expr_mul MOD expr_cast {
-      $$ = new expr_dop_t(expr_op_t::kind_t::MOD, $1, $3);
+      $$ = new expr_dop_t(expr_t::kind_t::MOD, $1, $3);
     }
   ;
 
@@ -783,28 +783,28 @@ expr_prefix
       $$ = $1;
     }
   | INC expr_prefix {
-      $$ = new expr_op_t(expr_op_t::kind_t::INC_PRE, $2);
+      $$ = new expr_prefix_t(expr_t::kind_t::INC_PRE, $2);
     }
   | DEC expr_prefix {
-      $$ = new expr_op_t(expr_op_t::kind_t::DEC_PRE, $2);
+      $$ = new expr_prefix_t(expr_t::kind_t::DEC_PRE, $2);
     }
   | AND expr_prefix {
-      $$ = new expr_op_t(expr_op_t::kind_t::AND_PRE, $2);
+      $$ = new expr_prefix_t(expr_t::kind_t::AND_PRE, $2);
     }
   | ADD expr_prefix {
-      $$ = new expr_op_t(expr_op_t::kind_t::ADD_PRE, $2);
+      $$ = new expr_prefix_t(expr_t::kind_t::ADD_PRE, $2);
     }
   | SUB expr_prefix {
-      $$ = new expr_op_t(expr_op_t::kind_t::SUB_PRE, $2);
+      $$ = new expr_prefix_t(expr_t::kind_t::SUB_PRE, $2);
     }
   | MUL expr_prefix {
-      $$ = new expr_op_t(expr_op_t::kind_t::MUL_PRE, $2);
+      $$ = new expr_prefix_t(expr_t::kind_t::MUL_PRE, $2);
     }
   | NOT expr_prefix {
-      $$ = new expr_op_t(expr_op_t::kind_t::NOT_PRE, $2);
+      $$ = new expr_prefix_t(expr_t::kind_t::NOT_PRE, $2);
     }
   | TID expr_prefix {
-      $$ = new expr_op_t(expr_op_t::kind_t::TID_PRE, $2);
+      $$ = new expr_prefix_t(expr_t::kind_t::TID_PRE, $2);
     }
   ;
 
@@ -813,28 +813,28 @@ expr_postfix
       $$ = $1;
     }
   | expr_postfix LSQU RSQU {
-      $$ = new expr_op_t(expr_op_t::kind_t::POS, $1);
+      $$ = new expr_pos_t($1, nullptr);
     }
   | expr_postfix LSQU expr RSQU {
-      $$ = new expr_dop_t(expr_op_t::kind_t::POS, $1, $3);
+      $$ = new expr_pos_t($1, $3);
     }
   | expr_postfix LPAR expr_list RPAR {
-      $$ = new expr_dop_t(expr_op_t::kind_t::CALL, $1, $3);
+      $$ = new expr_call_t($1, $3);
     }
   | expr_postfix INC {
-      $$ = new expr_op_t(expr_op_t::kind_t::INC_POST, $1);
+      $$ = new expr_postfix_t(expr_t::kind_t::INC_POST, $1);
     }
   | expr_postfix DEC {
-      $$ = new expr_op_t(expr_op_t::kind_t::DEC_POST, $1);
+      $$ = new expr_postfix_t(expr_t::kind_t::DEC_POST, $1);
     }
   ;
 
 expr_primary
   : expr_const {
-      $$ = new expr_op_t(expr_op_t::kind_t::CONST, $1);
+      $$ = new expr_primary_t(expr_t::kind_t::CONST, $1);
     }
   | LPAR expr_list RPAR {
-      $$ = new expr_op_t(expr_op_t::kind_t::ENCLOSE, $2);
+      $$ = new expr_primary_t(expr_t::kind_t::ENCLOSE, $2);
     }
   ;
 

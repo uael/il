@@ -37,7 +37,7 @@ namespace dyc {
 
     void const_lambda_t::accept(node_t *scope) {
       ACCEPT(args);
-      ACCEPT((node_t *) closure);
+      ACCEPT(closure);
       node_t::accept(scope);
     }
 

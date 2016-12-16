@@ -30,7 +30,7 @@ namespace dyc {
     void decl_t::accept(node_t *scope) {
       ACCEPT(ids);
       ACCEPT(type_specifier);
-      ACCEPT(closure ? closure->as_node() : nullptr);
+      ACCEPT(closure);
       node_t::accept(scope);
     }
 

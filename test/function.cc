@@ -64,7 +64,6 @@ TEST(func, sort) {
     "  sort1(0, count(array) - 1);"
     "}"
   ));
-  driver.ast.accept(nullptr);
 }
 
 SYNTAX_TEST(func, tuple, true, "",
@@ -108,7 +107,6 @@ SYNTAX_TEST(func, initializer3, true, "",
 TEST(func, find) {
   dyc::driver driver = dyc::driver();
   ASSERT_EQ(true, driver.parse_string("main,oops(argc:int,argv:*char[]):int=>{return 0;}"));
-  driver.ast.accept(nullptr);
   decl_function_t *main = driver.ast.decls->find<decl_function_t *>("main");
   if (!main) {
     FAIL();

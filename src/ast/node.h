@@ -31,7 +31,7 @@
 #define rforeach(value, values) \
   for (__typeof__(values) value = values; value; value = (__typeof__(values)) value->prev)
 
-#define ACCEPT(node) if ((node)) (node)->accept(this)
+#define ACCEPT(node) if ((node)) (dynamic_cast<dyc::ast::node_t *>(node))->accept(this)
 
 namespace dyc {
   namespace ast {

@@ -37,7 +37,11 @@ namespace dyc {
 
     parser parser(*this);
     parser.set_debug_level(trace_parsing);
-    return (parser.parse() == 0);
+    if (parser.parse() == 0) {
+      ast.accept(nullptr);
+      return true;
+    }
+    return false;
   }
 
   bool driver::parse_file(const std::string &filename) {

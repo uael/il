@@ -89,7 +89,7 @@ namespace dyc {
     void stmt_iter_t::accept(node_t *scope) {
       ACCEPT(decls);
       ACCEPT(cond);
-      ACCEPT((node_t *) step);
+      ACCEPT(step);
       ACCEPT(stmt);
       node_t::accept(scope);
     }

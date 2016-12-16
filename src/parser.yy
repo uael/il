@@ -140,7 +140,7 @@ using namespace dyc::ast;
 #undef yylex
 #define yylex driver.lexer->lex
 
-#define MAKE(n, l, t, ...) do { n = new t(__VA_ARGS__); n->loc = l; } while(0)
+#define MAKE(n, l, t, ...) do { n = new t(__VA_ARGS__); n->loc = &l; } while(0)
 %}
 
 %destructor { if ($$) delete $$; $$ = nullptr; } id id_list

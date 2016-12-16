@@ -23,7 +23,6 @@
 
 #include <map>
 #include "writer.h"
-#include "location.hh"
 
 #define foreach(value, values) \
   for (__typeof__(values) value = values; value; value = (__typeof__(values)) value->next)
@@ -34,6 +33,8 @@
 #define ACCEPT(node) if ((node)) (dynamic_cast<dyc::ast::node_t *>(node))->accept(this)
 
 namespace dyc {
+  class location;
+
   namespace ast {
     struct identifier_t;
     struct generic_t;
@@ -78,7 +79,7 @@ namespace dyc {
       node_t *scope = nullptr;
       node_t *prev = nullptr;
       node_t *next = nullptr;
-      location loc;
+      location *loc = nullptr;
 
       virtual ~node_t();
       virtual void write(writer_t *writer);

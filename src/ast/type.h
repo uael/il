@@ -26,18 +26,29 @@
 
 namespace dyc {
   namespace ast {
-    struct type_specifier_t : node_t {
-      type_t *type = nullptr;
-      std::vector<type_specifier_t *> call_chain;
-      int array_lvl;
+    struct type_specifier_t : node_t {};
 
-      type_specifier_t(type_t *type);
+    struct type_callable_t : type_specifier_t {
+      type_specifier_t *type = nullptr;
+      type_specifier_t *args_types = nullptr;
 
-      virtual void accept(node_t *scope) override;
+      type_callable_t(type_specifier_t *type, type_specifier_t *args_types = nullptr);
+
+      void accept(node_t *scope) override;
       void write(writer_t *writer) override;
     };
 
-    struct type_t : node_t {};
+    struct type_array_t : type_specifier_t {
+      type_specifier_t *type = nullptr;
+      expr_t *fixed_size = nullptr;
+
+      type_array_t(type_specifier_t *type, expr_t *fixed_size = nullptr);
+
+      void accept(node_t *scope) override;
+      void write(writer_t *writer) override;
+    };
+
+    struct type_t : type_specifier_t {};
 
     struct type_scalar_t : type_t {
       enum kind_t {

@@ -364,19 +364,19 @@ type_specifier_list
 
 type_specifier_unit
   : type {
-      MAKE($$, @$, type_specifier_t, $1);
+      $$ = $1;
     }
   | type_specifier_unit LSQU RSQU {
-      $1->array_lvl++;
-      $$ = $1;
+      MAKE($$, @$, type_array_t, $1);
     }
-  | type_specifier_unit LPAR type_specifier_list RPAR {
-      $1->call_chain.push_back($3);
-      $$ = $1;
+  | type_specifier_unit LSQU expr_cond RSQU {
+      MAKE($$, @$, type_array_t, $1, $3);
     }
   | type_specifier_unit LPAR RPAR {
-      $1->call_chain.push_back(nullptr);
-      $$ = $1;
+      MAKE($$, @$, type_callable_t, $1);
+    }
+  | type_specifier_unit LPAR type_specifier_list RPAR {
+      MAKE($$, @$, type_callable_t, $1, $3);
     }
   ;
 

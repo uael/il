@@ -23,17 +23,28 @@
 
 namespace dyc {
   namespace ast {
-    type_specifier_t::type_specifier_t(type_t *type) : type(type) {}
+    type_callable_t::type_callable_t(type_specifier_t *type, type_specifier_t *args_types)
+      : type(type), args_types(args_types) {}
 
-    void type_specifier_t::accept(node_t *scope) {
+    void type_callable_t::accept(node_t *scope) {
       ACCEPT(type);
-      for (auto &t : call_chain) {
-        ACCEPT(t);
-      }
+      ACCEPT(args_types);
       node_t::accept(scope);
     }
 
-    void type_specifier_t::write(writer_t *writer) {
+    void type_callable_t::write(writer_t *writer) {
+      node_t::write(writer);
+    }
+
+    type_array_t::type_array_t(type_specifier_t *type, expr_t *fixed_size) : type(type), fixed_size(fixed_size) {}
+
+    void type_array_t::accept(node_t *scope) {
+      ACCEPT(type);
+      ACCEPT(fixed_size);
+      node_t::accept(scope);
+    }
+
+    void type_array_t::write(writer_t *writer) {
       node_t::write(writer);
     }
 

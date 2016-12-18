@@ -36,6 +36,17 @@ namespace dyc {
       node_t::write(writer);
     }
 
+    type_ptr_t::type_ptr_t(type_specifier_t *type) : type(type) {}
+
+    void type_ptr_t::accept(node_t *scope) {
+      ACCEPT(type);
+      node_t::accept(scope);
+    }
+
+    void type_ptr_t::write(writer_t *writer) {
+      node_t::write(writer);
+    }
+
     type_array_t::type_array_t(type_specifier_t *type, expr_t *fixed_size) : type(type), fixed_size(fixed_size) {}
 
     void type_array_t::accept(node_t *scope) {
@@ -55,6 +66,7 @@ namespace dyc {
     }
 
     type_userdef_t::type_userdef_t(std::string *id) : id(id) {}
+    type_userdef_t::type_userdef_t(identifier_t *ns, std::string *id) : id(id), ns(ns) {}
 
     void type_userdef_t::write(writer_t *writer) {
       type_t::write(writer);

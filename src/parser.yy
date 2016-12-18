@@ -378,6 +378,9 @@ type_specifier_unit
   : type {
       $$ = $1;
     }
+  | MUL type_specifier_unit {
+      MAKE($$, @$, type_ptr_t, $2);
+    }
   | type_specifier_unit LSQU RSQU {
       MAKE($$, @$, type_array_t, $1);
     }
@@ -455,6 +458,9 @@ type_internal
 type_userdef
   : USERDEF {
       MAKE($$, @$, type_userdef_t, $1);
+    }
+  | id_dot_list DOT USERDEF {
+      MAKE($$, @$, type_userdef_t, $1, $3);
     }
   ;
 
@@ -792,6 +798,12 @@ expr_prefix
   : expr_postfix {
       $$ = $1;
     }
+  | MUL expr_prefix {
+      MAKE($$, @$, expr_prefix_t, expr_t::kind_t::MUL_PRE, $2);
+    }
+  | AND expr_prefix {
+      MAKE($$, @$, expr_prefix_t, expr_t::kind_t::AND_PRE, $2);
+    }
   | INC expr_prefix {
       MAKE($$, @$, expr_prefix_t, expr_t::kind_t::INC_PRE, $2);
     }
@@ -861,7 +873,7 @@ expr_kvp_list
   ;
 
 expr_const
-  : id {
+  : id_dot_list {
       $$ = $1;
     }
   | const_value {

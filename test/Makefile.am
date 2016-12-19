@@ -5,6 +5,6 @@ AM_CXXFLAGS = \
   -I$(top_srcdir)/src -I$(top_builddir)/src
 
 check_PROGRAMS = \
-  argument function
+  argument function frame
 
 TESTS = $(check_PROGRAMS)

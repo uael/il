@@ -24,9 +24,34 @@
 
 namespace dyc {
   namespace ast {
-    decl_namespace_t::decl_namespace_t(identifier_t *name, decl_t *decls) : name(name), decls(decls) {}
+    decl_include_t::decl_include_t(identifier_t *includes) : includes(includes) {}
 
-    void decl_namespace_t::accept(node_t *scope) {
+    void decl_include_t::accept(node_t *scope) {
+      ACCEPT(includes);
+      node_t::accept(scope);
+    }
+
+    void decl_include_t::write(writer_t *writer) {
+      foreach(include, includes) {
+        *writer << "#include \"" << *include->value << "\"\n";
+      }
+      node_t::write(writer);
+    }
+
+    decl_use_t::decl_use_t(identifier_t *uses) : uses(uses) {}
+
+    void decl_use_t::accept(node_t *scope) {
+      ACCEPT(uses);
+      node_t::accept(scope);
+    }
+
+    void decl_use_t::write(writer_t *writer) {
+      node_t::write(writer);
+    }
+
+    decl_nested_t::decl_nested_t(identifier_t *name, decl_t *decls) : name(name), decls(decls) {}
+
+    void decl_nested_t::accept(node_t *scope) {
       ACCEPT(name);
       node_t::accept(scope);
     }
@@ -61,6 +86,33 @@ namespace dyc {
 
     void decl_function_t::write(writer_t *writer) {
       decl_member_t::write(writer);
+    }
+
+    decl_ctor_t::decl_ctor_t(decl_t *args, closure_t *closure, const bool &poly)
+      : decl_function_t(nullptr, nullptr, args, nullptr, closure), poly(poly) {}
+    decl_ctor_t::decl_ctor_t(identifier_t *props_args, closure_t *closure, const bool &poly)
+      : decl_function_t(nullptr, nullptr, nullptr, nullptr, closure), props_args(props_args), poly(poly) {}
+
+    void decl_ctor_t::accept(node_t *scope) {
+      ACCEPT(props_args);
+      decl_function_t::accept(scope);
+    }
+
+    void decl_ctor_t::write(writer_t *writer) {
+      decl_function_t::write(writer);
+    }
+
+    decl_frame_t::decl_frame_t(identifier_t *name, generic_t *generics, type_specifier_t *type, decl_t *decls)
+      : decl_nested_t(name, decls), generics(generics), type(type)  {}
+
+    void decl_frame_t::accept(node_t *scope) {
+      ACCEPT(generics);
+      ACCEPT(type);
+      decl_nested_t::accept(scope);
+    }
+
+    void decl_frame_t::write(writer_t *writer) {
+      node_t::write(writer);
     }
   }
 }

@@ -41,15 +41,23 @@ namespace dyc {
     struct closure_t;
 
     struct decl_t;
+    struct decl_include_t;
+    struct decl_use_t;
+    struct decl_nested_t;
+    struct decl_nested_t;
     struct decl_property_t;
     struct decl_function_t;
+    struct decl_ctor_t;
+    struct decl_frame_t;
 
     struct type_specifier_t;
     struct type_callable_t;
+    struct type_ptr_t;
     struct type_array_t;
     struct type_t;
     struct type_internal_t;
     struct type_userdef_t;
+    struct type_generic_t;
 
     struct stmt_t;
     struct stmt_expr_t;
@@ -67,12 +75,15 @@ namespace dyc {
     struct expr_cast_t;
     struct expr_call_t;
     struct expr_pos_t;
-    struct expr_prefix_t;
+    struct expr_unary_t;
     struct expr_postfix_t;
+    struct expr_nested_t;
+    struct expr_sizeof_t;
     struct expr_primary_t;
     struct expr_kvp_t;
     struct expr_const_t;
 
+    struct const_this_t;
     struct const_value_t;
     struct const_lambda_t;
     struct const_initializer_t;

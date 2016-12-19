@@ -23,6 +23,10 @@
 
 namespace dyc {
   namespace ast {
+    void const_this_t::write(writer_t *writer) {
+      node_t::write(writer);
+    }
+
     const_value_t::const_value_t(const_value_t::kind_t kind, std::string *value) : kind(kind), value(value) {}
 
     void const_value_t::write(writer_t *writer) {
@@ -50,6 +54,17 @@ namespace dyc {
     void const_initializer_t::accept(node_t *scope) {
       ACCEPT(exprs);
       node_t::accept(scope);
+    }
+
+    const_new_t::const_new_t(identifier_t *id, expr_t *exprs) : const_initializer_t(exprs), id(id) {}
+
+    void const_new_t::accept(node_t *scope) {
+      ACCEPT(id);
+      const_initializer_t::accept(scope);
+    }
+
+    void const_new_t::write(writer_t *writer) {
+      const_initializer_t::write(writer);
     }
   }
 }

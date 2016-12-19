@@ -18,24 +18,52 @@
 
 /* $Id$ */
 
-#ifndef _AST_CLOSURE_H
-#define _AST_CLOSURE_H
+#include <iostream>
+#include <fstream>
+#include "driver.h"
+#include "test.h"
 
-#include "node.h"
+using namespace dyc;
+using namespace dyc::ast;
 
-namespace dyc {
-  namespace ast {
-    struct closure_t {
-      bool macro = true;
+SYNTAX_TEST(frame, f1, true, "",
+  "include stdlib;"
+  ""
+  "frame Ptr<T> : *T {"
+  "  self();"
+  "  self(value : T) => *this.malloc() = value;"
+  "  ~self() => free(this);"
+  ""
+  "  malloc() : static => this = malloc(sizeof(T));"
+  "}"
+);
 
-      virtual ~closure_t();
+SYNTAX_TEST(frame, f2, true, "",
+  "use Ptr;"
+  ""
+  "frame Buffer<TItem> : Ptr<TItem> {"
+  "  realloc(new_size : Size) : static => {"
+  "    return this = realloc(this, new_size * sizeof(TItem));"
+  "  }"
+  "}"
+);
 
-      node_t *as_node();
-    };
-  }
+TEST(frame, f3) {
+  dyc::driver driver = dyc::driver();
+  ASSERT_TRUE(driver.parse_string(
+    "use Ptr;"
+    ""
+    "frame Buffer<TItem> : Ptr<TItem> {"
+    "  realloc(new_size : Size) : static => {"
+    "    return this = realloc(this, new_size * sizeof(TItem));"
+    "  }"
+    "}"
+  ));
 }
 
-#endif /* _AST_CLOSURE_H */
+#ifdef HAVE_CONFIG_H
+RUN
+#endif
 
 /*
  * Local variables:

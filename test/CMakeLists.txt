@@ -4,7 +4,8 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 set(check_SOURCES
         argument.cc
-        function.cc)
+        function.cc
+        frame.cc)
 
 add_executable(check main.cc ${check_SOURCES})
 

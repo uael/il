@@ -32,6 +32,9 @@ namespace dyc {
     }
 
     void node_t::write(writer_t *writer) {
+      if (next) {
+        next->write(writer);
+      }
     }
   }
 }

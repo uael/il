@@ -25,6 +25,10 @@
 
 namespace dyc {
   namespace ast {
+    struct const_this_t : expr_const_t {
+      void write(writer_t *writer) override;
+    };
+
     struct const_value_t : expr_const_t {
       enum kind_t {
         INT, FLOAT, STRING
@@ -53,6 +57,15 @@ namespace dyc {
 
       void write(writer_t *writer) override;
       void accept(node_t *scope) override;
+    };
+
+    struct const_new_t : const_initializer_t {
+      identifier_t *id;
+
+      const_new_t(identifier_t *id, expr_t *exprs);
+
+      void accept(node_t *scope) override;
+      void write(writer_t *writer) override;
     };
   }
 }

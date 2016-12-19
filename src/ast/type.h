@@ -61,8 +61,8 @@ namespace dyc {
 
     struct type_internal_t : type_t {
       enum kind_t {
-        VOID, BOOL, CHAR, INT, UINT, SINT, SHORT, USHORT, STRING,
-        SSHORT, FLOAT, UFLOAT, SFLOAT, DOUBLE, UDOUBLE, SDOUBLE
+        SELF, STATIC, VOID, BOOL, CHAR, INT, UINT, SINT, SHORT, USHORT,
+        STRING, SSHORT, FLOAT, UFLOAT, SFLOAT, DOUBLE, UDOUBLE, SDOUBLE
       } kind;
 
       type_internal_t(kind_t kind);
@@ -71,12 +71,20 @@ namespace dyc {
     };
 
     struct type_userdef_t : type_t {
-      std::string *id = nullptr;
-      identifier_t *ns = nullptr;
+      identifier_t *id = nullptr;
 
-      type_userdef_t(std::string *id);
-      type_userdef_t(identifier_t *ns, std::string *id);
+      type_userdef_t(identifier_t *id);
 
+      void accept(node_t *scope) override;
+      void write(writer_t *writer) override;
+    };
+
+    struct type_generic_t : type_userdef_t {
+      type_specifier_t *types = nullptr;
+
+      type_generic_t(identifier_t *id, type_specifier_t *types);
+
+      void accept(node_t *scope) override;
       void write(writer_t *writer) override;
     };
   }

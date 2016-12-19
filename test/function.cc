@@ -39,7 +39,7 @@ SYNTAX_TEST(func, fibonacci, true, "",
 );
 
 SYNTAX_TEST(func, ns_fibonacci, true, "",
-  "namespace math.lol {"
+  "namespace Math {"
   "  fibonacci(n:int):int => {"
   "    if (n==0) {"
   "      return 0;"
@@ -61,7 +61,7 @@ TEST(func, sort) {
     "      array[i] = array[j];"
     "      array[j] = t;"
     "    },"
-    "    sort(l, r : T) => {"
+    "    sort(l, r : T) {"
     "      var p = array[(l + r) / 2], i = l, j = r;"
     "      while (i <= j) {"
     "        while (array[i] < p) i += 1;"
@@ -75,7 +75,7 @@ TEST(func, sort) {
     "      if (l < j) sort(l, j);"
     "      if (j < r) sort(i, r);"
     "    };"
-    "  sort1(0, count(array) - 1);"
+    "  sort(0, count(array) - 1);"
     "}"
   ));
 }

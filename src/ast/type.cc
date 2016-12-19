@@ -65,11 +65,26 @@ namespace dyc {
       type_t::write(writer);
     }
 
-    type_userdef_t::type_userdef_t(std::string *id) : id(id) {}
-    type_userdef_t::type_userdef_t(identifier_t *ns, std::string *id) : id(id), ns(ns) {}
+    type_userdef_t::type_userdef_t(identifier_t *id) : id(id) {}
+
+    void type_userdef_t::accept(node_t *scope) {
+      ACCEPT(id);
+      node_t::accept(scope);
+    }
 
     void type_userdef_t::write(writer_t *writer) {
       type_t::write(writer);
+    }
+
+    type_generic_t::type_generic_t(identifier_t *id, type_specifier_t *types) : type_userdef_t(id), types(types) {}
+
+    void type_generic_t::accept(node_t *scope) {
+      ACCEPT(types);
+      type_userdef_t::accept(scope);
+    }
+
+    void type_generic_t::write(writer_t *writer) {
+      type_userdef_t::write(writer);
     }
   }
 }

@@ -154,9 +154,9 @@ namespace dyc {
       *writer << op1 << "[" << op2 << "]";
     }
 
-    expr_prefix_t::expr_prefix_t(expr_op_t::kind_t kind, expr_t *op1) : expr_op_t(kind, op1) {}
+    expr_unary_t::expr_unary_t(expr_op_t::kind_t kind, expr_t *op1) : expr_op_t(kind, op1) {}
 
-    void expr_prefix_t::write(writer_t *writer) {
+    void expr_unary_t::write(writer_t *writer) {
       *writer << op() << op1;
     }
 
@@ -164,6 +164,29 @@ namespace dyc {
 
     void expr_postfix_t::write(writer_t *writer) {
       *writer  << op1 << op();
+    }
+
+    expr_nested_t::expr_nested_t(expr_t *op1, identifier_t *id) : expr_op_t(NESTED, op1), id(id) {}
+
+    void expr_nested_t::accept(node_t *scope) {
+      //ACCEPT(id);
+      expr_op_t::accept(scope);
+    }
+
+    void expr_nested_t::write(writer_t *writer) {
+      node_t::write(writer);
+    }
+
+    expr_sizeof_t::expr_sizeof_t(type_specifier_t *type) : expr_op_t(SIZEOF, nullptr), type(type) {}
+    expr_sizeof_t::expr_sizeof_t(expr_t *op1) : expr_op_t(SIZEOF, op1) {}
+
+    void expr_sizeof_t::accept(node_t *scope) {
+      ACCEPT(type);
+      node_t::accept(scope);
+    }
+
+    void expr_sizeof_t::write(writer_t *writer) {
+      *writer << "sizeof(" << type << ")";
     }
 
     expr_primary_t::expr_primary_t(expr_op_t::kind_t kind, expr_t *op1) : expr_op_t(kind, op1) {}

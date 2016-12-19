@@ -28,11 +28,29 @@ namespace dyc {
   namespace ast {
     struct decl_t : node_t {};
 
-    struct decl_namespace_t : decl_t {
+    struct decl_include_t : decl_t {
+      identifier_t *includes = nullptr;
+
+      decl_include_t(identifier_t *includes);
+
+      void accept(node_t *scope) override;
+      void write(writer_t *writer) override;
+    };
+
+    struct decl_use_t : decl_t {
+      identifier_t *uses = nullptr;
+
+      decl_use_t(identifier_t *uses);
+
+      void accept(node_t *scope) override;
+      void write(writer_t *writer) override;
+    };
+
+    struct decl_nested_t : decl_t {
       identifier_t *name = nullptr;
       decl_t *decls = nullptr;
 
-      decl_namespace_t(identifier_t *name, decl_t *decls);
+      decl_nested_t(identifier_t *name, decl_t *decls);
 
       void accept(node_t *scope) override;
     };
@@ -63,6 +81,29 @@ namespace dyc {
                       closure_t *closure);
 
       virtual void accept(node_t *scope) override;
+      void write(writer_t *writer) override;
+    };
+
+    struct decl_ctor_t : decl_function_t {
+      identifier_t *props_args = nullptr;
+      bool poly = true;
+      bool dtor = false;
+
+      decl_ctor_t(decl_t *args, closure_t *closure, const bool &poly = true);
+      decl_ctor_t(identifier_t *props_args, closure_t *closure, const bool &poly = true);
+
+      void accept(node_t *scope) override;
+      void write(writer_t *writer) override;
+    };
+
+    struct decl_frame_t : decl_nested_t {
+      generic_t *generics = nullptr;
+      type_specifier_t *type = nullptr;
+
+      decl_frame_t(identifier_t *name, generic_t *generics, type_specifier_t *type, decl_t *decls);
+
+      void accept(node_t *scope) override;
+
       void write(writer_t *writer) override;
     };
   }

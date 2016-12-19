@@ -123,7 +123,11 @@ typedef dyc::parser::token token;
 "++"                              RET(INC);
 "--"                              RET(DEC);
 
+"include"                         RET(INCLUDE);
+"use"                             RET(USE);
+
 "namespace"                       RET(NAMESPACE);
+"frame"                           RET(FRAME);
 "tuple"                           RET(TUPLE);
 "enum"                            RET(ENUM);
 "struct"                          RET(STRUCT);
@@ -182,7 +186,7 @@ typedef dyc::parser::token token;
 "signed double"                   RET(SDOUBLE);
 
 [a-z_][a-z0-9_]*	                SAVE_STRING; RET(ID);
-[A-Z]([A-Z]+[a-z0-9])*            SAVE_STRING; RET(USERDEF);
+[A-Z][A-Za-z0-9]*                 SAVE_STRING; RET(USERDEF);
 
 {HP}{H}+{IS}?				              SAVE_STRING; RET(INT_CONST);
 {NZ}{D}*{IS}?				              SAVE_STRING; RET(INT_CONST);

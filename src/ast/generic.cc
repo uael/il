@@ -19,14 +19,18 @@
 /* $Id$ */
 
 #include "generic.h"
+#include "ident.h"
+#include "type.h"
 
 namespace dyc {
   namespace ast {
-    generic_t::generic_t(std::string *value, type_specifier_t *type_specifier)
+    generic_t::generic_t(identifier_t *value, type_specifier_t *type_specifier)
       : value(value), type_specifier(type_specifier) {}
 
-    void generic_t::write(writer_t *writer) {
-      node_t::write(writer);
+    void generic_t::accept(node_t *scope) {
+      ACCEPT(value);
+      ACCEPT(type_specifier);
+      node_t::accept(scope);
     }
   }
 }

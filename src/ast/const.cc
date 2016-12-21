@@ -20,20 +20,13 @@
 
 #include "const.h"
 #include "ident.h"
+#include "type.h"
 
 namespace dyc {
   namespace ast {
     const_value_t::const_value_t(const_value_t::kind_t kind, std::string *value) : kind(kind), value(value) {}
 
-    void const_value_t::write(writer_t *writer) {
-      expr_const_t::write(writer);
-    }
-
     const_lambda_t::const_lambda_t(identifier_t *args, closure_t *closure) : args(args), closure(closure) {}
-
-    void const_lambda_t::write(writer_t *writer) {
-      expr_const_t::write(writer);
-    }
 
     void const_lambda_t::accept(node_t *scope) {
       ACCEPT(args);
@@ -43,13 +36,16 @@ namespace dyc {
 
     const_initializer_t::const_initializer_t(expr_t *exprs) : exprs(exprs) {}
 
-    void const_initializer_t::write(writer_t *writer) {
-      expr_const_t::write(writer);
-    }
-
     void const_initializer_t::accept(node_t *scope) {
       ACCEPT(exprs);
       node_t::accept(scope);
+    }
+
+    const_new_t::const_new_t(type_userdef_t *type, expr_t *exprs) : const_initializer_t(exprs), type(type) {}
+
+    void const_new_t::accept(node_t *scope) {
+      ACCEPT(type);
+      const_initializer_t::accept(scope);
     }
   }
 }

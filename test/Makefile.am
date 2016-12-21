@@ -2,10 +2,9 @@ AM_DEFAULT_SOURCE_EXT = .cc
 AM_LDFLAGS = $(top_builddir)/lib/libgtest.la $(top_builddir)/src/libdyc.la
 AM_CXXFLAGS = \
   -I$(top_srcdir)/lib/gtest/googletest/include \
-  -I$(top_srcdir)/src -I$(top_builddir)/src \
-  -I$(top_srcdir)/tests
+  -I$(top_srcdir)/src -I$(top_builddir)/src
 
 check_PROGRAMS = \
-  argument function
+  argument function frame
 
 TESTS = $(check_PROGRAMS)

@@ -18,33 +18,54 @@
 
 /* $Id$ */
 
-#ifndef _WRITER_H
-#define _WRITER_H
+#include <iostream>
+#include <fstream>
+#include "driver.h"
+#include "test.h"
 
-#include <string>
+using namespace dyc;
+using namespace dyc::ast;
 
-namespace dyc {
-  struct ast_t;
-  namespace ast {
-    struct node_t;
-  }
+SYNTAX_TEST(frame, f1, true, "",
+  "include stdlib;"
+  ""
+  "frame Ptr<T> : *T {"
+  "  self();"
+  "  self(value : T) => {"
+  "    *this.malloc() = value;"
+  "  }"
+  "  ~self() => free(this);"
+  ""
+  "  malloc() : static => this = malloc(sizeof(T))"
+  "}"
+);
 
-  struct writer_t {
-    ast_t *ast;
-    std::string stream;
-    int indent_lvl;
+SYNTAX_TEST(frame, f2, true, "",
+  "use Ptr;"
+  ""
+  "frame Buffer<TItem> : Ptr<TItem> {"
+  "  realloc(new_size : Size) : static => {"
+  "    return this = realloc(this, new_size * sizeof(TItem));"
+  "  }"
+  "};"
+);
 
-    writer_t(ast_t *ast);
-
-    writer_t &operator<<(ast::node_t *node);
-
-    writer_t &operator<<(const char *string);
-
-    writer_t &operator<<(const std::string &str);
-  };
+TEST(frame, f3) {
+  dyc::driver driver = dyc::driver();
+  ASSERT_TRUE(driver.parse_string(
+    "use Ptr;"
+    ""
+    "frame Buffer<TItem> : Ptr<TItem> {"
+    "  realloc(new_size : Size) : static => {"
+    "    return this = realloc(this, new_size * sizeof(TItem));"
+    "  }"
+    "}"
+  ));
 }
 
-#endif /* _WRITER_H */
+#ifdef HAVE_CONFIG_H
+RUN
+#endif
 
 /*
  * Local variables:

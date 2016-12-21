@@ -26,39 +26,59 @@
 
 namespace dyc {
   namespace ast {
-    struct type_specifier_t : node_t {
-      type_t *type = nullptr;
-      std::vector<type_specifier_t *> call_chain;
-      decl_t *decls = nullptr;
-      int ptr_lvl;
-      int array_lvl;
+    struct type_specifier_t : node_t {};
 
-      type_specifier_t(type_t *type);
-      type_specifier_t(type_t *type, decl_t *decls);
+    struct type_callable_t : type_specifier_t {
+      type_specifier_t *type = nullptr;
+      type_specifier_t *args_types = nullptr;
 
-      virtual void accept(node_t *scope) override;
-      void write(writer_t *writer) override;
+      type_callable_t(type_specifier_t *type, type_specifier_t *args_types = nullptr);
+
+      void accept(node_t *scope) override;
     };
 
-    struct type_t : node_t {};
+    struct type_ptr_t : type_specifier_t {
+      type_specifier_t *type = nullptr;
 
-    struct type_scalar_t : type_t {
+      type_ptr_t(type_specifier_t *type);
+
+      void accept(node_t *scope) override;
+    };
+
+    struct type_array_t : type_specifier_t {
+      type_specifier_t *type = nullptr;
+      expr_t *fixed_size = nullptr;
+
+      type_array_t(type_specifier_t *type, expr_t *fixed_size = nullptr);
+
+      void accept(node_t *scope) override;
+    };
+
+    struct type_t : type_specifier_t {};
+
+    struct type_internal_t : type_t {
       enum kind_t {
-        VOID, BOOL, CHAR, INT, UINT, SINT, SHORT, USHORT,
-        SSHORT, FLOAT, UFLOAT, SFLOAT, DOUBLE, UDOUBLE, SDOUBLE
+        SELF, STATIC, VOID, BOOL, CHAR, INT, UINT, SINT, SHORT, USHORT,
+        STRING, SSHORT, FLOAT, UFLOAT, SFLOAT, DOUBLE, UDOUBLE, SDOUBLE
       } kind;
 
-      type_scalar_t(kind_t kind);
-
-      void write(writer_t *writer) override;
+      type_internal_t(kind_t kind);
     };
 
-    struct type_generic_t : type_t {
-      std::string *id;
+    struct type_userdef_t : type_t {
+      identifier_t *id = nullptr;
 
-      type_generic_t(std::string *id);
+      type_userdef_t(identifier_t *id);
 
-      void write(writer_t *writer) override;
+      void accept(node_t *scope) override;
+    };
+
+    struct type_generic_t : type_userdef_t {
+      type_specifier_t *types = nullptr;
+
+      type_generic_t(identifier_t *id, type_specifier_t *types);
+
+      void accept(node_t *scope) override;
     };
   }
 }

@@ -38,16 +38,31 @@ SYNTAX_TEST(func, fibonacci, true, "",
   "}"
 );
 
+SYNTAX_TEST(func, ns_fibonacci, true, "",
+  "namespace Math {"
+  "  fibonacci(n:int):int => {"
+  "    if (n==0) {"
+  "      return 0;"
+  "    } else if (n == 1) {"
+  "      return 1;"
+  "    } else {"
+  "      return fibonacci(n-1)+fibonacci(n-2);"
+  "    }"
+  "  }"
+  "}"
+);
+
 TEST(func, sort) {
   dyc::driver driver = dyc::driver();
   ASSERT_TRUE(driver.parse_string(
     "sort<T>(array : T[]) => {"
+    "  use Foo;"
     "  var swap(i, j : T) => {"
     "      var t = array[i];"
     "      array[i] = array[j];"
     "      array[j] = t;"
     "    },"
-    "    sort(l, r : T) => {"
+    "    sort(l, r : T) {"
     "      var p = array[(l + r) / 2], i = l, j = r;"
     "      while (i <= j) {"
     "        while (array[i] < p) i += 1;"
@@ -61,21 +76,21 @@ TEST(func, sort) {
     "      if (l < j) sort(l, j);"
     "      if (j < r) sort(i, r);"
     "    };"
-    "  sort1(0, count(array) - 1);"
+    "  sort(0, count(array) - 1);"
     "}"
   ));
 }
 
 SYNTAX_TEST(func, tuple, true, "",
-  "func(n : int) : int, *double => { return 1, &2.0; }"
+  "func(n : int) : int, double[] => { return 1, [2.0]; }"
 );
 
 SYNTAX_TEST(func, tuple1, true, "",
-  "func(n : int) : int, tuple<*double, bool> => { return 1, &2.0, true; }"
+  "func(n : int) : int, tuple<double[], bool> => { return 1, [2.0], true; }"
 );
 
 SYNTAX_TEST(func, tuple3, true, "",
-  "func(n : int) : int, tuple<*double, bool> => { return 1, (&2.0, true); }"
+  "func(n : int) : int, tuple<double[], bool> => { return 1, ([2.0], true); }"
 );
 
 SYNTAX_TEST(func, initializer, true, "",
@@ -103,15 +118,6 @@ SYNTAX_TEST(func, initializer3, true, "",
   "  };"
   "}"
 );
-
-TEST(func, find) {
-  dyc::driver driver = dyc::driver();
-  ASSERT_EQ(true, driver.parse_string("main,oops(argc:int,argv:*char[]):int=>{return 0;}"));
-  decl_function_t *main = driver.ast.decls->find<decl_function_t *>("main");
-  if (!main) {
-    FAIL();
-  }
-}
 
 #ifdef HAVE_CONFIG_H
 RUN

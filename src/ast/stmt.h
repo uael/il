@@ -35,7 +35,6 @@ namespace dyc {
       stmt_expr_t(expr_t *expr);
 
       virtual void accept(node_t *scope) override;
-      void write(writer_t *writer) override;
     };
 
     struct stmt_label_t : stmt_t {
@@ -51,7 +50,6 @@ namespace dyc {
       stmt_label_t(expr_t *cond, stmt_t *stmt);
 
       virtual void accept(node_t *scope) override;
-      void write(writer_t *writer) override;
     };
 
     struct stmt_compound_t : stmt_t, closure_t {
@@ -61,7 +59,6 @@ namespace dyc {
       stmt_compound_t(stmt_t *stmts);
 
       virtual void accept(node_t *scope) override;
-      void write(writer_t *writer) override;
     };
 
     struct stmt_select_t : stmt_t {
@@ -77,7 +74,6 @@ namespace dyc {
       stmt_select_t(expr_t *cond, stmt_t *stmt, stmt_t *else_stmt);
 
       virtual void accept(node_t *scope) override;
-      void write(writer_t *writer) override;
     };
 
     struct stmt_iter_t : stmt_t {
@@ -95,7 +91,6 @@ namespace dyc {
       stmt_iter_t(stmt_t *decls, expr_t *cond, closure_t *step, stmt_t *stmt);
 
       virtual void accept(node_t *scope) override;
-      void write(writer_t *writer) override;
     };
 
     struct stmt_jump_t : stmt_t {
@@ -110,7 +105,6 @@ namespace dyc {
       stmt_jump_t(expr_t *expr);
 
       virtual void accept(node_t *scope) override;
-      void write(writer_t *writer) override;
     };
 
     struct stmt_decl_t : stmt_t {
@@ -120,7 +114,6 @@ namespace dyc {
       stmt_decl_t(decl_t *decls);
 
       virtual void accept(node_t *scope) override;
-      void write(writer_t *writer) override;
     };
   }
 }

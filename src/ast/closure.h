@@ -26,7 +26,10 @@
 namespace dyc {
   namespace ast {
     struct closure_t {
+      bool macro = true;
+
       virtual ~closure_t();
+
       node_t *as_node();
     };
   }

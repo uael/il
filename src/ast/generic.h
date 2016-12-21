@@ -26,12 +26,12 @@
 namespace dyc {
   namespace ast {
     struct generic_t : node_t {
-      std::string *value;
+      identifier_t *value;
       type_specifier_t *type_specifier = nullptr;
 
-      generic_t(std::string *value, type_specifier_t *type_specifier);
+      generic_t(identifier_t *value, type_specifier_t *type_specifier);
 
-      void write(writer_t *writer) override;
+      void accept(node_t *scope) override;
     };
   }
 }

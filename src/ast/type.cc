@@ -23,32 +23,44 @@
 
 namespace dyc {
   namespace ast {
-    type_specifier_t::type_specifier_t(type_t *type) : type(type) {}
-    type_specifier_t::type_specifier_t(type_t *type, decl_t *decls) : type(type), decls(decls) {}
+    type_callable_t::type_callable_t(type_specifier_t *type, type_specifier_t *args_types)
+      : type(type), args_types(args_types) {}
 
-    void type_specifier_t::accept(node_t *scope) {
+    void type_callable_t::accept(node_t *scope) {
       ACCEPT(type);
-      ACCEPT(decls);
-      for (auto &t : call_chain) {
-        ACCEPT(t);
-      }
+      ACCEPT(args_types);
       node_t::accept(scope);
     }
 
-    void type_specifier_t::write(writer_t *writer) {
-      node_t::write(writer);
+    type_ptr_t::type_ptr_t(type_specifier_t *type) : type(type) {}
+
+    void type_ptr_t::accept(node_t *scope) {
+      ACCEPT(type);
+      node_t::accept(scope);
     }
 
-    type_scalar_t::type_scalar_t(type_scalar_t::kind_t kind) : kind(kind) {}
+    type_array_t::type_array_t(type_specifier_t *type, expr_t *fixed_size) : type(type), fixed_size(fixed_size) {}
 
-    void type_scalar_t::write(writer_t *writer) {
-      type_t::write(writer);
+    void type_array_t::accept(node_t *scope) {
+      ACCEPT(type);
+      ACCEPT(fixed_size);
+      node_t::accept(scope);
     }
 
-    type_generic_t::type_generic_t(std::string *id) : id(id) {}
+    type_internal_t::type_internal_t(type_internal_t::kind_t kind) : kind(kind) {}
 
-    void type_generic_t::write(writer_t *writer) {
-      type_t::write(writer);
+    type_userdef_t::type_userdef_t(identifier_t *id) : id(id) {}
+
+    void type_userdef_t::accept(node_t *scope) {
+      ACCEPT(id);
+      node_t::accept(scope);
+    }
+
+    type_generic_t::type_generic_t(identifier_t *id, type_specifier_t *types) : type_userdef_t(id), types(types) {}
+
+    void type_generic_t::accept(node_t *scope) {
+      ACCEPT(types);
+      type_userdef_t::accept(scope);
     }
   }
 }

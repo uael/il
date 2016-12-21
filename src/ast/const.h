@@ -25,6 +25,9 @@
 
 namespace dyc {
   namespace ast {
+    struct const_this_t : expr_const_t {
+    };
+
     struct const_value_t : expr_const_t {
       enum kind_t {
         INT, FLOAT, STRING
@@ -32,8 +35,6 @@ namespace dyc {
       std::string *value;
 
       const_value_t(kind_t kind, std::string *value);
-
-      void write(writer_t *writer) override;
     };
 
     struct const_lambda_t : expr_const_t {
@@ -42,7 +43,6 @@ namespace dyc {
 
       const_lambda_t(identifier_t *args, closure_t *closure);
 
-      void write(writer_t *writer) override;
       void accept(node_t *scope) override;
     };
 
@@ -51,7 +51,14 @@ namespace dyc {
 
       const_initializer_t(expr_t *exprs);
 
-      void write(writer_t *writer) override;
+      void accept(node_t *scope) override;
+    };
+
+    struct const_new_t : const_initializer_t {
+      type_userdef_t *type;
+
+      const_new_t(type_userdef_t *type, expr_t *exprs = nullptr);
+
       void accept(node_t *scope) override;
     };
   }

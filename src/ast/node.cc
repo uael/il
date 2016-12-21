@@ -30,9 +30,6 @@ namespace dyc {
         this->next->accept(scope);
       }
     }
-
-    void node_t::write(writer_t *writer) {
-    }
   }
 }
 

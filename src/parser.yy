@@ -154,99 +154,120 @@ using namespace dyc::ast;
 %%
 
 program
-  : decl_file_body {
+  :
+    decl_file_body {
       driver.ast = dyc::ast_t($1);
     }
   ;
 
 id
-  : ID {
+  :
+    ID {
       MAKE($$, @$, identifier_t, $1);
     }
   ;
 
 id_list
-  : id {
+  :
+    id {
       $$ = $1;
     }
-  | id_list COMMA id {
+  |
+    id_list COMMA id {
       $$ = $1->push($3);
     }
   ;
 
 userdef
-  : USERDEF {
+  :
+    USERDEF {
       MAKE($$, @$, identifier_t, $1);
     }
   ;
 
 userdef_list
-  : userdef {
+  :
+    userdef {
       $$ = $1;
     }
-  | userdef_list DOT userdef {
+  |
+    userdef_list DOT userdef {
       $$ = $1->push($3);
     }
   ;
   
 generic
-  : userdef {
+  :
+    userdef {
       MAKE($$, @$, generic_t, $1, nullptr);
     }
-  | userdef COLON type_specifier {
+  |
+    userdef COLON type_specifier {
       MAKE($$, @$, generic_t, $1, $3);
     }
   ;
   
 generic_list
-  : generic {
+  :
+    generic {
       $$ = $1;
     }
-  | generic_list COMMA generic {
+  |
+    generic_list COMMA generic {
       $$ = $1->push($3);
     }
   ;
 
 generics
-  : LT generic_list GT {
+  :
+    LT generic_list GT {
       $$ = $2;
     }
   ;
 
 generics_or_empty
-  : /* empty */ {
+  :
+    /* empty */ {
       $$ = nullptr;
     }
-  | generics {
+  |
+    generics {
       $$ = $1;
     }
   ;
 
 closure
-  : ARROW expr {
+  :
+    ARROW expr {
       $$ = $2;
     }
-  | stmt_compound {
+  |
+    stmt_compound {
       $$ = $1;
       $$->macro = false;
     }
-  | ARROW stmt_compound {
+  |
+    ARROW stmt_compound {
       $$ = $2;
     }
   ;
 
 closure_or_empty
-  : /* empty */ {
+  :
+    /* empty */ {
       $$ = nullptr;
     }
-  | closure {
+  |
+    closure {
       $$ = $1;
     }
   ;
 
 eod
-  : SEMICOLON
-  | /* empty */ {
+  :
+    SEMICOLON
+  |
+    /* empty */ {
       if (
         driver.lexer->prev != token::RBRA &&
         driver.lexer->prev != token::SEMICOLON &&
@@ -258,377 +279,474 @@ eod
   ;
 
 decl_file_item
-  : INCLUDE id_list {
+  :
+    INCLUDE id_list {
       MAKE($$, @$, decl_include_t, $2);
     }
-  | NAMESPACE userdef_list LBRA decl_file_body RBRA {
+  |
+    NAMESPACE userdef_list LBRA decl_file_body RBRA {
       MAKE($$, @$, decl_nested_t, $2, $4);
     }
-  | decl_use {
+  |
+    decl_use {
       $$ = $1;
     }
-  | decl_var {
+  |
+    decl_var {
       $$ = $1;
     }
-  | decl_container {
+  |
+    decl_container {
       $$ = $1;
     }
   ;
 
 decl_file_body
-  : /* empty */ {
+  :
+    /* empty */ {
       $$ = nullptr;
     }
-  | decl_file_item eod {
+  |
+    decl_file_item eod {
       $$ = $1;
     }
-  | decl_file_body eod decl_file_item eod {
+  |
+    decl_file_body eod decl_file_item eod {
       $$ = $1->push($3);
     }
   ;
 
 decl_use
-  : USE userdef_list {
+  :
+    USE userdef_list {
       MAKE($$, @$, decl_use_t, $2);
     }
   ;
 
 decl_var
-  : id_list ASSIGN expr_cond {
+  :
+    id_list ASSIGN expr_cond {
       MAKE($$, @$, decl_property_t, $1, nullptr, $3, true);
     }
-  | id_list COLON type_specifier ASSIGN expr_cond {
+  |
+    id_list COLON type_specifier ASSIGN expr_cond {
       MAKE($$, @$, decl_property_t, $1, $3, $5, true);
     }
-  | id_list COLON type_specifier closure_or_empty {
+  |
+    id_list COLON type_specifier closure_or_empty {
       MAKE($$, @$, decl_property_t, $1, $3, $4, false);
     }
-  | id_list generics_or_empty LPAR decl_var_list RPAR closure_or_empty {
+  |
+    id_list generics_or_empty LPAR decl_var_list RPAR closure_or_empty {
       MAKE($$, @$, decl_function_t, $1, $2, $4, nullptr, $6);
     }
-  | id_list generics_or_empty LPAR decl_var_list RPAR COLON type_specifier_list closure_or_empty {
+  |
+    id_list generics_or_empty LPAR decl_var_list RPAR COLON type_specifier_list closure_or_empty {
       MAKE($$, @$, decl_function_t, $1, $2, $4, $7, $8);
     }
   ;
 
 decl_var_list
-  : /* empty */ {
+  :
+    /* empty */ {
       $$ = nullptr;
     }
-  | decl_var {
+  |
+    decl_var {
       $$ = $1;
     }
-  | decl_var_list COMMA decl_var {
+  |
+    decl_var_list COMMA decl_var {
       $$ = $1->push($3);
     }
   ;
 
 decl_container
-  : FRAME userdef generics COLON type_specifier_list decl_container_body {
+  :
+    FRAME userdef generics COLON type_specifier_list decl_container_body {
       MAKE($$, @$, decl_frame_t, $2, $3, $5, $6);
     }
   ;
 
 decl_container_item
-  : decl_use {
+  :
+    decl_use {
       $$ = $1;
     }
-  | decl_var {
+  |
+    decl_var {
       $$ = $1;
     }
-  | decl_ctor {
+  |
+    decl_ctor {
       $$ = $1;
     }
-  | decl_dtor {
+  |
+    decl_dtor {
       $$ = $1;
     }
-  | decl_container {
+  |
+    decl_container {
       $$ = $1;
     }
   ;
 
 decl_container_body
-  : /* empty */ {
+  :
+    /* empty */ {
       $$ = nullptr;
     }
-  | LBRA _decl_container_body RBRA {
+  |
+    LBRA _decl_container_body RBRA {
       $$ = $2;
     }
   ;
 
 _decl_container_body
-  : /* empty */ {
+  :
+    /* empty */ {
       $$ = nullptr;
     }
-  | decl_container_item eod {
+  |
+    decl_container_item eod {
       $$ = $1;
     }
-  | _decl_container_body eod decl_container_item eod {
+  |
+    _decl_container_body eod decl_container_item eod {
       $$ = $1->push($3);
     }
   ;
 
 decl_ctor
-  : SELF LPAR decl_var_list RPAR closure_or_empty {
+  :
+    SELF LPAR decl_var_list RPAR closure_or_empty {
       MAKE($$, @$, decl_ctor_t, $3, $5, false);
     }
-  | STATIC LPAR decl_var_list RPAR closure_or_empty {
+  |
+    STATIC LPAR decl_var_list RPAR closure_or_empty {
       MAKE($$, @$, decl_ctor_t, $3, $5);
     }
-  | SELF LPAR id_list RPAR closure_or_empty {
+  |
+    SELF LPAR id_list RPAR closure_or_empty {
       MAKE($$, @$, decl_ctor_t, $3, $5, false);
     }
-  | STATIC LPAR id_list RPAR closure_or_empty {
+  |
+    STATIC LPAR id_list RPAR closure_or_empty {
       MAKE($$, @$, decl_ctor_t, $3, $5);
     }
   ;
 
 decl_dtor
-  : TID SELF LPAR decl_var_list RPAR closure_or_empty {
+  :
+    TID SELF LPAR decl_var_list RPAR closure_or_empty {
       MAKE($$, @$, decl_ctor_t, $4, $6, false);
     }
-  | TID STATIC LPAR decl_var_list RPAR closure_or_empty {
+  |
+    TID STATIC LPAR decl_var_list RPAR closure_or_empty {
       MAKE($$, @$, decl_ctor_t, $4, $6);
     }
-  | TID SELF LPAR id_list RPAR closure_or_empty {
+  |
+    TID SELF LPAR id_list RPAR closure_or_empty {
       MAKE($$, @$, decl_ctor_t, $4, $6, false);
     }
-  | TID STATIC LPAR id_list RPAR closure_or_empty {
+  |
+    TID STATIC LPAR id_list RPAR closure_or_empty {
       MAKE($$, @$, decl_ctor_t, $4, $6);
     }
   ;
 
 type_specifier
-  : type_specifier_unit {
+  :
+    type_specifier_unit {
       $$ = $1;
     }
-  | TUPLE LT type_specifier_list GT {
+  |
+    TUPLE LT type_specifier_list GT {
       $$ = $3;
     }
   ;
 
 type_specifier_list
-  : type_specifier {
+  :
+    type_specifier {
       $$ = $1;
     }
-  | type_specifier_list COMMA type_specifier {
+  |
+    type_specifier_list COMMA type_specifier {
       $$ = $1->push($3);
     }
   ;
 
 type_specifier_unit
-  : type {
+  :
+    type {
       $$ = $1;
     }
-  | MUL type_specifier_unit {
+  |
+    MUL type_specifier_unit {
       MAKE($$, @$, type_ptr_t, $2);
     }
-  | type_specifier_unit LSQU RSQU {
+  |
+    type_specifier_unit LSQU RSQU {
       MAKE($$, @$, type_array_t, $1);
     }
-  | type_specifier_unit LSQU expr_cond RSQU {
+  |
+    type_specifier_unit LSQU expr_cond RSQU {
       MAKE($$, @$, type_array_t, $1, $3);
     }
-  | type_specifier_unit LPAR RPAR {
+  |
+    type_specifier_unit LPAR RPAR {
       MAKE($$, @$, type_callable_t, $1);
     }
-  | type_specifier_unit LPAR type_specifier_list RPAR {
+  |
+    type_specifier_unit LPAR type_specifier_list RPAR {
       MAKE($$, @$, type_callable_t, $1, $3);
     }
   ;
 
 type
-  : type_internal {
+  :
+    type_internal {
       $$ = $1;
     }
-  | type_userdef {
+  |
+    type_userdef {
       $$ = $1;
     }
   ;
 
 type_internal
-  : SELF {
+  :
+    SELF {
       MAKE($$, @$, type_internal_t, type_internal_t::kind_t::SELF);
     }
-  | STATIC {
+  |
+    STATIC {
       MAKE($$, @$, type_internal_t, type_internal_t::kind_t::STATIC);
     }
-  | VOID {
+  |
+    VOID {
       MAKE($$, @$, type_internal_t, type_internal_t::kind_t::VOID);
     }
-  | BOOL {
+  |
+    BOOL {
       MAKE($$, @$, type_internal_t, type_internal_t::kind_t::BOOL);
     }
-  | CHAR {
+  |
+    CHAR {
       MAKE($$, @$, type_internal_t, type_internal_t::kind_t::CHAR);
     }
-  | INT {
+  |
+    INT {
       MAKE($$, @$, type_internal_t, type_internal_t::kind_t::INT);
     }
-  | STRING {
+  |
+    STRING {
       MAKE($$, @$, type_internal_t, type_internal_t::kind_t::STRING);
     }
-  | UINT {
+  |
+    UINT {
       MAKE($$, @$, type_internal_t, type_internal_t::kind_t::UINT);
     }
-  | SINT {
+  |
+    SINT {
       MAKE($$, @$, type_internal_t, type_internal_t::kind_t::SINT);
     }
-  | SHORT {
+  |
+    SHORT {
       MAKE($$, @$, type_internal_t, type_internal_t::kind_t::SHORT);
     }
-  | USHORT {
+  |
+    USHORT {
       MAKE($$, @$, type_internal_t, type_internal_t::kind_t::USHORT);
     }
-  | SSHORT {
+  |
+    SSHORT {
       MAKE($$, @$, type_internal_t, type_internal_t::kind_t::SSHORT);
     }
-  | FLOAT {
+  |
+    FLOAT {
       MAKE($$, @$, type_internal_t, type_internal_t::kind_t::FLOAT);
     }
-  | UFLOAT {
+  |
+    UFLOAT {
       MAKE($$, @$, type_internal_t, type_internal_t::kind_t::UFLOAT);
     }
-  | SFLOAT {
+  |
+    SFLOAT {
       MAKE($$, @$, type_internal_t, type_internal_t::kind_t::SFLOAT);
     }
-  | DOUBLE {
+  |
+    DOUBLE {
       MAKE($$, @$, type_internal_t, type_internal_t::kind_t::DOUBLE);
     }
-  | UDOUBLE {
+  |
+    UDOUBLE {
       MAKE($$, @$, type_internal_t, type_internal_t::kind_t::UDOUBLE);
     }
-  | SDOUBLE {
+  |
+    SDOUBLE {
       MAKE($$, @$, type_internal_t, type_internal_t::kind_t::SDOUBLE);
     }
   ;
 
 type_userdef_unit
-  : userdef {
+  :
+    userdef {
       MAKE($$, @$, type_userdef_t, $1);
     }
-  | userdef LT type_specifier_list GT {
+  |
+    userdef LT type_specifier_list GT {
       MAKE($$, @$, type_generic_t, $1, $3);
     }
   ;
 
 type_userdef
-  : type_userdef_unit {
+  :
+    type_userdef_unit {
       $$ = $1;
     }
-  | type_userdef DOT type_userdef_unit {
+  |
+    type_userdef DOT type_userdef_unit {
       $$ = $1->push($3);
     }
   ;
 
 stmt
-  : stmt_expr {
+  :
+    stmt_expr {
       $$ = $1;
     }
-  | stmt_label {
+  |
+    stmt_label {
       $$ = $1;
     }
-  | stmt_compound {
+  |
+    stmt_compound {
       $$ = $1;
     }
-  | stmt_select {
+  |
+    stmt_select {
       $$ = $1;
     }
-  | stmt_iter {
+  |
+    stmt_iter {
       $$ = $1;
     }
-  | stmt_jump {
+  |
+    stmt_jump {
       $$ = $1;
     }
-  | stmt_decl {
+  |
+    stmt_decl {
       $$ = $1;
     }
   ;
 
 stmt_list
-  : /* empty */ {
+  :
+    /* empty */ {
       $$ = nullptr;
     }
-  | stmt {
+  |
+    stmt {
       $$ = $1;
     }
-  | stmt_list stmt {
+  |
+    stmt_list stmt {
       $$ = $1->push($2);
     }
   ;
 
 stmt_expr
-  : SEMICOLON {
+  :
+    SEMICOLON {
       MAKE($$, @$, stmt_expr_t, );
     }
-  | expr SEMICOLON {
+  |
+    expr SEMICOLON {
       MAKE($$, @$, stmt_expr_t, $1);
     }
   ;
 
 stmt_label
-  : ID COLON stmt {
+  :
+    ID COLON stmt {
       MAKE($$, @$, stmt_label_t, $1, $3);
     }
-  | CASE expr_cond COLON stmt {
+  |
+    CASE expr_cond COLON stmt {
       MAKE($$, @$, stmt_label_t, $2, $4);
     }
-  | DEFAULT COLON stmt {
+  |
+    DEFAULT COLON stmt {
       MAKE($$, @$, stmt_label_t, $3);
     }
   ;
 
 stmt_compound
-  : LBRA stmt_list RBRA {
+  :
+    LBRA stmt_list RBRA {
       MAKE($$, @$, stmt_compound_t, $2);
     }
   ;
 
 stmt_select
-  : IF LPAR expr RPAR stmt ELSE stmt {
+  :
+    IF LPAR expr RPAR stmt ELSE stmt {
       MAKE($$, @$, stmt_select_t, $3, $5, $7);
     }
-  | IF LPAR expr RPAR stmt {
+  |
+    IF LPAR expr RPAR stmt {
       MAKE($$, @$, stmt_select_t, stmt_select_t::kind_t::IF, $3, $5);
     }
-  | SWITCH LPAR expr RPAR stmt {
+  |
+    SWITCH LPAR expr RPAR stmt {
       MAKE($$, @$, stmt_select_t, stmt_select_t::kind_t::SWITCH, $3, $5);
     }
   ;
 
 stmt_iter
-	: WHILE LPAR expr RPAR stmt {
+	:
+    WHILE LPAR expr RPAR stmt {
 	    MAKE($$, @$, stmt_iter_t, $3, $5);
 	  }
-	| DO stmt WHILE LPAR expr RPAR SEMICOLON {
+	|
+    DO stmt WHILE LPAR expr RPAR SEMICOLON {
       MAKE($$, @$, stmt_iter_t, $2, $5);
     }
-	| FOR LPAR stmt_expr stmt_expr RPAR stmt {
+	|
+    FOR LPAR stmt_expr stmt_expr RPAR stmt {
       $$ = new stmt_iter_t(
         $3, $4 ? $4->expr : nullptr, nullptr, $6
       );
     }
-	| FOR LPAR stmt_expr stmt_expr expr RPAR stmt {
+	|
+    FOR LPAR stmt_expr stmt_expr expr RPAR stmt {
       $$ = new stmt_iter_t(
         $3, $4 ? $4->expr : nullptr, $5, $7
       );
     }
-	| FOR LPAR stmt_expr stmt_expr stmt_compound RPAR stmt {
+	|
+    FOR LPAR stmt_expr stmt_expr stmt_compound RPAR stmt {
       $$ = new stmt_iter_t(
         $3, $4 ? $4->expr : nullptr, $5, $7
       );
     }
-	| FOR LPAR stmt_decl stmt_expr RPAR stmt {
+	|
+    FOR LPAR stmt_decl stmt_expr RPAR stmt {
       $$ = new stmt_iter_t(
         $3, $4 ? $4->expr : nullptr, nullptr, $6
       );
     }
-	| FOR LPAR stmt_decl stmt_expr expr RPAR stmt {
+	|
+    FOR LPAR stmt_decl stmt_expr expr RPAR stmt {
       $$ = new stmt_iter_t(
         $3, $4 ? $4->expr : nullptr, $5, $7
       );
     }
-	| FOR LPAR stmt_decl stmt_expr stmt_compound RPAR stmt {
+	|
+    FOR LPAR stmt_decl stmt_expr stmt_compound RPAR stmt {
 	    $$ = new stmt_iter_t(
 	      $3, $4 ? $4->expr : nullptr, $5, $7
 	    );
@@ -636,367 +754,463 @@ stmt_iter
 	;
 
 stmt_jump
-  : GOTO ID SEMICOLON {
+  :
+    GOTO ID SEMICOLON {
       MAKE($$, @$, stmt_jump_t, $2);
     }
-  | CONTINUE SEMICOLON {
+  |
+    CONTINUE SEMICOLON {
       MAKE($$, @$, stmt_jump_t, stmt_jump_t::kind_t::CONTINUE);
     }
-  | BREAK SEMICOLON {
+  |
+    BREAK SEMICOLON {
       MAKE($$, @$, stmt_jump_t, stmt_jump_t::kind_t::BREAK);
     }
-  | RETURN SEMICOLON {
+  |
+    RETURN SEMICOLON {
       MAKE($$, @$, stmt_jump_t, stmt_jump_t::kind_t::RETURN);
     }
-  | RETURN expr_list SEMICOLON {
+  |
+    RETURN expr_list SEMICOLON {
       MAKE($$, @$, stmt_jump_t, $2);
     }
   ;
 
 stmt_decl
-  : VAR decl_var_list SEMICOLON {
+  :
+    VAR decl_var_list SEMICOLON {
       MAKE($$, @$, stmt_decl_t, $2);
     }
-  | decl_use eod {
+  |
+    decl_use eod {
       MAKE($$, @$, stmt_decl_t, $1);
     }
-  | decl_container eod {
+  |
+    decl_container eod {
       MAKE($$, @$, stmt_decl_t, $1);
     }
   ;
 
 expr
-  : expr_assign {
+  :
+    expr_assign {
       $$ = $1;
     }
   ;
 
 expr_list
-  : /* empty */ {
+  :
+    /* empty */ {
       $$ = nullptr;
     }
-  | expr {
+  |
+    expr {
       $$ = $1;
     }
-  | expr_list COMMA expr {
+  |
+    expr_list COMMA expr {
       $$ = $1->push($3);
     }
   ;
 
 expr_assign
-  : expr_cond {
+  :
+    expr_cond {
       $$ = $1;
     }
-  | expr_unary ASSIGN expr_assign {
+  |
+    expr_unary ASSIGN expr_assign {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::ASSIGN, $1, $3);
     }
-  | expr_unary MUL_ASSIGN expr_assign {
+  |
+    expr_unary MUL_ASSIGN expr_assign {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::MUL_ASSIGN, $1, $3);
     }
-  | expr_unary DIV_ASSIGN expr_assign {
+  |
+    expr_unary DIV_ASSIGN expr_assign {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::DIV_ASSIGN, $1, $3);
     }
-  | expr_unary MOD_ASSIGN expr_assign {
+  |
+    expr_unary MOD_ASSIGN expr_assign {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::MOD_ASSIGN, $1, $3);
     }
-  | expr_unary ADD_ASSIGN expr_assign {
+  |
+    expr_unary ADD_ASSIGN expr_assign {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::ADD_ASSIGN, $1, $3);
     }
-  | expr_unary SUB_ASSIGN expr_assign {
+  |
+    expr_unary SUB_ASSIGN expr_assign {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::SUB_ASSIGN, $1, $3);
     }
-  | expr_unary LEFT_ASSIGN expr_assign {
+  |
+    expr_unary LEFT_ASSIGN expr_assign {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::LEFT_ASSIGN, $1, $3);
     }
-  | expr_unary RIGHT_ASSIGN expr_assign {
+  |
+    expr_unary RIGHT_ASSIGN expr_assign {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::RIGHT_ASSIGN, $1, $3);
     }
-  | expr_unary AND_ASSIGN expr_assign {
+  |
+    expr_unary AND_ASSIGN expr_assign {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::AND_ASSIGN, $1, $3);
     }
-  | expr_unary XOR_ASSIGN expr_assign {
+  |
+    expr_unary XOR_ASSIGN expr_assign {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::XOR_ASSIGN, $1, $3);
     }
-  | expr_unary OR_ASSIGN expr_assign {
+  |
+    expr_unary OR_ASSIGN expr_assign {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::OR_ASSIGN, $1, $3);
     }
   ;
 
 expr_cond
-  : expr_lor {
+  :
+    expr_lor {
       $$ = $1;
     }
-  | expr_lor COND expr COLON expr_cond {
+  |
+    expr_lor COND expr COLON expr_cond {
       MAKE($$, @$, expr_ternary_t, $1, $3, $5);
     }
   ;
 
 expr_lor
-  : expr_land {
+  :
+    expr_land {
       $$ = $1;
     }
-  | expr_lor LOR expr_land {
+  |
+    expr_lor LOR expr_land {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::LOR, $1, $3);
     }
   ;
 
 expr_land
-  : expr_or {
+  :
+    expr_or {
       $$ = $1;
     }
-  | expr_land LAND expr_or {
+  |
+    expr_land LAND expr_or {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::LAND, $1, $3);
     }
   ;
 
 expr_or
-  : expr_xor {
+  :
+    expr_xor {
       $$ = $1;
     }
-  | expr_or OR expr_xor {
+  |
+    expr_or OR expr_xor {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::OR, $1, $3);
     }
   ;
 
 expr_xor
-  : expr_and {
+  :
+    expr_and {
       $$ = $1;
     }
-  | expr_xor XOR expr_and {
+  |
+    expr_xor XOR expr_and {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::XOR, $1, $3);
     }
   ;
 
 expr_and
-  : expr_equal {
+  :
+    expr_equal {
       $$ = $1;
     }
-  | expr_and AND expr_equal {
+  |
+    expr_and AND expr_equal {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::AND, $1, $3);
     }
   ;
 
 expr_equal
-  : expr_relational {
+  :
+    expr_relational {
       $$ = $1;
     }
-  | expr_equal EQ expr_relational {
+  |
+    expr_equal EQ expr_relational {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::EQ, $1, $3);
     }
-  | expr_equal NEQ expr_relational {
+  |
+    expr_equal NEQ expr_relational {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::NEQ, $1, $3);
     }
   ;
 
 expr_relational
-  : expr_shift {
+  :
+    expr_shift {
       $$ = $1;
     }
-  | expr_relational LT expr_shift {
+  |
+    expr_relational LT expr_shift {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::LT, $1, $3);
     }
-  | expr_relational GT expr_shift {
+  |
+    expr_relational GT expr_shift {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::GT, $1, $3);
     }
-  | expr_relational LE expr_shift {
+  |
+    expr_relational LE expr_shift {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::LTE, $1, $3);
     }
-  | expr_relational GE expr_shift {
+  |
+    expr_relational GE expr_shift {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::GTE, $1, $3);
     }
   ;
 
 expr_shift
-  : expr_add {
+  :
+    expr_add {
       $$ = $1;
     }
-  | expr_shift LS expr_add {
+  |
+    expr_shift LS expr_add {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::LEFT, $1, $3);
     }
-  | expr_shift RS expr_add {
+  |
+    expr_shift RS expr_add {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::RIGHT, $1, $3);
     }
   ;
 
 expr_add
-  : expr_mul {
+  :
+    expr_mul {
       $$ = $1;
     }
-  | expr_add ADD expr_mul {
+  |
+    expr_add ADD expr_mul {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::ADD, $1, $3);
     }
-  | expr_add SUB expr_mul {
+  |
+    expr_add SUB expr_mul {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::SUB, $1, $3);
     }
   ;
 
 expr_mul
-  : expr_cast {
+  :
+    expr_cast {
       $$ = $1;
     }
-  | expr_mul MUL expr_cast {
+  |
+    expr_mul MUL expr_cast {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::MUL, $1, $3);
     }
-  | expr_mul DIV expr_cast {
+  |
+    expr_mul DIV expr_cast {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::DIV, $1, $3);
     }
-  | expr_mul MOD expr_cast {
+  |
+    expr_mul MOD expr_cast {
       MAKE($$, @$, expr_dop_t, expr_t::kind_t::MOD, $1, $3);
     }
   ;
 
 expr_cast
-  : expr_unary {
+  :
+    expr_unary {
       $$ = $1;
     }
-  | LPAR type_specifier RPAR expr_cast {
+  |
+    LPAR type_specifier RPAR expr_cast {
       MAKE($$, @$, expr_cast_t, $4, $2);
     }
-  | expr_cast AS type_specifier {
+  |
+    expr_cast AS type_specifier {
       MAKE($$, @$, expr_cast_t, $1, $3);
     }
   ;
 
 expr_unary
-  : expr_postfix {
+  :
+    expr_postfix {
       $$ = $1;
     }
-  | SIZEOF expr_unary {
+  |
+    SIZEOF expr_unary {
       MAKE($$, @$, expr_sizeof_t, $2);
     }
-  | SIZEOF LPAR type_specifier_unit RPAR {
+  |
+    SIZEOF LPAR type_specifier_unit RPAR {
       MAKE($$, @$, expr_sizeof_t, $3);
     }
-  | INC expr_unary {
+  |
+    INC expr_unary {
       MAKE($$, @$, expr_unary_t, expr_t::kind_t::INC_PRE, $2);
     }
-  | DEC expr_unary {
+  |
+    DEC expr_unary {
       MAKE($$, @$, expr_unary_t, expr_t::kind_t::DEC_PRE, $2);
     }
-  | MUL expr_cast {
+  |
+    MUL expr_cast {
       MAKE($$, @$, expr_unary_t, expr_t::kind_t::MUL_PRE, $2);
     }
-  | AND expr_cast {
+  |
+    AND expr_cast {
       MAKE($$, @$, expr_unary_t, expr_t::kind_t::AND_PRE, $2);
     }
-  | ADD expr_cast {
+  |
+    ADD expr_cast {
       MAKE($$, @$, expr_unary_t, expr_t::kind_t::ADD_PRE, $2);
     }
-  | SUB expr_cast {
+  |
+    SUB expr_cast {
       MAKE($$, @$, expr_unary_t, expr_t::kind_t::SUB_PRE, $2);
     }
-  | NOT expr_cast {
+  |
+    NOT expr_cast {
       MAKE($$, @$, expr_unary_t, expr_t::kind_t::NOT_PRE, $2);
     }
-  | TID expr_cast {
+  |
+    TID expr_cast {
       MAKE($$, @$, expr_unary_t, expr_t::kind_t::TID_PRE, $2);
     }
   ;
 
 expr_postfix
-  : expr_primary {
+  :
+    expr_primary {
       $$ = $1;
     }
-  | expr_postfix DOT id {
+  |
+    expr_postfix DOT id {
       MAKE($$, @$, expr_nested_t, $1, $3);
     }
-  | expr_postfix LSQU RSQU {
+  |
+    expr_postfix LSQU RSQU {
       MAKE($$, @$, expr_pos_t, $1, nullptr);
     }
-  | expr_postfix LSQU expr RSQU {
+  |
+    expr_postfix LSQU expr RSQU {
       MAKE($$, @$, expr_pos_t, $1, $3);
     }
-  | expr_postfix LPAR expr_list RPAR {
+  |
+    expr_postfix LPAR expr_list RPAR {
       MAKE($$, @$, expr_call_t, $1, $3);
     }
-  | expr_postfix INC {
+  |
+    expr_postfix INC {
       MAKE($$, @$, expr_postfix_t, expr_t::kind_t::INC_POST, $1);
     }
-  | expr_postfix DEC {
+  |
+    expr_postfix DEC {
       MAKE($$, @$, expr_postfix_t, expr_t::kind_t::DEC_POST, $1);
     }
   ;
 
 expr_primary
-  : expr_const {
+  :
+    expr_const {
       MAKE($$, @$, expr_primary_t, expr_t::kind_t::CONST, $1);
     }
-  | LPAR expr_list RPAR {
+  |
+    LPAR expr_list RPAR {
       MAKE($$, @$, expr_primary_t, expr_t::kind_t::ENCLOSE, $2);
     }
   ;
 
 expr_kvp
-  : expr_cond COLON expr {
+  :
+    expr_cond COLON expr {
       MAKE($$, @$, expr_kvp_t, $1, $3);
     }
   ;
 
 expr_kvp_list
-  : /* empty */ {
+  :
+    /* empty */ {
       $$ = nullptr;
     }
-  | expr_kvp {
+  |
+    expr_kvp {
       $$ = $1;
     }
-  | expr_kvp_list COMMA expr_kvp {
+  |
+    expr_kvp_list COMMA expr_kvp {
       $$ = $1->push($3);
     }
   ;
 
 expr_const
-  : id {
+  :
+    id {
       $$ = $1;
     }
-  | userdef_list {
+  |
+    userdef_list {
       $$ = $1;
     }
-  | THIS {
+  |
+    THIS {
       MAKE($$, @$, const_this_t);
     }
-  | const_value {
+  |
+    const_value {
       $$ = $1;
     }
-  | const_lambda {
+  |
+    const_lambda {
       $$ = $1;
     }
-  | const_initializer {
+  |
+    const_initializer {
       $$ = $1;
     }
   ;
 
 const_value
-  : FLOAT_CONST {
+  :
+    FLOAT_CONST {
       MAKE($$, @$, const_value_t, const_value_t::kind_t::FLOAT, $1);
     }
-  | STRING_CONST {
+  |
+    STRING_CONST {
       MAKE($$, @$, const_value_t, const_value_t::kind_t::STRING, $1);
     }
-  | INT_CONST {
+  |
+    INT_CONST {
       MAKE($$, @$, const_value_t, const_value_t::kind_t::INT, $1);
     }
   ;
 
 const_lambda
-  : LPAR id_list RPAR closure {
+  :
+    LPAR id_list RPAR closure {
       MAKE($$, @$, const_lambda_t, $2, $4);
     }
-  | id closure {
+  |
+    id closure {
       MAKE($$, @$, const_lambda_t, $1, $2);
     }
   ;
 
 const_initializer
-  : NEW type_userdef {
+  :
+    NEW type_userdef {
       MAKE($$, @$, const_new_t, $2);
     }
-  | NEW type_userdef LPAR expr_list RPAR {
+  |
+    NEW type_userdef LPAR expr_list RPAR {
       MAKE($$, @$, const_new_t, $2, $4);
     }
-  | LSQU expr_list RSQU {
+  |
+    LSQU expr_list RSQU {
       MAKE($$, @$, const_initializer_t, $2);
     }
-  | LBRA expr_kvp_list RBRA {
+  |
+    LBRA expr_kvp_list RBRA {
       MAKE($$, @$, const_initializer_t, $2);
     }
   ;

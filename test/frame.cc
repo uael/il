@@ -36,7 +36,7 @@ SYNTAX_TEST(frame, f1, true, "",
   "  }"
   "  ~self() => free(this);"
   ""
-  "  malloc() : static => this = malloc(sizeof(T));"
+  "  malloc() : static => this = malloc(sizeof(T))"
   "}"
 );
 
@@ -47,7 +47,7 @@ SYNTAX_TEST(frame, f2, true, "",
   "  realloc(new_size : Size) : static => {"
   "    return this = realloc(this, new_size * sizeof(TItem));"
   "  }"
-  "}"
+  "};"
 );
 
 TEST(frame, f3) {

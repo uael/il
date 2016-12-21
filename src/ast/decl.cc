@@ -31,22 +31,11 @@ namespace dyc {
       node_t::accept(scope);
     }
 
-    void decl_include_t::write(writer_t *writer) {
-      foreach(include, includes) {
-        *writer << "#include \"" << *include->value << "\"\n";
-      }
-      node_t::write(writer);
-    }
-
     decl_use_t::decl_use_t(identifier_t *uses) : uses(uses) {}
 
     void decl_use_t::accept(node_t *scope) {
       ACCEPT(uses);
       node_t::accept(scope);
-    }
-
-    void decl_use_t::write(writer_t *writer) {
-      node_t::write(writer);
     }
 
     decl_nested_t::decl_nested_t(identifier_t *name, decl_t *decls) : name(name), decls(decls) {}
@@ -70,10 +59,6 @@ namespace dyc {
       identifier_t *ids, type_specifier_t *type_specifier, closure_t *closure, bool assigned)
       : decl_member_t(ids, type_specifier, closure), assigned(assigned) {}
 
-    void decl_property_t::write(writer_t *writer) {
-      decl_member_t::write(writer);
-    }
-
     decl_function_t::decl_function_t(
       identifier_t *ids, generic_t *generics, decl_t *args, type_specifier_t *type_specifier, closure_t *closure)
       : decl_member_t(ids, type_specifier, closure), generics(generics), args(args) {}
@@ -82,10 +67,6 @@ namespace dyc {
       ACCEPT(generics);
       ACCEPT(args);
       decl_member_t::accept(scope);
-    }
-
-    void decl_function_t::write(writer_t *writer) {
-      decl_member_t::write(writer);
     }
 
     decl_ctor_t::decl_ctor_t(decl_t *args, closure_t *closure, const bool &poly)
@@ -98,10 +79,6 @@ namespace dyc {
       decl_function_t::accept(scope);
     }
 
-    void decl_ctor_t::write(writer_t *writer) {
-      decl_function_t::write(writer);
-    }
-
     decl_frame_t::decl_frame_t(identifier_t *name, generic_t *generics, type_specifier_t *type, decl_t *decls)
       : decl_nested_t(name, decls), generics(generics), type(type)  {}
 
@@ -109,10 +86,6 @@ namespace dyc {
       ACCEPT(generics);
       ACCEPT(type);
       decl_nested_t::accept(scope);
-    }
-
-    void decl_frame_t::write(writer_t *writer) {
-      node_t::write(writer);
     }
   }
 }

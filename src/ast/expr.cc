@@ -19,6 +19,7 @@
 /* $Id$ */
 
 #include "expr.h"
+#include "ident.h"
 #include "type.h"
 
 namespace dyc {
@@ -111,20 +112,12 @@ namespace dyc {
 
     expr_dop_t::expr_dop_t(expr_op_t::kind_t kind, expr_t *op1, expr_t *op2) : expr_op_t(kind, op1), op2(op2) {}
 
-    void expr_dop_t::write(writer_t *writer) {
-      *writer << "(" << op1 << op() << op2 << ")";
-    }
-
     void expr_dop_t::accept(node_t *scope) {
       ACCEPT(op2);
       expr_op_t::accept(scope);
     }
 
     expr_ternary_t::expr_ternary_t(expr_t *cond, expr_t *op1, expr_t *op2) : expr_dop_t(TERNARY, op1, op2),cond(cond) {}
-
-    void expr_ternary_t::write(writer_t *writer) {
-      *writer << "(" << cond << "?" << op1 << ":" << op2 << ")";
-    }
 
     void expr_ternary_t::accept(node_t *scope) {
       ACCEPT(cond);
@@ -133,10 +126,6 @@ namespace dyc {
 
     expr_cast_t::expr_cast_t(expr_t *op1, type_specifier_t *type) : expr_op_t(CAST, op1), type(type) {}
 
-    void expr_cast_t::write(writer_t *writer) {
-      *writer << "(" << type << ")" << op1;
-    }
-
     void expr_cast_t::accept(node_t *scope) {
       ACCEPT(type);
       expr_op_t::accept(scope);
@@ -144,37 +133,17 @@ namespace dyc {
 
     expr_call_t::expr_call_t(expr_t *op1, expr_t *op2) : expr_dop_t(CALL, op1, op2) {}
 
-    void expr_call_t::write(writer_t *writer) {
-      *writer << op1 << "(" << op2 << ")";
-    }
-
     expr_pos_t::expr_pos_t(expr_t *op1, expr_t *op2) : expr_dop_t(POS, op1, op2) {}
-
-    void expr_pos_t::write(writer_t *writer) {
-      *writer << op1 << "[" << op2 << "]";
-    }
 
     expr_unary_t::expr_unary_t(expr_op_t::kind_t kind, expr_t *op1) : expr_op_t(kind, op1) {}
 
-    void expr_unary_t::write(writer_t *writer) {
-      *writer << op() << op1;
-    }
-
     expr_postfix_t::expr_postfix_t(expr_op_t::kind_t kind, expr_t *op1) : expr_op_t(kind, op1) {}
-
-    void expr_postfix_t::write(writer_t *writer) {
-      *writer  << op1 << op();
-    }
 
     expr_nested_t::expr_nested_t(expr_t *op1, identifier_t *id) : expr_op_t(NESTED, op1), id(id) {}
 
     void expr_nested_t::accept(node_t *scope) {
-      //ACCEPT(id);
+      ACCEPT(id);
       expr_op_t::accept(scope);
-    }
-
-    void expr_nested_t::write(writer_t *writer) {
-      node_t::write(writer);
     }
 
     expr_sizeof_t::expr_sizeof_t(type_specifier_t *type) : expr_op_t(SIZEOF, nullptr), type(type) {}
@@ -185,19 +154,7 @@ namespace dyc {
       node_t::accept(scope);
     }
 
-    void expr_sizeof_t::write(writer_t *writer) {
-      *writer << "sizeof(" << type << ")";
-    }
-
     expr_primary_t::expr_primary_t(expr_op_t::kind_t kind, expr_t *op1) : expr_op_t(kind, op1) {}
-
-    void expr_primary_t::write(writer_t *writer) {
-      if (kind == ENCLOSE) {
-        *writer << "(" << op1 << ")";
-      } else {
-        *writer << op1;
-      }
-    }
 
     expr_kvp_t::expr_kvp_t(expr_t *op1, expr_t *op2) : expr_dop_t(KVP, op1, op2) {}
   }

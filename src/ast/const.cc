@@ -23,21 +23,9 @@
 
 namespace dyc {
   namespace ast {
-    void const_this_t::write(writer_t *writer) {
-      node_t::write(writer);
-    }
-
     const_value_t::const_value_t(const_value_t::kind_t kind, std::string *value) : kind(kind), value(value) {}
 
-    void const_value_t::write(writer_t *writer) {
-      expr_const_t::write(writer);
-    }
-
     const_lambda_t::const_lambda_t(identifier_t *args, closure_t *closure) : args(args), closure(closure) {}
-
-    void const_lambda_t::write(writer_t *writer) {
-      expr_const_t::write(writer);
-    }
 
     void const_lambda_t::accept(node_t *scope) {
       ACCEPT(args);
@@ -46,10 +34,6 @@ namespace dyc {
     }
 
     const_initializer_t::const_initializer_t(expr_t *exprs) : exprs(exprs) {}
-
-    void const_initializer_t::write(writer_t *writer) {
-      expr_const_t::write(writer);
-    }
 
     void const_initializer_t::accept(node_t *scope) {
       ACCEPT(exprs);
@@ -61,10 +45,6 @@ namespace dyc {
     void const_new_t::accept(node_t *scope) {
       ACCEPT(id);
       const_initializer_t::accept(scope);
-    }
-
-    void const_new_t::write(writer_t *writer) {
-      const_initializer_t::write(writer);
     }
   }
 }

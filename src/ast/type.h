@@ -35,7 +35,6 @@ namespace dyc {
       type_callable_t(type_specifier_t *type, type_specifier_t *args_types = nullptr);
 
       void accept(node_t *scope) override;
-      void write(writer_t *writer) override;
     };
 
     struct type_ptr_t : type_specifier_t {
@@ -44,7 +43,6 @@ namespace dyc {
       type_ptr_t(type_specifier_t *type);
 
       void accept(node_t *scope) override;
-      void write(writer_t *writer) override;
     };
 
     struct type_array_t : type_specifier_t {
@@ -54,7 +52,6 @@ namespace dyc {
       type_array_t(type_specifier_t *type, expr_t *fixed_size = nullptr);
 
       void accept(node_t *scope) override;
-      void write(writer_t *writer) override;
     };
 
     struct type_t : type_specifier_t {};
@@ -66,8 +63,6 @@ namespace dyc {
       } kind;
 
       type_internal_t(kind_t kind);
-
-      void write(writer_t *writer) override;
     };
 
     struct type_userdef_t : type_t {
@@ -76,7 +71,6 @@ namespace dyc {
       type_userdef_t(identifier_t *id);
 
       void accept(node_t *scope) override;
-      void write(writer_t *writer) override;
     };
 
     struct type_generic_t : type_userdef_t {
@@ -85,7 +79,6 @@ namespace dyc {
       type_generic_t(identifier_t *id, type_specifier_t *types);
 
       void accept(node_t *scope) override;
-      void write(writer_t *writer) override;
     };
   }
 }

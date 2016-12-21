@@ -22,7 +22,6 @@
 #define _AST_NODE_H
 
 #include <map>
-#include "writer.h"
 
 #define foreach(value, values) \
   for (__typeof__(values) value = values; value; value = (__typeof__(values)) value->next)
@@ -95,7 +94,6 @@ namespace dyc {
       location *loc = nullptr;
 
       virtual ~node_t();
-      virtual void write(writer_t *writer);
       virtual void accept(node_t *scope);
 
       template<typename T>

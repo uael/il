@@ -26,7 +26,6 @@
 namespace dyc {
   namespace ast {
     struct const_this_t : expr_const_t {
-      void write(writer_t *writer) override;
     };
 
     struct const_value_t : expr_const_t {
@@ -36,8 +35,6 @@ namespace dyc {
       std::string *value;
 
       const_value_t(kind_t kind, std::string *value);
-
-      void write(writer_t *writer) override;
     };
 
     struct const_lambda_t : expr_const_t {
@@ -46,7 +43,6 @@ namespace dyc {
 
       const_lambda_t(identifier_t *args, closure_t *closure);
 
-      void write(writer_t *writer) override;
       void accept(node_t *scope) override;
     };
 
@@ -55,7 +51,6 @@ namespace dyc {
 
       const_initializer_t(expr_t *exprs);
 
-      void write(writer_t *writer) override;
       void accept(node_t *scope) override;
     };
 
@@ -65,7 +60,6 @@ namespace dyc {
       const_new_t(identifier_t *id, expr_t *exprs);
 
       void accept(node_t *scope) override;
-      void write(writer_t *writer) override;
     };
   }
 }

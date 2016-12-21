@@ -28,10 +28,6 @@ namespace dyc {
       uk_value = *value;
       node_t::accept(scope);
     }
-
-    void identifier_t::write(writer_t *writer) {
-      node_t::write(writer);
-    }
   }
 }
 

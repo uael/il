@@ -32,19 +32,11 @@ namespace dyc {
       node_t::accept(scope);
     }
 
-    void type_callable_t::write(writer_t *writer) {
-      node_t::write(writer);
-    }
-
     type_ptr_t::type_ptr_t(type_specifier_t *type) : type(type) {}
 
     void type_ptr_t::accept(node_t *scope) {
       ACCEPT(type);
       node_t::accept(scope);
-    }
-
-    void type_ptr_t::write(writer_t *writer) {
-      node_t::write(writer);
     }
 
     type_array_t::type_array_t(type_specifier_t *type, expr_t *fixed_size) : type(type), fixed_size(fixed_size) {}
@@ -55,15 +47,7 @@ namespace dyc {
       node_t::accept(scope);
     }
 
-    void type_array_t::write(writer_t *writer) {
-      node_t::write(writer);
-    }
-
     type_internal_t::type_internal_t(type_internal_t::kind_t kind) : kind(kind) {}
-
-    void type_internal_t::write(writer_t *writer) {
-      type_t::write(writer);
-    }
 
     type_userdef_t::type_userdef_t(identifier_t *id) : id(id) {}
 
@@ -72,19 +56,11 @@ namespace dyc {
       node_t::accept(scope);
     }
 
-    void type_userdef_t::write(writer_t *writer) {
-      type_t::write(writer);
-    }
-
     type_generic_t::type_generic_t(identifier_t *id, type_specifier_t *types) : type_userdef_t(id), types(types) {}
 
     void type_generic_t::accept(node_t *scope) {
       ACCEPT(types);
       type_userdef_t::accept(scope);
-    }
-
-    void type_generic_t::write(writer_t *writer) {
-      type_userdef_t::write(writer);
     }
   }
 }

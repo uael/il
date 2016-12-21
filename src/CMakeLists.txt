@@ -23,8 +23,7 @@ set(libdyc_SOURCES
         parser.yy
         scanner.ll
         y.tab.h
-        driver.cc
-        writer.cc)
+        driver.cc)
 
 add_library(libdyc ${libdyc_SOURCES})
 

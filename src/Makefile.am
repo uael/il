@@ -9,7 +9,7 @@ libdyc_la_SOURCES = \
 	ast/ident.cc ast/node.cc ast/stmt.cc ast/type.cc \
 	ast.cc \
 	parser.yy scanner.ll y.tab.h \
-	driver.cc writer.cc
+	driver.cc
 
 bin_PROGRAMS = dyc
 

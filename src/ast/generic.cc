@@ -27,10 +27,6 @@ namespace dyc {
     generic_t::generic_t(identifier_t *value, type_specifier_t *type_specifier)
       : value(value), type_specifier(type_specifier) {}
 
-    void generic_t::write(writer_t *writer) {
-      node_t::write(writer);
-    }
-
     void generic_t::accept(node_t *scope) {
       ACCEPT(value);
       ACCEPT(type_specifier);

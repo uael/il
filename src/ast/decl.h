@@ -34,7 +34,6 @@ namespace dyc {
       decl_include_t(identifier_t *includes);
 
       void accept(node_t *scope) override;
-      void write(writer_t *writer) override;
     };
 
     struct decl_use_t : decl_t {
@@ -43,7 +42,6 @@ namespace dyc {
       decl_use_t(identifier_t *uses);
 
       void accept(node_t *scope) override;
-      void write(writer_t *writer) override;
     };
 
     struct decl_nested_t : decl_t {
@@ -69,8 +67,6 @@ namespace dyc {
       bool assigned;
 
       decl_property_t(identifier_t *ids, type_specifier_t *type_specifier, closure_t *closure, bool assigned);
-
-      void write(writer_t *writer) override;
     };
 
     struct decl_function_t : decl_member_t {
@@ -81,7 +77,6 @@ namespace dyc {
                       closure_t *closure);
 
       virtual void accept(node_t *scope) override;
-      void write(writer_t *writer) override;
     };
 
     struct decl_ctor_t : decl_function_t {
@@ -93,7 +88,6 @@ namespace dyc {
       decl_ctor_t(identifier_t *props_args, closure_t *closure, const bool &poly = true);
 
       void accept(node_t *scope) override;
-      void write(writer_t *writer) override;
     };
 
     struct decl_frame_t : decl_nested_t {
@@ -103,8 +97,6 @@ namespace dyc {
       decl_frame_t(identifier_t *name, generic_t *generics, type_specifier_t *type, decl_t *decls);
 
       void accept(node_t *scope) override;
-
-      void write(writer_t *writer) override;
     };
   }
 }

@@ -32,10 +32,6 @@ namespace dyc {
       ACCEPT(expr);
     }
 
-    void stmt_expr_t::write(writer_t *writer) {
-      stmt_t::write(writer);
-    }
-
     stmt_label_t::stmt_label_t(stmt_t *stmt) : kind(DEFAULT), stmt(stmt) {}
     stmt_label_t::stmt_label_t(std::string *id, stmt_t *stmt) : kind(LABEL), id(id), stmt(stmt) {}
     stmt_label_t::stmt_label_t(expr_t *cond, stmt_t *stmt) : kind(CASE), stmt(stmt), cond(cond) {}
@@ -46,20 +42,12 @@ namespace dyc {
       node_t::accept(scope);
     }
 
-    void stmt_label_t::write(writer_t *writer) {
-      stmt_t::write(writer);
-    }
-
     stmt_compound_t::stmt_compound_t(stmt_t *stmts) : stmts(stmts) {}
     stmt_compound_t::stmt_compound_t() {}
 
     void stmt_compound_t::accept(node_t *scope) {
       ACCEPT(stmts);
       node_t::accept(scope);
-    }
-
-    void stmt_compound_t::write(writer_t *writer) {
-      stmt_t::write(writer);
     }
 
     stmt_select_t::stmt_select_t() {}
@@ -73,10 +61,6 @@ namespace dyc {
       ACCEPT(stmt);
       ACCEPT(else_stmt);
       node_t::accept(scope);
-    }
-
-    void stmt_select_t::write(writer_t *writer) {
-      stmt_t::write(writer);
     }
 
     stmt_iter_t::stmt_iter_t(expr_t *cond, stmt_t *stmt) : kind(WHILE), cond(cond), stmt(stmt) {}
@@ -94,10 +78,6 @@ namespace dyc {
       node_t::accept(scope);
     }
 
-    void stmt_iter_t::write(writer_t *writer) {
-      stmt_t::write(writer);
-    }
-
     stmt_jump_t::stmt_jump_t(stmt_jump_t::kind_t kind) : kind(kind) {}
     stmt_jump_t::stmt_jump_t(std::string *id) : kind(GOTO), id(id) {}
     stmt_jump_t::stmt_jump_t(expr_t *expr) : kind(RETURN), expr(expr) {}
@@ -107,20 +87,12 @@ namespace dyc {
       node_t::accept(scope);
     }
 
-    void stmt_jump_t::write(writer_t *writer) {
-      stmt_t::write(writer);
-    }
-
     stmt_decl_t::stmt_decl_t() {}
     stmt_decl_t::stmt_decl_t(decl_t *decls) : decls(decls) {}
 
     void stmt_decl_t::accept(node_t *scope) {
       ACCEPT(decls);
       node_t::accept(scope);
-    }
-
-    void stmt_decl_t::write(writer_t *writer) {
-      stmt_t::write(writer);
     }
   }
 }

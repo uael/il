@@ -32,7 +32,6 @@ namespace dyc {
       generic_t(identifier_t *value, type_specifier_t *type_specifier);
 
       void accept(node_t *scope) override;
-      void write(writer_t *writer) override;
     };
   }
 }

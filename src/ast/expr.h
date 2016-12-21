@@ -52,7 +52,6 @@ namespace dyc {
 
       expr_dop_t(kind_t kind, expr_t *op1, expr_t *op2);
 
-      void write(writer_t *writer) override;
       void accept(node_t *scope) override;
     };
 
@@ -61,7 +60,6 @@ namespace dyc {
 
       expr_ternary_t(expr_t *cond, expr_t *op1, expr_t *op2);
 
-      void write(writer_t *writer) override;
       void accept(node_t *scope) override;
     };
 
@@ -70,32 +68,23 @@ namespace dyc {
 
       expr_cast_t(expr_t *op1, type_specifier_t *type);
 
-      void write(writer_t *writer) override;
       void accept(node_t *scope) override;
     };
 
     struct expr_call_t : expr_dop_t {
       expr_call_t(expr_t *op1, expr_t *op2);
-
-      void write(writer_t *writer) override;
     };
 
     struct expr_pos_t : expr_dop_t {
       expr_pos_t(expr_t *op1, expr_t *op2);
-
-      void write(writer_t *writer) override;
     };
 
     struct expr_unary_t : expr_op_t {
       expr_unary_t(kind_t kind, expr_t *op1);
-
-      void write(writer_t *writer) override;
     };
 
     struct expr_postfix_t : expr_op_t {
       expr_postfix_t(kind_t kind, expr_t *op1);
-
-      void write(writer_t *writer) override;
     };
 
     struct expr_nested_t : expr_op_t {
@@ -104,8 +93,6 @@ namespace dyc {
       expr_nested_t(expr_t *op1, identifier_t *id);
 
       void accept(node_t *scope) override;
-
-      void write(writer_t *writer) override;
     };
 
     struct expr_sizeof_t : expr_op_t {
@@ -115,13 +102,10 @@ namespace dyc {
       expr_sizeof_t(expr_t *op1);
 
       void accept(node_t *scope) override;
-      void write(writer_t *writer) override;
     };
 
     struct expr_primary_t : expr_op_t {
       expr_primary_t(kind_t kind, expr_t *op1);
-
-      void write(writer_t *writer) override;
     };
 
     struct expr_kvp_t : expr_dop_t {

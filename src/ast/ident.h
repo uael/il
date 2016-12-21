@@ -33,7 +33,6 @@ namespace dyc {
       identifier_t(std::string *value);
 
       void accept(node_t *scope) override;
-      void write(writer_t *writer) override;
     };
   }
 }

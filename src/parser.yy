@@ -40,20 +40,15 @@
 
 %union {
   std::string *_string;
-
   dyc::ast::identifier_t *_id;
-
   dyc::ast::generic_t *_generic;
   dyc::ast::closure_t *_closure;
-
   dyc::ast::decl_t *_decl;
   dyc::ast::decl_t *_decl_list;
-
   dyc::ast::type_specifier_t *_type_specifier;
   dyc::ast::type_t *_type;
   dyc::ast::type_internal_t *_type_internal;
   dyc::ast::type_userdef_t *_type_userdef;
-
   dyc::ast::stmt_t *_stmt;
   dyc::ast::stmt_expr_t *_stmt_expr;
   dyc::ast::stmt_label_t *_stmt_label;
@@ -62,9 +57,7 @@
   dyc::ast::stmt_iter_t *_stmt_iter;
   dyc::ast::stmt_jump_t *_stmt_jump;
   dyc::ast::stmt_decl_t *_stmt_decl;
-
   dyc::ast::expr_t *_expr;
-
   dyc::ast::const_value_t *_const_value;
   dyc::ast::const_lambda_t *_const_lambda;
   dyc::ast::const_initializer_t *_const_initializer;
@@ -85,21 +78,15 @@
 %token PRIVATE PROTECTED CONST VOLATILE ABSTRACT STATIC VIRTUAL FINAL INLINE
 %token VAR NEW SIZEOF TYPEOF ASSERT TRY CATCH SELF THIS
 
-%destructor { if ($$) delete $$; $$ = nullptr; } ID INT_CONST FLOAT_CONST STRING_CONST
-
 %type <_id> id id_list userdef userdef_list
-
 %type <_generic> generic generic_list generics generics_or_empty
 %type <_closure> closure closure_or_empty
-
 %type <_decl> decl_file_item decl_container decl_container_item decl_use decl_var decl_dtor decl_ctor
 %type <_decl_list> decl_file_body decl_container_body _decl_container_body decl_var_list
-
 %type <_type_specifier> type_specifier type_specifier_list type_specifier_unit
 %type <_type> type
 %type <_type_internal> type_internal
 %type <_type_userdef> type_userdef type_userdef_unit
-
 %type <_stmt> stmt stmt_list
 %type <_stmt_expr> stmt_expr
 %type <_stmt_label> stmt_label
@@ -108,7 +95,6 @@
 %type <_stmt_iter> stmt_iter
 %type <_stmt_jump> stmt_jump
 %type <_stmt_decl> stmt_decl
-
 %type <_expr> expr expr_list
 %type <_expr> expr_assign
 %type <_expr> expr_cond
@@ -128,7 +114,6 @@
 %type <_expr> expr_primary
 %type <_expr> expr_kvp expr_kvp_list
 %type <_expr> expr_const
-
 %type <_const_value> const_value
 %type <_const_lambda> const_lambda
 %type <_const_initializer> const_initializer
@@ -145,15 +130,28 @@ using namespace dyc::ast;
 #define YYERR goto yyerrlab
 
 #define MAKE(n, l, t, ...) do { n = new t(__VA_ARGS__); n->loc = &l; } while(0)
+#define DESTRUCT(n) if (n) delete n; n = nullptr
 %}
 
-%destructor { if ($$) delete $$; $$ = nullptr; } id id_list userdef userdef_list
+%destructor { DESTRUCT($$); }
+  ID USERDEF INT_CONST FLOAT_CONST STRING_CONST
+  id id_list
+  userdef userdef_list
+  generic generic_list generics generics_or_empty
+  closure closure_or_empty
+  decl_file_item decl_container decl_container_item decl_use decl_var decl_dtor decl_ctor decl_file_body
+  decl_container_body _decl_container_body decl_var_list
+  type_specifier type_specifier_list type_specifier_unit type type_internal type_userdef type_userdef_unit
+  stmt stmt_list stmt_expr stmt_label stmt_compound stmt_select stmt_iter stmt_jump stmt_decl
+  expr expr_list expr_assign expr_cond expr_lor expr_land expr_or expr_xor expr_and expr_equal expr_relational
+  expr_shift expr_add expr_mul expr_cast expr_unary expr_postfix expr_primary expr_kvp expr_kvp_list expr_const
+  const_value const_lambda const_initializer
 
-%start program
+%start file
 
 %%
 
-program
+file
   :
     decl_file_body {
       driver.ast = dyc::ast_t($1);

@@ -90,6 +90,12 @@ namespace dyc {
       void accept(node_t *scope) override;
     };
 
+    struct decl_dtor_t : decl_ctor_t {
+      decl_dtor_t(decl_t *args, closure_t *closure, const bool &poly);
+
+      decl_dtor_t(identifier_t *props_args, closure_t *closure, const bool &poly);
+    };
+
     struct decl_frame_t : decl_nested_t {
       generic_t *generics = nullptr;
       type_specifier_t *type = nullptr;

@@ -48,9 +48,6 @@
 
   dyc::ast::decl_t *_decl;
   dyc::ast::decl_t *_decl_list;
-  dyc::ast::decl_property_t *_decl_property;
-  dyc::ast::decl_function_t *_decl_function;
-  dyc::ast::decl_ctor_t *_decl_ctor;
 
   dyc::ast::type_specifier_t *_type_specifier;
   dyc::ast::type_t *_type;
@@ -95,11 +92,8 @@
 %type <_generic> generic generic_list generics generics_or_empty
 %type <_closure> closure closure_or_empty
 
-%type <_decl> decl_file_item decl_container decl_container_item decl_use decl_var
-%type <_decl_list> decl_file_body decl_container_body decl_var_list
-%type <_decl_property> decl_property
-%type <_decl_function> decl_function
-%type <_decl_ctor> decl_dtor decl_ctor
+%type <_decl> decl_file_item decl_container decl_container_item decl_use decl_var decl_dtor decl_ctor
+%type <_decl_list> decl_file_body decl_container_body _decl_container_body decl_var_list
 
 %type <_type_specifier> type_specifier type_specifier_list type_specifier_unit
 %type <_type> type
@@ -263,18 +257,6 @@ eod
     }
   ;
 
-decl_file_body
-  : /* empty */ {
-      $$ = nullptr;
-    }
-  | decl_file_item eod {
-      $$ = $1;
-    }
-  | decl_file_body eod decl_file_item eod {
-      $$ = $1->push($3);
-    }
-  ;
-
 decl_file_item
   : INCLUDE id_list {
       MAKE($$, @$, decl_include_t, $2);
@@ -293,6 +275,18 @@ decl_file_item
     }
   ;
 
+decl_file_body
+  : /* empty */ {
+      $$ = nullptr;
+    }
+  | decl_file_item eod {
+      $$ = $1;
+    }
+  | decl_file_body eod decl_file_item eod {
+      $$ = $1->push($3);
+    }
+  ;
+
 decl_use
   : USE userdef_list {
       MAKE($$, @$, decl_use_t, $2);
@@ -300,11 +294,20 @@ decl_use
   ;
 
 decl_var
-  : decl_property {
-      $$ = $1;
+  : id_list ASSIGN expr_cond {
+      MAKE($$, @$, decl_property_t, $1, nullptr, $3, true);
     }
-  | decl_function {
-      $$ = $1;
+  | id_list COLON type_specifier ASSIGN expr_cond {
+      MAKE($$, @$, decl_property_t, $1, $3, $5, true);
+    }
+  | id_list COLON type_specifier closure_or_empty {
+      MAKE($$, @$, decl_property_t, $1, $3, $4, false);
+    }
+  | id_list generics_or_empty LPAR decl_var_list RPAR closure_or_empty {
+      MAKE($$, @$, decl_function_t, $1, $2, $4, nullptr, $6);
+    }
+  | id_list generics_or_empty LPAR decl_var_list RPAR COLON type_specifier_list closure_or_empty {
+      MAKE($$, @$, decl_function_t, $1, $2, $4, $7, $8);
     }
   ;
 
@@ -321,8 +324,8 @@ decl_var_list
   ;
 
 decl_container
-  : FRAME userdef generics COLON type_specifier_list LBRA decl_container_body RBRA {
-      MAKE($$, @$, decl_frame_t, $2, $3, $5, $7);
+  : FRAME userdef generics COLON type_specifier_list decl_container_body {
+      MAKE($$, @$, decl_frame_t, $2, $3, $5, $6);
     }
   ;
 
@@ -348,32 +351,20 @@ decl_container_body
   : /* empty */ {
       $$ = nullptr;
     }
+  | LBRA _decl_container_body RBRA {
+      $$ = $2;
+    }
+  ;
+
+_decl_container_body
+  : /* empty */ {
+      $$ = nullptr;
+    }
   | decl_container_item eod {
       $$ = $1;
     }
-  | decl_container_body eod decl_container_item eod {
+  | _decl_container_body eod decl_container_item eod {
       $$ = $1->push($3);
-    }
-  ;
-
-decl_property
-  : id_list ASSIGN expr_cond {
-      MAKE($$, @$, decl_property_t, $1, nullptr, $3, true);
-    }
-  | id_list COLON type_specifier ASSIGN expr_cond {
-      MAKE($$, @$, decl_property_t, $1, $3, $5, true);
-    }
-  | id_list COLON type_specifier closure_or_empty {
-      MAKE($$, @$, decl_property_t, $1, $3, $4, false);
-    }
-  ;
-
-decl_function
-  : id_list generics_or_empty LPAR decl_var_list RPAR closure_or_empty {
-      MAKE($$, @$, decl_function_t, $1, $2, $4, nullptr, $6);
-    }
-  | id_list generics_or_empty LPAR decl_var_list RPAR COLON type_specifier_list closure_or_empty {
-      MAKE($$, @$, decl_function_t, $1, $2, $4, $7, $8);
     }
   ;
 
@@ -393,9 +384,17 @@ decl_ctor
   ;
 
 decl_dtor
-  : TID decl_ctor {
-      $$ = $2;
-      $$->dtor = true;
+  : TID SELF LPAR decl_var_list RPAR closure_or_empty {
+      MAKE($$, @$, decl_ctor_t, $4, $6, false);
+    }
+  | TID STATIC LPAR decl_var_list RPAR closure_or_empty {
+      MAKE($$, @$, decl_ctor_t, $4, $6);
+    }
+  | TID SELF LPAR id_list RPAR closure_or_empty {
+      MAKE($$, @$, decl_ctor_t, $4, $6, false);
+    }
+  | TID STATIC LPAR id_list RPAR closure_or_empty {
+      MAKE($$, @$, decl_ctor_t, $4, $6);
     }
   ;
 
@@ -659,6 +658,9 @@ stmt_decl
       MAKE($$, @$, stmt_decl_t, $2);
     }
   | decl_use eod {
+      MAKE($$, @$, stmt_decl_t, $1);
+    }
+  | decl_container eod {
       MAKE($$, @$, stmt_decl_t, $1);
     }
   ;

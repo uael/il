@@ -79,6 +79,10 @@ namespace dyc {
       decl_function_t::accept(scope);
     }
 
+    decl_dtor_t::decl_dtor_t(decl_t *args, closure_t *closure, const bool &poly) : decl_ctor_t(args, closure, poly) {}
+    decl_dtor_t::decl_dtor_t(identifier_t *props_args, closure_t *closure, const bool &poly)
+      : decl_ctor_t(props_args, closure, poly) {}
+
     decl_frame_t::decl_frame_t(identifier_t *name, generic_t *generics, type_specifier_t *type, decl_t *decls)
       : decl_nested_t(name, decls), generics(generics), type(type)  {}
 

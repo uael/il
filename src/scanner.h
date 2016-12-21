@@ -24,39 +24,43 @@
 #include "dyc.h"
 
 #ifndef YY_DECL
-#define  YY_DECL            \
-    dyc::parser::token_type        \
-    dyc::scanner::lex(        \
-  dyc::parser::semantic_type* yylval,    \
-  dyc::parser::location_type* yylloc    \
-    )
+# define  YY_DECL \
+    dyc::parser::token_type dyc::scanner::_lex(dyc::parser::semantic_type* yylval, dyc::parser::location_type* yylloc)
 #endif
 
 #ifndef __FLEX_LEXER_H
-#  define yyFlexLexer dycFlexLexer
-#  include "FlexLexer.h"
-#  undef yyFlexLexer
+# define yyFlexLexer dycFlexLexer
+# include "FlexLexer.h"
+# undef yyFlexLexer
 #endif
 
 #if __cplusplus > 199711L
-#  define register
+# define register
 #endif
 
 #ifdef BISON_USE_PARSER_H_EXTENSION
-#  include "parser.h"
+# include "parser.h"
 #else
-#  include "parser.hh"
+# include "parser.hh"
 #endif
 
 namespace dyc {
 
   class scanner : public dycFlexLexer {
   public:
+    parser::token_type prev;
+    parser::token_type current;
+
     scanner(std::istream *arg_yyin = 0, std::ostream *arg_yyout = 0);
 
     virtual ~scanner();
-    virtual parser::token_type lex(parser::semantic_type *yylval, parser::location_type *yylloc);
+    virtual parser::token_type _lex(parser::semantic_type *yylval, parser::location_type *yylloc);
     void set_debug(bool b);
+
+    parser::token_type lex(parser::semantic_type *yylval, parser::location_type *yylloc) {
+      prev = current;
+      return current = _lex(yylval, yylloc);
+    }
   };
 
 }

@@ -20,6 +20,7 @@
 
 #include "const.h"
 #include "ident.h"
+#include "type.h"
 
 namespace dyc {
   namespace ast {
@@ -40,10 +41,10 @@ namespace dyc {
       node_t::accept(scope);
     }
 
-    const_new_t::const_new_t(identifier_t *id, expr_t *exprs) : const_initializer_t(exprs), id(id) {}
+    const_new_t::const_new_t(type_userdef_t *type, expr_t *exprs) : const_initializer_t(exprs), type(type) {}
 
     void const_new_t::accept(node_t *scope) {
-      ACCEPT(id);
+      ACCEPT(type);
       const_initializer_t::accept(scope);
     }
   }

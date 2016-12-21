@@ -56,6 +56,7 @@ TEST(func, sort) {
   dyc::driver driver = dyc::driver();
   ASSERT_TRUE(driver.parse_string(
     "sort<T>(array : T[]) => {"
+    "  use Foo;"
     "  var swap(i, j : T) => {"
     "      var t = array[i];"
     "      array[i] = array[j];"

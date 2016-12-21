@@ -88,7 +88,7 @@ typedef dyc::parser::token token;
 "?"                               RET(COND);
 ":"                               RET(COLON);
 "::"                              RET(DOUBLE_COLON);
-";"                               RET(SEMICOLON);
+;+                                RET(SEMICOLON);
 ","                               RET(COMMA);
 "("                               RET(LPAR);
 ")"                               RET(RPAR);

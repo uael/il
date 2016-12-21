@@ -55,9 +55,9 @@ namespace dyc {
     };
 
     struct const_new_t : const_initializer_t {
-      identifier_t *id;
+      type_userdef_t *type;
 
-      const_new_t(identifier_t *id, expr_t *exprs);
+      const_new_t(type_userdef_t *type, expr_t *exprs = nullptr);
 
       void accept(node_t *scope) override;
     };

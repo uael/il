@@ -27,7 +27,8 @@
   TEST(prefix, postfix) { \
     dyc::driver driver = dyc::driver(); \
     testing::internal::CaptureStderr(); \
-    ASSERT_EQ(ex_status, driver.parse_string(code)); \
+    if (ex_status) ASSERT_TRUE(driver.parse_string(code)); \
+    else ASSERT_FALSE(driver.parse_string(code)); \
     std::string output = testing::internal::GetCapturedStderr(); \
     ASSERT_EQ(ex_cerr, output); \
   } \

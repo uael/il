@@ -35,6 +35,8 @@
 %parse-param {class driver &driver}
 
 %locations
+%define api.pure
+%pure-parser
 
 %union {
   std::string *_string;
@@ -42,8 +44,10 @@
   dyc::ast::identifier_t *_id;
 
   dyc::ast::generic_t *_generic;
+  dyc::ast::closure_t *_closure;
 
   dyc::ast::decl_t *_decl;
+  dyc::ast::decl_t *_decl_list;
   dyc::ast::decl_property_t *_decl_property;
   dyc::ast::decl_function_t *_decl_function;
   dyc::ast::decl_ctor_t *_decl_ctor;
@@ -89,11 +93,13 @@
 %type <_id> id id_list userdef userdef_list
 
 %type <_generic> generic generic_list generics generics_or_empty
+%type <_closure> closure closure_or_empty
 
-%type <_decl> decl decl_var decl_list decl_args decl_comma_list decl_body
-%type <_decl_property> decl_property_expr
-%type <_decl_function> decl_function_expr decl_function_compound
-%type <_decl_ctor> decl_ctor_expr decl_ctor_compound decl_ctor
+%type <_decl> decl_file_item decl_container decl_container_item decl_use decl_var
+%type <_decl_list> decl_file_body decl_container_body decl_var_list
+%type <_decl_property> decl_property
+%type <_decl_function> decl_function
+%type <_decl_ctor> decl_dtor decl_ctor
 
 %type <_type_specifier> type_specifier type_specifier_list type_specifier_unit
 %type <_type> type
@@ -103,13 +109,13 @@
 %type <_stmt> stmt stmt_list
 %type <_stmt_expr> stmt_expr
 %type <_stmt_label> stmt_label
-%type <_stmt_compound> stmt_compound closure_compound
+%type <_stmt_compound> stmt_compound
 %type <_stmt_select> stmt_select
 %type <_stmt_iter> stmt_iter
 %type <_stmt_jump> stmt_jump
 %type <_stmt_decl> stmt_decl
 
-%type <_expr> expr expr_list closure_expr closure_expr_or_empty
+%type <_expr> expr expr_list
 %type <_expr> expr_assign
 %type <_expr> expr_cond
 %type <_expr> expr_lor
@@ -142,64 +148,19 @@ using namespace dyc::ast;
 
 #undef yylex
 #define yylex driver.lexer->lex
+#define YYERR goto yyerrlab
 
 #define MAKE(n, l, t, ...) do { n = new t(__VA_ARGS__); n->loc = &l; } while(0)
 %}
 
 %destructor { if ($$) delete $$; $$ = nullptr; } id id_list userdef userdef_list
 
-%destructor { if ($$) delete $$; $$ = nullptr; } generic generic_list generics generics_or_empty
-
-%destructor { if ($$) delete $$; $$ = nullptr; } decl decl_var decl_list decl_args decl_comma_list
-%destructor { if ($$) delete $$; $$ = nullptr; } decl_property_expr
-%destructor { if ($$) delete $$; $$ = nullptr; } decl_function_expr decl_function_compound
-%destructor { if ($$) delete $$; $$ = nullptr; } decl_ctor_expr decl_ctor_compound decl_ctor
-
-%destructor { if ($$) delete $$; $$ = nullptr; } type_specifier type_specifier_list type_specifier_unit
-%destructor { if ($$) delete $$; $$ = nullptr; } type
-%destructor { if ($$) delete $$; $$ = nullptr; } type_internal
-%destructor { if ($$) delete $$; $$ = nullptr; } type_userdef type_userdef_unit
-
-%destructor { if ($$) delete $$; $$ = nullptr; } stmt stmt_list
-%destructor { if ($$) delete $$; $$ = nullptr; } stmt_expr
-%destructor { if ($$) delete $$; $$ = nullptr; } stmt_label
-%destructor { if ($$) delete $$; $$ = nullptr; } stmt_compound closure_compound
-%destructor { if ($$) delete $$; $$ = nullptr; } stmt_select
-%destructor { if ($$) delete $$; $$ = nullptr; } stmt_iter
-%destructor { if ($$) delete $$; $$ = nullptr; } stmt_jump
-%destructor { if ($$) delete $$; $$ = nullptr; } stmt_decl
-
-%destructor { if ($$) delete $$; $$ = nullptr; } expr expr_list closure_expr closure_expr_or_empty
-%destructor { if ($$) delete $$; $$ = nullptr; } expr_assign
-%destructor { if ($$) delete $$; $$ = nullptr; } expr_cond
-%destructor { if ($$) delete $$; $$ = nullptr; } expr_lor
-%destructor { if ($$) delete $$; $$ = nullptr; } expr_land
-%destructor { if ($$) delete $$; $$ = nullptr; } expr_or
-%destructor { if ($$) delete $$; $$ = nullptr; } expr_xor
-%destructor { if ($$) delete $$; $$ = nullptr; } expr_and
-%destructor { if ($$) delete $$; $$ = nullptr; } expr_equal
-%destructor { if ($$) delete $$; $$ = nullptr; } expr_relational
-%destructor { if ($$) delete $$; $$ = nullptr; } expr_shift
-%destructor { if ($$) delete $$; $$ = nullptr; } expr_add
-%destructor { if ($$) delete $$; $$ = nullptr; } expr_mul
-%destructor { if ($$) delete $$; $$ = nullptr; } expr_cast
-%destructor { if ($$) delete $$; $$ = nullptr; } expr_unary
-%destructor { if ($$) delete $$; $$ = nullptr; } expr_postfix
-%destructor { if ($$) delete $$; $$ = nullptr; } expr_primary
-%destructor { if ($$) delete $$; $$ = nullptr; } expr_const
-
-%destructor { if ($$) delete $$; $$ = nullptr; } const_value
-%destructor { if ($$) delete $$; $$ = nullptr; } const_lambda
-%destructor { if ($$) delete $$; $$ = nullptr; } const_initializer
-
-%destructor { if ($$) delete $$; $$ = nullptr; } expr_kvp expr_kvp_list
-
 %start program
 
 %%
 
 program
-  : decl_list {
+  : decl_file_body {
       driver.ast = dyc::ast_t($1);
     }
   ;
@@ -267,8 +228,11 @@ generics_or_empty
     }
   ;
 
-closure_compound
-  : stmt_compound {
+closure
+  : ARROW expr {
+      $$ = $2;
+    }
+  | stmt_compound {
       $$ = $1;
       $$->macro = false;
     }
@@ -277,179 +241,161 @@ closure_compound
     }
   ;
 
-closure_expr
-  : ARROW expr {
-      $$ = $2;
-    }
-  ;
-
-closure_expr_or_empty
+closure_or_empty
   : /* empty */ {
       $$ = nullptr;
     }
-  | closure_expr {
+  | closure {
       $$ = $1;
     }
   ;
 
-decl
-  : INCLUDE id_list SEMICOLON {
+eod
+  : SEMICOLON
+  | /* empty */ {
+      if (
+        driver.lexer->prev != token::RBRA &&
+        driver.lexer->prev != token::SEMICOLON &&
+        driver.lexer->current != token::RBRA &&
+        driver.lexer->current != token::END) {
+        YYERR;
+      }
+    }
+  ;
+
+decl_file_body
+  : /* empty */ {
+      $$ = nullptr;
+    }
+  | decl_file_item eod {
+      $$ = $1;
+    }
+  | decl_file_body eod decl_file_item eod {
+      $$ = $1->push($3);
+    }
+  ;
+
+decl_file_item
+  : INCLUDE id_list {
       MAKE($$, @$, decl_include_t, $2);
     }
-  | USE userdef_list SEMICOLON {
-      MAKE($$, @$, decl_use_t, $2);
-    }
-  | NAMESPACE userdef_list LBRA decl_list RBRA {
+  | NAMESPACE userdef_list LBRA decl_file_body RBRA {
       MAKE($$, @$, decl_nested_t, $2, $4);
     }
-  | FRAME userdef generics COLON type_specifier_list LBRA decl_body RBRA {
-      MAKE($$, @$, decl_frame_t, $2, $3, $5, $7);
-    }
-  | decl_property_expr SEMICOLON {
+  | decl_use {
       $$ = $1;
     }
-  | decl_function_expr SEMICOLON {
+  | decl_var {
       $$ = $1;
     }
-  | decl_function_compound {
+  | decl_container {
       $$ = $1;
     }
   ;
 
-decl_list
-  : /* empty */ {
-      $$ = nullptr;
-    }
-  | decl {
-      $$ = $1;
-    }
-  | decl_list decl {
-      $$ = $1->push($2);
-    }
-  ;
-
-decl_property_expr
-  : id_list ASSIGN expr_cond {
-      MAKE($$, @$, decl_property_t, $1, nullptr, $3, true);
-    }
-  | id_list COLON type_specifier ASSIGN expr_cond {
-      MAKE($$, @$, decl_property_t, $1, $3, $5, true);
-    }
-  | id_list COLON type_specifier closure_expr_or_empty {
-      MAKE($$, @$, decl_property_t, $1, $3, $4, false);
-    }
-  ;
-
-decl_function_expr
-  : id_list generics_or_empty decl_args closure_expr_or_empty {
-      MAKE($$, @$, decl_function_t, $1, $2, $3, nullptr, $4);
-    }
-  | id_list generics_or_empty decl_args COLON type_specifier_list closure_expr_or_empty {
-      MAKE($$, @$, decl_function_t, $1, $2, $3, $5, $6);
-    }
-  ;
-
-decl_function_compound
-  : id_list generics_or_empty decl_args closure_compound {
-      MAKE($$, @$, decl_function_t, $1, $2, $3, nullptr, $4);
-    }
-  | id_list generics_or_empty decl_args COLON type_specifier_list closure_compound {
-      MAKE($$, @$, decl_function_t, $1, $2, $3, $5, $6);
+decl_use
+  : USE userdef_list {
+      MAKE($$, @$, decl_use_t, $2);
     }
   ;
 
 decl_var
-  : decl_property_expr {
+  : decl_property {
       $$ = $1;
     }
-  | decl_function_expr {
-      $$ = $1;
-    }
-  | decl_function_compound {
+  | decl_function {
       $$ = $1;
     }
   ;
 
-decl_comma_list
+decl_var_list
   : /* empty */ {
       $$ = nullptr;
     }
   | decl_var {
       $$ = $1;
     }
-  | decl_comma_list COMMA decl_var {
+  | decl_var_list COMMA decl_var {
       $$ = $1->push($3);
     }
   ;
 
-decl_args
-  : LPAR decl_comma_list RPAR {
-      $$ = $2;
+decl_container
+  : FRAME userdef generics COLON type_specifier_list LBRA decl_container_body RBRA {
+      MAKE($$, @$, decl_frame_t, $2, $3, $5, $7);
     }
   ;
 
-decl_ctor
-  : decl_ctor_expr SEMICOLON {
+decl_container_item
+  : decl_use {
       $$ = $1;
     }
-  | decl_ctor_compound {
+  | decl_var {
       $$ = $1;
-    }
-  | TID decl_ctor_expr SEMICOLON {
-      $$ = $2;
-      $$->dtor = true;
-    }
-  | TID decl_ctor_compound {
-      $$ = $2;
-      $$->dtor = true;
-    }
-  ;
-
-decl_ctor_expr
-  : SELF decl_args closure_expr_or_empty {
-      MAKE($$, @$, decl_ctor_t, $2, $3, false);
-    }
-  | STATIC decl_args closure_expr_or_empty {
-      MAKE($$, @$, decl_ctor_t, $2, $3);
-    }
-  | SELF LPAR id_list RPAR closure_expr_or_empty {
-      MAKE($$, @$, decl_ctor_t, $3, $5, false);
-    }
-  | STATIC LPAR id_list RPAR closure_expr_or_empty {
-      MAKE($$, @$, decl_ctor_t, $3, $5);
-    }
-  ;
-
-decl_ctor_compound
-  : SELF decl_args closure_compound {
-      MAKE($$, @$, decl_ctor_t, $2, $3, false);
-    }
-  | STATIC decl_args closure_compound {
-      MAKE($$, @$, decl_ctor_t, $2, $3);
-    }
-  | SELF LPAR id_list RPAR closure_compound {
-      MAKE($$, @$, decl_ctor_t, $3, $5, false);
-    }
-  | STATIC LPAR id_list RPAR closure_compound {
-      MAKE($$, @$, decl_ctor_t, $3, $5);
-    }
-  ;
-
-decl_body
-  : /* empty */ {
-      $$ = nullptr;
-    }
-  | decl {
-      $$ = $1;
-    }
-  | decl_body decl {
-      $$ = $1->push($2);
     }
   | decl_ctor {
       $$ = $1;
     }
-  | decl_body decl_ctor {
-      $$ = $1->push($2);
+  | decl_dtor {
+      $$ = $1;
+    }
+  | decl_container {
+      $$ = $1;
+    }
+  ;
+
+decl_container_body
+  : /* empty */ {
+      $$ = nullptr;
+    }
+  | decl_container_item eod {
+      $$ = $1;
+    }
+  | decl_container_body eod decl_container_item eod {
+      $$ = $1->push($3);
+    }
+  ;
+
+decl_property
+  : id_list ASSIGN expr_cond {
+      MAKE($$, @$, decl_property_t, $1, nullptr, $3, true);
+    }
+  | id_list COLON type_specifier ASSIGN expr_cond {
+      MAKE($$, @$, decl_property_t, $1, $3, $5, true);
+    }
+  | id_list COLON type_specifier closure_or_empty {
+      MAKE($$, @$, decl_property_t, $1, $3, $4, false);
+    }
+  ;
+
+decl_function
+  : id_list generics_or_empty LPAR decl_var_list RPAR closure_or_empty {
+      MAKE($$, @$, decl_function_t, $1, $2, $4, nullptr, $6);
+    }
+  | id_list generics_or_empty LPAR decl_var_list RPAR COLON type_specifier_list closure_or_empty {
+      MAKE($$, @$, decl_function_t, $1, $2, $4, $7, $8);
+    }
+  ;
+
+decl_ctor
+  : SELF LPAR decl_var_list RPAR closure_or_empty {
+      MAKE($$, @$, decl_ctor_t, $3, $5, false);
+    }
+  | STATIC LPAR decl_var_list RPAR closure_or_empty {
+      MAKE($$, @$, decl_ctor_t, $3, $5);
+    }
+  | SELF LPAR id_list RPAR closure_or_empty {
+      MAKE($$, @$, decl_ctor_t, $3, $5, false);
+    }
+  | STATIC LPAR id_list RPAR closure_or_empty {
+      MAKE($$, @$, decl_ctor_t, $3, $5);
+    }
+  ;
+
+decl_dtor
+  : TID decl_ctor {
+      $$ = $2;
+      $$->dtor = true;
     }
   ;
 
@@ -709,8 +655,11 @@ stmt_jump
   ;
 
 stmt_decl
-  : VAR decl_comma_list SEMICOLON {
+  : VAR decl_var_list SEMICOLON {
       MAKE($$, @$, stmt_decl_t, $2);
+    }
+  | decl_use eod {
+      MAKE($$, @$, stmt_decl_t, $1);
     }
   ;
 
@@ -1027,22 +976,19 @@ const_value
   ;
 
 const_lambda
-  : LPAR id_list RPAR closure_expr {
+  : LPAR id_list RPAR closure {
       MAKE($$, @$, const_lambda_t, $2, $4);
     }
-  | LPAR id_list RPAR closure_compound {
-      MAKE($$, @$, const_lambda_t, $2, $4);
-    }
-  | id closure_expr {
-      MAKE($$, @$, const_lambda_t, $1, $2);
-    }
-  | id closure_compound {
+  | id closure {
       MAKE($$, @$, const_lambda_t, $1, $2);
     }
   ;
 
 const_initializer
-  : NEW userdef_list LPAR expr_list RPAR {
+  : NEW type_userdef {
+      MAKE($$, @$, const_new_t, $2);
+    }
+  | NEW type_userdef LPAR expr_list RPAR {
       MAKE($$, @$, const_new_t, $2, $4);
     }
   | LSQU expr_list RSQU {

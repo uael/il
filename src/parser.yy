@@ -79,10 +79,10 @@
 %token VAR NEW SIZEOF TYPEOF ASSERT TRY CATCH SELF THIS
 
 %type <_id> id id_list userdef userdef_list
-%type <_generic> generic generic_list generics generics_or_empty
+%type <_generic> generic generic_list generics
 %type <_closure> closure closure_or_empty
-%type <_decl> decl_file_item decl_container decl_container_item decl_use decl_var decl_dtor decl_ctor
-%type <_decl_list> decl_file_body decl_container_body _decl_container_body decl_var_list
+%type <_decl> decl_file_item decl_frame decl_frame_item decl_use decl_var decl_dtor decl_ctor
+%type <_decl_list> decl_file_body decl_frame_body frame_body decl_var_list
 %type <_type_specifier> type_specifier type_specifier_list type_specifier_unit
 %type <_type> type
 %type <_type_internal> type_internal
@@ -137,10 +137,10 @@ using namespace dyc::ast;
   ID USERDEF INT_CONST FLOAT_CONST STRING_CONST
   id id_list
   userdef userdef_list
-  generic generic_list generics generics_or_empty
+  generic generic_list generics
   closure closure_or_empty
-  decl_file_item decl_container decl_container_item decl_use decl_var decl_dtor decl_ctor decl_file_body
-  decl_container_body _decl_container_body decl_var_list
+  decl_file_item decl_frame decl_frame_item decl_use decl_var decl_dtor decl_ctor decl_file_body
+  decl_frame_body frame_body decl_var_list
   type_specifier type_specifier_list type_specifier_unit type type_internal type_userdef type_userdef_unit
   stmt stmt_list stmt_expr stmt_label stmt_compound stmt_select stmt_iter stmt_jump stmt_decl
   expr expr_list expr_assign expr_cond expr_lor expr_land expr_or expr_xor expr_and expr_equal expr_relational
@@ -218,19 +218,12 @@ generic_list
 
 generics
   :
-    LT generic_list GT {
-      $$ = $2;
-    }
-  ;
-
-generics_or_empty
-  :
     /* empty */ {
       $$ = nullptr;
     }
   |
-    generics {
-      $$ = $1;
+    LT generic_list GT {
+      $$ = $2;
     }
   ;
 
@@ -294,7 +287,7 @@ decl_file_item
       $$ = $1;
     }
   |
-    decl_container {
+    decl_frame {
       $$ = $1;
     }
   ;
@@ -335,11 +328,11 @@ decl_var
       MAKE($$, @$, decl_property_t, $1, $3, $4, false);
     }
   |
-    id_list generics_or_empty LPAR decl_var_list RPAR closure_or_empty {
+    id_list generics LPAR decl_var_list RPAR closure_or_empty {
       MAKE($$, @$, decl_function_t, $1, $2, $4, nullptr, $6);
     }
   |
-    id_list generics_or_empty LPAR decl_var_list RPAR COLON type_specifier_list closure_or_empty {
+    id_list generics LPAR decl_var_list RPAR COLON type_specifier_list closure_or_empty {
       MAKE($$, @$, decl_function_t, $1, $2, $4, $7, $8);
     }
   ;
@@ -359,14 +352,14 @@ decl_var_list
     }
   ;
 
-decl_container
+decl_frame
   :
-    FRAME userdef generics COLON type_specifier_list decl_container_body {
+    FRAME userdef generics COLON type_specifier_list decl_frame_body {
       MAKE($$, @$, decl_frame_t, $2, $3, $5, $6);
     }
   ;
 
-decl_container_item
+decl_frame_item
   :
     decl_use {
       $$ = $1;
@@ -384,33 +377,33 @@ decl_container_item
       $$ = $1;
     }
   |
-    decl_container {
+    decl_frame {
       $$ = $1;
     }
   ;
 
-decl_container_body
+decl_frame_body
   :
     /* empty */ {
       $$ = nullptr;
     }
   |
-    LBRA _decl_container_body RBRA {
+    LBRA frame_body RBRA {
       $$ = $2;
     }
   ;
 
-_decl_container_body
+frame_body
   :
     /* empty */ {
       $$ = nullptr;
     }
   |
-    decl_container_item eod {
+    decl_frame_item eod {
       $$ = $1;
     }
   |
-    _decl_container_body eod decl_container_item eod {
+    frame_body eod decl_frame_item eod {
       $$ = $1->push($3);
     }
   ;
@@ -784,7 +777,7 @@ stmt_decl
       MAKE($$, @$, stmt_decl_t, $1);
     }
   |
-    decl_container eod {
+    decl_frame eod {
       MAKE($$, @$, stmt_decl_t, $1);
     }
   ;

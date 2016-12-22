@@ -18,14 +18,17 @@
 
 /* $Id$ */
 
-#include "ast.h"
+#include "file.h"
+#include "decl.h"
 
 namespace dyc {
-  ast_t::ast_t() {}
+  namespace ast {
+    file_t::file_t(std::string filename, decl_t *decls) : filename(filename), decls(decls) {}
 
-  void ast_t::accept(ast::node_t *scope) {
-    ast::node_t::accept(scope);
-    ACCEPT(files);
+    void file_t::accept(node_t *scope) {
+      ACCEPT(decls);
+      node_t::accept(scope);
+    }
   }
 }
 

@@ -24,6 +24,7 @@
 #include <sstream>
 
 #include "driver.h"
+#include "gen/ast_gen.h"
 
 int main(int argc, char *argv[]) {
   dyc::driver driver = dyc::driver();
@@ -43,7 +44,8 @@ int main(int argc, char *argv[]) {
 
       bool result = driver.parse_stream(infile, argv[ai]);
       if (result) {
-
+        dyc::gen::ast_gen_t c(&driver.ast);
+        c.generate(nullptr);
       }
 
       readfile = true;

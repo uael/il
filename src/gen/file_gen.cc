@@ -18,14 +18,24 @@
 
 /* $Id$ */
 
-#include "ast.h"
+#include <fstream>
+#include "file_gen.h"
 
 namespace dyc {
-  ast_t::ast_t() {}
+  namespace gen {
+    using namespace ast;
 
-  void ast_t::accept(ast::node_t *scope) {
-    ast::node_t::accept(scope);
-    ACCEPT(files);
+    file_gen_t::file_gen_t(ast_t *ast, file_t *node) : cgen_t(ast, node) {}
+
+    void file_gen_t::generate(file_gen_t *file) {
+      foreach(decl, node->decls) {
+
+      }
+      std::string f = node->filename.substr(0, node->filename.size() - 3) + ".c";
+      std::ofstream ofstream;
+      ofstream.open(f);
+      ofstream << declarations;
+    }
   }
 }
 

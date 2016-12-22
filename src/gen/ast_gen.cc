@@ -18,14 +18,21 @@
 
 /* $Id$ */
 
-#include "ast.h"
+#include "ast_gen.h"
+#include "file_gen.h"
 
 namespace dyc {
-  ast_t::ast_t() {}
+  namespace gen {
+    using namespace ast;
 
-  void ast_t::accept(ast::node_t *scope) {
-    ast::node_t::accept(scope);
-    ACCEPT(files);
+    ast_gen_t::ast_gen_t(ast_t *ast) : cgen_t(ast) {}
+
+    void ast_gen_t::generate(file_gen_t *file) {
+      foreach(f, ast->files) {
+        file_gen_t gen(ast, f);
+        gen.generate(nullptr);
+      };
+    }
   }
 }
 

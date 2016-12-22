@@ -18,16 +18,32 @@
 
 /* $Id$ */
 
+#ifndef _CGEN_H
+#define _CGEN_H
+
+#include <map>
 #include "ast.h"
 
 namespace dyc {
-  ast_t::ast_t() {}
-
-  void ast_t::accept(ast::node_t *scope) {
-    ast::node_t::accept(scope);
-    ACCEPT(files);
+  namespace gen {
+    struct file_gen_t;
   }
+
+  template <typename T = ast::node_t>
+  struct cgen_t {
+    ast_t *ast;
+    std::string cursor;
+    T *node;
+
+    cgen_t(ast_t *ast, T *node) : ast(ast), node(node) {}
+    cgen_t(ast_t *ast) : cgen_t(ast, ast) {}
+
+    virtual ~cgen_t() {};
+    virtual void generate(gen::file_gen_t *file) {};
+  };
 }
+
+#endif /* _CGEN_H */
 
 /*
  * Local variables:

@@ -25,6 +25,7 @@
 #include "ast/const.h"
 #include "ast/decl.h"
 #include "ast/expr.h"
+#include "ast/file.h"
 #include "ast/generic.h"
 #include "ast/ident.h"
 #include "ast/node.h"
@@ -33,10 +34,9 @@
 
 namespace dyc {
   struct ast_t : ast::node_t {
-    ast::decl_t *decls = nullptr;
+    ast::file_t *files = nullptr;
 
     ast_t();
-    ast_t(ast::decl_t *decls);
 
     void accept(ast::node_t *scope) override;
   };

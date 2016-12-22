@@ -12,12 +12,15 @@ set(libdyc_SOURCES
         ast/const.cc
         ast/decl.cc
         ast/expr.cc
+        ast/file.cc
         ast/generic.cc
         ast/ident.cc
         ast/node.cc
         ast/stmt.cc
         ast/type.cc
         ast.cc
+        gen/ast_gen.cc
+        gen/file_gen.cc
         ${FLEX_scanner_OUTPUTS}
         ${BISON_parser_OUTPUTS}
         parser.yy

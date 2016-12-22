@@ -18,16 +18,25 @@
 
 /* $Id$ */
 
-#include "ast.h"
+#ifndef _AST_FILE_H
+#define _AST_FILE_H
+
+#include "node.h"
 
 namespace dyc {
-  ast_t::ast_t() {}
+  namespace ast {
+    struct file_t : node_t {
+      std::string filename;
+      decl_t *decls = nullptr;
 
-  void ast_t::accept(ast::node_t *scope) {
-    ast::node_t::accept(scope);
-    ACCEPT(files);
+      file_t(std::string filename, decl_t *decls);
+
+      void accept(node_t *scope) override;
+    };
   }
 }
+
+#endif /* _AST_FILE_H */
 
 /*
  * Local variables:

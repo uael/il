@@ -154,7 +154,11 @@ using namespace dyc::ast;
 file
   :
     decl_file_body {
-      driver.ast = dyc::ast_t($1);
+      if (driver.ast.files) {
+        driver.ast.files->push(new file_t(driver.streamname, $1));
+      } else {
+        driver.ast.files = new file_t(driver.streamname, $1);
+      }
     }
   ;
 

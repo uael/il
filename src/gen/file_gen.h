@@ -18,16 +18,29 @@
 
 /* $Id$ */
 
-#include "ast.h"
+#ifndef _GEN_FILE_H
+#define _GEN_FILE_H
+
+#include "gen.h"
 
 namespace dyc {
-  ast_t::ast_t() {}
+  namespace gen {
+    struct file_gen_t : cgen_t<ast::file_t> {
+      std::string includes;
+      std::string source_includes;
+      std::string macros;
+      std::string source_macros;
+      std::string declarations;
+      std::string definitions;
 
-  void ast_t::accept(ast::node_t *scope) {
-    ast::node_t::accept(scope);
-    ACCEPT(files);
+      file_gen_t(ast_t *ast, ast::file_t *node);
+
+      void generate(file_gen_t *file) override;
+    };
   }
 }
+
+#endif /* _GEN_FILE_GEN_H */
 
 /*
  * Local variables:

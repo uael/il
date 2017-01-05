@@ -4,8 +4,10 @@ project(jay)
 set(CMAKE_CXX_STANDARD 11)
 
 include_directories(src)
+include_directories(lib)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/src)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/lib/parse)
 
 add_subdirectory(lib)
 add_subdirectory(src)

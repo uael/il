@@ -18,22 +18,24 @@
 
 /* $Id$ */
 
-#ifndef _GEN_AST_H
-#define _GEN_AST_H
+#ifndef _AST_PROGRAM_H
+#define _AST_PROGRAM_H
 
-#include "gen.h"
+#include "file.h"
 
 namespace Jay {
-  namespace Gen {
-    struct AstGen : CGen<Program> {
-      AstGen(Program *program);
+  namespace Ast {
+    struct Program : Ast::Node {
+      File *files = nullptr;
 
-      void generate(FileGen *file) override;
+      Program();
+
+      void accept(Node *scope) override;
     };
   }
 }
 
-#endif /* _GEN_AST_GEN_H */
+#endif /* _AST_PROGRAM_H */
 
 /*
  * Local variables:

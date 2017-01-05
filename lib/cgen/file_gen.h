@@ -18,31 +18,29 @@
 
 /* $Id$ */
 
-#ifndef _AST_H
-#define _AST_H
+#ifndef _GEN_FILE_H
+#define _GEN_FILE_H
 
-#include "ast/closure.h"
-#include "ast/const.h"
-#include "ast/decl.h"
-#include "ast/expr.h"
-#include "ast/file.h"
-#include "ast/generic.h"
-#include "ast/ident.h"
-#include "ast/node.h"
-#include "ast/stmt.h"
-#include "ast/type.h"
+#include "cgen.h"
 
 namespace Jay {
-  struct Program : Ast::Node {
-    Ast::File *files = nullptr;
+  namespace Gen {
+    struct FileGen : CGen<Ast::File> {
+      std::string includes;
+      std::string source_includes;
+      std::string macros;
+      std::string source_macros;
+      std::string declarations;
+      std::string definitions;
 
-      Program();
+      FileGen(Ast::Program *ast, Ast::File *node);
 
-    void accept(Ast::Node *scope) override;
-  };
+      void generate(FileGen *file) override;
+    };
+  }
 }
 
-#endif /* _AST_H */
+#endif /* _GEN_FILE_GEN_H */
 
 /*
  * Local variables:

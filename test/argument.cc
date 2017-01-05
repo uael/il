@@ -20,7 +20,6 @@
 
 #include <iostream>
 #include <fstream>
-#include "driver.h"
 #include "test.h"
 
 using namespace Jay;

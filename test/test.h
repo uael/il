@@ -22,6 +22,8 @@
 #define _TEST_H
 
 #include "gtest/gtest.h"
+#include "ast/ast.h"
+#include "parse/driver.h"
 
 #define SYNTAX_TEST(prefix, postfix, ex_status, ex_cerr, code) \
   TEST(prefix, postfix) { \

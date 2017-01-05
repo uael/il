@@ -18,36 +18,18 @@
 
 /* $Id$ */
 
-#ifndef _DRIVER_H
-#define _DRIVER_H
-
-#include <string>
-#include <vector>
-#include "scanner.h"
+#include "program.h"
 
 namespace Jay {
+  namespace Ast {
+    Program::Program() {}
 
-  class Driver {
-  public:
-    bool trace_scanning;
-    bool trace_parsing;
-    std::string streamname;
-
-    Jay::Program program;
-
-    class Scanner *lexer;
-
-    Driver();
-
-    bool parse_stream(std::istream &in, const std::string &sname = "stream input");
-    bool parse_string(const std::string &input, const std::string &sname = "string stream");
-    bool parse_file(const std::string &filename);
-    void error(const class location &l, const std::string &m);
-    void error(const std::string &m);
-  };
+    void Program::accept(Node *scope) {
+      Node::accept(scope);
+      ACCEPT(files);
+    }
+  }
 }
-
-#endif /* _DRIVER_H */
 
 /*
  * Local variables:

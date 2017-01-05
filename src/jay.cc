@@ -23,8 +23,7 @@
 #include <typeinfo>
 #include <sstream>
 
-#include "driver.h"
-#include "gen/ast_gen.h"
+#include "jay.h"
 
 int main(int argc, char *argv[]) {
   Jay::Driver driver = Jay::Driver();

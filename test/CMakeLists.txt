@@ -10,6 +10,6 @@ set(check_SOURCES
 add_executable(check main.cc ${check_SOURCES})
 
 target_link_libraries(check gtest gtest_main)
-target_link_libraries(check ast)
+target_link_libraries(check parse)
 
 add_test(check check)

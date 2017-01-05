@@ -1,5 +1,5 @@
 # Jay - Ultra portable and fast programming language
-[![Build Status](https://img.shields.io/travis/jayl/jay/master.svg)](https://travis-ci.org/jayl/jay)
+[![Build Status](https://img.shields.io/travis/jaylang/jay/master.svg)](https://travis-ci.org/jaylang/jay)
 
 **For fun**
 

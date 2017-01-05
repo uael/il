@@ -25,7 +25,7 @@ namespace Jay {
   namespace Gen {
     using namespace Ast;
 
-    AstGen::AstGen(Program *ast) : CGen(ast) {}
+    AstGen::AstGen(Program *program) : CGen(program) {}
 
     void AstGen::generate(FileGen *file) {
       foreach(f, ast->files) {

@@ -154,10 +154,10 @@ using namespace Jay::Ast;
 file
   :
     decl_file_body {
-      if (driver.ast.files) {
-        driver.ast.files->push(new File(driver.streamname, $1));
+      if (driver.program.files) {
+        driver.program.files->push(new File(driver.streamname, $1));
       } else {
-        driver.ast.files = new File(driver.streamname, $1);
+        driver.program.files = new File(driver.streamname, $1);
       }
     }
   ;

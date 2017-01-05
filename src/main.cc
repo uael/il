@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 
       bool result = driver.parse_stream(infile, argv[ai]);
       if (result) {
-        Jay::Gen::AstGen c(&driver.ast);
+        Jay::Gen::AstGen c(&driver.program);
         c.generate(nullptr);
       }
 

@@ -38,7 +38,7 @@ namespace Jay {
     Parser parser(*this);
     parser.set_debug_level(trace_parsing);
     if (parser.parse() == 0) {
-      ast.accept(nullptr);
+      program.accept(nullptr);
       return true;
     }
     return false;

@@ -33,7 +33,7 @@ namespace Jay {
     bool trace_parsing;
     std::string streamname;
 
-    Jay::Program ast;
+    Jay::Program program;
 
     class Scanner *lexer;
 

@@ -26,7 +26,7 @@
 namespace Jay {
   namespace Gen {
     struct AstGen : CGen<Program> {
-      AstGen(Program *ast);
+      AstGen(Program *program);
 
       void generate(FileGen *file) override;
     };

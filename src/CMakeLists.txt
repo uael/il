@@ -7,7 +7,7 @@ bison_target(parser parser.yy ${CMAKE_CURRENT_BINARY_DIR}/parser.cc)
 flex_target(scanner scanner.ll ${CMAKE_CURRENT_BINARY_DIR}/scanner.cc)
 add_flex_bison_dependency(scanner parser)
 
-set(libdyc_SOURCES
+set(libast_SOURCES
         ast/closure.cc
         ast/const.cc
         ast/decl.cc
@@ -18,7 +18,7 @@ set(libdyc_SOURCES
         ast/node.cc
         ast/stmt.cc
         ast/type.cc
-        ast.cc
+        program.cc
         gen/ast_gen.cc
         gen/file_gen.cc
         ${FLEX_scanner_OUTPUTS}
@@ -28,10 +28,10 @@ set(libdyc_SOURCES
         y.tab.h
         driver.cc)
 
-add_library(libdyc ${libdyc_SOURCES})
+add_library(ast ${libast_SOURCES})
 
-set(dyc_SOURCES
+set(jay_SOURCES
         main.cc)
 
-add_executable(dyc ${dyc_SOURCES})
-target_link_libraries(dyc libdyc)
+add_executable(jay ${jay_SOURCES})
+target_link_libraries(jay ast)

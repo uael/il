@@ -23,9 +23,9 @@
 
 #include "gen.h"
 
-namespace dyc {
-  namespace gen {
-    struct file_gen_t : cgen_t<ast::file_t> {
+namespace Jay {
+  namespace Gen {
+    struct FileGen : CGen<Ast::File> {
       std::string includes;
       std::string source_includes;
       std::string macros;
@@ -33,9 +33,9 @@ namespace dyc {
       std::string declarations;
       std::string definitions;
 
-      file_gen_t(ast_t *ast, ast::file_t *node);
+      FileGen(Program *ast, Ast::File *node);
 
-      void generate(file_gen_t *file) override;
+      void generate(FileGen *file) override;
     };
   }
 }

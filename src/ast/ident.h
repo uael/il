@@ -24,15 +24,15 @@
 #include "node.h"
 #include "expr.h"
 
-namespace dyc {
-  namespace ast {
-    struct identifier_t : expr_const_t {
+namespace Jay {
+  namespace Ast {
+    struct Identifier : ExprConst {
       std::string *value;
       std::string uk_value;
 
-      identifier_t(std::string *value);
+      Identifier(std::string *value);
 
-      void accept(node_t *scope) override;
+      void accept(Node *scope) override;
     };
   }
 }

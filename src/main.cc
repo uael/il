@@ -27,7 +27,7 @@
 #include "gen/ast_gen.h"
 
 int main(int argc, char *argv[]) {
-  dyc::driver driver = dyc::driver();
+  Jay::Driver driver = Jay::Driver();
   bool readfile = false;
 
   for (int ai = 1; ai < argc; ++ai) {
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 
       bool result = driver.parse_stream(infile, argv[ai]);
       if (result) {
-        dyc::gen::ast_gen_t c(&driver.ast);
+        Jay::Gen::AstGen c(&driver.ast);
         c.generate(nullptr);
       }
 

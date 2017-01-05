@@ -20,12 +20,12 @@
 
 #include "closure.h"
 
-namespace dyc {
-  namespace ast {
-    closure_t::~closure_t() {}
+namespace Jay {
+  namespace Ast {
+    Closure::~Closure() {}
 
-    node_t *closure_t::as_node() {
-      return dynamic_cast<node_t *>(this);
+    Node *Closure::as_node() {
+      return dynamic_cast<Node *>(this);
     }
   }
 }

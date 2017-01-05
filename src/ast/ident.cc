@@ -20,13 +20,13 @@
 
 #include "ident.h"
 
-namespace dyc {
-  namespace ast {
-    identifier_t::identifier_t(std::string *value) : value(value) {}
+namespace Jay {
+  namespace Ast {
+    Identifier::Identifier(std::string *value) : value(value) {}
 
-    void identifier_t::accept(node_t *scope) {
+    void Identifier::accept(Node *scope) {
       uk_value = *value;
-      node_t::accept(scope);
+      Node::accept(scope);
     }
   }
 }

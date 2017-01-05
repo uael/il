@@ -22,11 +22,11 @@
 #include "ident.h"
 #include "type.h"
 
-namespace dyc {
-  namespace ast {
-    expr_op_t::expr_op_t(expr_op_t::kind_t kind, expr_t *op1) : kind(kind), op1(op1) {}
+namespace Jay {
+  namespace Ast {
+    ExprOp::ExprOp(ExprOp::Kind kind, Expr *op1) : kind(kind), op1(op1) {}
 
-    std::string expr_op_t::op() {
+    std::string ExprOp::op() {
       switch (kind) {
         case INC_PRE:
         case INC_POST:
@@ -105,58 +105,58 @@ namespace dyc {
       }
     }
 
-    void expr_op_t::accept(node_t *scope) {
+    void ExprOp::accept(Node *scope) {
       ACCEPT(op1);
-      node_t::accept(scope);
+      Node::accept(scope);
     }
 
-    expr_dop_t::expr_dop_t(expr_op_t::kind_t kind, expr_t *op1, expr_t *op2) : expr_op_t(kind, op1), op2(op2) {}
+    ExprDop::ExprDop(ExprOp::Kind kind, Expr *op1, Expr *op2) : ExprOp(kind, op1), op2(op2) {}
 
-    void expr_dop_t::accept(node_t *scope) {
+    void ExprDop::accept(Node *scope) {
       ACCEPT(op2);
-      expr_op_t::accept(scope);
+      ExprOp::accept(scope);
     }
 
-    expr_ternary_t::expr_ternary_t(expr_t *cond, expr_t *op1, expr_t *op2) : expr_dop_t(TERNARY, op1, op2),cond(cond) {}
+    ExprTernary::ExprTernary(Expr *cond, Expr *op1, Expr *op2) : ExprDop(TERNARY, op1, op2),cond(cond) {}
 
-    void expr_ternary_t::accept(node_t *scope) {
+    void ExprTernary::accept(Node *scope) {
       ACCEPT(cond);
-      expr_dop_t::accept(scope);
+      ExprDop::accept(scope);
     }
 
-    expr_cast_t::expr_cast_t(expr_t *op1, type_specifier_t *type) : expr_op_t(CAST, op1), type(type) {}
+    ExprCast::ExprCast(Expr *op1, TypeSpecifier *type) : ExprOp(CAST, op1), type(type) {}
 
-    void expr_cast_t::accept(node_t *scope) {
+    void ExprCast::accept(Node *scope) {
       ACCEPT(type);
-      expr_op_t::accept(scope);
+      ExprOp::accept(scope);
     }
 
-    expr_call_t::expr_call_t(expr_t *op1, expr_t *op2) : expr_dop_t(CALL, op1, op2) {}
+    ExprCall::ExprCall(Expr *op1, Expr *op2) : ExprDop(CALL, op1, op2) {}
 
-    expr_pos_t::expr_pos_t(expr_t *op1, expr_t *op2) : expr_dop_t(POS, op1, op2) {}
+    ExprPos::ExprPos(Expr *op1, Expr *op2) : ExprDop(POS, op1, op2) {}
 
-    expr_unary_t::expr_unary_t(expr_op_t::kind_t kind, expr_t *op1) : expr_op_t(kind, op1) {}
+    ExprUnary::ExprUnary(ExprOp::Kind kind, Expr *op1) : ExprOp(kind, op1) {}
 
-    expr_postfix_t::expr_postfix_t(expr_op_t::kind_t kind, expr_t *op1) : expr_op_t(kind, op1) {}
+    ExprPostfix::ExprPostfix(ExprOp::Kind kind, Expr *op1) : ExprOp(kind, op1) {}
 
-    expr_nested_t::expr_nested_t(expr_t *op1, identifier_t *id) : expr_op_t(NESTED, op1), id(id) {}
+    ExprNested::ExprNested(Expr *op1, Identifier *id) : ExprOp(NESTED, op1), id(id) {}
 
-    void expr_nested_t::accept(node_t *scope) {
+    void ExprNested::accept(Node *scope) {
       ACCEPT(id);
-      expr_op_t::accept(scope);
+      ExprOp::accept(scope);
     }
 
-    expr_sizeof_t::expr_sizeof_t(type_specifier_t *type) : expr_op_t(SIZEOF, nullptr), type(type) {}
-    expr_sizeof_t::expr_sizeof_t(expr_t *op1) : expr_op_t(SIZEOF, op1) {}
+    ExprSizeof::ExprSizeof(TypeSpecifier *type) : ExprOp(SIZEOF, nullptr), type(type) {}
+    ExprSizeof::ExprSizeof(Expr *op1) : ExprOp(SIZEOF, op1) {}
 
-    void expr_sizeof_t::accept(node_t *scope) {
+    void ExprSizeof::accept(Node *scope) {
       ACCEPT(type);
-      node_t::accept(scope);
+      Node::accept(scope);
     }
 
-    expr_primary_t::expr_primary_t(expr_op_t::kind_t kind, expr_t *op1) : expr_op_t(kind, op1) {}
+    ExprPrimary::ExprPrimary(ExprOp::Kind kind, Expr *op1) : ExprOp(kind, op1) {}
 
-    expr_kvp_t::expr_kvp_t(expr_t *op1, expr_t *op2) : expr_dop_t(KVP, op1, op2) {}
+    ExprKvp::ExprKvp(Expr *op1, Expr *op2) : ExprDop(KVP, op1, op2) {}
   }
 }
 

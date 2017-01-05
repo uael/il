@@ -21,46 +21,46 @@
 #include "type.h"
 #include "decl.h"
 
-namespace dyc {
-  namespace ast {
-    type_callable_t::type_callable_t(type_specifier_t *type, type_specifier_t *args_types)
+namespace Jay {
+  namespace Ast {
+    type_callable_t::type_callable_t(TypeSpecifier *type, TypeSpecifier *args_types)
       : type(type), args_types(args_types) {}
 
-    void type_callable_t::accept(node_t *scope) {
+    void type_callable_t::accept(Node *scope) {
       ACCEPT(type);
       ACCEPT(args_types);
-      node_t::accept(scope);
+      Node::accept(scope);
     }
 
-    type_ptr_t::type_ptr_t(type_specifier_t *type) : type(type) {}
+    TypePtr::TypePtr(TypeSpecifier *type) : type(type) {}
 
-    void type_ptr_t::accept(node_t *scope) {
+    void TypePtr::accept(Node *scope) {
       ACCEPT(type);
-      node_t::accept(scope);
+      Node::accept(scope);
     }
 
-    type_array_t::type_array_t(type_specifier_t *type, expr_t *fixed_size) : type(type), fixed_size(fixed_size) {}
+    TypeArray::TypeArray(TypeSpecifier *type, Expr *fixed_size) : type(type), fixed_size(fixed_size) {}
 
-    void type_array_t::accept(node_t *scope) {
+    void TypeArray::accept(Node *scope) {
       ACCEPT(type);
       ACCEPT(fixed_size);
-      node_t::accept(scope);
+      Node::accept(scope);
     }
 
-    type_internal_t::type_internal_t(type_internal_t::kind_t kind) : kind(kind) {}
+    TypeInternal::TypeInternal(TypeInternal::Kind kind) : kind(kind) {}
 
-    type_userdef_t::type_userdef_t(identifier_t *id) : id(id) {}
+    TypeUserdef::TypeUserdef(Identifier *id) : id(id) {}
 
-    void type_userdef_t::accept(node_t *scope) {
+    void TypeUserdef::accept(Node *scope) {
       ACCEPT(id);
-      node_t::accept(scope);
+      Node::accept(scope);
     }
 
-    type_generic_t::type_generic_t(identifier_t *id, type_specifier_t *types) : type_userdef_t(id), types(types) {}
+    TypeGeneric::TypeGeneric(Identifier *id, TypeSpecifier *types) : TypeUserdef(id), types(types) {}
 
-    void type_generic_t::accept(node_t *scope) {
+    void TypeGeneric::accept(Node *scope) {
       ACCEPT(types);
-      type_userdef_t::accept(scope);
+      TypeUserdef::accept(scope);
     }
   }
 }

@@ -25,7 +25,7 @@
 
 #define SYNTAX_TEST(prefix, postfix, ex_status, ex_cerr, code) \
   TEST(prefix, postfix) { \
-    dyc::driver driver = dyc::driver(); \
+    Jay::Driver driver = Jay::Driver(); \
     testing::internal::CaptureStderr(); \
     if (ex_status) ASSERT_TRUE(driver.parse_string(code)); \
     else ASSERT_FALSE(driver.parse_string(code)); \

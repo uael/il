@@ -21,15 +21,15 @@
 #ifndef _SCANNER_H
 #define _SCANNER_H
 
-#include "dyc.h"
+#include "jay.h"
 
 #ifndef YY_DECL
 # define  YY_DECL \
-    dyc::parser::token_type dyc::scanner::_lex(dyc::parser::semantic_type* yylval, dyc::parser::location_type* yylloc)
+    Jay::Parser::token_type Jay::Scanner::_lex(Jay::Parser::semantic_type* yylval, Jay::Parser::location_type* yylloc)
 #endif
 
 #ifndef __FLEX_LEXER_H
-# define yyFlexLexer dycFlexLexer
+# define yyFlexLexer JayFlexLexer
 # include "FlexLexer.h"
 # undef yyFlexLexer
 #endif
@@ -44,20 +44,20 @@
 # include "parser.hh"
 #endif
 
-namespace dyc {
+namespace Jay {
 
-  class scanner : public dycFlexLexer {
+  class Scanner : public JayFlexLexer {
   public:
-    parser::token_type prev;
-    parser::token_type current;
+    Parser::token_type prev;
+      Parser::token_type current;
 
-    scanner(std::istream *arg_yyin = 0, std::ostream *arg_yyout = 0);
+    Scanner(std::istream *arg_yyin = 0, std::ostream *arg_yyout = 0);
 
-    virtual ~scanner();
-    virtual parser::token_type _lex(parser::semantic_type *yylval, parser::location_type *yylloc);
+    virtual ~Scanner();
+    virtual Parser::token_type _lex(Parser::semantic_type *yylval, Parser::location_type *yylloc);
     void set_debug(bool b);
 
-    parser::token_type lex(parser::semantic_type *yylval, parser::location_type *yylloc) {
+      Parser::token_type lex(Parser::semantic_type *yylval, Parser::location_type *yylloc) {
       prev = current;
       return current = _lex(yylval, yylloc);
     }

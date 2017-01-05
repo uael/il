@@ -24,61 +24,61 @@
 #include <vector>
 #include "node.h"
 
-namespace dyc {
-  namespace ast {
-    struct type_specifier_t : node_t {};
+namespace Jay {
+  namespace Ast {
+    struct TypeSpecifier : Node {};
 
-    struct type_callable_t : type_specifier_t {
-      type_specifier_t *type = nullptr;
-      type_specifier_t *args_types = nullptr;
+    struct type_callable_t : TypeSpecifier {
+      TypeSpecifier *type = nullptr;
+      TypeSpecifier *args_types = nullptr;
 
-      type_callable_t(type_specifier_t *type, type_specifier_t *args_types = nullptr);
+      type_callable_t(TypeSpecifier *type, TypeSpecifier *args_types = nullptr);
 
-      void accept(node_t *scope) override;
+      void accept(Node *scope) override;
     };
 
-    struct type_ptr_t : type_specifier_t {
-      type_specifier_t *type = nullptr;
+    struct TypePtr : TypeSpecifier {
+      TypeSpecifier *type = nullptr;
 
-      type_ptr_t(type_specifier_t *type);
+      TypePtr(TypeSpecifier *type);
 
-      void accept(node_t *scope) override;
+      void accept(Node *scope) override;
     };
 
-    struct type_array_t : type_specifier_t {
-      type_specifier_t *type = nullptr;
-      expr_t *fixed_size = nullptr;
+    struct TypeArray : TypeSpecifier {
+      TypeSpecifier *type = nullptr;
+      Expr *fixed_size = nullptr;
 
-      type_array_t(type_specifier_t *type, expr_t *fixed_size = nullptr);
+      TypeArray(TypeSpecifier *type, Expr *fixed_size = nullptr);
 
-      void accept(node_t *scope) override;
+      void accept(Node *scope) override;
     };
 
-    struct type_t : type_specifier_t {};
+    struct Type : TypeSpecifier {};
 
-    struct type_internal_t : type_t {
-      enum kind_t {
+    struct TypeInternal : Type {
+      enum Kind {
         SELF, STATIC, VOID, BOOL, CHAR, INT, UINT, SINT, SHORT, USHORT,
         STRING, SSHORT, FLOAT, UFLOAT, SFLOAT, DOUBLE, UDOUBLE, SDOUBLE
       } kind;
 
-      type_internal_t(kind_t kind);
+      TypeInternal(Kind kind);
     };
 
-    struct type_userdef_t : type_t {
-      identifier_t *id = nullptr;
+    struct TypeUserdef : Type {
+      Identifier *id = nullptr;
 
-      type_userdef_t(identifier_t *id);
+      TypeUserdef(Identifier *id);
 
-      void accept(node_t *scope) override;
+      void accept(Node *scope) override;
     };
 
-    struct type_generic_t : type_userdef_t {
-      type_specifier_t *types = nullptr;
+    struct TypeGeneric : TypeUserdef {
+      TypeSpecifier *types = nullptr;
 
-      type_generic_t(identifier_t *id, type_specifier_t *types);
+      TypeGeneric(Identifier *id, TypeSpecifier *types);
 
-      void accept(node_t *scope) override;
+      void accept(Node *scope) override;
     };
   }
 }

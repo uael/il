@@ -23,43 +23,43 @@
 
 #include "expr.h"
 
-namespace dyc {
-  namespace ast {
-    struct const_this_t : expr_const_t {
+namespace Jay {
+  namespace Ast {
+    struct ConstThis : ExprConst {
     };
 
-    struct const_value_t : expr_const_t {
-      enum kind_t {
+    struct ConstValue : ExprConst {
+      enum Kind {
         INT, FLOAT, STRING
       } kind;
       std::string *value;
 
-      const_value_t(kind_t kind, std::string *value);
+      ConstValue(Kind kind, std::string *value);
     };
 
-    struct const_lambda_t : expr_const_t {
-      identifier_t *args = nullptr;
-      closure_t *closure = nullptr;
+    struct ConstLambda : ExprConst {
+      Identifier *args = nullptr;
+      Closure *closure = nullptr;
 
-      const_lambda_t(identifier_t *args, closure_t *closure);
+      ConstLambda(Identifier *args, Closure *closure);
 
-      void accept(node_t *scope) override;
+      void accept(Node *scope) override;
     };
 
-    struct const_initializer_t : expr_const_t {
-      expr_t *exprs = nullptr;
+    struct ConstInitializer : ExprConst {
+      Expr *exprs = nullptr;
 
-      const_initializer_t(expr_t *exprs);
+      ConstInitializer(Expr *exprs);
 
-      void accept(node_t *scope) override;
+      void accept(Node *scope) override;
     };
 
-    struct const_new_t : const_initializer_t {
-      type_userdef_t *type;
+    struct ConstNew : ConstInitializer {
+      TypeUserdef *type;
 
-      const_new_t(type_userdef_t *type, expr_t *exprs = nullptr);
+      ConstNew(TypeUserdef *type, Expr *exprs = nullptr);
 
-      void accept(node_t *scope) override;
+      void accept(Node *scope) override;
     };
   }
 }

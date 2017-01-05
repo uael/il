@@ -27,73 +27,73 @@
 #define rforeach(v, values) for (__typeof__(values) v = values; v; v = (__typeof__(values)) v->prev)
 #define as(node, type) dynamic_cast<type *>(node)
 #define cast(node, dnode) (dnode = dynamic_cast<__typeof__(dnode)>(node))
-#define ACCEPT(node) if ((node)) (dynamic_cast<dyc::ast::node_t *>(node))->accept(this)
+#define ACCEPT(node) if ((node)) (dynamic_cast<Jay::Ast::Node *>(node))->accept(this)
 
-namespace dyc {
+namespace Jay {
   class location;
 
-  namespace ast {
-    struct file_t;
-    struct identifier_t;
-    struct generic_t;
-    struct closure_t;
+  namespace Ast {
+    struct File;
+    struct Identifier;
+    struct Generic;
+    struct Closure;
 
-    struct decl_t;
-    struct decl_include_t;
-    struct decl_use_t;
-    struct decl_nested_t;
-    struct decl_nested_t;
-    struct decl_property_t;
-    struct decl_function_t;
-    struct decl_ctor_t;
-    struct decl_frame_t;
+    struct Decl;
+    struct DeclInclude;
+    struct DeclUse;
+    struct DeclNested;
+    struct DeclNested;
+    struct DeclProperty;
+    struct DeclFunction;
+    struct DeclCtor;
+    struct DeclFrame;
 
-    struct type_specifier_t;
+    struct TypeSpecifier;
     struct type_callable_t;
-    struct type_ptr_t;
-    struct type_array_t;
-    struct type_t;
-    struct type_internal_t;
-    struct type_userdef_t;
-    struct type_generic_t;
+    struct TypePtr;
+    struct TypeArray;
+    struct Type;
+    struct TypeInternal;
+    struct TypeUserdef;
+    struct TypeGeneric;
 
-    struct stmt_t;
-    struct stmt_expr_t;
-    struct stmt_label_t;
-    struct stmt_compound_t;
-    struct stmt_select_t;
-    struct stmt_iter_t;
-    struct stmt_jump_t;
-    struct stmt_decl_t;
+    struct Stmt;
+    struct StmtExpr;
+    struct StmtLabel;
+    struct StmtCompound;
+    struct StmtSelect;
+    struct StmtIter;
+    struct StmtJump;
+    struct StmtDecl;
 
-    struct expr_t;
-    struct expr_op_t;
-    struct expr_dop_t;
-    struct expr_ternary_t;
-    struct expr_cast_t;
-    struct expr_call_t;
-    struct expr_pos_t;
-    struct expr_unary_t;
-    struct expr_postfix_t;
-    struct expr_nested_t;
-    struct expr_sizeof_t;
-    struct expr_primary_t;
-    struct expr_kvp_t;
-    struct expr_const_t;
+    struct Expr;
+    struct ExprOp;
+    struct ExprDop;
+    struct ExprTernary;
+    struct ExprCast;
+    struct ExprCall;
+    struct ExprPos;
+    struct ExprUnary;
+    struct ExprPostfix;
+    struct ExprNested;
+    struct ExprSizeof;
+    struct ExprPrimary;
+    struct ExprKvp;
+    struct ExprConst;
 
-    struct const_this_t;
-    struct const_value_t;
-    struct const_lambda_t;
-    struct const_initializer_t;
+    struct ConstThis;
+    struct ConstValue;
+    struct ConstLambda;
+    struct ConstInitializer;
 
-    struct node_t {
-      node_t *scope = nullptr;
-      node_t *prev = nullptr;
-      node_t *next = nullptr;
+    struct Node {
+      Node *scope = nullptr;
+      Node *prev = nullptr;
+      Node *next = nullptr;
       location *loc = nullptr;
 
-      virtual ~node_t();
-      virtual void accept(node_t *scope);
+      virtual ~Node();
+      virtual void accept(Node *scope);
 
       template<typename T>
       T *push(T *node) {

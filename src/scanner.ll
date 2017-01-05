@@ -42,13 +42,13 @@ ES  (\\(['"\?\\abfnrtv]|[0-7]{1,3}|x[a-fA-F0-9]+))
 WS  [ \t\v\n\f]
 
 %{
-#include "dyc.h"
+#include "jay.h"
 #include "y.tab.h"
 
 using namespace std;
-using namespace dyc::ast;
+using namespace Jay::Ast;
 
-typedef dyc::parser::token token;
+typedef Jay::Parser::token token;
 
 #define STEP yylloc->step()
 #define YY_USER_ACTION STEP; yylloc->columns(yyleng);
@@ -60,7 +60,7 @@ typedef dyc::parser::token token;
 %}
 
 %option c++
-%option prefix="dyc"
+%option prefix="Jay"
 %option batch
 %option debug
 %option noyywrap
@@ -69,18 +69,18 @@ typedef dyc::parser::token token;
 
 %%
 
-"..."					                    RET(ELLIPSIS);
+"..."					          RET(ELLIPSIS);
 
-">>="					                    RET(RIGHT_ASSIGN);
-"<<="					                    RET(LEFT_ASSIGN);
-"+="					                    RET(ADD_ASSIGN);
-"-="					                    RET(SUB_ASSIGN);
-"*="					                    RET(MUL_ASSIGN);
-"/="					                    RET(DIV_ASSIGN);
-"%="					                    RET(MOD_ASSIGN);
-"&="					                    RET(AND_ASSIGN);
-"^="					                    RET(XOR_ASSIGN);
-"|="					                    RET(OR_ASSIGN);
+">>="					          RET(RIGHT_ASSIGN);
+"<<="					          RET(LEFT_ASSIGN);
+"+="					          RET(ADD_ASSIGN);
+"-="					          RET(SUB_ASSIGN);
+"*="					          RET(MUL_ASSIGN);
+"/="					          RET(DIV_ASSIGN);
+"%="					          RET(MOD_ASSIGN);
+"&="					          RET(AND_ASSIGN);
+"^="					          RET(XOR_ASSIGN);
+"|="					          RET(OR_ASSIGN);
 
 "."                               RET(DOT);
 "->"                              RET(ACCESS);
@@ -185,29 +185,29 @@ typedef dyc::parser::token token;
 "unsigned double"                 RET(UDOUBLE);
 "signed double"                   RET(SDOUBLE);
 
-[a-z_][a-z0-9_]*	                SAVE_STRING; RET(ID);
+[a-z_][a-z0-9_]*	              SAVE_STRING; RET(ID);
 [A-Z][A-Za-z0-9]*                 SAVE_STRING; RET(USERDEF);
 
-{HP}{H}+{IS}?				              SAVE_STRING; RET(INT_CONST);
-{NZ}{D}*{IS}?				              SAVE_STRING; RET(INT_CONST);
-"0"{O}*{IS}?				              SAVE_STRING; RET(INT_CONST);
+{HP}{H}+{IS}?				      SAVE_STRING; RET(INT_CONST);
+{NZ}{D}*{IS}?				      SAVE_STRING; RET(INT_CONST);
+"0"{O}*{IS}?				      SAVE_STRING; RET(INT_CONST);
 {CP}?"'"([^'\\\n]|{ES})+"'"       SAVE_STRING; RET(INT_CONST);
-{D}+{E}{FS}?				              SAVE_STRING; RET(FLOAT_CONST);
-{D}*"."{D}+{E}?{FS}?			        SAVE_STRING; RET(FLOAT_CONST);
-{D}+"."{E}?{FS}?			            SAVE_STRING; RET(FLOAT_CONST);
-{HP}{H}+{P}{FS}?			            SAVE_STRING; RET(FLOAT_CONST);
-{HP}{H}*"."{H}+{P}{FS}?			      SAVE_STRING; RET(FLOAT_CONST);
-{HP}{H}+"."{P}{FS}?			          SAVE_STRING; RET(FLOAT_CONST);
+{D}+{E}{FS}?				      SAVE_STRING; RET(FLOAT_CONST);
+{D}*"."{D}+{E}?{FS}?			  SAVE_STRING; RET(FLOAT_CONST);
+{D}+"."{E}?{FS}?			      SAVE_STRING; RET(FLOAT_CONST);
+{HP}{H}+{P}{FS}?			      SAVE_STRING; RET(FLOAT_CONST);
+{HP}{H}*"."{H}+{P}{FS}?			  SAVE_STRING; RET(FLOAT_CONST);
+{HP}{H}+"."{P}{FS}?			      SAVE_STRING; RET(FLOAT_CONST);
 ({SP}?\"([^"\\\n]|{ES})*\"{WS}*)+ SAVE_STRING; RET(STRING_CONST);
 
 {WS}+                             STEP;
 
 %%
 
-namespace dyc {
-  scanner::scanner(std::istream* in, std::ostream* out) : yyFlexLexer(in, out) { }
-  scanner::~scanner() { }
-  void scanner::set_debug(bool b) { yy_flex_debug = b; }
+namespace Jay {
+  Scanner::Scanner(std::istream* in, std::ostream* out) : yyFlexLexer(in, out) { }
+  Scanner::~Scanner() { }
+  void Scanner::set_debug(bool b) { yy_flex_debug = b; }
 }
 
 #ifdef yylex

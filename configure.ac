@@ -1,4 +1,4 @@
-AC_INIT([dyc], [0.1], [https://github.com/dotdry/dyc/issues])
+AC_INIT([Jay], [0.1], [https://github.com/jayl/jay/issues])
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_SRCDIR([src/driver.cc])
 AC_CONFIG_HEADERS([config.h])

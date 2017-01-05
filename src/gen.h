@@ -22,24 +22,24 @@
 #define _CGEN_H
 
 #include <map>
-#include "ast.h"
+#include "program.h"
 
-namespace dyc {
-  namespace gen {
-    struct file_gen_t;
+namespace Jay {
+  namespace Gen {
+    struct FileGen;
   }
 
-  template <typename T = ast::node_t>
-  struct cgen_t {
-    ast_t *ast;
+  template <typename T = Ast::Node>
+  struct CGen {
+    Program *ast;
     std::string cursor;
     T *node;
 
-    cgen_t(ast_t *ast, T *node) : ast(ast), node(node) {}
-    cgen_t(ast_t *ast) : cgen_t(ast, ast) {}
+    CGen(Program *ast, T *node) : ast(ast), node(node) {}
+    CGen(Program *ast) : CGen(ast, ast) {}
 
-    virtual ~cgen_t() {};
-    virtual void generate(gen::file_gen_t *file) {};
+    virtual ~CGen() {};
+    virtual void generate(Gen::FileGen *file) {};
   };
 }
 

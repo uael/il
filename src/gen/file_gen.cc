@@ -21,13 +21,13 @@
 #include <fstream>
 #include "file_gen.h"
 
-namespace dyc {
-  namespace gen {
-    using namespace ast;
+namespace Jay {
+  namespace Gen {
+    using namespace Ast;
 
-    file_gen_t::file_gen_t(ast_t *ast, file_t *node) : cgen_t(ast, node) {}
+    FileGen::FileGen(Program *ast, File *node) : CGen(ast, node) {}
 
-    void file_gen_t::generate(file_gen_t *file) {
+    void FileGen::generate(FileGen *file) {
       foreach(decl, node->decls) {
 
       }

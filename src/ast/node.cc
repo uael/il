@@ -20,11 +20,11 @@
 
 #include "node.h"
 
-namespace dyc {
-  namespace ast {
-    node_t::~node_t() {}
+namespace Jay {
+  namespace Ast {
+    Node::~Node() {}
 
-    void node_t::accept(node_t *scope) {
+    void Node::accept(Node *scope) {
       this->scope = scope;
       if (this->next) {
         this->next->accept(scope);

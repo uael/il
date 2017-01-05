@@ -21,15 +21,15 @@
 #include "ast_gen.h"
 #include "file_gen.h"
 
-namespace dyc {
-  namespace gen {
-    using namespace ast;
+namespace Jay {
+  namespace Gen {
+    using namespace Ast;
 
-    ast_gen_t::ast_gen_t(ast_t *ast) : cgen_t(ast) {}
+    AstGen::AstGen(Program *ast) : CGen(ast) {}
 
-    void ast_gen_t::generate(file_gen_t *file) {
+    void AstGen::generate(FileGen *file) {
       foreach(f, ast->files) {
-        file_gen_t gen(ast, f);
+        FileGen gen(ast, f);
         gen.generate(nullptr);
       };
     }

@@ -1,11 +1,10 @@
-# dyc - under development 
-[![Build Status](https://img.shields.io/travis/dotdry/dyc/master.svg)](https://travis-ci.org/dotdry/dyc)
+# Jay - Ultra portable and fast programming language
+[![Build Status](https://img.shields.io/travis/jayl/jay/master.svg)](https://travis-ci.org/jayl/jay)
 
 **For fun**
 
-.dry compiler.
-An ultra processing language, .dry generate c files from an high level language syntax.
-Currently support functionnal parsing only :
+An ultra processing language, .jay generate c files from an high level language syntax.
+Currently support functional parsing only :
 - Multiple name
 - Auto type
 - Lambda

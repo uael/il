@@ -21,13 +21,13 @@
 #include "file.h"
 #include "decl.h"
 
-namespace dyc {
-  namespace ast {
-    file_t::file_t(std::string filename, decl_t *decls) : filename(filename), decls(decls) {}
+namespace Jay {
+  namespace Ast {
+    File::File(std::string filename, Decl *decls) : filename(filename), decls(decls) {}
 
-    void file_t::accept(node_t *scope) {
+    void File::accept(Node *scope) {
       ACCEPT(decls);
-      node_t::accept(scope);
+      Node::accept(scope);
     }
   }
 }

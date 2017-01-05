@@ -32,13 +32,13 @@
 #include "ast/stmt.h"
 #include "ast/type.h"
 
-namespace dyc {
-  struct ast_t : ast::node_t {
-    ast::file_t *files = nullptr;
+namespace Jay {
+  struct Program : Ast::Node {
+    Ast::File *files = nullptr;
 
-    ast_t();
+      Program();
 
-    void accept(ast::node_t *scope) override;
+    void accept(Ast::Node *scope) override;
   };
 }
 

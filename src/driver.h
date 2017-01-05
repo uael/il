@@ -25,19 +25,19 @@
 #include <vector>
 #include "scanner.h"
 
-namespace dyc {
+namespace Jay {
 
-  class driver {
+  class Driver {
   public:
     bool trace_scanning;
     bool trace_parsing;
     std::string streamname;
 
-    dyc::ast_t ast;
+    Jay::Program ast;
 
-    class scanner *lexer;
+    class Scanner *lexer;
 
-    driver();
+    Driver();
 
     bool parse_stream(std::istream &in, const std::string &sname = "stream input");
     bool parse_string(const std::string &input, const std::string &sname = "string stream");

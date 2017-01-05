@@ -24,85 +24,85 @@
 #include "node.h"
 #include "ident.h"
 
-namespace dyc {
-  namespace ast {
-    struct decl_t : node_t {};
+namespace Jay {
+  namespace Ast {
+    struct Decl : Node {};
 
-    struct decl_include_t : decl_t {
-      identifier_t *includes = nullptr;
+    struct DeclInclude : Decl {
+      Identifier *includes = nullptr;
 
-      decl_include_t(identifier_t *includes);
+      DeclInclude(Identifier *includes);
 
-      void accept(node_t *scope) override;
+      void accept(Node *scope) override;
     };
 
-    struct decl_use_t : decl_t {
-      identifier_t *uses = nullptr;
+    struct DeclUse : Decl {
+      Identifier *uses = nullptr;
 
-      decl_use_t(identifier_t *uses);
+      DeclUse(Identifier *uses);
 
-      void accept(node_t *scope) override;
+      void accept(Node *scope) override;
     };
 
-    struct decl_nested_t : decl_t {
-      identifier_t *name = nullptr;
-      decl_t *decls = nullptr;
+    struct DeclNested : Decl {
+      Identifier *name = nullptr;
+      Decl *decls = nullptr;
 
-      decl_nested_t(identifier_t *name, decl_t *decls);
+      DeclNested(Identifier *name, Decl *decls);
 
-      void accept(node_t *scope) override;
+      void accept(Node *scope) override;
     };
 
-    struct decl_member_t : decl_t {
-      identifier_t *ids = nullptr;
-      type_specifier_t *type_specifier = nullptr;
-      closure_t *closure = nullptr;
+    struct DeclMember : Decl {
+      Identifier *ids = nullptr;
+      TypeSpecifier *type_specifier = nullptr;
+      Closure *closure = nullptr;
 
-      decl_member_t(identifier_t *ids, type_specifier_t *type_specifier, closure_t *closure);
+      DeclMember(Identifier *ids, TypeSpecifier *type_specifier, Closure *closure);
 
-      virtual void accept(node_t *scope) override;
+      virtual void accept(Node *scope) override;
     };
 
-    struct decl_property_t : decl_member_t {
+    struct DeclProperty : DeclMember {
       bool assigned;
 
-      decl_property_t(identifier_t *ids, type_specifier_t *type_specifier, closure_t *closure, bool assigned);
+      DeclProperty(Identifier *ids, TypeSpecifier *type_specifier, Closure *closure, bool assigned);
     };
 
-    struct decl_function_t : decl_member_t {
-      generic_t *generics = nullptr;
-      decl_t *args = nullptr;
+    struct DeclFunction : DeclMember {
+      Generic *generics = nullptr;
+      Decl *args = nullptr;
 
-      decl_function_t(identifier_t *ids, generic_t *generics, decl_t *args, type_specifier_t *type_specifier,
-                      closure_t *closure);
+      DeclFunction(Identifier *ids, Generic *generics, Decl *args, TypeSpecifier *type_specifier,
+                      Closure *closure);
 
-      virtual void accept(node_t *scope) override;
+      virtual void accept(Node *scope) override;
     };
 
-    struct decl_ctor_t : decl_function_t {
-      identifier_t *props_args = nullptr;
+    struct DeclCtor : DeclFunction {
+      Identifier *props_args = nullptr;
       bool poly = true;
       bool dtor = false;
 
-      decl_ctor_t(decl_t *args, closure_t *closure, const bool &poly = true);
-      decl_ctor_t(identifier_t *props_args, closure_t *closure, const bool &poly = true);
+      DeclCtor(Decl *args, Closure *closure, const bool &poly = true);
+      DeclCtor(Identifier *props_args, Closure *closure, const bool &poly = true);
 
-      void accept(node_t *scope) override;
+      void accept(Node *scope) override;
     };
 
-    struct decl_dtor_t : decl_ctor_t {
-      decl_dtor_t(decl_t *args, closure_t *closure, const bool &poly);
+    struct DeclDtor : DeclCtor {
+      DeclDtor(Decl *args, Closure *closure, const bool &poly);
 
-      decl_dtor_t(identifier_t *props_args, closure_t *closure, const bool &poly);
+      DeclDtor(Identifier *props_args, Closure *closure, const bool &poly);
     };
 
-    struct decl_frame_t : decl_nested_t {
-      generic_t *generics = nullptr;
-      type_specifier_t *type = nullptr;
+    struct DeclFrame : DeclNested {
+      Generic *generics = nullptr;
+      TypeSpecifier *type = nullptr;
 
-      decl_frame_t(identifier_t *name, generic_t *generics, type_specifier_t *type, decl_t *decls);
+      DeclFrame(Identifier *name, Generic *generics, TypeSpecifier *type, Decl *decls);
 
-      void accept(node_t *scope) override;
+      void accept(Node *scope) override;
     };
   }
 }

@@ -22,30 +22,30 @@
 #include "ident.h"
 #include "type.h"
 
-namespace dyc {
-  namespace ast {
-    const_value_t::const_value_t(const_value_t::kind_t kind, std::string *value) : kind(kind), value(value) {}
+namespace Jay {
+  namespace Ast {
+    ConstValue::ConstValue(ConstValue::Kind kind, std::string *value) : kind(kind), value(value) {}
 
-    const_lambda_t::const_lambda_t(identifier_t *args, closure_t *closure) : args(args), closure(closure) {}
+    ConstLambda::ConstLambda(Identifier *args, Closure *closure) : args(args), closure(closure) {}
 
-    void const_lambda_t::accept(node_t *scope) {
+    void ConstLambda::accept(Node *scope) {
       ACCEPT(args);
       ACCEPT(closure);
-      node_t::accept(scope);
+      Node::accept(scope);
     }
 
-    const_initializer_t::const_initializer_t(expr_t *exprs) : exprs(exprs) {}
+    ConstInitializer::ConstInitializer(Expr *exprs) : exprs(exprs) {}
 
-    void const_initializer_t::accept(node_t *scope) {
+    void ConstInitializer::accept(Node *scope) {
       ACCEPT(exprs);
-      node_t::accept(scope);
+      Node::accept(scope);
     }
 
-    const_new_t::const_new_t(type_userdef_t *type, expr_t *exprs) : const_initializer_t(exprs), type(type) {}
+    ConstNew::ConstNew(TypeUserdef *type, Expr *exprs) : ConstInitializer(exprs), type(type) {}
 
-    void const_new_t::accept(node_t *scope) {
+    void ConstNew::accept(Node *scope) {
       ACCEPT(type);
-      const_initializer_t::accept(scope);
+      ConstInitializer::accept(scope);
     }
   }
 }

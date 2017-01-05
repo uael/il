@@ -23,12 +23,12 @@
 
 #include "gen.h"
 
-namespace dyc {
-  namespace gen {
-    struct ast_gen_t : cgen_t<ast_t> {
-      ast_gen_t(ast_t *ast);
+namespace Jay {
+  namespace Gen {
+    struct AstGen : CGen<Program> {
+      AstGen(Program *ast);
 
-      void generate(file_gen_t *file) override;
+      void generate(FileGen *file) override;
     };
   }
 }

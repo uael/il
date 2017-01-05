@@ -22,77 +22,77 @@
 #include "expr.h"
 #include "decl.h"
 
-namespace dyc {
-  namespace ast {
-    stmt_expr_t::stmt_expr_t() {}
-    stmt_expr_t::stmt_expr_t(expr_t *expr) : expr(expr) {}
+namespace Jay {
+  namespace Ast {
+    StmtExpr::StmtExpr() {}
+    StmtExpr::StmtExpr(Expr *expr) : expr(expr) {}
 
-    void stmt_expr_t::accept(node_t *scope) {
-      node_t::accept(scope);
+    void StmtExpr::accept(Node *scope) {
+      Node::accept(scope);
       ACCEPT(expr);
     }
 
-    stmt_label_t::stmt_label_t(stmt_t *stmt) : kind(DEFAULT), stmt(stmt) {}
-    stmt_label_t::stmt_label_t(std::string *id, stmt_t *stmt) : kind(LABEL), id(id), stmt(stmt) {}
-    stmt_label_t::stmt_label_t(expr_t *cond, stmt_t *stmt) : kind(CASE), stmt(stmt), cond(cond) {}
+    StmtLabel::StmtLabel(Stmt *stmt) : kind(DEFAULT), stmt(stmt) {}
+    StmtLabel::StmtLabel(std::string *id, Stmt *stmt) : kind(LABEL), id(id), stmt(stmt) {}
+    StmtLabel::StmtLabel(Expr *cond, Stmt *stmt) : kind(CASE), stmt(stmt), cond(cond) {}
 
-    void stmt_label_t::accept(node_t *scope) {
+    void StmtLabel::accept(Node *scope) {
       ACCEPT(stmt);
       ACCEPT(cond);
-      node_t::accept(scope);
+      Node::accept(scope);
     }
 
-    stmt_compound_t::stmt_compound_t(stmt_t *stmts) : stmts(stmts) {}
-    stmt_compound_t::stmt_compound_t() {}
+    StmtCompound::StmtCompound(Stmt *stmts) : stmts(stmts) {}
+    StmtCompound::StmtCompound() {}
 
-    void stmt_compound_t::accept(node_t *scope) {
+    void StmtCompound::accept(Node *scope) {
       ACCEPT(stmts);
-      node_t::accept(scope);
+      Node::accept(scope);
     }
 
-    stmt_select_t::stmt_select_t() {}
-    stmt_select_t::stmt_select_t(stmt_select_t::kind_t kind, expr_t *cond, stmt_t *stmt)
+    StmtSelect::StmtSelect() {}
+    StmtSelect::StmtSelect(StmtSelect::Kind kind, Expr *cond, Stmt *stmt)
       : kind(kind), cond(cond), stmt(stmt) {}
-    stmt_select_t::stmt_select_t(expr_t *cond, stmt_t *stmt, stmt_t *else_stmt)
+    StmtSelect::StmtSelect(Expr *cond, Stmt *stmt, Stmt *else_stmt)
       : kind(IF), cond(cond), stmt(stmt), else_stmt(else_stmt) {}
 
-    void stmt_select_t::accept(node_t *scope) {
+    void StmtSelect::accept(Node *scope) {
       ACCEPT(cond);
       ACCEPT(stmt);
       ACCEPT(else_stmt);
-      node_t::accept(scope);
+      Node::accept(scope);
     }
 
-    stmt_iter_t::stmt_iter_t(expr_t *cond, stmt_t *stmt) : kind(WHILE), cond(cond), stmt(stmt) {}
-    stmt_iter_t::stmt_iter_t(stmt_t *stmt, expr_t *cond) : kind(DO_WHILE), cond(cond), stmt(stmt) {}
-    stmt_iter_t::stmt_iter_t(expr_t *cond, closure_t *step, stmt_t *stmt)
+    StmtIter::StmtIter(Expr *cond, Stmt *stmt) : kind(WHILE), cond(cond), stmt(stmt) {}
+    StmtIter::StmtIter(Stmt *stmt, Expr *cond) : kind(DO_WHILE), cond(cond), stmt(stmt) {}
+    StmtIter::StmtIter(Expr *cond, Closure *step, Stmt *stmt)
       : kind(FOR), cond(cond), step(step), stmt(stmt) {}
-    stmt_iter_t::stmt_iter_t(stmt_t *decls, expr_t *cond, closure_t *step, stmt_t *stmt)
+    StmtIter::StmtIter(Stmt *decls, Expr *cond, Closure *step, Stmt *stmt)
       : kind(FOR), decls(decls), cond(cond), step(step), stmt(stmt) {}
 
-    void stmt_iter_t::accept(node_t *scope) {
+    void StmtIter::accept(Node *scope) {
       ACCEPT(decls);
       ACCEPT(cond);
       ACCEPT(step);
       ACCEPT(stmt);
-      node_t::accept(scope);
+      Node::accept(scope);
     }
 
-    stmt_jump_t::stmt_jump_t(stmt_jump_t::kind_t kind) : kind(kind) {}
-    stmt_jump_t::stmt_jump_t(std::string *id) : kind(GOTO), id(id) {}
-    stmt_jump_t::stmt_jump_t(expr_t *expr) : kind(RETURN), expr(expr) {}
+    StmtJump::StmtJump(StmtJump::Kind kind) : kind(kind) {}
+    StmtJump::StmtJump(std::string *id) : kind(GOTO), id(id) {}
+    StmtJump::StmtJump(Expr *expr) : kind(RETURN), expr(expr) {}
 
-    void stmt_jump_t::accept(node_t *scope) {
+    void StmtJump::accept(Node *scope) {
       ACCEPT(expr);
-      node_t::accept(scope);
+      Node::accept(scope);
     }
 
-    stmt_decl_t::stmt_decl_t() {}
-    stmt_decl_t::stmt_decl_t(decl_t *decls) : decls(decls) {}
+    StmtDecl::StmtDecl() {}
+    StmtDecl::StmtDecl(Decl *decls) : decls(decls) {}
 
-    void stmt_decl_t::accept(node_t *scope) {
+    void StmtDecl::accept(Node *scope) {
       ACCEPT(decls);
-      node_t::accept(scope);
+      Node::accept(scope);
     }
   }
 }

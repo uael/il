@@ -23,8 +23,8 @@
 #include "driver.h"
 #include "test.h"
 
-using namespace dyc;
-using namespace dyc::ast;
+using namespace Jay;
+using namespace Jay::Ast;
 
 SYNTAX_TEST(frame, f1, true, "",
   "include stdlib;"
@@ -51,7 +51,7 @@ SYNTAX_TEST(frame, f2, true, "",
 );
 
 TEST(frame, f3) {
-  dyc::driver driver = dyc::driver();
+  Jay::Driver driver = Jay::Driver();
   ASSERT_TRUE(driver.parse_string(
     "use Ptr;"
     ""

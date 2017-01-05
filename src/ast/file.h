@@ -23,15 +23,15 @@
 
 #include "node.h"
 
-namespace dyc {
-  namespace ast {
-    struct file_t : node_t {
+namespace Jay {
+  namespace Ast {
+    struct File : Node {
       std::string filename;
-      decl_t *decls = nullptr;
+      Decl *decls = nullptr;
 
-      file_t(std::string filename, decl_t *decls);
+      File(std::string filename, Decl *decls);
 
-      void accept(node_t *scope) override;
+      void accept(Node *scope) override;
     };
   }
 }

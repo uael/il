@@ -22,74 +22,74 @@
 #include "generic.h"
 #include "type.h"
 
-namespace dyc {
-  namespace ast {
-    decl_include_t::decl_include_t(identifier_t *includes) : includes(includes) {}
+namespace Jay {
+  namespace Ast {
+    DeclInclude::DeclInclude(Identifier *includes) : includes(includes) {}
 
-    void decl_include_t::accept(node_t *scope) {
+    void DeclInclude::accept(Node *scope) {
       ACCEPT(includes);
-      node_t::accept(scope);
+      Node::accept(scope);
     }
 
-    decl_use_t::decl_use_t(identifier_t *uses) : uses(uses) {}
+    DeclUse::DeclUse(Identifier *uses) : uses(uses) {}
 
-    void decl_use_t::accept(node_t *scope) {
+    void DeclUse::accept(Node *scope) {
       ACCEPT(uses);
-      node_t::accept(scope);
+      Node::accept(scope);
     }
 
-    decl_nested_t::decl_nested_t(identifier_t *name, decl_t *decls) : name(name), decls(decls) {}
+    DeclNested::DeclNested(Identifier *name, Decl *decls) : name(name), decls(decls) {}
 
-    void decl_nested_t::accept(node_t *scope) {
+    void DeclNested::accept(Node *scope) {
       ACCEPT(name);
-      node_t::accept(scope);
+      Node::accept(scope);
     }
 
-    decl_member_t::decl_member_t(identifier_t *ids, type_specifier_t *type_specifier, closure_t *closure)
+    DeclMember::DeclMember(Identifier *ids, TypeSpecifier *type_specifier, Closure *closure)
       : ids(ids), type_specifier(type_specifier), closure(closure) {}
 
-    void decl_member_t::accept(node_t *scope) {
+    void DeclMember::accept(Node *scope) {
       ACCEPT(ids);
       ACCEPT(type_specifier);
       ACCEPT(closure);
-      node_t::accept(scope);
+      Node::accept(scope);
     }
 
-    decl_property_t::decl_property_t(
-      identifier_t *ids, type_specifier_t *type_specifier, closure_t *closure, bool assigned)
-      : decl_member_t(ids, type_specifier, closure), assigned(assigned) {}
+    DeclProperty::DeclProperty(
+      Identifier *ids, TypeSpecifier *type_specifier, Closure *closure, bool assigned)
+      : DeclMember(ids, type_specifier, closure), assigned(assigned) {}
 
-    decl_function_t::decl_function_t(
-      identifier_t *ids, generic_t *generics, decl_t *args, type_specifier_t *type_specifier, closure_t *closure)
-      : decl_member_t(ids, type_specifier, closure), generics(generics), args(args) {}
+    DeclFunction::DeclFunction(
+      Identifier *ids, Generic *generics, Decl *args, TypeSpecifier *type_specifier, Closure *closure)
+      : DeclMember(ids, type_specifier, closure), generics(generics), args(args) {}
 
-    void decl_function_t::accept(node_t *scope) {
+    void DeclFunction::accept(Node *scope) {
       ACCEPT(generics);
       ACCEPT(args);
-      decl_member_t::accept(scope);
+      DeclMember::accept(scope);
     }
 
-    decl_ctor_t::decl_ctor_t(decl_t *args, closure_t *closure, const bool &poly)
-      : decl_function_t(nullptr, nullptr, args, nullptr, closure), poly(poly) {}
-    decl_ctor_t::decl_ctor_t(identifier_t *props_args, closure_t *closure, const bool &poly)
-      : decl_function_t(nullptr, nullptr, nullptr, nullptr, closure), props_args(props_args), poly(poly) {}
+    DeclCtor::DeclCtor(Decl *args, Closure *closure, const bool &poly)
+      : DeclFunction(nullptr, nullptr, args, nullptr, closure), poly(poly) {}
+    DeclCtor::DeclCtor(Identifier *props_args, Closure *closure, const bool &poly)
+      : DeclFunction(nullptr, nullptr, nullptr, nullptr, closure), props_args(props_args), poly(poly) {}
 
-    void decl_ctor_t::accept(node_t *scope) {
+    void DeclCtor::accept(Node *scope) {
       ACCEPT(props_args);
-      decl_function_t::accept(scope);
+      DeclFunction::accept(scope);
     }
 
-    decl_dtor_t::decl_dtor_t(decl_t *args, closure_t *closure, const bool &poly) : decl_ctor_t(args, closure, poly) {}
-    decl_dtor_t::decl_dtor_t(identifier_t *props_args, closure_t *closure, const bool &poly)
-      : decl_ctor_t(props_args, closure, poly) {}
+    DeclDtor::DeclDtor(Decl *args, Closure *closure, const bool &poly) : DeclCtor(args, closure, poly) {}
+    DeclDtor::DeclDtor(Identifier *props_args, Closure *closure, const bool &poly)
+      : DeclCtor(props_args, closure, poly) {}
 
-    decl_frame_t::decl_frame_t(identifier_t *name, generic_t *generics, type_specifier_t *type, decl_t *decls)
-      : decl_nested_t(name, decls), generics(generics), type(type)  {}
+    DeclFrame::DeclFrame(Identifier *name, Generic *generics, TypeSpecifier *type, Decl *decls)
+      : DeclNested(name, decls), generics(generics), type(type)  {}
 
-    void decl_frame_t::accept(node_t *scope) {
+    void DeclFrame::accept(Node *scope) {
       ACCEPT(generics);
       ACCEPT(type);
-      decl_nested_t::accept(scope);
+      DeclNested::accept(scope);
     }
   }
 }

@@ -23,8 +23,8 @@
 #include "driver.h"
 #include "test.h"
 
-using namespace dyc;
-using namespace dyc::ast;
+using namespace Jay;
+using namespace Jay::Ast;
 
 SYNTAX_TEST(args, empty_args, true, "",
   "foo()=>{}"

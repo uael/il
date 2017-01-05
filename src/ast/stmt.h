@@ -24,96 +24,96 @@
 #include "node.h"
 #include "closure.h"
 
-namespace dyc {
-  namespace ast {
-    struct stmt_t : node_t {};
+namespace Jay {
+  namespace Ast {
+    struct Stmt : Node {};
 
-    struct stmt_expr_t : stmt_t {
-      expr_t *expr = nullptr;
+    struct StmtExpr : Stmt {
+      Expr *expr = nullptr;
 
-      stmt_expr_t();
-      stmt_expr_t(expr_t *expr);
+      StmtExpr();
+      StmtExpr(Expr *expr);
 
-      virtual void accept(node_t *scope) override;
+      virtual void accept(Node *scope) override;
     };
 
-    struct stmt_label_t : stmt_t {
-      enum kind_t {
+    struct StmtLabel : Stmt {
+      enum Kind {
         LABEL, CASE, DEFAULT
       } kind;
       std::string *id;
-      stmt_t *stmt = nullptr;
-      expr_t *cond = nullptr;
+      Stmt *stmt = nullptr;
+      Expr *cond = nullptr;
 
-      stmt_label_t(stmt_t *stmt);
-      stmt_label_t(std::string *id, stmt_t *stmt);
-      stmt_label_t(expr_t *cond, stmt_t *stmt);
+      StmtLabel(Stmt *stmt);
+      StmtLabel(std::string *id, Stmt *stmt);
+      StmtLabel(Expr *cond, Stmt *stmt);
 
-      virtual void accept(node_t *scope) override;
+      virtual void accept(Node *scope) override;
     };
 
-    struct stmt_compound_t : stmt_t, closure_t {
-      stmt_t *stmts = nullptr;
+    struct StmtCompound : Stmt, Closure {
+      Stmt *stmts = nullptr;
 
-      stmt_compound_t();
-      stmt_compound_t(stmt_t *stmts);
+      StmtCompound();
+      StmtCompound(Stmt *stmts);
 
-      virtual void accept(node_t *scope) override;
+      virtual void accept(Node *scope) override;
     };
 
-    struct stmt_select_t : stmt_t {
-      enum kind_t {
+    struct StmtSelect : Stmt {
+      enum Kind {
         IF, SWITCH
       } kind;
-      expr_t *cond = nullptr;
-      stmt_t *stmt = nullptr;
-      stmt_t *else_stmt = nullptr;
+      Expr *cond = nullptr;
+      Stmt *stmt = nullptr;
+      Stmt *else_stmt = nullptr;
 
-      stmt_select_t();
-      stmt_select_t(kind_t kind, expr_t *cond, stmt_t *stmt);
-      stmt_select_t(expr_t *cond, stmt_t *stmt, stmt_t *else_stmt);
+      StmtSelect();
+      StmtSelect(Kind kind, Expr *cond, Stmt *stmt);
+      StmtSelect(Expr *cond, Stmt *stmt, Stmt *else_stmt);
 
-      virtual void accept(node_t *scope) override;
+      virtual void accept(Node *scope) override;
     };
 
-    struct stmt_iter_t : stmt_t {
-      enum kind_t {
+    struct StmtIter : Stmt {
+      enum Kind {
         WHILE, DO_WHILE, FOR
       } kind;
-      stmt_t *decls = nullptr;
-      expr_t *cond = nullptr;
-      closure_t *step = nullptr;
-      stmt_t *stmt = nullptr;
+      Stmt *decls = nullptr;
+      Expr *cond = nullptr;
+      Closure *step = nullptr;
+      Stmt *stmt = nullptr;
 
-      stmt_iter_t(expr_t *cond, stmt_t *stmt);
-      stmt_iter_t(stmt_t *stmt, expr_t *cond);
-      stmt_iter_t(expr_t *cond, closure_t *step, stmt_t *stmt);
-      stmt_iter_t(stmt_t *decls, expr_t *cond, closure_t *step, stmt_t *stmt);
+      StmtIter(Expr *cond, Stmt *stmt);
+      StmtIter(Stmt *stmt, Expr *cond);
+      StmtIter(Expr *cond, Closure *step, Stmt *stmt);
+      StmtIter(Stmt *decls, Expr *cond, Closure *step, Stmt *stmt);
 
-      virtual void accept(node_t *scope) override;
+      virtual void accept(Node *scope) override;
     };
 
-    struct stmt_jump_t : stmt_t {
-      enum kind_t {
+    struct StmtJump : Stmt {
+      enum Kind {
         GOTO, CONTINUE, BREAK, RETURN
       } kind;
       std::string *id;
-      expr_t *expr = nullptr;
+      Expr *expr = nullptr;
 
-      stmt_jump_t(kind_t kind);
-      stmt_jump_t(std::string *id);
-      stmt_jump_t(expr_t *expr);
+      StmtJump(Kind kind);
+      StmtJump(std::string *id);
+      StmtJump(Expr *expr);
 
-      virtual void accept(node_t *scope) override;
+      virtual void accept(Node *scope) override;
     };
 
-    struct stmt_decl_t : stmt_t {
-      decl_t *decls = nullptr;
+    struct StmtDecl : Stmt {
+      Decl *decls = nullptr;
 
-      stmt_decl_t();
-      stmt_decl_t(decl_t *decls);
+      StmtDecl();
+      StmtDecl(Decl *decls);
 
-      virtual void accept(node_t *scope) override;
+      virtual void accept(Node *scope) override;
     };
   }
 }

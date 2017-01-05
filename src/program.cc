@@ -1,7 +1,7 @@
 /*
  *  MIT License
  *
- * Copyright (c) 2016, Abel Lucas <ylilt71@gmail.com>
+ * Copyright (c) 2016 .DRY (Don't Repeat Yourself)
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -18,15 +18,16 @@
 
 /* $Id$ */
 
-#ifndef _DYC_H
-#define _DYC_H
+#include "program.h"
 
-#ifdef HAVE_CONFIG_H
-#  include "config.h"
-#endif
-#include "ast.h"
+namespace Jay {
+  Program::Program() {}
 
-#endif /* _DYC_H */
+  void Program::accept(Ast::Node *scope) {
+    Ast::Node::accept(scope);
+    ACCEPT(files);
+  }
+}
 
 /*
  * Local variables:

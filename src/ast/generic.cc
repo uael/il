@@ -22,15 +22,15 @@
 #include "ident.h"
 #include "type.h"
 
-namespace dyc {
-  namespace ast {
-    generic_t::generic_t(identifier_t *value, type_specifier_t *type_specifier)
+namespace Jay {
+  namespace Ast {
+    Generic::Generic(Identifier *value, TypeSpecifier *type_specifier)
       : value(value), type_specifier(type_specifier) {}
 
-    void generic_t::accept(node_t *scope) {
+    void Generic::accept(Node *scope) {
       ACCEPT(value);
       ACCEPT(type_specifier);
-      node_t::accept(scope);
+      Node::accept(scope);
     }
   }
 }

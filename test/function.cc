@@ -23,8 +23,8 @@
 #include "driver.h"
 #include "test.h"
 
-using namespace dyc;
-using namespace dyc::ast;
+using namespace Jay;
+using namespace Jay::Ast;
 
 SYNTAX_TEST(func, fibonacci, true, "",
   "fibonacci(n:int):int => {"
@@ -53,7 +53,7 @@ SYNTAX_TEST(func, ns_fibonacci, true, "",
 );
 
 TEST(func, sort) {
-  dyc::driver driver = dyc::driver();
+  Jay::Driver driver = Jay::Driver();
   ASSERT_TRUE(driver.parse_string(
     "sort<T>(array : T[]) => {"
     "  use Foo;"

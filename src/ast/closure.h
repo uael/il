@@ -23,14 +23,14 @@
 
 #include "node.h"
 
-namespace dyc {
-  namespace ast {
-    struct closure_t {
+namespace Jay {
+  namespace Ast {
+    struct Closure {
       bool macro = true;
 
-      virtual ~closure_t();
+      virtual ~Closure();
 
-      node_t *as_node();
+      Node *as_node();
     };
   }
 }

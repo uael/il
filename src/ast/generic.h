@@ -23,15 +23,15 @@
 
 #include "node.h"
 
-namespace dyc {
-  namespace ast {
-    struct generic_t : node_t {
-      identifier_t *value;
-      type_specifier_t *type_specifier = nullptr;
+namespace Jay {
+  namespace Ast {
+    struct Generic : Node {
+      Identifier *value;
+      TypeSpecifier *type_specifier = nullptr;
 
-      generic_t(identifier_t *value, type_specifier_t *type_specifier);
+      Generic(Identifier *value, TypeSpecifier *type_specifier);
 
-      void accept(node_t *scope) override;
+      void accept(Node *scope) override;
     };
   }
 }

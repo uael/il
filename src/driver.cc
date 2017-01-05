@@ -23,19 +23,19 @@
 #include <iostream>
 #include "driver.h"
 
-namespace dyc {
+namespace Jay {
 
-  driver::driver()
+  Driver::Driver()
     : trace_scanning(false), trace_parsing(false) { }
 
-  bool driver::parse_stream(std::istream &in, const std::string &sname) {
+  bool Driver::parse_stream(std::istream &in, const std::string &sname) {
     streamname = sname;
 
-    scanner scanner(&in);
+    Scanner scanner(&in);
     scanner.set_debug(trace_scanning);
     this->lexer = &scanner;
 
-    parser parser(*this);
+    Parser parser(*this);
     parser.set_debug_level(trace_parsing);
     if (parser.parse() == 0) {
       ast.accept(nullptr);
@@ -44,22 +44,22 @@ namespace dyc {
     return false;
   }
 
-  bool driver::parse_file(const std::string &filename) {
+  bool Driver::parse_file(const std::string &filename) {
     std::ifstream in(filename.c_str());
     if (!in.good()) return false;
     return parse_stream(in, filename);
   }
 
-  bool driver::parse_string(const std::string &input, const std::string &sname) {
+  bool Driver::parse_string(const std::string &input, const std::string &sname) {
     std::istringstream iss(input);
     return parse_stream(iss, sname);
   }
 
-  void driver::error(const class location &l, const std::string &m) {
+  void Driver::error(const class location &l, const std::string &m) {
     std::cerr << l << ": " << m << std::endl;
   }
 
-  void driver::error(const std::string &m) {
+  void Driver::error(const std::string &m) {
     std::cerr << m << std::endl;
   }
 }

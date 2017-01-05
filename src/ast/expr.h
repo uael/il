@@ -26,10 +26,10 @@
 #include "node.h"
 #include "closure.h"
 
-namespace dyc {
-  namespace ast {
-    struct expr_t : node_t, closure_t {
-      enum kind_t {
+namespace Jay {
+  namespace Ast {
+    struct Expr : Node, Closure {
+      enum Kind {
         INC_PRE, DEC_PRE, AND_PRE, ADD_PRE, SUB_PRE, MUL_PRE, NOT_PRE, TID_PRE, POS, CALL, INC_POST, DEC_POST, CONST,
         ENCLOSE, ASSIGN, MUL_ASSIGN, DIV_ASSIGN, MOD_ASSIGN, ADD_ASSIGN, SUB_ASSIGN, LEFT_ASSIGN, RIGHT_ASSIGN,
         AND_ASSIGN, XOR_ASSIGN, OR_ASSIGN, MUL, DIV, MOD, ADD, SUB, LEFT, RIGHT, AND, XOR, OR, LAND, LOR, EQ, NEQ, LT,
@@ -37,82 +37,82 @@ namespace dyc {
       };
     };
 
-    struct expr_op_t : expr_t {
-      kind_t kind;
-      expr_t *op1 = nullptr;
+    struct ExprOp : Expr {
+      Kind kind;
+      Expr *op1 = nullptr;
 
-      expr_op_t(kind_t kind, expr_t *op1);
+      ExprOp(Kind kind, Expr *op1);
 
       std::string op();
-      void accept(node_t *scope) override;
+      void accept(Node *scope) override;
     };
 
-    struct expr_dop_t : expr_op_t {
-      expr_t *op2 = nullptr;
+    struct ExprDop : ExprOp {
+      Expr *op2 = nullptr;
 
-      expr_dop_t(kind_t kind, expr_t *op1, expr_t *op2);
+      ExprDop(Kind kind, Expr *op1, Expr *op2);
 
-      void accept(node_t *scope) override;
+      void accept(Node *scope) override;
     };
 
-    struct expr_ternary_t : expr_dop_t {
-      expr_t *cond = nullptr;
+    struct ExprTernary : ExprDop {
+      Expr *cond = nullptr;
 
-      expr_ternary_t(expr_t *cond, expr_t *op1, expr_t *op2);
+      ExprTernary(Expr *cond, Expr *op1, Expr *op2);
 
-      void accept(node_t *scope) override;
+      void accept(Node *scope) override;
     };
 
-    struct expr_cast_t : expr_op_t {
-      type_specifier_t *type = nullptr;
+    struct ExprCast : ExprOp {
+      TypeSpecifier *type = nullptr;
 
-      expr_cast_t(expr_t *op1, type_specifier_t *type);
+      ExprCast(Expr *op1, TypeSpecifier *type);
 
-      void accept(node_t *scope) override;
+      void accept(Node *scope) override;
     };
 
-    struct expr_call_t : expr_dop_t {
-      expr_call_t(expr_t *op1, expr_t *op2);
+    struct ExprCall : ExprDop {
+      ExprCall(Expr *op1, Expr *op2);
     };
 
-    struct expr_pos_t : expr_dop_t {
-      expr_pos_t(expr_t *op1, expr_t *op2);
+    struct ExprPos : ExprDop {
+      ExprPos(Expr *op1, Expr *op2);
     };
 
-    struct expr_unary_t : expr_op_t {
-      expr_unary_t(kind_t kind, expr_t *op1);
+    struct ExprUnary : ExprOp {
+      ExprUnary(Kind kind, Expr *op1);
     };
 
-    struct expr_postfix_t : expr_op_t {
-      expr_postfix_t(kind_t kind, expr_t *op1);
+    struct ExprPostfix : ExprOp {
+      ExprPostfix(Kind kind, Expr *op1);
     };
 
-    struct expr_nested_t : expr_op_t {
-      identifier_t *id = nullptr;
+    struct ExprNested : ExprOp {
+      Identifier *id = nullptr;
 
-      expr_nested_t(expr_t *op1, identifier_t *id);
+      ExprNested(Expr *op1, Identifier *id);
 
-      void accept(node_t *scope) override;
+      void accept(Node *scope) override;
     };
 
-    struct expr_sizeof_t : expr_op_t {
-      type_specifier_t *type = nullptr;
+    struct ExprSizeof : ExprOp {
+      TypeSpecifier *type = nullptr;
 
-      expr_sizeof_t(type_specifier_t *type);
-      expr_sizeof_t(expr_t *op1);
+      ExprSizeof(TypeSpecifier *type);
+      ExprSizeof(Expr *op1);
 
-      void accept(node_t *scope) override;
+      void accept(Node *scope) override;
     };
 
-    struct expr_primary_t : expr_op_t {
-      expr_primary_t(kind_t kind, expr_t *op1);
+    struct ExprPrimary : ExprOp {
+      ExprPrimary(Kind kind, Expr *op1);
     };
 
-    struct expr_kvp_t : expr_dop_t {
-      expr_kvp_t(expr_t *op1, expr_t *op2);
+    struct ExprKvp : ExprDop {
+      ExprKvp(Expr *op1, Expr *op2);
     };
 
-    struct expr_const_t : expr_t {};
+    struct ExprConst : Expr {};
   }
 }
 

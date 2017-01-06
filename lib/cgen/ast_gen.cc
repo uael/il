@@ -19,7 +19,6 @@
 /* $Id$ */
 
 #include "ast_gen.h"
-#include "file_gen.h"
 
 namespace Jay {
   namespace Gen {
@@ -28,8 +27,8 @@ namespace Jay {
     AstGen::AstGen(Program *program) : CGen(program) {}
 
     void AstGen::generate(FileGen *file) {
-      foreach(f, ast->files) {
-        FileGen gen(ast, f);
+      foreach(f, program->files) {
+        FileGen gen(program, f);
         gen.generate(nullptr);
       };
     }

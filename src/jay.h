@@ -24,7 +24,10 @@
 #ifdef HAVE_CONFIG_H
 #  include "config.h"
 #endif
-#include "program.h"
+
+#include "ast/ast.h"
+#include "cgen/cgen.h"
+#include "parse/driver.h"
 
 #endif /* _JAY_H */
 

@@ -21,7 +21,7 @@
 #ifndef _SCANNER_H
 #define _SCANNER_H
 
-#include "jay.h"
+#include "ast/ast.h"
 
 #ifndef YY_DECL
 # define  YY_DECL \

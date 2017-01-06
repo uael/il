@@ -18,53 +18,22 @@
 
 /* $Id$ */
 
-#include <iostream>
-#include <fstream>
-#include "test.h"
+#ifndef _GEN_AST_H
+#define _GEN_AST_H
 
-using namespace Jay;
-using namespace Jay::Ast;
+#include "cgen.h"
 
-SYNTAX_TEST(frame, f1, true, "",
-  "include stdlib;"
-  ""
-  "frame Ptr<T> : *T {"
-  "  self();"
-  "  self(value : T) => {"
-  "    *this.malloc() = value;"
-  "  }"
-  "  ~self() => free(this);"
-  ""
-  "  malloc() : static => this = malloc(sizeof(T))"
-  "}"
-);
+namespace Jay {
+  namespace Gen {
+    struct AstGen : CGen<Ast::Program> {
+      AstGen(Ast::Program *program);
 
-SYNTAX_TEST(frame, f2, true, "",
-  "use Ptr;"
-  ""
-  "frame Buffer<TItem> : Ptr<TItem> {"
-  "  realloc(new_size : Size) : static => {"
-  "    return this = realloc(this, new_size * sizeof(TItem));"
-  "  }"
-  "};"
-);
-
-TEST(frame, f3) {
-  Jay::Driver driver = Jay::Driver();
-  ASSERT_TRUE(driver.parse_string(
-    "use Ptr;"
-    ""
-    "frame Buffer<TItem> : Ptr<TItem> {"
-    "  realloc(new_size : Size) : static => {"
-    "    return this = realloc(this, new_size * sizeof(TItem));"
-    "  }"
-    "}"
-  ));
+      void generate(FileGen *file) override;
+    };
+  }
 }
 
-#ifdef HAVE_CONFIG_H
-RUN
-#endif
+#endif /* _GEN_AST_GEN_H */
 
 /*
  * Local variables:

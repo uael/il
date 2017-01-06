@@ -19,7 +19,7 @@
 /* $Id$ */
 
 %{
-#include "jay.h"
+#include "ast/ast.h"
 
 #include <cstdio>
 #include <cstdlib>

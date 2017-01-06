@@ -18,32 +18,36 @@
 
 /* $Id$ */
 
-#ifndef _CGEN_H
-#define _CGEN_H
+#ifndef _DRIVER_H
+#define _DRIVER_H
 
-#include <map>
-#include "program.h"
+#include <string>
+#include <vector>
+#include "scanner.h"
 
 namespace Jay {
-  namespace Gen {
-    struct FileGen;
-  }
 
-  template <typename T = Ast::Node>
-  struct CGen {
-    Program *ast;
-    std::string cursor;
-    T *node;
+  class Driver {
+  public:
+    bool trace_scanning;
+    bool trace_parsing;
+    std::string streamname;
 
-    CGen(Program *ast, T *node) : ast(ast), node(node) {}
-    CGen(Program *ast) : CGen(ast, ast) {}
+    Jay::Ast::Program program;
 
-    virtual ~CGen() {};
-    virtual void generate(Gen::FileGen *file) {};
+    class Scanner *lexer;
+
+    Driver();
+
+    bool parse_stream(std::istream &in, const std::string &sname = "stream input");
+    bool parse_string(const std::string &input, const std::string &sname = "string stream");
+    bool parse_file(const std::string &filename);
+    void error(const class location &l, const std::string &m);
+    void error(const std::string &m);
   };
 }
 
-#endif /* _CGEN_H */
+#endif /* _DRIVER_H */
 
 /*
  * Local variables:

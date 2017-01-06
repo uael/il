@@ -1,2 +1,4 @@
 add_subdirectory(gtest)
-include_directories(${gtest_SOURCE_DIR}/include)
+add_subdirectory(ast)
+add_subdirectory(cgen)
+add_subdirectory(parse)

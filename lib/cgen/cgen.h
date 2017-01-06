@@ -18,29 +18,35 @@
 
 /* $Id$ */
 
-#ifndef _GEN_FILE_H
-#define _GEN_FILE_H
+#ifndef _CGEN_H
+#define _CGEN_H
 
-#include "gen.h"
+#include <map>
+#include "ast/ast.h"
 
 namespace Jay {
   namespace Gen {
-    struct FileGen : CGen<Ast::File> {
-      std::string includes;
-      std::string source_includes;
-      std::string macros;
-      std::string source_macros;
-      std::string declarations;
-      std::string definitions;
-
-      FileGen(Program *ast, Ast::File *node);
-
-      void generate(FileGen *file) override;
-    };
+    struct FileGen;
   }
+
+  template <typename T = Ast::Node>
+  struct CGen {
+    Ast::Program *program;
+    std::string cursor;
+    T *node;
+
+    CGen(Ast::Program *program, T *node) : program(program), node(node) {}
+    CGen(Ast::Program *program) : CGen(program, program) {}
+
+    virtual ~CGen() {};
+    virtual void generate(Gen::FileGen *file) {};
+  };
 }
 
-#endif /* _GEN_FILE_GEN_H */
+#include "ast_gen.h"
+#include "file_gen.h"
+
+#endif /* _CGEN_H */
 
 /*
  * Local variables:

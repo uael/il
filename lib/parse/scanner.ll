@@ -42,7 +42,6 @@ ES  (\\(['"\?\\abfnrtv]|[0-7]{1,3}|x[a-fA-F0-9]+))
 WS  [ \t\v\n\f]
 
 %{
-#include "jay.h"
 #include "y.tab.h"
 
 using namespace std;

@@ -18,16 +18,22 @@
 
 /* $Id$ */
 
+#ifndef _AST_H
+#define _AST_H
+
+#include "closure.h"
+#include "const.h"
+#include "decl.h"
+#include "expr.h"
+#include "file.h"
+#include "generic.h"
+#include "ident.h"
+#include "node.h"
 #include "program.h"
+#include "stmt.h"
+#include "type.h"
 
-namespace Jay {
-  Program::Program() {}
-
-  void Program::accept(Ast::Node *scope) {
-    Ast::Node::accept(scope);
-    ACCEPT(files);
-  }
-}
+#endif /* _AST_H */
 
 /*
  * Local variables:

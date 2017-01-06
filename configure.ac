@@ -1,6 +1,6 @@
 AC_INIT([Jay], [0.1], [https://github.com/jaylang/jay/issues])
 AC_CONFIG_AUX_DIR([scripts])
-AC_CONFIG_SRCDIR([src/driver.cc])
+AC_CONFIG_SRCDIR([src/jay.cc])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIRS([m4])
 
@@ -19,5 +19,9 @@ AC_PROG_BISON
 
 LT_INIT
 
-AC_CONFIG_FILES([Makefile lib/Makefile src/Makefile test/Makefile])
+AC_CONFIG_FILES([ \
+  Makefile \
+  lib/Makefile lib/ast/Makefile lib/cgen/Makefile lib/parse/Makefile \
+  src/Makefile test/Makefile \
+])
 AC_OUTPUT

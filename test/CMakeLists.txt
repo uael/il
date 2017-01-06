@@ -1,6 +1,6 @@
 enable_testing()
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${gtest_SOURCE_DIR}/include)
 
 set(check_SOURCES
         argument.cc
@@ -8,8 +8,6 @@ set(check_SOURCES
         frame.cc)
 
 add_executable(check main.cc ${check_SOURCES})
-
-target_link_libraries(check gtest gtest_main)
-target_link_libraries(check parse)
+target_link_libraries(check gtest gtest_main parse)
 
 add_test(check check)

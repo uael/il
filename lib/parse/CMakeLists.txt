@@ -1,10 +1,15 @@
+cmake_minimum_required(VERSION 2.6.2)
+
+project(libparse)
+
 find_package(BISON)
 find_package(FLEX)
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+set(libparse_SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${libparse_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 
-bison_target(parser parser.yy ${CMAKE_CURRENT_BINARY_DIR}/parser.cc)
-flex_target(scanner scanner.ll ${CMAKE_CURRENT_BINARY_DIR}/scanner.cc)
+bison_target(parser parser.yy ${libparse_SOURCE_DIR}/parser.cc)
+flex_target(scanner scanner.ll ${libparse_SOURCE_DIR}/scanner.cc)
 add_flex_bison_dependency(scanner parser)
 
 set(libparse_SOURCES

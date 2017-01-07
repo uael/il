@@ -25,11 +25,15 @@ $ mkdir build && cd build
 autotools
 $ ../configure && make
 
-or cmake
+cmake
 $ cmake .. && make
 ```
 
 ##Test
 ```bash
+autotools
 $ make check
+
+cmake
+$ make check && test/check
 ```

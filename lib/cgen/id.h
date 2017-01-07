@@ -18,25 +18,22 @@
 
 /* $Id$ */
 
-#ifndef _AST_GENERIC_H
-#define _AST_GENERIC_H
+#ifndef _CGEN_ID_H
+#define _CGEN_ID_H
 
-#include "node.h"
+#include "cgen.h"
 
 namespace Jay {
-  namespace Ast {
-    struct Generic : Node {
-      Id *value;
-      TypeSpecifier *type_specifier = nullptr;
+  namespace Gen {
+    struct Id : CGen<Ast::Id> {
+      Id(Ast::Program *program, Ast::Id *node);
 
-      Generic(Id *value, TypeSpecifier *type_specifier);
-
-      void accept(Node *scope) override;
+      void generate(File *file) override;
     };
   }
 }
 
-#endif /* _AST_GENERIC_H */
+#endif /* _CGEN_ID_H */
 
 /*
  * Local variables:

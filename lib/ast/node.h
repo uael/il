@@ -34,7 +34,7 @@ namespace Jay {
 
   namespace Ast {
     struct File;
-    struct Identifier;
+    struct Id;
     struct Generic;
     struct Closure;
 
@@ -79,8 +79,8 @@ namespace Jay {
     struct ExprSizeof;
     struct ExprPrimary;
     struct ExprKvp;
-    struct ExprConst;
 
+    struct Const;
     struct ConstThis;
     struct ConstValue;
     struct ConstLambda;

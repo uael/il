@@ -24,28 +24,28 @@
 
 namespace Jay {
   namespace Ast {
-    DeclInclude::DeclInclude(Identifier *includes) : includes(includes) {}
+    DeclInclude::DeclInclude(Id *includes) : includes(includes) {}
 
     void DeclInclude::accept(Node *scope) {
       ACCEPT(includes);
       Node::accept(scope);
     }
 
-    DeclUse::DeclUse(Identifier *uses) : uses(uses) {}
+    DeclUse::DeclUse(Id *uses) : uses(uses) {}
 
     void DeclUse::accept(Node *scope) {
       ACCEPT(uses);
       Node::accept(scope);
     }
 
-    DeclNested::DeclNested(Identifier *name, Decl *decls) : name(name), decls(decls) {}
+    DeclNested::DeclNested(Id *name, Decl *decls) : name(name), decls(decls) {}
 
     void DeclNested::accept(Node *scope) {
       ACCEPT(name);
       Node::accept(scope);
     }
 
-    DeclMember::DeclMember(Identifier *ids, TypeSpecifier *type_specifier, Closure *closure)
+    DeclMember::DeclMember(Id *ids, TypeSpecifier *type_specifier, Closure *closure)
       : ids(ids), type_specifier(type_specifier), closure(closure) {}
 
     void DeclMember::accept(Node *scope) {
@@ -56,11 +56,11 @@ namespace Jay {
     }
 
     DeclProperty::DeclProperty(
-      Identifier *ids, TypeSpecifier *type_specifier, Closure *closure, bool assigned)
+      Id *ids, TypeSpecifier *type_specifier, Closure *closure, bool assigned)
       : DeclMember(ids, type_specifier, closure), assigned(assigned) {}
 
     DeclFunction::DeclFunction(
-      Identifier *ids, Generic *generics, Decl *args, TypeSpecifier *type_specifier, Closure *closure)
+      Id *ids, Generic *generics, Decl *args, TypeSpecifier *type_specifier, Closure *closure)
       : DeclMember(ids, type_specifier, closure), generics(generics), args(args) {}
 
     void DeclFunction::accept(Node *scope) {
@@ -71,7 +71,7 @@ namespace Jay {
 
     DeclCtor::DeclCtor(Decl *args, Closure *closure, const bool &poly)
       : DeclFunction(nullptr, nullptr, args, nullptr, closure), poly(poly) {}
-    DeclCtor::DeclCtor(Identifier *props_args, Closure *closure, const bool &poly)
+    DeclCtor::DeclCtor(Id *props_args, Closure *closure, const bool &poly)
       : DeclFunction(nullptr, nullptr, nullptr, nullptr, closure), props_args(props_args), poly(poly) {}
 
     void DeclCtor::accept(Node *scope) {
@@ -80,10 +80,10 @@ namespace Jay {
     }
 
     DeclDtor::DeclDtor(Decl *args, Closure *closure, const bool &poly) : DeclCtor(args, closure, poly) {}
-    DeclDtor::DeclDtor(Identifier *props_args, Closure *closure, const bool &poly)
+    DeclDtor::DeclDtor(Id *props_args, Closure *closure, const bool &poly)
       : DeclCtor(props_args, closure, poly) {}
 
-    DeclFrame::DeclFrame(Identifier *name, Generic *generics, TypeSpecifier *type, Decl *decls)
+    DeclFrame::DeclFrame(Id *name, Generic *generics, TypeSpecifier *type, Decl *decls)
       : DeclNested(name, decls), generics(generics), type(type)  {}
 
     void DeclFrame::accept(Node *scope) {

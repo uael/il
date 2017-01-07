@@ -18,25 +18,27 @@
 
 /* $Id$ */
 
-#ifndef _AST_GENERIC_H
-#define _AST_GENERIC_H
+#ifndef _AST_ID_H
+#define _AST_ID_H
 
 #include "node.h"
+#include "expr.h"
+#include "const.h"
 
 namespace Jay {
   namespace Ast {
-    struct Generic : Node {
-      Id *value;
-      TypeSpecifier *type_specifier = nullptr;
+    struct Id : Const {
+      std::string *value;
+      std::string uk_value;
 
-      Generic(Id *value, TypeSpecifier *type_specifier);
+      Id(std::string *value);
 
       void accept(Node *scope) override;
     };
   }
 }
 
-#endif /* _AST_GENERIC_H */
+#endif /* _AST_ID_H */
 
 /*
  * Local variables:

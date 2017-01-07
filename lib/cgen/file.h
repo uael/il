@@ -18,8 +18,8 @@
 
 /* $Id$ */
 
-#ifndef _GEN_FILE_H
-#define _GEN_FILE_H
+#ifndef _CGEN_FILE_H
+#define _CGEN_FILE_H
 
 #include "cgen.h"
 
@@ -40,7 +40,7 @@ namespace Jay {
   }
 }
 
-#endif /* _GEN_FILE_GEN_H */
+#endif /* _CGEN_FILE_H */
 
 /*
  * Local variables:

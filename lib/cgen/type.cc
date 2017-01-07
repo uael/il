@@ -18,15 +18,14 @@
 
 /* $Id$ */
 
-#include "ident.h"
+#include "type.h"
 
 namespace Jay {
-  namespace Ast {
-    Identifier::Identifier(std::string *value) : value(value) {}
+  namespace Gen {
+    Type::Type(Ast::Program *program, Ast::Type *node) : CGen(program, node) {}
 
-    void Identifier::accept(Node *scope) {
-      uk_value = *value;
-      Node::accept(scope);
+    void Type::generate(File *file) {
+      CGen::generate(file);
     }
   }
 }

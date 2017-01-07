@@ -66,9 +66,9 @@ namespace Jay {
     };
 
     struct TypeUserdef : Type {
-      Identifier *id = nullptr;
+      Id *id = nullptr;
 
-      TypeUserdef(Identifier *id);
+      TypeUserdef(Id *id);
 
       void accept(Node *scope) override;
     };
@@ -76,7 +76,7 @@ namespace Jay {
     struct TypeGeneric : TypeUserdef {
       TypeSpecifier *types = nullptr;
 
-      TypeGeneric(Identifier *id, TypeSpecifier *types);
+      TypeGeneric(Id *id, TypeSpecifier *types);
 
       void accept(Node *scope) override;
     };

@@ -22,43 +22,43 @@
 #define _AST_DECL_H
 
 #include "node.h"
-#include "ident.h"
+#include "id.h"
 
 namespace Jay {
   namespace Ast {
     struct Decl : Node {};
 
     struct DeclInclude : Decl {
-      Identifier *includes = nullptr;
+      Id *includes = nullptr;
 
-      DeclInclude(Identifier *includes);
+      DeclInclude(Id *includes);
 
       void accept(Node *scope) override;
     };
 
     struct DeclUse : Decl {
-      Identifier *uses = nullptr;
+      Id *uses = nullptr;
 
-      DeclUse(Identifier *uses);
+      DeclUse(Id *uses);
 
       void accept(Node *scope) override;
     };
 
     struct DeclNested : Decl {
-      Identifier *name = nullptr;
+      Id *name = nullptr;
       Decl *decls = nullptr;
 
-      DeclNested(Identifier *name, Decl *decls);
+      DeclNested(Id *name, Decl *decls);
 
       void accept(Node *scope) override;
     };
 
     struct DeclMember : Decl {
-      Identifier *ids = nullptr;
+      Id *ids = nullptr;
       TypeSpecifier *type_specifier = nullptr;
       Closure *closure = nullptr;
 
-      DeclMember(Identifier *ids, TypeSpecifier *type_specifier, Closure *closure);
+      DeclMember(Id *ids, TypeSpecifier *type_specifier, Closure *closure);
 
       virtual void accept(Node *scope) override;
     };
@@ -66,26 +66,26 @@ namespace Jay {
     struct DeclProperty : DeclMember {
       bool assigned;
 
-      DeclProperty(Identifier *ids, TypeSpecifier *type_specifier, Closure *closure, bool assigned);
+      DeclProperty(Id *ids, TypeSpecifier *type_specifier, Closure *closure, bool assigned);
     };
 
     struct DeclFunction : DeclMember {
       Generic *generics = nullptr;
       Decl *args = nullptr;
 
-      DeclFunction(Identifier *ids, Generic *generics, Decl *args, TypeSpecifier *type_specifier,
+      DeclFunction(Id *ids, Generic *generics, Decl *args, TypeSpecifier *type_specifier,
                       Closure *closure);
 
       virtual void accept(Node *scope) override;
     };
 
     struct DeclCtor : DeclFunction {
-      Identifier *props_args = nullptr;
+      Id *props_args = nullptr;
       bool poly = true;
       bool dtor = false;
 
       DeclCtor(Decl *args, Closure *closure, const bool &poly = true);
-      DeclCtor(Identifier *props_args, Closure *closure, const bool &poly = true);
+      DeclCtor(Id *props_args, Closure *closure, const bool &poly = true);
 
       void accept(Node *scope) override;
     };
@@ -93,14 +93,14 @@ namespace Jay {
     struct DeclDtor : DeclCtor {
       DeclDtor(Decl *args, Closure *closure, const bool &poly);
 
-      DeclDtor(Identifier *props_args, Closure *closure, const bool &poly);
+      DeclDtor(Id *props_args, Closure *closure, const bool &poly);
     };
 
     struct DeclFrame : DeclNested {
       Generic *generics = nullptr;
       TypeSpecifier *type = nullptr;
 
-      DeclFrame(Identifier *name, Generic *generics, TypeSpecifier *type, Decl *decls);
+      DeclFrame(Id *name, Generic *generics, TypeSpecifier *type, Decl *decls);
 
       void accept(Node *scope) override;
     };

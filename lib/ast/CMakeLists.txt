@@ -10,7 +10,7 @@ set(libast_SOURCES
         expr.cc
         file.cc
         generic.cc
-        ident.cc
+        id.cc
         node.cc
         program.cc
         stmt.cc

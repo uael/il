@@ -40,7 +40,7 @@
 
 %union {
   std::string *_string;
-  Jay::Ast::Identifier *_id;
+  Jay::Ast::Id *_id;
   Jay::Ast::Generic *_generic;
   Jay::Ast::Closure *_closure;
   Jay::Ast::Decl *_decl;
@@ -165,7 +165,7 @@ file
 id
   :
     ID {
-      MAKE($$, @$, Identifier, $1);
+      MAKE($$, @$, Id, $1);
     }
   ;
 
@@ -183,7 +183,7 @@ id_list
 userdef
   :
     USERDEF {
-      MAKE($$, @$, Identifier, $1);
+      MAKE($$, @$, Id, $1);
     }
   ;
 

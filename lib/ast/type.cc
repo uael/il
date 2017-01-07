@@ -49,14 +49,14 @@ namespace Jay {
 
     TypeInternal::TypeInternal(TypeInternal::Kind kind) : kind(kind) {}
 
-    TypeUserdef::TypeUserdef(Identifier *id) : id(id) {}
+    TypeUserdef::TypeUserdef(Id *id) : id(id) {}
 
     void TypeUserdef::accept(Node *scope) {
       ACCEPT(id);
       Node::accept(scope);
     }
 
-    TypeGeneric::TypeGeneric(Identifier *id, TypeSpecifier *types) : TypeUserdef(id), types(types) {}
+    TypeGeneric::TypeGeneric(Id *id, TypeSpecifier *types) : TypeUserdef(id), types(types) {}
 
     void TypeGeneric::accept(Node *scope) {
       ACCEPT(types);

@@ -88,9 +88,9 @@ namespace Jay {
     };
 
     struct ExprNested : ExprOp {
-      Identifier *id = nullptr;
+      Id *id = nullptr;
 
-      ExprNested(Expr *op1, Identifier *id);
+      ExprNested(Expr *op1, Id *id);
 
       void accept(Node *scope) override;
     };
@@ -111,8 +111,6 @@ namespace Jay {
     struct ExprKvp : ExprDop {
       ExprKvp(Expr *op1, Expr *op2);
     };
-
-    struct ExprConst : Expr {};
   }
 }
 

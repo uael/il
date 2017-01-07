@@ -19,14 +19,14 @@
 /* $Id$ */
 
 #include "const.h"
-#include "ident.h"
+#include "id.h"
 #include "type.h"
 
 namespace Jay {
   namespace Ast {
     ConstValue::ConstValue(ConstValue::Kind kind, std::string *value) : kind(kind), value(value) {}
 
-    ConstLambda::ConstLambda(Identifier *args, Closure *closure) : args(args), closure(closure) {}
+    ConstLambda::ConstLambda(Id *args, Closure *closure) : args(args), closure(closure) {}
 
     void ConstLambda::accept(Node *scope) {
       ACCEPT(args);

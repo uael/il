@@ -19,7 +19,7 @@
 /* $Id$ */
 
 #include "expr.h"
-#include "ident.h"
+#include "id.h"
 #include "type.h"
 
 namespace Jay {
@@ -139,7 +139,7 @@ namespace Jay {
 
     ExprPostfix::ExprPostfix(ExprOp::Kind kind, Expr *op1) : ExprOp(kind, op1) {}
 
-    ExprNested::ExprNested(Expr *op1, Identifier *id) : ExprOp(NESTED, op1), id(id) {}
+    ExprNested::ExprNested(Expr *op1, Id *id) : ExprOp(NESTED, op1), id(id) {}
 
     void ExprNested::accept(Node *scope) {
       ACCEPT(id);

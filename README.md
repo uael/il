@@ -26,7 +26,7 @@ autotools
 $ ../configure && make
 
 or cmake
-$ cmake && make
+$ cmake .. && make
 ```
 
 ##Test

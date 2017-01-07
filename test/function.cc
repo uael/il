@@ -27,12 +27,12 @@ using namespace Jay::Ast;
 
 SYNTAX_TEST(func, fibonacci, true, "",
   "fibonacci(n:int):int => {"
-  "  if (n==0) {"
-  "    return 0;"
-  "  } else if (n == 1) {"
-  "    return 1;"
+  "  if n==0 {"
+  "    return 0"
+  "  } else if n == 1 {"
+  "    return 1"
   "  } else {"
-  "    return fibonacci(n-1)+fibonacci(n-2);"
+  "    return fibonacci(n-1)+fibonacci(n-2)"
   "  }"
   "}"
 );
@@ -54,34 +54,34 @@ SYNTAX_TEST(func, ns_fibonacci, true, "",
 TEST(func, sort) {
   Jay::Driver driver = Jay::Driver();
   ASSERT_TRUE(driver.parse_string(
-    "sort<T>(array : T[]) => {"
+    "sort<T>(array : T[]) : void => {"
     "  use Foo;"
-    "  var swap(i, j : T) => {"
-    "      var t = array[i];"
-    "      array[i] = array[j];"
-    "      array[j] = t;"
-    "    },"
-    "    sort(l, r : T) {"
-    "      var p = array[(l + r) / 2], i = l, j = r;"
-    "      while (i <= j) {"
-    "        while (array[i] < p) i += 1;"
-    "        while (array[i] < p) l -= 1;"
-    "        if (i <= j) {"
-    "          swap(i, j);"
-    "          i += 1;"
-    "          j -= 1;"
-    "        }"
+    "  const swap(i, j : T) => {"
+    "    var t = array[i];"
+    "    array[i] = array[j];"
+    "    array[j] = t"
+    "  },"
+    "  sort(l, r : T) => {"
+    "    var p = array[(l + r) / 2], i = l, j = r;"
+    "    while i <= j {"
+    "      while array[i] < p { i += 1 }"
+    "      while (array[i] < p) l -= 1;"
+    "      if i <= j {"
+    "        swap(i, j);"
+    "        i += 1;"
+    "        j -= 1"
     "      }"
-    "      if (l < j) sort(l, j);"
-    "      if (j < r) sort(i, r);"
-    "    };"
-    "  sort(0, count(array) - 1);"
+    "    }"
+    "    if (l < j) sort(l, j);"
+    "    if (j < r) sort(i, r)"
+    "  }"
+    "  sort(0, array.length - 1)"
     "}"
   ));
 }
 
 SYNTAX_TEST(func, tuple, true, "",
-  "func(n : int) : int, double[] => { return 1, [2.0]; }"
+  "func(n : int) : int, double[] => { return 1, [2.0] }"
 );
 
 SYNTAX_TEST(func, tuple1, true, "",

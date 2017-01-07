@@ -89,6 +89,7 @@ namespace Jay {
 
     StmtDecl::StmtDecl() {}
     StmtDecl::StmtDecl(Decl *decls) : decls(decls) {}
+    StmtDecl::StmtDecl(Decl *decls, bool constant) : decls(decls), constant(constant) {}
 
     void StmtDecl::accept(Node *scope) {
       ACCEPT(decls);

@@ -4,6 +4,6 @@ AM_CXXFLAGS = -Wall -std=c++11 -I$(top_srcdir)/lib -I$(top_builddir)/lib/parse
 bin_PROGRAMS = jay
 
 jay_SOURCES = jay.cc
-jay_LDADD = $(top_builddir)/lib/parse/libparse.la
+jay_LDADD = $(top_builddir)/lib/parse/libparse.la $(top_builddir)/lib/cgen/libcgen.la
 
 pkginclude_HEADERS = jay.h

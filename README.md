@@ -15,24 +15,25 @@ Currently support functional parsing only :
 ##Deps
 ```bash
 $ sudo apt install build-essential make autoconf automake libtool g++ bison flex 
-$ git submodule update --init
 ```
 
-##Installation
+##Build
 ```bash
-$ ./configure
-$ make
-$ sudo make install 
-```
-
-##Development 
-```bash
+$ git clone --recursive https://github.com/jayl/jay.git
 $ mkdir build && cd build
-$ ../configure
-$ make
+
+autotools
+$ ../configure && make
+
+cmake
+$ cmake .. && make
 ```
 
 ##Test
 ```bash
+autotools
 $ make check
+
+cmake
+$ make check && test/check
 ```

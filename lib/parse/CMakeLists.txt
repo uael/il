@@ -21,4 +21,4 @@ set(libparse_SOURCES
         driver.cc)
 
 add_library(parse ${libparse_SOURCES})
-target_link_libraries(parse ast cgen)
+target_link_libraries(parse ast)

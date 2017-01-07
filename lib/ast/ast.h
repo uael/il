@@ -27,7 +27,7 @@
 #include "expr.h"
 #include "file.h"
 #include "generic.h"
-#include "ident.h"
+#include "id.h"
 #include "node.h"
 #include "program.h"
 #include "stmt.h"

@@ -19,12 +19,12 @@
 /* $Id$ */
 
 #include "generic.h"
-#include "ident.h"
+#include "id.h"
 #include "type.h"
 
 namespace Jay {
   namespace Ast {
-    Generic::Generic(Identifier *value, TypeSpecifier *type_specifier)
+    Generic::Generic(Id *value, TypeSpecifier *type_specifier)
       : value(value), type_specifier(type_specifier) {}
 
     void Generic::accept(Node *scope) {

@@ -18,25 +18,41 @@
 
 /* $Id$ */
 
-#ifndef _AST_GENERIC_H
-#define _AST_GENERIC_H
-
-#include "node.h"
+#include "const.h"
 
 namespace Jay {
-  namespace Ast {
-    struct Generic : Node {
-      Id *value;
-      TypeSpecifier *type_specifier = nullptr;
+  namespace Gen {
+    Const::Const(Ast::Program *program, Ast::Const *node) : CGen(program, node) {}
 
-      Generic(Id *value, TypeSpecifier *type_specifier);
+    void Const::generate(File *file) {
+      CGen::generate(file);
+    }
 
-      void accept(Node *scope) override;
-    };
+    ConstThis::ConstThis(Ast::Program *program, Ast::ConstThis *node) : CGen(program, node) {}
+
+    void ConstThis::generate(File *file) {
+      CGen::generate(file);
+    }
+
+    ConstLambda::ConstLambda(Ast::Program *program, Ast::ConstLambda *node) : CGen(program, node) {}
+
+    void ConstLambda::generate(File *file) {
+      CGen::generate(file);
+    }
+
+    ConstInitializer::ConstInitializer(Ast::Program *program, Ast::ConstInitializer *node) : CGen(program, node) {}
+
+    void ConstInitializer::generate(File *file) {
+      CGen::generate(file);
+    }
+
+    ConstNew::ConstNew(Ast::Program *program, Ast::ConstNew *node) : CGen(program, node) {}
+
+    void ConstNew::generate(File *file) {
+      CGen::generate(file);
+    }
   }
 }
-
-#endif /* _AST_GENERIC_H */
 
 /*
  * Local variables:

@@ -18,26 +18,22 @@
 
 /* $Id$ */
 
-#ifndef _AST_IDENT_H
-#define _AST_IDENT_H
+#ifndef _CGEN_STMT_H
+#define _CGEN_STMT_H
 
-#include "node.h"
-#include "expr.h"
+#include "cgen.h"
 
 namespace Jay {
-  namespace Ast {
-    struct Identifier : ExprConst {
-      std::string *value;
-      std::string uk_value;
+  namespace Gen {
+    struct Stmt : CGen<Ast::Stmt> {
+      Stmt(Ast::Program *program, Ast::Stmt *node);
 
-      Identifier(std::string *value);
-
-      void accept(Node *scope) override;
+      void generate(File *file) override;
     };
   }
 }
 
-#endif /* _AST_IDENT_H */
+#endif /* _CGEN_STMT_H */
 
 /*
  * Local variables:

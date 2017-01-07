@@ -40,7 +40,7 @@
 
 %union {
   std::string *_string;
-  Jay::Ast::Identifier *_id;
+  Jay::Ast::Id *_id;
   Jay::Ast::Generic *_generic;
   Jay::Ast::Closure *_closure;
   Jay::Ast::Decl *_decl;
@@ -81,7 +81,7 @@
 %type <_id> id id_list userdef userdef_list
 %type <_generic> generic generic_list generics
 %type <_closure> closure closure_or_empty
-%type <_decl> decl_file_item decl_frame decl_frame_item decl_use decl_var decl_dtor decl_ctor
+%type <_decl> decl_file_item decl_frame decl_frame_item decl_use decl_var decl_function decl_dtor decl_ctor
 %type <_decl_list> decl_file_body decl_frame_body frame_body decl_var_list
 %type <_type_specifier> type_specifier type_specifier_list type_specifier_unit
 %type <_type> type
@@ -139,7 +139,7 @@ using namespace Jay::Ast;
   userdef userdef_list
   generic generic_list generics
   closure closure_or_empty
-  decl_file_item decl_frame decl_frame_item decl_use decl_var decl_dtor decl_ctor decl_file_body
+  decl_file_item decl_frame decl_frame_item decl_use decl_var decl_function decl_dtor decl_ctor decl_file_body
   decl_frame_body frame_body decl_var_list
   type_specifier type_specifier_list type_specifier_unit type type_internal type_userdef type_userdef_unit
   stmt stmt_list stmt_expr stmt_label stmt_compound stmt_select stmt_iter stmt_jump stmt_decl
@@ -165,7 +165,7 @@ file
 id
   :
     ID {
-      MAKE($$, @$, Identifier, $1);
+      MAKE($$, @$, Id, $1);
     }
   ;
 
@@ -183,7 +183,7 @@ id_list
 userdef
   :
     USERDEF {
-      MAKE($$, @$, Identifier, $1);
+      MAKE($$, @$, Id, $1);
     }
   ;
 
@@ -237,11 +237,6 @@ closure
       $$ = $2;
     }
   |
-    stmt_compound {
-      $$ = $1;
-      $$->macro = false;
-    }
-  |
     ARROW stmt_compound {
       $$ = $2;
     }
@@ -258,7 +253,7 @@ closure_or_empty
     }
   ;
 
-eod
+eot
   :
     SEMICOLON
   |
@@ -302,11 +297,11 @@ decl_file_body
       $$ = nullptr;
     }
   |
-    decl_file_item eod {
+    decl_file_item eot {
       $$ = $1;
     }
   |
-    decl_file_body eod decl_file_item eod {
+    decl_file_body eot decl_file_item eot {
       $$ = $1->push($3);
     }
   ;
@@ -332,6 +327,11 @@ decl_var
       MAKE($$, @$, DeclProperty, $1, $3, $4, false);
     }
   |
+    decl_function
+  ;
+
+decl_function
+  :
     id_list generics LPAR decl_var_list RPAR closure_or_empty {
       MAKE($$, @$, DeclFunction, $1, $2, $4, nullptr, $6);
     }
@@ -403,11 +403,11 @@ frame_body
       $$ = nullptr;
     }
   |
-    decl_frame_item eod {
+    decl_frame_item eot {
       $$ = $1;
     }
   |
-    frame_body eod decl_frame_item eod {
+    frame_body eot decl_frame_item eot {
       $$ = $1->push($3);
     }
   ;
@@ -659,7 +659,7 @@ stmt_expr
       MAKE($$, @$, StmtExpr, );
     }
   |
-    expr SEMICOLON {
+    expr eot {
       MAKE($$, @$, StmtExpr, $1);
     }
   ;
@@ -699,6 +699,18 @@ stmt_select
     SWITCH LPAR expr RPAR stmt {
       MAKE($$, @$, StmtSelect, StmtSelect::Kind::SWITCH, $3, $5);
     }
+  |
+    IF expr stmt_compound ELSE stmt {
+      MAKE($$, @$, StmtSelect, $2, $3, $5);
+    }
+  |
+    IF expr stmt_compound {
+      MAKE($$, @$, StmtSelect, StmtSelect::Kind::IF, $2, $3);
+    }
+  |
+    SWITCH expr stmt_compound {
+      MAKE($$, @$, StmtSelect, StmtSelect::Kind::SWITCH, $2, $3);
+    }
   ;
 
 stmt_iter
@@ -707,8 +719,16 @@ stmt_iter
 	    MAKE($$, @$, StmtIter, $3, $5);
 	  }
 	|
-    DO stmt WHILE LPAR expr RPAR SEMICOLON {
+    WHILE expr stmt_compound {
+	    MAKE($$, @$, StmtIter, $2, $3);
+	  }
+	|
+    DO stmt WHILE LPAR expr RPAR eot {
       MAKE($$, @$, StmtIter, $2, $5);
+    }
+	|
+    DO stmt_compound WHILE expr eot {
+      MAKE($$, @$, StmtIter, $2, $4);
     }
 	|
     FOR LPAR stmt_expr stmt_expr RPAR stmt {
@@ -750,38 +770,42 @@ stmt_iter
 
 stmt_jump
   :
-    GOTO ID SEMICOLON {
+    GOTO ID eot {
       MAKE($$, @$, StmtJump, $2);
     }
   |
-    CONTINUE SEMICOLON {
+    CONTINUE eot {
       MAKE($$, @$, StmtJump, StmtJump::Kind::CONTINUE);
     }
   |
-    BREAK SEMICOLON {
+    BREAK eot {
       MAKE($$, @$, StmtJump, StmtJump::Kind::BREAK);
     }
   |
-    RETURN SEMICOLON {
+    RETURN eot {
       MAKE($$, @$, StmtJump, StmtJump::Kind::RETURN);
     }
   |
-    RETURN expr_list SEMICOLON {
+    RETURN expr_list eot {
       MAKE($$, @$, StmtJump, $2);
     }
   ;
 
 stmt_decl
   :
-    VAR decl_var_list SEMICOLON {
+    VAR decl_var_list eot {
       MAKE($$, @$, StmtDecl, $2);
     }
   |
-    decl_use eod {
+    CONST decl_var_list eot {
+      MAKE($$, @$, StmtDecl, $2, true);
+    }
+  |
+    decl_use eot {
       MAKE($$, @$, StmtDecl, $1);
     }
   |
-    decl_frame eod {
+    decl_frame eot {
       MAKE($$, @$, StmtDecl, $1);
     }
   ;

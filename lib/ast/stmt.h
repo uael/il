@@ -109,9 +109,11 @@ namespace Jay {
 
     struct StmtDecl : Stmt {
       Decl *decls = nullptr;
+      bool constant = false;
 
       StmtDecl();
       StmtDecl(Decl *decls);
+      StmtDecl(Decl *decls, bool constant);
 
       virtual void accept(Node *scope) override;
     };

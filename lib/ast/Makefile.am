@@ -5,5 +5,5 @@ noinst_LTLIBRARIES = libast.la
 
 libast_la_SOURCES = \
 	ast.h closure.cc const.cc decl.cc expr.cc \
-  file.cc generic.cc ident.cc node.cc program.cc \
+  file.cc generic.cc id.cc node.cc program.cc \
   stmt.cc type.cc

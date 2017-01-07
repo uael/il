@@ -25,10 +25,11 @@
 
 namespace Jay {
   namespace Ast {
-    struct ConstThis : ExprConst {
-    };
+    struct Const : Expr {};
 
-    struct ConstValue : ExprConst {
+    struct ConstThis : Const {};
+
+    struct ConstValue : Const {
       enum Kind {
         INT, FLOAT, STRING
       } kind;
@@ -37,16 +38,16 @@ namespace Jay {
       ConstValue(Kind kind, std::string *value);
     };
 
-    struct ConstLambda : ExprConst {
-      Identifier *args = nullptr;
+    struct ConstLambda : Const {
+      Id *args = nullptr;
       Closure *closure = nullptr;
 
-      ConstLambda(Identifier *args, Closure *closure);
+      ConstLambda(Id *args, Closure *closure);
 
       void accept(Node *scope) override;
     };
 
-    struct ConstInitializer : ExprConst {
+    struct ConstInitializer : Const {
       Expr *exprs = nullptr;
 
       ConstInitializer(Expr *exprs);

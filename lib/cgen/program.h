@@ -33,7 +33,7 @@ namespace Jay {
   }
 }
 
-#endif /* _GEN_AST_GEN_H */
+#endif /* _CGEN_PROGRAM_H */
 
 /*
  * Local variables:

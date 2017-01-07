@@ -19,7 +19,7 @@ $ sudo apt install build-essential make autoconf automake libtool g++ bison flex
 
 ##Build
 ```bash
-$ git clone --recursive https://github.com/jayl/jay.git
+$ git clone --recursive https://github.com/jayl/jay.git && cd jay
 $ mkdir build && cd build
 
 autotools

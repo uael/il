@@ -30,6 +30,30 @@ namespace Jay {
 
       void generate(File *file) override;
     };
+
+    struct ConstThis : CGen<Ast::ConstThis> {
+      ConstThis(Ast::Program *program, Ast::ConstThis *node);
+
+      void generate(File *file) override;
+    };
+
+    struct ConstLambda : CGen<Ast::ConstLambda> {
+      ConstLambda(Ast::Program *program, Ast::ConstLambda *node);
+
+      void generate(File *file) override;
+    };
+
+    struct ConstInitializer : CGen<Ast::ConstInitializer> {
+      ConstInitializer(Ast::Program *program, Ast::ConstInitializer *node);
+
+      void generate(File *file) override;
+    };
+
+    struct ConstNew : CGen<Ast::ConstNew> {
+      ConstNew(Ast::Program *program, Ast::ConstNew *node);
+
+      void generate(File *file) override;
+    };
   }
 }
 

@@ -27,6 +27,30 @@ namespace Jay {
     void Const::generate(File *file) {
       CGen::generate(file);
     }
+
+    ConstThis::ConstThis(Ast::Program *program, Ast::ConstThis *node) : CGen(program, node) {}
+
+    void ConstThis::generate(File *file) {
+      CGen::generate(file);
+    }
+
+    ConstLambda::ConstLambda(Ast::Program *program, Ast::ConstLambda *node) : CGen(program, node) {}
+
+    void ConstLambda::generate(File *file) {
+      CGen::generate(file);
+    }
+
+    ConstInitializer::ConstInitializer(Ast::Program *program, Ast::ConstInitializer *node) : CGen(program, node) {}
+
+    void ConstInitializer::generate(File *file) {
+      CGen::generate(file);
+    }
+
+    ConstNew::ConstNew(Ast::Program *program, Ast::ConstNew *node) : CGen(program, node) {}
+
+    void ConstNew::generate(File *file) {
+      CGen::generate(file);
+    }
   }
 }
 

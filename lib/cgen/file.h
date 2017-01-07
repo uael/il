@@ -25,7 +25,7 @@
 
 namespace Jay {
   namespace Gen {
-    struct FileGen : CGen<Ast::File> {
+    struct File : CGen<Ast::File> {
       std::string includes;
       std::string source_includes;
       std::string macros;
@@ -33,9 +33,9 @@ namespace Jay {
       std::string declarations;
       std::string definitions;
 
-      FileGen(Ast::Program *ast, Ast::File *node);
+      File(Ast::Program *ast, Ast::File *node);
 
-      void generate(FileGen *file) override;
+      void generate(File *file) override;
     };
   }
 }

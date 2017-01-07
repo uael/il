@@ -4,8 +4,8 @@ project(libcgen)
 
 set(libcgen_SOURCES
         cgen.h
-        ast_gen.cc
-        file_gen.cc)
+        file.cc
+        program.cc)
 
 add_library(cgen ${libcgen_SOURCES})
 target_link_libraries(cgen ast)

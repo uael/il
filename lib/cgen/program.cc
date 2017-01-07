@@ -18,23 +18,17 @@
 
 /* $Id$ */
 
-#include <fstream>
-#include "file_gen.h"
+#include "program.h"
 
 namespace Jay {
   namespace Gen {
-    using namespace Ast;
+    Program::Program(Ast::Program *program) : CGen(program) {}
 
-    FileGen::FileGen(Program *ast, File *node) : CGen(ast, node) {}
-
-    void FileGen::generate(FileGen *file) {
-      foreach(decl, node->decls) {
-
-      }
-      std::string f = node->filename.substr(0, node->filename.size() - 3) + ".c";
-      std::ofstream ofstream;
-      ofstream.open(f);
-      ofstream << declarations;
+    void Program::generate(File *file) {
+      foreach(f, program->files) {
+        File gen(program, f);
+        gen.generate(nullptr);
+      };
     }
   }
 }

@@ -18,17 +18,17 @@
 
 /* $Id$ */
 
-#ifndef _GEN_AST_H
-#define _GEN_AST_H
+#ifndef _CGEN_PROGRAM_H
+#define _CGEN_PROGRAM_H
 
 #include "cgen.h"
 
 namespace Jay {
   namespace Gen {
-    struct AstGen : CGen<Ast::Program> {
-      AstGen(Ast::Program *program);
+    struct Program : CGen<Ast::Program> {
+      Program(Ast::Program *program);
 
-      void generate(FileGen *file) override;
+      void generate(File *file) override;
     };
   }
 }

@@ -26,7 +26,7 @@
 
 namespace Jay {
   namespace Gen {
-    struct FileGen;
+    struct File;
   }
 
   template <typename T = Ast::Node>
@@ -39,12 +39,12 @@ namespace Jay {
     CGen(Ast::Program *program) : CGen(program, program) {}
 
     virtual ~CGen() {};
-    virtual void generate(Gen::FileGen *file) {};
+    virtual void generate(Gen::File *file) {};
   };
 }
 
-#include "ast_gen.h"
-#include "file_gen.h"
+#include "program.h"
+#include "file.h"
 
 #endif /* _CGEN_H */
 

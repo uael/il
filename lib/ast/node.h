@@ -42,14 +42,15 @@ namespace Jay {
     struct DeclInclude;
     struct DeclUse;
     struct DeclNested;
-    struct DeclNested;
+    struct DeclMember;
     struct DeclProperty;
     struct DeclFunction;
     struct DeclCtor;
+    struct DeclDtor;
     struct DeclFrame;
 
     struct TypeSpecifier;
-    struct type_callable_t;
+    struct TypeCallable;
     struct TypePtr;
     struct TypeArray;
     struct Type;

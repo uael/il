@@ -30,6 +30,48 @@ namespace Jay {
 
       void generate(File *file) override;
     };
+
+    struct TypeSpecifier : CGen<Ast::TypeSpecifier> {
+      TypeSpecifier(Ast::Program *program, Ast::TypeSpecifier *node);
+
+      void generate(File *file) override;
+    };
+
+    struct TypeCallable : CGen<Ast::TypeCallable> {
+      TypeCallable(Ast::Program *program, Ast::TypeCallable *node);
+
+      void generate(File *file) override;
+    };
+
+    struct TypePtr : CGen<Ast::TypePtr> {
+      TypePtr(Ast::Program *program, Ast::TypePtr *node);
+
+      void generate(File *file) override;
+    };
+
+    struct TypeArray : CGen<Ast::TypeArray> {
+      TypeArray(Ast::Program *program, Ast::TypeArray *node);
+
+      void generate(File *file) override;
+    };
+
+    struct TypeInternal : CGen<Ast::TypeInternal> {
+      TypeInternal(Ast::Program *program, Ast::TypeInternal *node);
+
+      void generate(File *file) override;
+    };
+
+    struct TypeUserdef : CGen<Ast::TypeUserdef> {
+      TypeUserdef(Ast::Program *program, Ast::TypeUserdef *node);
+
+      void generate(File *file) override;
+    };
+
+    struct TypeGeneric : CGen<Ast::TypeGeneric> {
+      TypeGeneric(Ast::Program *program, Ast::TypeGeneric *node);
+
+      void generate(File *file) override;
+    };
   }
 }
 

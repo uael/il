@@ -30,6 +30,78 @@ namespace Jay {
 
       void generate(File *file) override;
     };
+
+    struct ExprOp : CGen<Ast::ExprOp> {
+      ExprOp(Ast::Program *program, Ast::ExprOp *expr);
+
+      void generate(File *file) override;
+    };
+
+    struct ExprDop : CGen<Ast::ExprDop> {
+      ExprDop(Ast::Program *program, Ast::ExprDop *expr);
+
+      void generate(File *file) override;
+    };
+
+    struct ExprTernary : CGen<Ast::ExprTernary> {
+      ExprTernary(Ast::Program *program, Ast::ExprTernary *expr);
+
+      void generate(File *file) override;
+    };
+
+    struct ExprCast : CGen<Ast::ExprCast> {
+      ExprCast(Ast::Program *program, Ast::ExprCast *expr);
+
+      void generate(File *file) override;
+    };
+
+    struct ExprCall : CGen<Ast::ExprCall> {
+      ExprCall(Ast::Program *program, Ast::ExprCall *expr);
+
+      void generate(File *file) override;
+    };
+
+    struct ExprPos : CGen<Ast::ExprPos> {
+      ExprPos(Ast::Program *program, Ast::ExprPos *expr);
+
+      void generate(File *file) override;
+    };
+
+    struct ExprUnary : CGen<Ast::ExprUnary> {
+      ExprUnary(Ast::Program *program, Ast::ExprUnary *expr);
+
+      void generate(File *file) override;
+    };
+
+    struct ExprPostfix : CGen<Ast::ExprPostfix> {
+      ExprPostfix(Ast::Program *program, Ast::ExprPostfix *expr);
+
+      void generate(File *file) override;
+    };
+
+    struct ExprNested : CGen<Ast::ExprNested> {
+      ExprNested(Ast::Program *program, Ast::ExprNested *expr);
+
+      void generate(File *file) override;
+    };
+
+    struct ExprSizeof : CGen<Ast::ExprSizeof> {
+      ExprSizeof(Ast::Program *program, Ast::ExprSizeof *expr);
+
+      void generate(File *file) override;
+    };
+
+    struct ExprPrimary : CGen<Ast::ExprPrimary> {
+      ExprPrimary(Ast::Program *program, Ast::ExprPrimary *expr);
+
+      void generate(File *file) override;
+    };
+
+    struct ExprKvp : CGen<Ast::ExprKvp> {
+      ExprKvp(Ast::Program *program, Ast::ExprKvp *expr);
+
+      void generate(File *file) override;
+    };
   }
 }
 

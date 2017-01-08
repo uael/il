@@ -24,6 +24,12 @@
 #include <map>
 #include "ast/ast.h"
 
+#define CGEN(type, node, ...) \
+  ({ type gen(this->program, node); gen.generate(file); &gen; })
+
+#define TRY_CGEN(type) \
+  do {Ast::type *__n; if ((__n = as(this->node, Ast::type))) { CGEN(type, __n); return; }} while (0)
+
 namespace Jay {
   namespace Gen {
     struct File;

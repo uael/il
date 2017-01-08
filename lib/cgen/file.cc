@@ -20,6 +20,7 @@
 
 #include <fstream>
 #include "file.h"
+#include "decl.h"
 
 namespace Jay {
   namespace Gen {
@@ -27,12 +28,25 @@ namespace Jay {
 
     void File::generate(File *file) {
       foreach(decl, node->decls) {
-
+        Decl gen(this->program,decl);
+        gen.generate(this);
       }
-      std::string f = node->filename.substr(0, node->filename.size() - 3) + ".c";
+      this->write(node->filename.substr(0, node->filename.size() - 4));
+    }
+
+    void File::write(std::string filename_no_ext) {
       std::ofstream ofstream;
-      ofstream.open(f);
+      ofstream.open(filename_no_ext + ".h");
+      ofstream << includes;
+      ofstream << macros;
+      ofstream << definitions;
+      ofstream.close();
+      ofstream.open(filename_no_ext + ".c");
+      source_includes += "#include \"" + filename_no_ext + ".h\"\n";
+      ofstream << source_includes;
+      ofstream << source_macros;
       ofstream << declarations;
+      ofstream.close();
     }
   }
 }

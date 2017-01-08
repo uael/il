@@ -27,6 +27,48 @@ namespace Jay {
     void Stmt::generate(File *file) {
       CGen::generate(file);
     }
+
+    StmtIter::StmtIter(Ast::Program *program, Ast::StmtIter *node) : CGen(program, node) {}
+
+    void StmtIter::generate(File *file) {
+      CGen::generate(file);
+    }
+
+    StmtSelect::StmtSelect(Ast::Program *program, Ast::StmtSelect *node) : CGen(program, node) {}
+
+    void StmtSelect::generate(File *file) {
+      CGen::generate(file);
+    }
+
+    StmtDecl::StmtDecl(Ast::Program *program, Ast::StmtDecl *node) : CGen(program, node) {}
+
+    void StmtDecl::generate(File *file) {
+      CGen::generate(file);
+    }
+
+    StmtExpr::StmtExpr(Ast::Program *program, Ast::StmtExpr *node) : CGen(program, node) {}
+
+    void StmtExpr::generate(File *file) {
+      CGen::generate(file);
+    }
+
+    StmtCompound::StmtCompound(Ast::Program *program, Ast::StmtCompound *node) : CGen(program, node) {}
+
+    void StmtCompound::generate(File *file) {
+      CGen::generate(file);
+    }
+
+    StmtJump::StmtJump(Ast::Program *program, Ast::StmtJump *node) : CGen(program, node) {}
+
+    void StmtJump::generate(File *file) {
+      CGen::generate(file);
+    }
+
+    StmtLabel::StmtLabel(Ast::Program *program, Ast::StmtLabel *node) : CGen(program, node) {}
+
+    void StmtLabel::generate(File *file) {
+      CGen::generate(file);
+    }
   }
 }
 

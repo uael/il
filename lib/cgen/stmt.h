@@ -30,6 +30,48 @@ namespace Jay {
 
       void generate(File *file) override;
     };
+
+    struct StmtExpr : CGen<Ast::StmtExpr> {
+      StmtExpr(Ast::Program *program, Ast::StmtExpr *node);
+
+      void generate(File *file) override;
+    };
+
+    struct StmtLabel : CGen<Ast::StmtLabel> {
+      StmtLabel(Ast::Program *program, Ast::StmtLabel *node);
+
+      void generate(File *file) override;
+    };
+
+    struct StmtCompound : CGen<Ast::StmtCompound> {
+      StmtCompound(Ast::Program *program, Ast::StmtCompound *node);
+
+      void generate(File *file) override;
+    };
+
+    struct StmtSelect : CGen<Ast::StmtSelect> {
+      StmtSelect(Ast::Program *program, Ast::StmtSelect *node);
+
+      void generate(File *file) override;
+    };
+
+    struct StmtIter : CGen<Ast::StmtIter> {
+      StmtIter(Ast::Program *program, Ast::StmtIter *node);
+
+      void generate(File *file) override;
+    };
+
+    struct StmtJump : CGen<Ast::StmtJump> {
+      StmtJump(Ast::Program *program, Ast::StmtJump *node);
+
+      void generate(File *file) override;
+    };
+
+    struct StmtDecl : CGen<Ast::StmtDecl> {
+      StmtDecl(Ast::Program *program, Ast::StmtDecl *node);
+
+      void generate(File *file) override;
+    };
   }
 }
 

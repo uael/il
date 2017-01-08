@@ -26,8 +26,7 @@ namespace Jay {
 
     void Program::generate(File *file) {
       foreach(f, program->files) {
-        File gen(program, f);
-        gen.generate(nullptr);
+        CGEN(File, f);
       };
     }
   }

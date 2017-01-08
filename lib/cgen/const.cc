@@ -19,13 +19,19 @@
 /* $Id$ */
 
 #include "const.h"
+#include "id.h"
 
 namespace Jay {
   namespace Gen {
     Const::Const(Ast::Program *program, Ast::Const *node) : CGen(program, node) {}
 
     void Const::generate(File *file) {
-      CGen::generate(file);
+      TRY_CGEN(Id);
+      TRY_CGEN(ConstThis);
+      TRY_CGEN(ConstNew);
+      TRY_CGEN(ConstInitializer);
+      TRY_CGEN(ConstLambda);
+      TRY_CGEN(ConstValue);
     }
 
     ConstThis::ConstThis(Ast::Program *program, Ast::ConstThis *node) : CGen(program, node) {}
@@ -50,6 +56,12 @@ namespace Jay {
 
     void ConstNew::generate(File *file) {
       CGen::generate(file);
+    }
+
+    ConstValue::ConstValue(Ast::Program *program, Ast::ConstValue *node) : CGen(program, node) {}
+
+    void ConstValue::generate(File *file) {
+      cursor.assign(*node->value);
     }
   }
 }

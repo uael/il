@@ -25,7 +25,7 @@ namespace Jay {
     Id::Id(Ast::Program *program, Ast::Id *node) : CGen(program, node) {}
 
     void Id::generate(File *file) {
-      CGen::generate(file);
+      cursor = *node->value;
     }
   }
 }

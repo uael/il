@@ -19,25 +19,35 @@
 /* $Id$ */
 
 #include "expr.h"
+#include "type.h"
+#include "const.h"
+#include "id.h"
 
 namespace Jay {
   namespace Gen {
     Expr::Expr(Ast::Program *program, Ast::Expr *node) : CGen(program, node) {}
 
     void Expr::generate(File *file) {
-      CGen::generate(file);
+      TRY_CGEN(Const);
+      TRY_CGEN(ExprDop);
+      TRY_CGEN(ExprOp);
     }
 
     ExprCast::ExprCast(Ast::Program *program, Ast::ExprCast *expr) : CGen(program, expr) {}
 
     void ExprCast::generate(File *file) {
-      CGen::generate(file);
+      cursor = "(" + CGEN(TypeSpecifier, node->type)->cursor + ")";
+      cursor += CGEN(Expr, node->op1)->cursor;
     }
 
     ExprPos::ExprPos(Ast::Program *program, Ast::ExprPos *expr) : CGen(program, expr) {}
 
     void ExprPos::generate(File *file) {
-      CGen::generate(file);
+      cursor = CGEN(Expr, node->op1)->cursor + "[";
+      if (node->op2) {
+        cursor += CGEN(Expr, node->op2)->cursor;
+      }
+      cursor += "]";
     }
 
     ExprKvp::ExprKvp(Ast::Program *program, Ast::ExprKvp *expr) : CGen(program, expr) {}
@@ -49,19 +59,31 @@ namespace Jay {
     ExprCall::ExprCall(Ast::Program *program, Ast::ExprCall *expr) : CGen(program, expr) {}
 
     void ExprCall::generate(File *file) {
-      CGen::generate(file);
+      cursor = CGEN(Expr, node->op1)->cursor + "(";
+      foreach(arg, node->op2) {
+        cursor += CGEN(Expr, arg)->cursor;
+        if (arg->next) {
+          cursor += ", ";
+        }
+      }
+      cursor += ")";
     }
 
     ExprNested::ExprNested(Ast::Program *program, Ast::ExprNested *expr) : CGen(program, expr) {}
 
     void ExprNested::generate(File *file) {
-      CGen::generate(file);
+      cursor = CGEN(Expr, node->op1)->cursor + "->" + CGEN(Id, node->id)->cursor;
     }
 
     ExprOp::ExprOp(Ast::Program *program, Ast::ExprOp *expr) : CGen(program, expr) {}
 
     void ExprOp::generate(File *file) {
-      CGen::generate(file);
+      TRY_CGEN(ExprCast);
+      TRY_CGEN(ExprUnary);
+      TRY_CGEN(ExprPostfix);
+      TRY_CGEN(ExprNested);
+      TRY_CGEN(ExprSizeof);
+      TRY_CGEN(ExprPrimary);
     }
 
     ExprPostfix::ExprPostfix(Ast::Program *program, Ast::ExprPostfix *expr) : CGen(program, expr) {}
@@ -73,31 +95,42 @@ namespace Jay {
     ExprSizeof::ExprSizeof(Ast::Program *program, Ast::ExprSizeof *expr) : CGen(program, expr) {}
 
     void ExprSizeof::generate(File *file) {
-      CGen::generate(file);
+      cursor = CGEN(Expr, node->op1)->cursor + node->op();
     }
 
     ExprDop::ExprDop(Ast::Program *program, Ast::ExprDop *expr) : CGen(program, expr) {}
 
     void ExprDop::generate(File *file) {
-      CGen::generate(file);
+      TRY_CGEN(ExprTernary);
+      TRY_CGEN(ExprCall);
+      TRY_CGEN(ExprPos);
+      TRY_CGEN(ExprKvp);
+      cursor = CGEN(Expr, node->op1)->cursor;
+      cursor += node->op();
+      cursor += CGEN(Expr, node->op2)->cursor;
     }
 
     ExprPrimary::ExprPrimary(Ast::Program *program, Ast::ExprPrimary *expr) : CGen(program, expr) {}
 
     void ExprPrimary::generate(File *file) {
-      CGen::generate(file);
+      if (node->kind == Ast::Expr::Kind::ENCLOSE) {
+        cursor = "(" + CGEN(Expr, node->op1)->cursor + ")";
+      } else {
+        cursor = CGEN(Expr, node->op1)->cursor;
+      }
     }
 
     ExprUnary::ExprUnary(Ast::Program *program, Ast::ExprUnary *expr) : CGen(program, expr) {}
 
     void ExprUnary::generate(File *file) {
-      CGen::generate(file);
+      cursor = node->op() + CGEN(Expr, node->op1)->cursor;
     }
 
     ExprTernary::ExprTernary(Ast::Program *program, Ast::ExprTernary *expr) : CGen(program, expr) {}
 
     void ExprTernary::generate(File *file) {
-      CGen::generate(file);
+      cursor = CGEN(Expr, node->cond)->cursor + "?";
+      cursor += CGEN(Expr, node->op1)->cursor + ":" + CGEN(Expr, node->op2)->cursor;
     }
   }
 }

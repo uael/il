@@ -25,27 +25,33 @@
 #include "ast/ast.h"
 
 #define CGEN(type, node, ...) \
-  ({ type gen(this->program, node); gen.generate(file); &gen; })
+  ({ if (gen_cursor) { delete gen_cursor; } gen_cursor = new type(this->program, node); gen_cursor->generate(file); gen_cursor; })
 
 #define TRY_CGEN(type) \
-  do {Ast::type *__n; if ((__n = as(this->node, Ast::type))) { CGEN(type, __n); return; }} while (0)
+  do {Ast::type *__n; if ((__n = as(this->node, Ast::type))) { cursor = CGEN(type, __n)->cursor; return; }} while (0)
 
 namespace Jay {
   namespace Gen {
     struct File;
   }
 
-  template <typename T = Ast::Node>
-  struct CGen {
-    Ast::Program *program;
+  struct _CGen {
     std::string cursor;
+    virtual void generate(Gen::File *file) {};
+  };
+
+  template <typename T = Ast::Node>
+  struct CGen : _CGen {
+    Ast::Program *program;
+    _CGen *gen_cursor = nullptr;
     T *node;
 
     CGen(Ast::Program *program, T *node) : program(program), node(node) {}
     CGen(Ast::Program *program) : CGen(program, program) {}
 
-    virtual ~CGen() {};
-    virtual void generate(Gen::File *file) {};
+    virtual ~CGen() {
+      delete gen_cursor;
+    };
   };
 }
 

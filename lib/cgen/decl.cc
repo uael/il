@@ -19,6 +19,7 @@
 /* $Id$ */
 
 #include "decl.h"
+#include "closure.h"
 
 namespace Jay {
   namespace Gen {
@@ -63,14 +64,15 @@ namespace Jay {
 
     void DeclFunction::generate(File *file) {
       if (node->ids->find("main") && as(node->scope, Ast::File)) {
-        this->cursor += "int main(";
+        cursor = "int main(";
         if (node->args) {
           foreach(arg, node->args) {
-            this->cursor += CGEN(Decl, arg)->cursor;
+            cursor += CGEN(Decl, arg)->cursor;
           }
         }
-        this->cursor += ") {\n";
-        file->declarations += "\n" + this->cursor + "\n";
+        cursor += ")";
+        cursor += CGEN(Closure, node->closure)->cursor;
+        file->declarations += "\n" + cursor + "\n";
 
       } else if (as(node->scope, Ast::DeclFunction)) {
 

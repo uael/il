@@ -31,6 +31,12 @@ namespace Jay {
       void generate(File *file) override;
     };
 
+    struct ConstValue : CGen<Ast::ConstValue> {
+      ConstValue(Ast::Program *program, Ast::ConstValue *node);
+
+      void generate(File *file) override;
+    };
+
     struct ConstThis : CGen<Ast::ConstThis> {
       ConstThis(Ast::Program *program, Ast::ConstThis *node);
 

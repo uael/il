@@ -19,13 +19,87 @@
 /* $Id$ */
 
 #include "decl.h"
+#include "closure.h"
 
 namespace Jay {
   namespace Gen {
     Decl::Decl(Ast::Program *program, Ast::Decl *node) : CGen(program, node) {}
 
     void Decl::generate(File *file) {
+      TRY_CGEN(DeclCtor);
+      TRY_CGEN(DeclDtor);
+      TRY_CGEN(DeclFrame);
+      TRY_CGEN(DeclFunction);
+      TRY_CGEN(DeclInclude);
+      TRY_CGEN(DeclProperty);
+    }
+
+    DeclUse::DeclUse(Ast::Program *program, Ast::DeclUse *node) : CGen(program, node) {}
+
+    void DeclUse::generate(File *file) {
       CGen::generate(file);
+    }
+
+    DeclInclude::DeclInclude(Ast::Program *program, Ast::DeclInclude *node) : CGen(program, node) {}
+
+    void DeclInclude::generate(File *file) {
+      foreach(include, node->includes) {
+        file->includes += "#include \"" + *include->value + ".h\"\n";
+      }
+    }
+
+    DeclCtor::DeclCtor(Ast::Program *program, Ast::DeclCtor *node) : CGen(program, node) {}
+
+    void DeclCtor::generate(File *file) {
+      CGen::generate(file);
+    }
+
+    DeclFrame::DeclFrame(Ast::Program *program, Ast::DeclFrame *node) : CGen(program, node) {}
+
+    void DeclFrame::generate(File *file) {
+      CGen::generate(file);
+    }
+
+    DeclFunction::DeclFunction(Ast::Program *program, Ast::DeclFunction *node) : CGen(program, node) {}
+
+    void DeclFunction::generate(File *file) {
+      if (node->ids->find("main") && as(node->scope, Ast::File)) {
+        cursor = "int main(";
+        if (node->args) {
+          foreach(arg, node->args) {
+            cursor += CGEN(Decl, arg)->cursor;
+          }
+        }
+        cursor += ")";
+        cursor += CGEN(Closure, node->closure)->cursor;
+        file->declarations += "\n" + cursor + "\n";
+
+      } else if (as(node->scope, Ast::DeclFunction)) {
+
+      } else {
+
+      }
+      this->cursor = "";
+    }
+
+    DeclDtor::DeclDtor(Ast::Program *program, Ast::DeclDtor *node) : CGen(program, node) {}
+
+    void DeclDtor::generate(File *file) {
+      CGen::generate(file);
+    }
+
+    DeclNested::DeclNested(Ast::Program *program, Ast::DeclNested *node) : CGen(program, node) {}
+
+    void DeclNested::generate(File *file) {
+      program->ns = node;
+    }
+
+    DeclProperty::DeclProperty(Ast::Program *program, Ast::DeclProperty *node) : CGen(program, node) {}
+
+    void DeclProperty::generate(File *file) {
+      if (node->type_specifier) {
+
+      }
     }
   }
 }

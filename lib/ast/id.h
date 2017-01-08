@@ -34,6 +34,8 @@ namespace Jay {
       Id(std::string *value);
 
       void accept(Node *scope) override;
+
+      Id *find(std::string value);
     };
   }
 }

@@ -19,20 +19,52 @@
 /* $Id$ */
 
 #include <fstream>
+#include <algorithm>
 #include "file.h"
+#include "decl.h"
 
 namespace Jay {
   namespace Gen {
     File::File(Ast::Program *ast, Ast::File *node) : CGen(ast, node) {}
 
+    struct MatchPathSeparator {
+      bool operator()(char ch) const {
+        return ch == '/';
+      }
+    };
+
+    std::string basename(std::string const &pathname) {
+      return std::string(
+        std::find_if(pathname.rbegin(), pathname.rend(), MatchPathSeparator()).base(),
+        pathname.end());
+    }
+
+    std::string no_ext(std::string const &filename) {
+      std::string::const_reverse_iterator pivot = std::find(filename.rbegin(), filename.rend(), '.');
+      return pivot == filename.rend() ? filename : std::string(filename.begin(), pivot.base() - 1);
+    }
+
     void File::generate(File *file) {
       foreach(decl, node->decls) {
-
+        Decl gen(this->program, decl);
+        gen.generate(this);
       }
-      std::string f = node->filename.substr(0, node->filename.size() - 3) + ".c";
+      this->write(no_ext(basename(node->filename)));
+    }
+
+    void File::write(std::string filename_no_ext) {
       std::ofstream ofstream;
-      ofstream.open(f);
+      ofstream.open(filename_no_ext + ".h");
+      ofstream << includes;
+      ofstream << macros;
+      ofstream << definitions;
+      ofstream.close();
+      ofstream.open(filename_no_ext + ".c");
+      source_includes += "#include \"" + filename_no_ext + ".h\"\n";
+      ofstream << source_includes;
+      ofstream << source_macros;
       ofstream << declarations;
+      ofstream.close();
     }
   }
 }

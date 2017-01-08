@@ -491,11 +491,11 @@ type_specifier_unit
     }
   |
     type_specifier_unit LPAR RPAR {
-      MAKE($$, @$, type_callable_t, $1);
+      MAKE($$, @$, TypeCallable, $1);
     }
   |
     type_specifier_unit LPAR type_specifier_list RPAR {
-      MAKE($$, @$, type_callable_t, $1, $3);
+      MAKE($$, @$, TypeCallable, $1, $3);
     }
   ;
 

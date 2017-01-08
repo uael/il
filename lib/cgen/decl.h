@@ -30,6 +30,54 @@ namespace Jay {
 
       void generate(File *file) override;
     };
+
+    struct DeclInclude : CGen<Ast::DeclInclude> {
+      DeclInclude(Ast::Program *program, Ast::DeclInclude *node);
+
+      void generate(File *file) override;
+    };
+
+    struct DeclUse : CGen<Ast::DeclUse> {
+      DeclUse(Ast::Program *program, Ast::DeclUse *node);
+
+      void generate(File *file) override;
+    };
+
+    struct DeclNested : CGen<Ast::DeclNested> {
+      DeclNested(Ast::Program *program, Ast::DeclNested *node);
+
+      void generate(File *file) override;
+    };
+
+    struct DeclProperty : CGen<Ast::DeclProperty> {
+      DeclProperty(Ast::Program *program, Ast::DeclProperty *node);
+
+      void generate(File *file) override;
+    };
+
+    struct DeclFunction : CGen<Ast::DeclFunction> {
+      DeclFunction(Ast::Program *program, Ast::DeclFunction *node);
+
+      void generate(File *file) override;
+    };
+
+    struct DeclCtor : CGen<Ast::DeclCtor> {
+      DeclCtor(Ast::Program *program, Ast::DeclCtor *node);
+
+      void generate(File *file) override;
+    };
+
+    struct DeclDtor : CGen<Ast::DeclDtor> {
+      DeclDtor(Ast::Program *program, Ast::DeclDtor *node);
+
+      void generate(File *file) override;
+    };
+
+    struct DeclFrame : CGen<Ast::DeclFrame> {
+      DeclFrame(Ast::Program *program, Ast::DeclFrame *node);
+
+      void generate(File *file) override;
+    };
   }
 }
 

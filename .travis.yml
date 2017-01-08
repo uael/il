@@ -5,6 +5,7 @@ group: beta
 language: cpp
 
 compiler:
+  - g++
   - clang
 
 install:

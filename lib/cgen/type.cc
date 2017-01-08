@@ -27,6 +27,48 @@ namespace Jay {
     void Type::generate(File *file) {
       CGen::generate(file);
     }
+
+    TypeCallable::TypeCallable(Ast::Program *program, Ast::TypeCallable *node) : CGen(program, node) {}
+
+    void TypeCallable::generate(File *file) {
+      CGen::generate(file);
+    }
+
+    TypeGeneric::TypeGeneric(Ast::Program *program, Ast::TypeGeneric *node) : CGen(program, node) {}
+
+    void TypeGeneric::generate(File *file) {
+      CGen::generate(file);
+    }
+
+    TypePtr::TypePtr(Ast::Program *program, Ast::TypePtr *node) : CGen(program, node) {}
+
+    void TypePtr::generate(File *file) {
+      CGen::generate(file);
+    }
+
+    TypeUserdef::TypeUserdef(Ast::Program *program, Ast::TypeUserdef *node) : CGen(program, node) {}
+
+    void TypeUserdef::generate(File *file) {
+      CGen::generate(file);
+    }
+
+    TypeArray::TypeArray(Ast::Program *program, Ast::TypeArray *node) : CGen(program, node) {}
+
+    void TypeArray::generate(File *file) {
+      CGen::generate(file);
+    }
+
+    TypeInternal::TypeInternal(Ast::Program *program, Ast::TypeInternal *node) : CGen(program, node) {}
+
+    void TypeInternal::generate(File *file) {
+      CGen::generate(file);
+    }
+
+    TypeSpecifier::TypeSpecifier(Ast::Program *program, Ast::TypeSpecifier *node) : CGen(program, node) {}
+
+    void TypeSpecifier::generate(File *file) {
+      CGen::generate(file);
+    }
   }
 }
 

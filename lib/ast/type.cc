@@ -23,10 +23,10 @@
 
 namespace Jay {
   namespace Ast {
-    type_callable_t::type_callable_t(TypeSpecifier *type, TypeSpecifier *args_types)
+    TypeCallable::TypeCallable(TypeSpecifier *type, TypeSpecifier *args_types)
       : type(type), args_types(args_types) {}
 
-    void type_callable_t::accept(Node *scope) {
+    void TypeCallable::accept(Node *scope) {
       ACCEPT(type);
       ACCEPT(args_types);
       Node::accept(scope);

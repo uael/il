@@ -28,6 +28,15 @@ namespace Jay {
       uk_value = *value;
       Node::accept(scope);
     }
+
+    Id *Id::find(std::string value) {
+      foreach(id, this) {
+        if (id->value && *id->value == value) {
+          return id;
+        }
+      }
+      return nullptr;
+    }
   }
 }
 

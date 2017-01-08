@@ -28,11 +28,11 @@ namespace Jay {
   namespace Ast {
     struct TypeSpecifier : Node {};
 
-    struct type_callable_t : TypeSpecifier {
+    struct TypeCallable : TypeSpecifier {
       TypeSpecifier *type = nullptr;
       TypeSpecifier *args_types = nullptr;
 
-      type_callable_t(TypeSpecifier *type, TypeSpecifier *args_types = nullptr);
+      TypeCallable(TypeSpecifier *type, TypeSpecifier *args_types = nullptr);
 
       void accept(Node *scope) override;
     };

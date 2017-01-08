@@ -24,22 +24,36 @@
 #include <map>
 #include "ast/ast.h"
 
+#define CGEN(type, node, ...) \
+  ({ if (gen_cursor) { delete gen_cursor; } gen_cursor = new type(this->program, node); gen_cursor->generate(file); gen_cursor; })
+
+#define TRY_CGEN(type) \
+  do {Ast::type *__n; if ((__n = as(this->node, Ast::type))) { cursor = CGEN(type, __n)->cursor; return; }} while (0)
+
 namespace Jay {
   namespace Gen {
     struct File;
   }
 
-  template <typename T = Ast::Node>
-  struct CGen {
-    Ast::Program *program;
+  struct Generator {
     std::string cursor;
+
+    virtual ~Generator() {}
+    virtual void generate(Gen::File *file) {}
+  };
+
+  template <typename T = Ast::Node>
+  struct CGen : Generator {
+    Ast::Program *program;
+    Generator *gen_cursor = nullptr;
     T *node;
 
     CGen(Ast::Program *program, T *node) : program(program), node(node) {}
     CGen(Ast::Program *program) : CGen(program, program) {}
 
-    virtual ~CGen() {};
-    virtual void generate(Gen::File *file) {};
+    virtual ~CGen() {
+      delete gen_cursor;
+    };
   };
 }
 

@@ -19,13 +19,16 @@
 /* $Id$ */
 
 #include "closure.h"
+#include "expr.h"
+#include "stmt.h"
 
 namespace Jay {
   namespace Gen {
     Closure::Closure(Ast::Program *program, Ast::Closure *node) : CGen(program, node) {}
 
     void Closure::generate(File *file) {
-      CGen::generate(file);
+      TRY_CGEN(StmtCompound);
+      TRY_CGEN(Expr);
     }
   }
 }

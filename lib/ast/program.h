@@ -27,6 +27,7 @@ namespace Jay {
   namespace Ast {
     struct Program : Ast::Node {
       File *files = nullptr;
+      Ast::DeclNested *ns = nullptr;
 
       Program();
 

@@ -23,8 +23,8 @@
 
 #include <map>
 
-#define foreach(v, values) for (__typeof__(values) v = values; v; v = (__typeof__(values)) v->next)
-#define rforeach(v, values) for (__typeof__(values) v = values; v; v = (__typeof__(values)) v->prev)
+#define foreach(v, values) for (__typeof__(*values) *v = values; v; v = (__typeof__(values)) v->next)
+#define rforeach(v, values) for (__typeof__(*values) *v = values; v; v = (__typeof__(values)) v->prev)
 #define as(node, type) dynamic_cast<type *>(node)
 #define cast(node, dnode) (dnode = dynamic_cast<__typeof__(dnode)>(node))
 #define ACCEPT(node) if ((node)) (dynamic_cast<Jay::Ast::Node *>(node))->accept(this)
@@ -42,14 +42,15 @@ namespace Jay {
     struct DeclInclude;
     struct DeclUse;
     struct DeclNested;
-    struct DeclNested;
+    struct DeclMember;
     struct DeclProperty;
     struct DeclFunction;
     struct DeclCtor;
+    struct DeclDtor;
     struct DeclFrame;
 
     struct TypeSpecifier;
-    struct type_callable_t;
+    struct TypeCallable;
     struct TypePtr;
     struct TypeArray;
     struct Type;

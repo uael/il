@@ -36,6 +36,8 @@ namespace Jay {
       File(Ast::Program *ast, Ast::File *node);
 
       void generate(File *file) override;
+
+      void write(std::string filename_no_ext);
     };
   }
 }

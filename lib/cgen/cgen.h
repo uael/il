@@ -35,15 +35,17 @@ namespace Jay {
     struct File;
   }
 
-  struct _CGen {
+  struct Generator {
     std::string cursor;
-    virtual void generate(Gen::File *file) {};
+
+    virtual ~Generator() {}
+    virtual void generate(Gen::File *file) {}
   };
 
   template <typename T = Ast::Node>
-  struct CGen : _CGen {
+  struct CGen : Generator {
     Ast::Program *program;
-    _CGen *gen_cursor = nullptr;
+    Generator *gen_cursor = nullptr;
     T *node;
 
     CGen(Ast::Program *program, T *node) : program(program), node(node) {}

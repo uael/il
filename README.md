@@ -12,6 +12,15 @@ Currently support functional parsing only :
 - Tuple, multiple return type
 - Strongly typed
 
+```bash
+include stdio;
+
+main() : int => {
+  puts("Hello World");
+  return 0
+}
+```
+
 ##Deps
 ```bash
 $ sudo apt install build-essential make autoconf automake libtool g++ bison flex 

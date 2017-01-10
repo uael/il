@@ -23,7 +23,6 @@
 
 #include <map>
 #include "ast/ast.h"
-#include "p99.h"
 
 #define APPEND(str) \
   (cursor += str)

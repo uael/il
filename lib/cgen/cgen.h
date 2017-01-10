@@ -22,6 +22,7 @@
 #define _CGEN_H
 
 #include <map>
+#include <cstring>
 #include "ast/ast.h"
 
 #define APPEND(str) \

@@ -61,7 +61,7 @@ namespace Jay {
     ConstValue::ConstValue(Ast::Program *program, Ast::ConstValue *node) : CGen(program, node) {}
 
     void ConstValue::generate(File *file) {
-      cursor.assign(*node->value);
+      cursor = *node->value;
     }
   }
 }

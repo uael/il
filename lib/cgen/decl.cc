@@ -64,16 +64,7 @@ namespace Jay {
 
     void DeclFunction::generate(File *file) {
       if (node->ids->find("main") && as(node->scope, Ast::File)) {
-        cursor = "int main(";
-        if (node->args) {
-          foreach(arg, node->args) {
-            cursor += CGEN(Decl, arg)->cursor;
-          }
-        }
-        cursor += ")";
-        cursor += CGEN(Closure, node->closure)->cursor;
-        file->declarations += "\n" + cursor + "\n";
-
+        file->declarations += "\nint main(" + CGEN_ALL(Decl, node->args, "") + ")" + CGEN(Closure, node->closure) + "\n";
       } else if (as(node->scope, Ast::DeclFunction)) {
 
       } else {

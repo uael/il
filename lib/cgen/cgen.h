@@ -23,12 +23,52 @@
 
 #include <map>
 #include "ast/ast.h"
+#include "p99.h"
 
-#define CGEN(type, node, ...) \
-  ({ if (gen_cursor) { delete gen_cursor; } gen_cursor = new type(this->program, node); gen_cursor->generate(file); gen_cursor; })
+#define APPEND(str) \
+  (cursor += str)
+
+#define APPENDLN(str) \
+  (cursor += str + "\n")
+
+#define CGEN(type, node) \
+  ({ if (gen_cursor) delete gen_cursor; \
+    gen_cursor = nullptr; \
+    if (node) { \
+      gen_cursor = new type(this->program, node); \
+      gen_cursor->generate(file); \
+    } \
+    gen_cursor ? gen_cursor->cursor : ""; \
+  })
+
+#define CGEN_ALL(type, node, ...) \
+  ({ \
+    std::string __ret; \
+    if (node) { \
+      foreach(__node, node) { \
+        __ret += CGEN(type, __node); \
+        if (__node->next && strlen(__VA_ARGS__"") > 0) { \
+          __ret += __VA_ARGS__""; \
+        } \
+      } \
+    }; \
+    __ret; \
+  })
 
 #define TRY_CGEN(type) \
-  do {Ast::type *__n; if ((__n = as(this->node, Ast::type))) { cursor = CGEN(type, __n)->cursor; return; }} while (0)
+  do {Ast::type *__n; if ((__n = as(this->node, Ast::type))) { cursor = CGEN(type, __n); return; }} while (0)
+
+#define CGEN_APPEND(type, node) \
+  APPEND(CGEN(type, node))
+
+#define CGEN_APPENDLN(type, node) \
+  APPENDLN(CGEN(type, node))
+
+#define CGEN_APPEND_ALL(type, node) \
+  do { if (node) { foreach(__node, node) { CGEN_APPEND(type, __node); }}} while (0)
+
+#define CGEN_APPENDLN_ALL(type, node) \
+  do { if (node) { foreach(__node, node) { CGEN_APPENDLN(type, __node); }}} while (0)
 
 namespace Jay {
   namespace Gen {

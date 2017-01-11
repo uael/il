@@ -26,7 +26,7 @@
 #endif
 
 #include "ast/ast.h"
-#include "cgen/cgen.h"
+#include "cgen/generator.h"
 #include "parse/driver.h"
 
 #endif /* _JAY_H */

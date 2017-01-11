@@ -26,7 +26,7 @@ namespace Jay {
   namespace Ast {
     ExprOp::ExprOp(ExprOp::Kind kind, Expr *op1) : kind(kind), op1(op1) {}
 
-    std::string ExprOp::op() {
+    std::string ExprOp::op_str() {
       switch (kind) {
         case INC_PRE:
         case INC_POST:

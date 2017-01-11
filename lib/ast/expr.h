@@ -43,7 +43,7 @@ namespace Jay {
 
       ExprOp(Kind kind, Expr *op1);
 
-      std::string op();
+      std::string op_str();
       void accept(Node *scope) override;
     };
 
@@ -53,6 +53,8 @@ namespace Jay {
       ExprDop(Kind kind, Expr *op1, Expr *op2);
 
       void accept(Node *scope) override;
+
+      void generate(Gen::Generator *generator);
     };
 
     struct ExprTernary : ExprDop {
@@ -61,6 +63,8 @@ namespace Jay {
       ExprTernary(Expr *cond, Expr *op1, Expr *op2);
 
       void accept(Node *scope) override;
+
+      void generate(Gen::Generator *generator);
     };
 
     struct ExprCast : ExprOp {
@@ -69,22 +73,32 @@ namespace Jay {
       ExprCast(Expr *op1, TypeSpecifier *type);
 
       void accept(Node *scope) override;
+
+      void generate(Gen::Generator *generator);
     };
 
     struct ExprCall : ExprDop {
       ExprCall(Expr *op1, Expr *op2);
+
+      void generate(Gen::Generator *generator);
     };
 
     struct ExprPos : ExprDop {
       ExprPos(Expr *op1, Expr *op2);
+
+      void generate(Gen::Generator *generator);
     };
 
     struct ExprUnary : ExprOp {
       ExprUnary(Kind kind, Expr *op1);
+
+      void generate(Gen::Generator *generator);
     };
 
     struct ExprPostfix : ExprOp {
       ExprPostfix(Kind kind, Expr *op1);
+
+      void generate(Gen::Generator *generator);
     };
 
     struct ExprNested : ExprOp {
@@ -93,6 +107,8 @@ namespace Jay {
       ExprNested(Expr *op1, Id *id);
 
       void accept(Node *scope) override;
+
+      void generate(Gen::Generator *generator);
     };
 
     struct ExprSizeof : ExprOp {
@@ -102,14 +118,20 @@ namespace Jay {
       ExprSizeof(Expr *op1);
 
       void accept(Node *scope) override;
+
+      void generate(Gen::Generator *generator);
     };
 
     struct ExprPrimary : ExprOp {
       ExprPrimary(Kind kind, Expr *op1);
+
+      void generate(Gen::Generator *generator);
     };
 
     struct ExprKvp : ExprDop {
       ExprKvp(Expr *op1, Expr *op2);
+
+      void generate(Gen::Generator *generator);
     };
   }
 }

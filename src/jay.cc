@@ -43,8 +43,8 @@ int main(int argc, char *argv[]) {
 
       bool result = driver.parse_stream(infile, argv[ai]);
       if (result) {
-        Jay::Gen::Program p(&driver.program);
-        p.generate(nullptr);
+        Jay::Gen::Generator generator(&driver.program);
+        driver.program.generate(&generator);
       }
 
       readfile = true;

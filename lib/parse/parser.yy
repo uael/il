@@ -708,6 +708,10 @@ stmt_select
       MAKE($$, @$, StmtSelect, StmtSelect::Kind::IF, $2, $3);
     }
   |
+    IF expr COLON stmt {
+      MAKE($$, @$, StmtSelect, StmtSelect::Kind::IF, $2, $4);
+    }
+  |
     SWITCH expr stmt_compound {
       MAKE($$, @$, StmtSelect, StmtSelect::Kind::SWITCH, $2, $3);
     }

@@ -36,6 +36,8 @@ namespace Jay {
       void accept(Node *scope) override;
 
       Id *find(std::string value);
+
+      void generate(Gen::Generator *generator);
     };
   }
 }

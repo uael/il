@@ -34,6 +34,8 @@ namespace Jay {
       DeclInclude(Id *includes);
 
       void accept(Node *scope) override;
+
+      void generate(Gen::Generator *generator);
     };
 
     struct DeclUse : Decl {
@@ -67,6 +69,8 @@ namespace Jay {
       bool assigned;
 
       DeclProperty(Id *ids, TypeSpecifier *type_specifier, Closure *closure, bool assigned);
+
+      void generate(Gen::Generator *generator);
     };
 
     struct DeclFunction : DeclMember {
@@ -77,6 +81,8 @@ namespace Jay {
                       Closure *closure);
 
       virtual void accept(Node *scope) override;
+
+      void generate(Gen::Generator *generator);
     };
 
     struct DeclCtor : DeclFunction {

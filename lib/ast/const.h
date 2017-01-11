@@ -36,6 +36,8 @@ namespace Jay {
       std::string *value;
 
       ConstValue(Kind kind, std::string *value);
+
+      void generate(Gen::Generator *generator);
     };
 
     struct ConstLambda : Const {

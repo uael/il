@@ -43,6 +43,8 @@ namespace Jay {
       TypePtr(TypeSpecifier *type);
 
       void accept(Node *scope) override;
+
+      void generate(Gen::Generator *generator);
     };
 
     struct TypeArray : TypeSpecifier {
@@ -52,6 +54,8 @@ namespace Jay {
       TypeArray(TypeSpecifier *type, Expr *fixed_size = nullptr);
 
       void accept(Node *scope) override;
+
+      void generate(Gen::Generator *generator);
     };
 
     struct Type : TypeSpecifier {};
@@ -63,6 +67,8 @@ namespace Jay {
       } kind;
 
       TypeInternal(Kind kind);
+
+      void generate(Gen::Generator *generator);
     };
 
     struct TypeUserdef : Type {

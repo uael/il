@@ -32,6 +32,10 @@
 namespace Jay {
   class location;
 
+  namespace Gen {
+    struct Generator;
+  }
+
   namespace Ast {
     struct File;
     struct Id;
@@ -107,6 +111,8 @@ namespace Jay {
         }
         return dynamic_cast<T *>(this);
       }
+
+      virtual void generate(Gen::Generator *generator) {};
     };
   }
 }

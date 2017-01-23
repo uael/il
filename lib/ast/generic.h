@@ -32,6 +32,7 @@ namespace Jay {
       Generic(Id *value, TypeSpecifier *type_specifier);
 
       void accept(Node *scope) override;
+      void generate(Gen::Generator *generator);
     };
   }
 }

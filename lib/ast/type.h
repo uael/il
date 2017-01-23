@@ -35,6 +35,7 @@ namespace Jay {
       TypeCallable(TypeSpecifier *type, TypeSpecifier *args_types = nullptr);
 
       void accept(Node *scope) override;
+      void generate(Gen::Generator *generator);
     };
 
     struct TypePtr : TypeSpecifier {
@@ -43,7 +44,6 @@ namespace Jay {
       TypePtr(TypeSpecifier *type);
 
       void accept(Node *scope) override;
-
       void generate(Gen::Generator *generator);
     };
 
@@ -54,7 +54,6 @@ namespace Jay {
       TypeArray(TypeSpecifier *type, Expr *fixed_size = nullptr);
 
       void accept(Node *scope) override;
-
       void generate(Gen::Generator *generator);
     };
 
@@ -77,6 +76,7 @@ namespace Jay {
       TypeUserdef(Id *id);
 
       void accept(Node *scope) override;
+      void generate(Gen::Generator *generator);
     };
 
     struct TypeGeneric : TypeUserdef {
@@ -85,6 +85,7 @@ namespace Jay {
       TypeGeneric(Id *id, TypeSpecifier *types);
 
       void accept(Node *scope) override;
+      void generate(Gen::Generator *generator);
     };
   }
 }

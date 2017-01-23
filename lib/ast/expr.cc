@@ -157,6 +157,12 @@ namespace Jay {
     ExprPrimary::ExprPrimary(ExprOp::Kind kind, Expr *op1) : ExprOp(kind, op1) {}
 
     ExprKvp::ExprKvp(Expr *op1, Expr *op2) : ExprDop(KVP, op1, op2) {}
+
+    ExprAccess::ExprAccess(Expr *op1, Id *id) : ExprNested(op1, id) {}
+
+    void ExprAccess::accept(Node *scope) {
+      ExprNested::accept(scope);
+    }
   }
 }
 

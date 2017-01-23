@@ -32,7 +32,6 @@ namespace Jay {
       File(std::string filename, Decl *decls);
 
       void accept(Node *scope) override;
-
       void generate(Gen::Generator *generator);
     };
   }

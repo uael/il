@@ -1,5 +1,6 @@
 AM_CFLAGS = -Wall -I$(top_srcdir)/lib
 AM_CXXFLAGS = -Wall -std=c++11 -I$(top_srcdir)/lib
+AM_LDFLAGS = $(top_builddir)/lib/ast/libast.la
 
 noinst_LTLIBRARIES = libcgen.la
 

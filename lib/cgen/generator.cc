@@ -20,8 +20,6 @@
 
 #include "generator.h"
 
-#define TAB "  "
-
 namespace Jay {
   namespace Gen {
     File::File(const std::string &filename, const std::string &ext) :
@@ -33,13 +31,7 @@ namespace Jay {
     }
 
     void File::open() {
-      std::fstream fstream(name);
-      if (fstream.good()) {
-        if (fstream.is_open()) {
-          fstream.close();
-        }
-        remove(name.c_str());
-      }
+      remove(name.c_str());
       if (!ofstream.is_open()) {
         ofstream.open(name);
       }
@@ -94,7 +86,7 @@ namespace Jay {
     void AllIndent::make(Generator *generator) {
       foreach(child, node) {
         for (int i = 0; i < generator->indent_lvl; i++) {
-          *generator << TAB;
+          *generator << "  ";
         }
         *generator << child;
         if (all || child->next) {
@@ -105,182 +97,162 @@ namespace Jay {
 
     void IndentCursor::make(Generator *generator) {
       for (int i = 0; i < generator->indent_lvl; i++) {
-        *generator << TAB;
+        *generator << "  ";
       }
     }
-  }
 
-  namespace Ast {
-    void Program::generate(Gen::Generator *generator) {
-      *generator << op(All, files);
-    }
+    Closure::Closure(Ast::Closure *closure) : closure(closure) {}
 
-    void File::generate(Gen::Generator *generator) {
-      generator->header = new Gen::File(filename, "h");
-      generator->source = new Gen::File(filename, "c");
-      generator->source->header += "#include \"" + generator->header->name + "\"\n";
-      *generator << op(All, decls, "\n", true);
-      generator->header->write();
-      generator->source->write();
-      delete generator->header;
-      delete generator->source;
-    }
-
-    void DeclFunction::generate(Gen::Generator *generator) {
-      generator->reset();
-      *generator << op(IndentCursor) << type_specifier << " " << ids->value << "(" << op(All, args, ", ") << ")";
-      generator->header->body += "\n" + generator->cursor + ";";
+    void Closure::make(Generator *generator) {
       if (closure) {
-        *generator << " " << closure;
-        generator->source->body += "\n" + generator->cursor;
-      }
-    }
-
-    void DeclProperty::generate(Gen::Generator *generator) {
-      if (as(scope, DeclFunction)) {
-        *generator << type_specifier << " " << ids;
-        TypeArray *arr;
-        if ((arr = as(type_specifier, TypeArray))) {
-          *generator << "[" << arr->fixed_size << "]";
-        }
-        if (closure) {
-          *generator << " = " << closure;
-        }
-      }
-    }
-
-    void TypeInternal::generate(Gen::Generator *generator) {
-      switch (kind) {
-        case SELF: *generator << ""; break;
-        case STATIC: *generator << ""; break;
-        case VOID: *generator << "void"; break;
-        case BOOL: *generator << "int"; break;
-        case CHAR: *generator << "char"; break;
-        case INT: *generator << "int"; break;
-        case UINT: *generator << "unsigned int"; break;
-        case SINT: *generator << "signed int"; break;
-        case SHORT: *generator << "short"; break;
-        case USHORT: *generator << "unsigned short"; break;
-        case STRING: *generator << "char *"; break;
-        case SSHORT: *generator << "signed short"; break;
-        case FLOAT: *generator << "float"; break;
-        case UFLOAT: *generator << "unsigned float"; break;
-        case SFLOAT: *generator << "signed float"; break;
-        case DOUBLE: *generator << "double"; break;
-        case UDOUBLE: *generator << "unsigned double"; break;
-        case SDOUBLE: *generator << "signed double"; break;
-      }
-    }
-
-    void TypePtr::generate(Gen::Generator *generator) {
-      *generator << type << "*";
-    }
-
-    void TypeArray::generate(Gen::Generator *generator) {
-      *generator << type;
-    }
-
-    void DeclInclude::generate(Gen::Generator *generator) {
-      *generator << "#include \"" << includes->value << ".h\"\n" << includes->next;
-      generator->source->header += generator->cursor;
-    }
-
-    void StmtCompound::generate(Gen::Generator *generator) {
-      *generator
-        << "{\n"
-        << op(Indent)
-        << op(AllIndent, stmts, "\n", true)
-        << op(IndentBack)
-        << op(IndentCursor)
-        << "}";
-    }
-
-    void StmtSelect::generate(Gen::Generator *generator) {
-      switch (kind) {
-        case IF:
-          *generator << "if (" << cond << ")" << stmt;
-          if (else_stmt) {
-            *generator << "else" << else_stmt;
+        Ast::Expr *expr;
+        Ast::StmtCompound *compound;
+        if ((expr = as(closure, Ast::Expr))) {
+          Ast::DeclMember *member = as(expr->scope, Ast::DeclMember);
+          if (!closure->macro) {
+            Ast::StmtJump *return_stmt = new Ast::StmtJump(expr);
+            Ast::StmtCompound *compound_stmt = new Ast::StmtCompound(return_stmt);
+            *generator << op(Closure, compound_stmt);
+            delete compound_stmt, return_stmt;
+          } else
+          if (member && member->is_void()) {
+            *generator << "do {" << expr << "; } while (0)\n";
+          } else {
+            *generator << "(" << expr << ")\n";
           }
-          break;
-        case SWITCH:
-          *generator << "switch (" << cond << ")" << stmt;
-          break;
+        } else
+        if ((compound = as(closure, Ast::StmtCompound))) {
+          Ast::DeclMember *member = as(compound->scope, Ast::DeclMember);
+          if (closure->macro) {
+            if (member->is_void()) {
+              *generator << "do { ";
+              if (compound->stmts->next) {
+                *generator << "\\\n" << op(Indent);
+              }
+            } else {
+              *generator << "({ ";
+            }
+            if (compound->stmts->next) {
+              *generator << "\\\n" << op(Indent);
+            }
+          } else {
+            *generator << "{\n";
+          }
+          Ast::StmtJump *jump = as(compound->stmts, Ast::StmtJump);
+          if (closure->macro && jump && jump->kind == Ast::StmtJump::RETURN) {
+            *generator << jump->expr << ";";
+          } else {
+            if (!closure->macro || member->is_void()) {
+              *generator
+                << op(Indent)
+                << op(AllIndent, compound->stmts, closure->macro ? " \\\n" : "\n", !closure->macro)
+                << op(IndentBack);
+                if (!closure->macro) {
+                  *generator << op(IndentCursor);
+                }
+            } else {
+              Ast::List<Ast::StmtJump> return_stmts = compound->select<Ast::StmtJump>([=](Ast::StmtJump *j) {
+                return j->kind == Ast::StmtJump::RETURN && j->next_scope<Ast::DeclMember>() == member;
+              });
+              if (!return_stmts.size) {
+                *generator
+                  << op(Indent)
+                  << op(AllIndent, compound->stmts, " \\\n")
+                  << op(IndentBack);
+              } else
+              if (return_stmts.size == 1 && !return_stmts.first()->next) {
+                Ast::StmtExpr expr_stmt = Ast::StmtExpr(return_stmts.first()->expr);
+                return_stmts.first()->replace(&expr_stmt);
+                *generator
+                  << op(Indent)
+                  << op(AllIndent, compound->stmts, " \\\n")
+                  << op(IndentBack);
+                return_stmts.first()->replace(return_stmts.first());
+              } else {
+                generator->member = member;
+                *generator << compound;
+                generator->member = nullptr;
+              }
+            }
+          }
+          if (closure->macro) {
+            if (compound->stmts->next) {
+              *generator << " \\\n" << op(IndentBack) << op(IndentCursor);
+            } else {
+              *generator << " ";
+            }
+            if (member->is_void()) {
+              *generator << "} while (0)\n" << op(IndentBack);
+            } else {
+              *generator << "})\n" << op(IndentBack);
+            }
+          } else {
+            *generator << "}\n";
+          }
+        }
       }
     }
 
-    void StmtExpr::generate(Gen::Generator *generator) {
-      *generator << expr << ";";
-    }
+    AllName::AllName(Ast::Node *node, const std::string &eot, bool all) : All(node, eot, all) {}
 
-    void StmtJump::generate(Gen::Generator *generator) {
-      switch (kind) {
-        case Ast::StmtJump::GOTO:
-          *generator << "goto " << id << ";";
-          break;
-        case Ast::StmtJump::CONTINUE:
-          *generator << "continue;";
-          break;
-        case Ast::StmtJump::BREAK:
-          *generator << "break;";
-          break;
-        case Ast::StmtJump::RETURN:
-          *generator << "return " << expr << ";";
-          break;
+    void AllName::make(Generator *generator) {
+      foreach(child, node) {
+        Ast::Named *named = as(child, Ast::Named);
+        if (named) {
+          foreach(id, named->ids) {
+            *generator << id->value;
+            if (all || child->next) {
+              *generator << eot;
+            }
+          }
+        }
       }
     }
 
-    void ExprCast::generate(Gen::Generator *generator) {
-      *generator << "(" << type << ")" << op1;
-    }
+    void StmtsNoReturn::make(Generator *generator) {
+      Ast::StmtJump *return_stmt;
+      std::string ret_prop_name = "__ret_" + *member->ids->value, ret_lbl_name = "__lbl_ret_" + *member->ids->value;
 
-    void ExprPos::generate(Gen::Generator *generator) {
-      *generator << op1 << "[" << op2 << "]";
-    }
+      *generator << op(Indent);
+      foreach(stmt, stmts) {
+        if (!stmt->prev && stmts->scope == member->closure->as_node()) {
+          for (int i = 0; i < generator->indent_lvl; i++) {
+            *generator << "  ";
+          }
+          Ast::Id ret_prop_id = Ast::Id(&ret_prop_name);
+          Ast::DeclProperty ret_prop = Ast::DeclProperty(&ret_prop_id, member->type_specifier, nullptr, false);
+          ret_prop.scope = stmt->scope;
+          ret_prop.generate(generator);
+          *generator << ";" << eot;
+        }
 
-    void ExprKvp::generate(Gen::Generator *generator) {}
+        for (int i = 0; i < generator->indent_lvl; i++) {
+          *generator << "  ";
+        }
 
-    void ExprCall::generate(Gen::Generator *generator) {
-      *generator << op1 << "(" << op(All, op2, ", ") << ")";
-    }
+        if ((return_stmt = as(stmt, Ast::StmtJump)) && return_stmt->kind == Ast::StmtJump::RETURN) {
+          *generator << ret_prop_name << " = " << return_stmt->expr << "; goto " << ret_lbl_name << ";";
+        } else {
+          *generator << stmt;
+        }
 
-    void ExprNested::generate(Gen::Generator *generator) {
-      *generator << op1 << "->" << id;
-    }
+        if (!stmt->next && stmts->scope == member->closure->as_node()) {
+          *generator << eot;
+          for (int i = 0; i < generator->indent_lvl; i++) {
+            *generator << "  ";
+          }
+          *generator << ret_lbl_name << ":; " << ret_prop_name << ";";
+        }
 
-    void ExprPostfix::generate(Gen::Generator *generator) {}
-
-    void ExprSizeof::generate(Gen::Generator *generator) {
-      *generator << op1 << op_str();
-    }
-
-    void ExprDop::generate(Gen::Generator *generator) {
-      *generator << op1 << op_str() << op2;
-    }
-
-    void ExprPrimary::generate(Gen::Generator *generator) {
-      if (kind == Ast::Expr::Kind::ENCLOSE) {
-        *generator << "(" << op1 << ")";
-      } else {
-        *generator << op1;
+        if (all || stmt->next) {
+          *generator << eot;
+        }
       }
+      *generator << op(IndentBack);
     }
 
-    void ExprUnary::generate(Gen::Generator *generator) {
-      *generator << op_str() << op1;
-    }
-
-    void ExprTernary::generate(Gen::Generator *generator) {
-      *generator << cond << "?" << op1 << ":" << op2;
-    }
-
-    void Id::generate(Gen::Generator *generator) {
-      *generator << value;
-    }
-
-    void ConstValue::generate(Gen::Generator *generator) {
-      *generator << value;
-    }
+    StmtsNoReturn::StmtsNoReturn(Ast::Stmt *stmts, Ast::DeclMember *member, const std::string &eot, bool all)
+      : stmts(stmts), member(member), eot(eot), all(all) {}
   }
 }
 

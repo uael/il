@@ -18,27 +18,15 @@
 
 /* $Id$ */
 
-#ifndef _AST_ID_H
-#define _AST_ID_H
-
-#include "node.h"
-#include "expr.h"
+#include "generator.h"
 
 namespace Jay {
   namespace Ast {
-    struct Id : Node {
-      std::string *value;
-      std::string uk_value;
+    void Generic::generate(Gen::Generator *generator) {
 
-      Id(std::string *value);
-
-      void accept(Node *scope) override;
-      void generate(Gen::Generator *generator);
-    };
+    }
   }
 }
-
-#endif /* _AST_ID_H */
 
 /*
  * Local variables:

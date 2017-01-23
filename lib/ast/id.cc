@@ -19,23 +19,14 @@
 /* $Id$ */
 
 #include "id.h"
+#include "decl.h"
 
 namespace Jay {
   namespace Ast {
     Id::Id(std::string *value) : value(value) {}
 
     void Id::accept(Node *scope) {
-      uk_value = *value;
       Node::accept(scope);
-    }
-
-    Id *Id::find(std::string value) {
-      foreach(id, this) {
-        if (id->value && *id->value == value) {
-          return id;
-        }
-      }
-      return nullptr;
     }
   }
 }

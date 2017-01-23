@@ -59,31 +59,34 @@
   Jay::Ast::StmtDecl *_stmt_decl;
   Jay::Ast::Expr *_expr;
   Jay::Ast::ConstValue *_const_value;
+  Jay::Ast::ConstPath *_const_path;
   Jay::Ast::ConstLambda *_const_lambda;
   Jay::Ast::ConstInitializer *_const_initializer;
 }
 
 %token END 0 "end of file"
 %token EOL "end of line"
-%token <_string> ID USERDEF INT_CONST FLOAT_CONST STRING_CONST
-%token INCLUDE USE
+%token <_string> ID INT_CONST FLOAT_CONST STRING_CONST
+%token INCLUDE
+       USE
 %token NAMESPACE TUPLE FRAME ENUM STRUCT INTERFACE CLASS
-%token VOID BOOL CHAR INT STRING UINT SINT SHORT USHORT SSHORT FLOAT UFLOAT SFLOAT DOUBLE UDOUBLE SDOUBLE
+%token VOID BOOL CHAR INT UINT SINT SHORT USHORT SSHORT FLOAT UFLOAT SFLOAT DOUBLE UDOUBLE SDOUBLE
 %token GT LT ADD SUB MUL DIV EQ NEQ LE GE
-%token COLON DOUBLE_COLON SEMICOLON COMMA LPAR RPAR LBRA RBRA ARROW ASSIGN
+%token COLON DOUBLE_COLON SEMICOLON COMMA LPAR RPAR LBRA RBRA ARROW
+       ASSIGN
 %token COND MOD ACCESS AND INC DEC LS LSQU RS RSQU NOT DOT TID OR XOR LAND LOR
 %token ELLIPSIS RIGHT_ASSIGN LEFT_ASSIGN ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN
 %token MOD_ASSIGN AND_ASSIGN XOR_ASSIGN OR_ASSIGN
 %token AS CASE DEFAULT IF ELSE SWITCH WHILE FOR DO GOTO CONTINUE BREAK RETURN
 %token PRIVATE PROTECTED CONST VOLATILE ABSTRACT STATIC VIRTUAL FINAL INLINE
-%token VAR NEW SIZEOF TYPEOF ASSERT TRY CATCH SELF THIS
+%token VAR NEW SIZEOF TYPEOF ASSERT TRY CATCH SELF THIS NULL_KEYWORD
 
-%type <_id> id id_list userdef userdef_list
+%type <_id> id id_list id_glue_list
 %type <_generic> generic generic_list generics
 %type <_closure> closure closure_or_empty
 %type <_decl> decl_file_item decl_frame decl_frame_item decl_use decl_var decl_function decl_dtor decl_ctor
 %type <_decl_list> decl_file_body decl_frame_body frame_body decl_var_list
-%type <_type_specifier> type_specifier type_specifier_list type_specifier_unit
+%type <_type_specifier> type_void type_specifier type_specifier_list type_specifier_unit
 %type <_type> type
 %type <_type_internal> type_internal
 %type <_type_userdef> type_userdef type_userdef_unit
@@ -115,6 +118,7 @@
 %type <_expr> expr_kvp expr_kvp_list
 %type <_expr> expr_const
 %type <_const_value> const_value
+%type <_const_path> const_path
 %type <_const_lambda> const_lambda
 %type <_const_initializer> const_initializer
 
@@ -134,14 +138,13 @@ using namespace Jay::Ast;
 %}
 
 %destructor { DESTRUCT($$); }
-  ID USERDEF INT_CONST FLOAT_CONST STRING_CONST
+  ID INT_CONST FLOAT_CONST STRING_CONST
   id id_list
-  userdef userdef_list
   generic generic_list generics
   closure closure_or_empty
   decl_file_item decl_frame decl_frame_item decl_use decl_var decl_function decl_dtor decl_ctor decl_file_body
   decl_frame_body frame_body decl_var_list
-  type_specifier type_specifier_list type_specifier_unit type type_internal type_userdef type_userdef_unit
+  type_void type_specifier type_specifier_list type_specifier_unit type type_internal type_userdef type_userdef_unit
   stmt stmt_list stmt_expr stmt_label stmt_compound stmt_select stmt_iter stmt_jump stmt_decl
   expr expr_list expr_assign expr_cond expr_lor expr_land expr_or expr_xor expr_and expr_equal expr_relational
   expr_shift expr_add expr_mul expr_cast expr_unary expr_postfix expr_primary expr_kvp expr_kvp_list expr_const
@@ -180,31 +183,24 @@ id_list
     }
   ;
 
-userdef
+id_glue_list
   :
-    USERDEF {
-      MAKE($$, @$, Id, $1);
-    }
-  ;
-
-userdef_list
-  :
-    userdef {
+    id {
       $$ = $1;
     }
   |
-    userdef_list DOT userdef {
+    id_glue_list COLON id {
       $$ = $1->push($3);
     }
   ;
   
 generic
   :
-    userdef {
+    id {
       MAKE($$, @$, Generic, $1, nullptr);
     }
   |
-    userdef COLON type_specifier {
+    id COLON type_specifier {
       MAKE($$, @$, Generic, $1, $3);
     }
   ;
@@ -274,8 +270,8 @@ decl_file_item
       MAKE($$, @$, DeclInclude, $2);
     }
   |
-    NAMESPACE userdef_list LBRA decl_file_body RBRA {
-      MAKE($$, @$, DeclNested, $2, $4);
+    NAMESPACE const_path LBRA decl_file_body RBRA {
+      MAKE($$, @$, DeclNamespace, $2, $4);
     }
   |
     decl_use {
@@ -308,7 +304,7 @@ decl_file_body
 
 decl_use
   :
-    USE userdef_list {
+    USE const_path {
       MAKE($$, @$, DeclUse, $2);
     }
   ;
@@ -332,8 +328,8 @@ decl_var
 
 decl_function
   :
-    id_list generics LPAR decl_var_list RPAR closure_or_empty {
-      MAKE($$, @$, DeclFunction, $1, $2, $4, nullptr, $6);
+    id_list generics LPAR decl_var_list RPAR type_void closure_or_empty {
+      MAKE($$, @$, DeclFunction, $1, $2, $4, $6, $7);
     }
   |
     id_list generics LPAR decl_var_list RPAR COLON type_specifier_list closure_or_empty {
@@ -358,7 +354,7 @@ decl_var_list
 
 decl_frame
   :
-    FRAME userdef generics COLON type_specifier_list decl_frame_body {
+    FRAME id generics COLON type_specifier_list decl_frame_body {
       MAKE($$, @$, DeclFrame, $2, $3, $5, $6);
     }
   ;
@@ -450,6 +446,13 @@ decl_dtor
     }
   ;
 
+type_void
+  :
+    /* empty */ {
+      MAKE($$, @$, TypeInternal, TypeInternal::Kind::VOID);
+    }
+  ;
+
 type_specifier
   :
     type_specifier_unit {
@@ -536,10 +539,6 @@ type_internal
       MAKE($$, @$, TypeInternal, TypeInternal::Kind::INT);
     }
   |
-    STRING {
-      MAKE($$, @$, TypeInternal, TypeInternal::Kind::STRING);
-    }
-  |
     UINT {
       MAKE($$, @$, TypeInternal, TypeInternal::Kind::UINT);
     }
@@ -587,11 +586,11 @@ type_internal
 
 type_userdef_unit
   :
-    userdef {
+    id {
       MAKE($$, @$, TypeUserdef, $1);
     }
   |
-    userdef LT type_specifier_list GT {
+    id LT type_specifier_list GT {
       MAKE($$, @$, TypeGeneric, $1, $3);
     }
   ;
@@ -1109,7 +1108,7 @@ expr_postfix
     }
   |
     expr_postfix DOT id {
-      MAKE($$, @$, ExprNested, $1, $3);
+      MAKE($$, @$, ExprAccess, $1, $3);
     }
   |
     expr_postfix LSQU RSQU {
@@ -1169,15 +1168,15 @@ expr_kvp_list
 expr_const
   :
     id {
-      $$ = $1;
-    }
-  |
-    userdef_list {
-      $$ = $1;
+      MAKE($$, @$, ConstId, $1);
     }
   |
     THIS {
       MAKE($$, @$, ConstThis);
+    }
+  |
+    NULL_KEYWORD {
+      MAKE($$, @$, ConstNull);
     }
   |
     const_value {
@@ -1190,6 +1189,13 @@ expr_const
   |
     const_initializer {
       $$ = $1;
+    }
+  ;
+
+const_path
+  :
+    id_glue_list {
+      MAKE($$, @$, ConstPath, $1);
     }
   ;
 

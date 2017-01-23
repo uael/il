@@ -1,12 +1,10 @@
-include stdio;
+include stdio, stdlib;
 
-say_hello_to(to : string) : void => {
-  printf("Hello World %s!", to);
+namespace sys {
+  print(string : *char) => printf(string)
 }
 
-main(argc : int, argv : string[]) : int => {
-  if argv {
-    say_hello_to("Jay");
-  }
+main(argc : int, argv : *char[]) : int => {
+  sys:print("Hello World");
   return 0
 }

@@ -23,46 +23,57 @@
 
 #include "node.h"
 #include "id.h"
+#include "const.h"
 
 namespace Jay {
   namespace Ast {
-    struct Decl : Node {};
+    struct Decl : Node, Named {
+      Decl(Id *ids);
+    };
 
     struct DeclInclude : Decl {
-      Id *includes = nullptr;
-
       DeclInclude(Id *includes);
 
       void accept(Node *scope) override;
-
       void generate(Gen::Generator *generator);
     };
 
     struct DeclUse : Decl {
-      Id *uses = nullptr;
+      ConstPath *path = nullptr;
 
-      DeclUse(Id *uses);
+      DeclUse(ConstPath *path);
 
       void accept(Node *scope) override;
+      void generate(Gen::Generator *generator);
     };
 
     struct DeclNested : Decl {
-      Id *name = nullptr;
       Decl *decls = nullptr;
 
       DeclNested(Id *name, Decl *decls);
 
       void accept(Node *scope) override;
+      void generate(Gen::Generator *generator);
+    };
+
+    struct DeclNamespace : DeclNested {
+      ConstPath *path = nullptr;
+
+      DeclNamespace(ConstPath *path, Decl *decls);
+
+      void accept(Node *scope) override;
+      void generate(Gen::Generator *generator);
     };
 
     struct DeclMember : Decl {
-      Id *ids = nullptr;
       TypeSpecifier *type_specifier = nullptr;
       Closure *closure = nullptr;
+      Node *use_scope = nullptr;
 
       DeclMember(Id *ids, TypeSpecifier *type_specifier, Closure *closure);
 
       virtual void accept(Node *scope) override;
+      bool is_void();
     };
 
     struct DeclProperty : DeclMember {
@@ -73,15 +84,26 @@ namespace Jay {
       void generate(Gen::Generator *generator);
     };
 
+    struct Use : Node {
+      Decl *node;
+
+      Use(Decl *node);
+
+      virtual ~Use();
+
+      void generate(Gen::Generator *generator) override;
+    };
+
     struct DeclFunction : DeclMember {
       Generic *generics = nullptr;
       Decl *args = nullptr;
+      Use *uses = nullptr;
 
-      DeclFunction(Id *ids, Generic *generics, Decl *args, TypeSpecifier *type_specifier,
-                      Closure *closure);
+      virtual ~DeclFunction();
+
+      DeclFunction(Id *ids, Generic *generics, Decl *args, TypeSpecifier *type_specifier, Closure *closure);
 
       virtual void accept(Node *scope) override;
-
       void generate(Gen::Generator *generator);
     };
 
@@ -94,12 +116,14 @@ namespace Jay {
       DeclCtor(Id *props_args, Closure *closure, const bool &poly = true);
 
       void accept(Node *scope) override;
+      void generate(Gen::Generator *generator);
     };
 
     struct DeclDtor : DeclCtor {
       DeclDtor(Decl *args, Closure *closure, const bool &poly);
-
       DeclDtor(Id *props_args, Closure *closure, const bool &poly);
+
+      void generate(Gen::Generator *generator);
     };
 
     struct DeclFrame : DeclNested {
@@ -109,6 +133,7 @@ namespace Jay {
       DeclFrame(Id *name, Generic *generics, TypeSpecifier *type, Decl *decls);
 
       void accept(Node *scope) override;
+      void generate(Gen::Generator *generator);
     };
   }
 }

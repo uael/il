@@ -18,27 +18,28 @@
 
 /* $Id$ */
 
-#ifndef _AST_ID_H
-#define _AST_ID_H
-
-#include "node.h"
-#include "expr.h"
+#include "generator.h"
 
 namespace Jay {
   namespace Ast {
-    struct Id : Node {
-      std::string *value;
-      std::string uk_value;
-
-      Id(std::string *value);
-
-      void accept(Node *scope) override;
-      void generate(Gen::Generator *generator);
-    };
+    void Id::generate(Gen::Generator *generator) {
+      uk_value = *value;
+      if (as(scope, Decl)) {
+        Decl *named = this->next_scope<Decl>();
+        while (named) {
+          if (scope != named) {
+            Id *last = as(named->ids->last(), Id);
+            rforeach(id, last) {
+              uk_value = *id->value + "_" + uk_value;
+            }
+          }
+          named = named->ids->scope->next_scope<Decl>();
+        }
+      }
+      *generator << uk_value;
+    }
   }
 }
-
-#endif /* _AST_ID_H */
 
 /*
  * Local variables:

@@ -94,6 +94,24 @@ namespace Jay {
     void StmtDecl::accept(Node *scope) {
       ACCEPT(decls);
       Node::accept(scope);
+
+      if (next) {
+        next->prev = prev;
+      }
+      if (prev) {
+        prev->next = next;
+        Node *_next = prev, *_prev;
+        while (_next->prev && !as(_next->prev, StmtDecl)) {
+          _next = _next->prev;
+        }
+        _prev = _next->prev;
+        next = _next;
+        _next->prev = this;
+        prev = _prev;
+        if (_prev) {
+          _prev->next = this;
+        }
+      }
     }
   }
 }

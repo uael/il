@@ -18,27 +18,43 @@
 
 /* $Id$ */
 
-#ifndef _AST_ID_H
-#define _AST_ID_H
-
-#include "node.h"
-#include "expr.h"
+#include "generator.h"
 
 namespace Jay {
   namespace Ast {
-    struct Id : Node {
-      std::string *value;
-      std::string uk_value;
+    void ConstValue::generate(Gen::Generator *generator) {
+      *generator << value;
+    }
 
-      Id(std::string *value);
+    void ConstLambda::generate(Gen::Generator *generator) {
 
-      void accept(Node *scope) override;
-      void generate(Gen::Generator *generator);
-    };
+    }
+
+    void ConstInitializer::generate(Gen::Generator *generator) {
+
+    }
+
+    void ConstThis::generate(Gen::Generator *generator) {
+
+    }
+
+    void ConstNew::generate(Gen::Generator *generator) {
+
+    }
+
+    void ConstPath::generate(Gen::Generator *generator) {
+      *generator << op(All, ids, "_");
+    }
+
+    void ConstId::generate(Gen::Generator *generator) {
+      *generator << ids;
+    }
+
+    void ConstNull::generate(Gen::Generator *generator) {
+      *generator << "NULL";
+    }
   }
 }
-
-#endif /* _AST_ID_H */
 
 /*
  * Local variables:

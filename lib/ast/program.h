@@ -32,7 +32,6 @@ namespace Jay {
       Program();
 
       void accept(Node *scope) override;
-
       void generate(Gen::Generator *generator);
     };
   }

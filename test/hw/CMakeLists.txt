@@ -6,7 +6,7 @@ function(add_jay_executable exec_name)
         string(REPLACE ".jay" ".c" output ${jay_file})
         add_custom_command(
             OUTPUT ${output}
-            COMMAND jay ${CMAKE_CURRENT_LIST_DIR}/${jay_file}
+            COMMAND ${CMAKE_BINARY_DIR}/src/jay ${CMAKE_CURRENT_LIST_DIR}/${jay_file}
             DEPENDS ${jay_file}
         )
         list(APPEND jay_exec_SOURCES ${output})

@@ -152,6 +152,7 @@ typedef Jay::Parser::token token;
 "catch"                           RET(CATCH);
 "self"                            RET(SELF);
 "this"                            RET(THIS);
+"null"                            RET(NULL_KEYWORD);
 
 "as"                              RET(AS);
 "case"                            RET(CASE);
@@ -171,7 +172,6 @@ typedef Jay::Parser::token token;
 "bool"                            RET(BOOL);
 "char"                            RET(CHAR);
 "int"                             RET(INT);
-"string"                          RET(STRING);
 "unsigned int"                    RET(UINT);
 "signed int"                      RET(SINT);
 "short"                           RET(SHORT);
@@ -184,8 +184,7 @@ typedef Jay::Parser::token token;
 "unsigned double"                 RET(UDOUBLE);
 "signed double"                   RET(SDOUBLE);
 
-[a-z_][a-z0-9_]*	              SAVE_STRING; RET(ID);
-[A-Z][A-Za-z0-9]*                 SAVE_STRING; RET(USERDEF);
+[A-Za-z_][A-Za-z0-9_]*	          SAVE_STRING; RET(ID);
 
 {HP}{H}+{IS}?				      SAVE_STRING; RET(INT_CONST);
 {NZ}{D}*{IS}?				      SAVE_STRING; RET(INT_CONST);

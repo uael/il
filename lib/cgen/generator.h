@@ -36,8 +36,8 @@ namespace Jay {
         }
       };
 
-      const std::string &basename;
       const std::string &filename;
+      const std::string &basename;
       std::string name;
       std::ofstream ofstream;
 
@@ -69,8 +69,25 @@ namespace Jay {
       void make(Generator *generator) override;
     };
 
+    struct AllName : All {
+      AllName(Ast::Node *node, const std::string &eot, bool all = false);
+
+      void make(Generator *generator) override;
+    };
+
     struct AllIndent : All {
-      AllIndent(Ast::Node *node, const std::string &eot, bool all);
+      AllIndent(Ast::Node *node, const std::string &eot, bool all = false);
+
+      void make(Generator *generator) override;
+    };
+
+    struct StmtsNoReturn : Op {
+      Ast::Stmt *stmts;
+      Ast::DeclMember *member;
+      const std::string &eot;
+      bool all = false;
+
+      StmtsNoReturn(Ast::Stmt *stmts, Ast::DeclMember *member, const std::string &eot, bool all = false);
 
       void make(Generator *generator) override;
     };
@@ -87,12 +104,21 @@ namespace Jay {
       void make(Generator *generator) override;
     };
 
+    struct Closure : Op {
+      Ast::Closure *closure;
+
+      Closure(Ast::Closure *closure);
+
+      void make(Generator *generator) override;
+    };
+
     struct Generator {
       Ast::Program *program;
       File *source;
       File *header;
       std::string cursor;
       int indent_lvl;
+      Ast::DeclMember *member = nullptr;
 
       Generator(Ast::Program *program);
 
@@ -110,11 +136,6 @@ namespace Jay {
         return *this;
       }
 
-      Generator &operator <<(Ast::Expr *expr) {
-        if (expr) expr->generate(this);
-        return *this;
-      }
-
       Generator &operator <<(Ast::Node *node) {
         if (node) node->generate(this);
         return *this;
@@ -123,11 +144,6 @@ namespace Jay {
       Generator &operator <<(Gen::Op *op) {
         if (op) op->make(this);
         delete op;
-        return *this;
-      }
-
-      Generator &operator <<(Ast::Closure *closure) {
-        if (closure) closure->as_node()->generate(this);
         return *this;
       }
     };

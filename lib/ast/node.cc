@@ -19,6 +19,7 @@
 /* $Id$ */
 
 #include "node.h"
+#include "id.h"
 
 namespace Jay {
   namespace Ast {
@@ -29,6 +30,17 @@ namespace Jay {
       if (this->next) {
         this->next->accept(scope);
       }
+    }
+
+    Named::Named(Id *ids) : ids(ids) {}
+
+    Id *Named::find_id(std::string value) {
+      foreach(id, ids) {
+        if (id->value && *id->value == value) {
+          return id;
+        }
+      }
+      return nullptr;
     }
   }
 }

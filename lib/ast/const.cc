@@ -24,6 +24,13 @@
 
 namespace Jay {
   namespace Ast {
+    ConstId::ConstId(Id *ids) : Named(ids) {}
+
+    void ConstId::accept(Node *scope) {
+      ACCEPT(ids);
+      Node::accept(scope);
+    }
+
     ConstValue::ConstValue(ConstValue::Kind kind, std::string *value) : kind(kind), value(value) {}
 
     ConstLambda::ConstLambda(Id *args, Closure *closure) : args(args), closure(closure) {}
@@ -46,6 +53,12 @@ namespace Jay {
     void ConstNew::accept(Node *scope) {
       ACCEPT(type);
       ConstInitializer::accept(scope);
+    }
+
+    ConstPath::ConstPath(Id *ids) : ConstId(ids) {}
+
+    void ConstPath::accept(Node *scope) {
+      ConstId::accept(scope);
     }
   }
 }

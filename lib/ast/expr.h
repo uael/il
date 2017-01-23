@@ -53,7 +53,6 @@ namespace Jay {
       ExprDop(Kind kind, Expr *op1, Expr *op2);
 
       void accept(Node *scope) override;
-
       void generate(Gen::Generator *generator);
     };
 
@@ -63,7 +62,6 @@ namespace Jay {
       ExprTernary(Expr *cond, Expr *op1, Expr *op2);
 
       void accept(Node *scope) override;
-
       void generate(Gen::Generator *generator);
     };
 
@@ -73,7 +71,6 @@ namespace Jay {
       ExprCast(Expr *op1, TypeSpecifier *type);
 
       void accept(Node *scope) override;
-
       void generate(Gen::Generator *generator);
     };
 
@@ -107,8 +104,15 @@ namespace Jay {
       ExprNested(Expr *op1, Id *id);
 
       void accept(Node *scope) override;
-
       void generate(Gen::Generator *generator);
+    };
+
+    struct ExprAccess : ExprNested {
+      ExprAccess(Expr *op1, Id *id);
+
+      void accept(Node *scope) override;
+
+      void generate(Gen::Generator *generator) override;
     };
 
     struct ExprSizeof : ExprOp {
@@ -118,7 +122,6 @@ namespace Jay {
       ExprSizeof(Expr *op1);
 
       void accept(Node *scope) override;
-
       void generate(Gen::Generator *generator);
     };
 

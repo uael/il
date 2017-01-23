@@ -27,7 +27,23 @@ namespace Jay {
   namespace Ast {
     struct Const : Expr {};
 
-    struct ConstThis : Const {};
+    struct ConstId : Const, Named {
+      ConstId(Id *ids);
+
+      void accept(Node *scope) override;
+      void generate(Gen::Generator *generator);
+    };
+
+    struct ConstPath : ConstId {
+      ConstPath(Id *ids);
+
+      void accept(Node *scope) override;
+      void generate(Gen::Generator *generator);
+    };
+
+    struct ConstThis : Const {
+      void generate(Gen::Generator *generator);
+    };
 
     struct ConstValue : Const {
       enum Kind {
@@ -47,6 +63,7 @@ namespace Jay {
       ConstLambda(Id *args, Closure *closure);
 
       void accept(Node *scope) override;
+      void generate(Gen::Generator *generator);
     };
 
     struct ConstInitializer : Const {
@@ -55,6 +72,7 @@ namespace Jay {
       ConstInitializer(Expr *exprs);
 
       void accept(Node *scope) override;
+      void generate(Gen::Generator *generator);
     };
 
     struct ConstNew : ConstInitializer {
@@ -63,6 +81,11 @@ namespace Jay {
       ConstNew(TypeUserdef *type, Expr *exprs = nullptr);
 
       void accept(Node *scope) override;
+      void generate(Gen::Generator *generator);
+    };
+
+    struct ConstNull : Const {
+      void generate(Gen::Generator *generator);
     };
   }
 }

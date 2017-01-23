@@ -35,7 +35,6 @@ namespace Jay {
       StmtExpr(Expr *expr);
 
       virtual void accept(Node *scope) override;
-
       void generate(Gen::Generator *generator);
     };
 
@@ -52,6 +51,7 @@ namespace Jay {
       StmtLabel(Expr *cond, Stmt *stmt);
 
       virtual void accept(Node *scope) override;
+      void generate(Gen::Generator *generator);
     };
 
     struct StmtCompound : Stmt, Closure {
@@ -61,7 +61,6 @@ namespace Jay {
       StmtCompound(Stmt *stmts);
 
       virtual void accept(Node *scope) override;
-
       void generate(Gen::Generator *generator);
     };
 
@@ -78,7 +77,6 @@ namespace Jay {
       StmtSelect(Expr *cond, Stmt *stmt, Stmt *else_stmt);
 
       virtual void accept(Node *scope) override;
-
       void generate(Gen::Generator *generator);
     };
 
@@ -97,6 +95,7 @@ namespace Jay {
       StmtIter(Stmt *decls, Expr *cond, Closure *step, Stmt *stmt);
 
       virtual void accept(Node *scope) override;
+      void generate(Gen::Generator *generator);
     };
 
     struct StmtJump : Stmt {
@@ -111,7 +110,6 @@ namespace Jay {
       StmtJump(Expr *expr);
 
       virtual void accept(Node *scope) override;
-
       void generate(Gen::Generator *generator);
     };
 
@@ -124,6 +122,7 @@ namespace Jay {
       StmtDecl(Decl *decls, bool constant);
 
       virtual void accept(Node *scope) override;
+      void generate(Gen::Generator *generator);
     };
   }
 }

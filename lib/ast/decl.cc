@@ -24,29 +24,30 @@
 
 namespace Jay {
   namespace Ast {
-    DeclInclude::DeclInclude(Id *includes) : includes(includes) {}
+    DeclInclude::DeclInclude(Id *includes) : Decl(includes) {}
 
     void DeclInclude::accept(Node *scope) {
-      ACCEPT(includes);
+      ACCEPT(ids);
       Node::accept(scope);
     }
 
-    DeclUse::DeclUse(Id *uses) : uses(uses) {}
+    DeclUse::DeclUse(ConstPath *path) : Decl(path->ids), path(path) {}
 
     void DeclUse::accept(Node *scope) {
-      ACCEPT(uses);
+      ACCEPT(path);
       Node::accept(scope);
     }
 
-    DeclNested::DeclNested(Id *name, Decl *decls) : name(name), decls(decls) {}
+    DeclNested::DeclNested(Id *name, Decl *decls) : Decl(name), decls(decls) {}
 
     void DeclNested::accept(Node *scope) {
-      ACCEPT(name);
+      ACCEPT(ids);
+      ACCEPT(decls);
       Node::accept(scope);
     }
 
     DeclMember::DeclMember(Id *ids, TypeSpecifier *type_specifier, Closure *closure)
-      : ids(ids), type_specifier(type_specifier), closure(closure) {}
+      : Decl(ids), type_specifier(type_specifier), closure(closure) {}
 
     void DeclMember::accept(Node *scope) {
       ACCEPT(ids);
@@ -55,18 +56,25 @@ namespace Jay {
       Node::accept(scope);
     }
 
-    DeclProperty::DeclProperty(
-      Id *ids, TypeSpecifier *type_specifier, Closure *closure, bool assigned)
+    DeclProperty::DeclProperty(Id *ids, TypeSpecifier *type_specifier, Closure *closure, bool assigned)
       : DeclMember(ids, type_specifier, closure), assigned(assigned) {}
 
-    DeclFunction::DeclFunction(
-      Id *ids, Generic *generics, Decl *args, TypeSpecifier *type_specifier, Closure *closure)
+    DeclFunction::DeclFunction(Id *ids, Generic *generics, Decl *args, TypeSpecifier *type_specifier, Closure *closure)
       : DeclMember(ids, type_specifier, closure), generics(generics), args(args) {}
 
     void DeclFunction::accept(Node *scope) {
       ACCEPT(generics);
       ACCEPT(args);
       DeclMember::accept(scope);
+    }
+
+    DeclFunction::~DeclFunction() {
+      delete uses;
+    }
+
+    bool DeclMember::is_void() {
+      TypeInternal *type = as(type_specifier, TypeInternal);
+      return type && type->kind == TypeInternal::VOID;
     }
 
     DeclCtor::DeclCtor(Decl *args, Closure *closure, const bool &poly)
@@ -89,6 +97,23 @@ namespace Jay {
     void DeclFrame::accept(Node *scope) {
       ACCEPT(generics);
       ACCEPT(type);
+      DeclNested::accept(scope);
+    }
+
+    Decl::Decl(Id *ids) : Named(ids) {}
+
+    Use::Use(Decl *node) : node(node) {}
+
+    Use::~Use() {
+      if (next) {
+        delete next;
+      }
+    }
+
+    DeclNamespace::DeclNamespace(ConstPath *path, Decl *decls) : DeclNested(path->ids, decls), path(path) {}
+
+    void DeclNamespace::accept(Node *scope) {
+      ACCEPT(path);
       DeclNested::accept(scope);
     }
   }

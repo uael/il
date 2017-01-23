@@ -18,53 +18,10 @@
 
 /* $Id$ */
 
-#include <iostream>
-#include <fstream>
-#include <typeinfo>
-#include <sstream>
-
 #include "jay.h"
 
 int main(int argc, char *argv[]) {
-  Jay::Driver driver = Jay::Driver();
-  bool readfile = false;
-
-  for (int ai = 1; ai < argc; ++ai) {
-    if (argv[ai] == std::string("-p")) {
-      driver.trace_parsing = true;
-    } else if (argv[ai] == std::string("-s")) {
-      driver.trace_scanning = true;
-    } else {
-      std::fstream infile(argv[ai]);
-      if (!infile.good()) {
-        std::cerr << "Could not open file: " << argv[ai] << std::endl;
-        return 0;
-      }
-
-      bool result = driver.parse_stream(infile, argv[ai]);
-      if (result) {
-        Jay::Gen::Generator generator(&driver.program);
-        driver.program.generate(&generator);
-      }
-
-      readfile = true;
-    }
-  }
-
-  if (readfile) return 0;
-
-  std::cout << "Reading nodes from stdin" << std::endl;
-
-  std::string line;
-  while (std::cout << "input: " &&
-         std::getline(std::cin, line) &&
-         !line.empty()) {
-    bool result = driver.parse_string(line, "input");
-
-    if (result) {
-
-    }
-  }
+  return 0;
 }
 
 /*

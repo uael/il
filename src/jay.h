@@ -22,12 +22,8 @@
 #define _JAY_H
 
 #ifdef HAVE_CONFIG_H
-#  include "config.h"
+#include "config.h"
 #endif
-
-#include "ast/ast.h"
-#include "cgen/generator.h"
-#include "parse/driver.h"
 
 #endif /* _JAY_H */
 

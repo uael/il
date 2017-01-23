@@ -21,7 +21,8 @@ LT_INIT
 
 AC_CONFIG_FILES([ \
   Makefile \
-  lib/Makefile lib/ast/Makefile lib/cgen/Makefile lib/parse/Makefile \
-  src/Makefile test/Makefile \
+  lib/Makefile \
+  src/Makefile \
+  test/Makefile \
 ])
 AC_OUTPUT

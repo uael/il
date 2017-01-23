@@ -18,19 +18,11 @@
 
 /* $Id$ */
 
-#include "file.h"
-#include "decl.h"
+#include "test.h"
 
-namespace Jay {
-  namespace Ast {
-    File::File(std::string filename, Decl *decls) : filename(filename), decls(decls) {}
-
-    void File::accept(Node *scope) {
-      ACCEPT(decls);
-      Node::accept(scope);
-    }
-  }
-}
+#ifdef HAVE_CONFIG_H
+RUN
+#endif
 
 /*
  * Local variables:

@@ -4,12 +4,12 @@
 **For fun**
 
 An ultra processing language, .jay generate c files from a high level language syntax.
-Currently support functional parsing only :
-- Multiple name
+Currently supports functional parsing only :
+- Multiple names
 - Auto type
 - Lambda
 - Generics
-- Tuple, multiple return type
+- Tuple, multiple return types
 - Strongly typed
 
 ```bash

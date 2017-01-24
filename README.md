@@ -3,7 +3,7 @@
 
 **For fun**
 
-An ultra processing language, .jay generate c files from an high level language syntax.
+An ultra processing language, .jay's generate c files from a high level language syntax.
 Currently support functional parsing only :
 - Multiple name
 - Auto type

@@ -3,6 +3,7 @@ include_directories(${libfirm_INCLUDE_DIRS})
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wno-missing-braces -Wno-psabi")
 
 set(jay_SOURCES
+    ${jayl_INCLUDES}
     backend/graphviz/dot.c
     backend/x86_64/abi.c
     backend/x86_64/assemble.c

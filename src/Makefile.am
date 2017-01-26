@@ -26,7 +26,7 @@ libjay_la_SOURCES = \
   preprocessor/macro.c \
   preprocessor/preprocess.c \
   preprocessor/strtab.c \
-  preprocessor/jayl_tokenize.c \
+  preprocessor/tokenize.c \
   util/argparse.c \
   util/hash.c \
   util/string.c \

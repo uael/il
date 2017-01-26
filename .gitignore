@@ -48,10 +48,12 @@ stamp-h?
 jay
 
 # usr
-/build
-.idea/
-scripts/
+/build/
+/scripts/
 
 # m4
-m4/l*.m4
+/m4/
+
+# Clion
 /cmake-build-debug/
+.idea/

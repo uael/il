@@ -2,10 +2,17 @@ dist: trusty
 sudo: false
 group: beta
 
-language: cpp
+language: c
+
+addons:
+  apt:
+    sources:
+      - sourceline: 'ppa:rebuntu16/other-stuff'
+    packages:
+      - libfirm-dev
 
 compiler:
-  - g++
+  - gcc
   - clang
 
 install:
@@ -18,7 +25,5 @@ before_script:
 
 script:
   - ${CC} --version
-  - ${CXX} --version
-  - bison --version
   - automake --version
   - make check

@@ -4,7 +4,7 @@
 #include <jayl/array.h>
 #include <jayl/token.h>
 
-typedef array_of(struct token) TokenArray;
+typedef array_of(jayl_token_t) TokenArray;
 
 /* Get empty token array, possibly already allocated with capacity. */
 TokenArray get_token_array(void);
@@ -41,7 +41,7 @@ struct macro {
 void register_builtin_definitions(void);
 
 /* Stringify a list of tokens, returning a new token of type STRING. */
-struct token stringify(const TokenArray *list);
+jayl_token_t stringify(const TokenArray *list);
 
 /*
  * Add macro definition. Takes ownership of any dynamically allocated
@@ -67,6 +67,6 @@ int expand(TokenArray *list);
 /*
  * Compare tokens for equality, returing 0 iff of same type and value.
  */
-int tok_cmp(struct token a, struct token b);
+int tok_cmp(jayl_token_t a, jayl_token_t b);
 
 #endif

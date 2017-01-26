@@ -84,7 +84,7 @@ static Type parameter_list(Type base)
  */
 static Type identifier_list(Type base)
 {
-    struct token t;
+    jayl_token_t t;
     Type type;
 
     type = type_create(T_FUNCTION, base);
@@ -157,7 +157,7 @@ static Type direct_declarator_array(Type base)
  */
 static Type direct_declarator(Type base, String *name)
 {
-    struct token t;
+    jayl_token_t t;
     Type type, head = basic_type__void;
 
     switch (peek().token) {
@@ -371,7 +371,7 @@ static void enumerator_list(void)
 static void enum_declaration(void)
 {
     String name;
-    struct token t;
+    jayl_token_t t;
     struct symbol *tag;
 
     consume(ENUM);
@@ -418,7 +418,7 @@ Type declaration_specifiers(int *storage_class, int *is_inline)
 {
     Type type = {-1}, other;
     const Type *tagged;
-    struct token tok;
+    jayl_token_t tok;
 
     if (storage_class) {
         *storage_class = '$';
@@ -637,7 +637,7 @@ static struct block *read_initializer_element(
 
 static int next_element(void)
 {
-    struct token t = peek();
+    jayl_token_t t = peek();
     if (t.token == ',') {
         if (peekn(2).token != '}') {
             next();
@@ -920,7 +920,7 @@ struct block *declaration(struct definition *def, struct block *parent)
 {
     String name;
     Type base, type;
-    struct token t;
+    jayl_token_t t;
     struct symbol *sym;
     const struct member *param;
     enum symtype symtype;

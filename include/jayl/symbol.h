@@ -43,7 +43,7 @@ struct symbol {
      * enumeration members and numbers which must be loaded from memory
      * in assembly code. Denoted by symtype SYM_CONSTANT.
      */
-    union value constant_value;
+    jayl_value_t constant_value;
 
     /*
      * String literals are also handled as symbols, having type [] const
@@ -90,6 +90,6 @@ const char *sym_name(const struct symbol *sym);
  * Create a floating point constant, which can be stored and loaded from
  * memory.
  */
-struct symbol *sym_create_constant(Type type, union value val);
+struct symbol *sym_create_constant(Type type, jayl_value_t val);
 
 #endif

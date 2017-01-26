@@ -10,7 +10,7 @@
 
 #define IDENT(s) {IDENTIFIER, 0, 1, 0, 0, {0}, {SHORT_STRING_INIT(s)}}
 
-struct token
+jayl_token_t
     ident__include = IDENT("include"),
     ident__defined = IDENT("defined"),
     ident__define = IDENT("define"),
@@ -42,7 +42,7 @@ enum state {
 
 struct number {
     Type type;
-    union value val;
+    jayl_value_t val;
 };
 
 /*
@@ -84,20 +84,20 @@ int in_active_block(void)
     return s == BRANCH_LIVE;
 }
 
-static void expect(const struct token *list, int token)
+static void expect(const jayl_token_t *list, int token)
 {
     String a, b;
     if (list->token != token) {
-        a = tokstr(basic_token[token]);
-        b = tokstr(*list);
+        a = jayl_token_str(basic_token[token]);
+        b = jayl_token_str(*list);
         error("Expected '%s', but got '%s'.", str_raw(a), str_raw(b));
         exit(1);
     }
 }
 
 static struct number expression(
-    const struct token *list,
-    const struct token **endptr);
+    const jayl_token_t *list,
+    const jayl_token_t **endptr);
 
 /*
  * Macro expansions should already have been done. Stray identifiers are
@@ -107,16 +107,16 @@ static struct number expression(
  * point numbers are not permitted by the standard.
  */
 static struct number eval_primary(
-    const struct token *list,
-    const struct token **endptr)
+    const jayl_token_t *list,
+    const jayl_token_t **endptr)
 {
     String s;
-    struct token n;
+    jayl_token_t n;
     struct number num;
 
     switch (list->token) {
     case PREP_NUMBER:
-        n = convert_preprocessing_number(*list);
+        n = jayl_token_convert(*list);
         assert(n.token == NUMBER);
         num.type = n.type;
         num.val = n.d.val;
@@ -131,7 +131,7 @@ static struct number eval_primary(
         break;
     default:
         if (!list->is_expandable) {
-            s = tokstr(*list);
+            s = jayl_token_str(*list);
             error("Invalid primary expression '%s' in directive.", str_raw(s));
             exit(1);
         }
@@ -160,8 +160,8 @@ static struct number eval_primary(
 }
 
 static struct number eval_unary(
-    const struct token *list,
-    const struct token **endptr)
+    const jayl_token_t *list,
+    const jayl_token_t **endptr)
 {
     struct number r;
 
@@ -220,8 +220,8 @@ static int both_signed(struct number *l, struct number *r)
 }
 
 static struct number eval_multiplicative(
-    const struct token *list,
-    const struct token **endptr)
+    const jayl_token_t *list,
+    const jayl_token_t **endptr)
 {
     struct number l, r;
 
@@ -266,8 +266,8 @@ static struct number eval_multiplicative(
 }
 
 static struct number eval_additive(
-    const struct token *list,
-    const struct token **endptr)
+    const jayl_token_t *list,
+    const jayl_token_t **endptr)
 {
     struct number l, r;
 
@@ -298,8 +298,8 @@ static struct number eval_additive(
 }
 
 static struct number eval_shift(
-    const struct token *list,
-    const struct token **endptr)
+    const jayl_token_t *list,
+    const jayl_token_t **endptr)
 {
     struct number l, r;
 
@@ -330,8 +330,8 @@ static struct number eval_shift(
 }
 
 static struct number eval_relational(
-    const struct token *list,
-    const struct token **endptr)
+    const jayl_token_t *list,
+    const jayl_token_t **endptr)
 {
     struct number l, r;
 
@@ -374,8 +374,8 @@ static struct number eval_relational(
 }
 
 static struct number eval_equality(
-    const struct token *list,
-    const struct token **endptr)
+    const jayl_token_t *list,
+    const jayl_token_t **endptr)
 {
     struct number l, r;
 
@@ -404,8 +404,8 @@ static struct number eval_equality(
 }
 
 static struct number eval_and(
-    const struct token *list,
-    const struct token **endptr)
+    const jayl_token_t *list,
+    const jayl_token_t **endptr)
 {
     struct number l, r;
 
@@ -424,8 +424,8 @@ static struct number eval_and(
 }
 
 static struct number eval_exclusive_or(
-    const struct token *list,
-    const struct token **endptr)
+    const jayl_token_t *list,
+    const jayl_token_t **endptr)
 {
     struct number l, r;
 
@@ -444,8 +444,8 @@ static struct number eval_exclusive_or(
 }
 
 static struct number eval_inclusive_or(
-    const struct token *list,
-    const struct token **endptr)
+    const jayl_token_t *list,
+    const jayl_token_t **endptr)
 {
     struct number l, r;
 
@@ -464,8 +464,8 @@ static struct number eval_inclusive_or(
 }
 
 static struct number eval_logical_and(
-    const struct token *list,
-    const struct token **endptr)
+    const jayl_token_t *list,
+    const jayl_token_t **endptr)
 {
     struct number l, r;
 
@@ -481,8 +481,8 @@ static struct number eval_logical_and(
 }
 
 static struct number eval_logical_or(
-    const struct token *list,
-    const struct token **endptr)
+    const jayl_token_t *list,
+    const jayl_token_t **endptr)
 {
     struct number l, r;
 
@@ -498,8 +498,8 @@ static struct number eval_logical_or(
 }
 
 static struct number expression(
-    const struct token *list,
-    const struct token **endptr)
+    const jayl_token_t *list,
+    const jayl_token_t **endptr)
 {
     struct number a, b, c;
 
@@ -521,7 +521,7 @@ static struct number expression(
     return a;
 }
 
-static void preprocess_include(const struct token line[])
+static void preprocess_include(const jayl_token_t line[])
 {
     String path;
 
@@ -535,7 +535,7 @@ static void preprocess_include(const struct token line[])
             if (line->token == '>') {
                 break;
             }
-            path = str_cat(path, tokstr(*line++));
+            path = str_cat(path, jayl_token_str(*line++));
         }
         if (!path.len || line->token != '>') {
             error("Invalid include directive.");
@@ -547,11 +547,11 @@ static void preprocess_include(const struct token line[])
 
 /* Function-like macro iff parenthesis immediately after identifier. */
 static struct macro preprocess_define(
-    const struct token *line,
-    const struct token **endptr)
+    const jayl_token_t *line,
+    const jayl_token_t **endptr)
 {
     struct macro macro = {0};
-    struct token param = {PARAM}, t;
+    jayl_token_t param = {PARAM}, t;
     TokenArray params = get_token_array();
     int i;
 
@@ -613,7 +613,7 @@ void preprocess_directive(TokenArray *array)
     int def;
     enum state state;
     String s;
-    const struct token *line = array->data;
+    const jayl_token_t *line = array->data;
 
     if (line->token == IF || !tok_cmp(*line, ident__elif)) {
         /*
@@ -701,7 +701,7 @@ void preprocess_directive(TokenArray *array)
             error("%s", str_raw(s));
             exit(1);
         } else {
-            s = tokstr(*line);
+            s = jayl_token_str(*line);
             error("Unsupported preprocessor directive '%s'.", str_raw(s));
             exit(1);
         }

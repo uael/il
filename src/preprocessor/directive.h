@@ -4,7 +4,7 @@
 #include "macro.h"
 #include <jayl/token.h>
 
-extern struct token
+extern jayl_token_t
     ident__include,
     ident__defined,
     ident__define,

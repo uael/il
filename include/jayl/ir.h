@@ -64,7 +64,7 @@ struct var {
 
     int lvalue;
 
-    union value imm;
+    jayl_value_t imm;
 };
 
 #define is_field(v) ((v).field_width != 0)
@@ -241,7 +241,7 @@ struct var var_direct(const struct symbol *sym);
 struct var var_int(int value);
 
 /* Immediate numeric value from typed number. */
-struct var var_numeric(Type type, union value val);
+struct var var_numeric(Type type, jayl_value_t val);
 
 /*
  * Create symbol representing a jump target, and associate it with the

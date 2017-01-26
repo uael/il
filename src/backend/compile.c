@@ -272,7 +272,7 @@ static void count_register_classifications(
     }
 }
 
-static int is_zero(union value val, Type type)
+static int is_zero(jayl_value_t val, Type type)
 {
     switch (type_of(type)) {
     case T_CHAR:
@@ -483,7 +483,7 @@ static void load_address(struct var v, enum reg r)
 static const struct symbol *get_x87_unsigned_adjust_constant(void)
 {
     static const struct symbol *sym;
-    union value val = {0};
+    jayl_value_t val = {0};
 
     if (!sym) {
         val.ld = 18446744073709551616.L;
@@ -604,7 +604,7 @@ static enum reg load_float_as_integer(
     enum opcode opcode;
     enum reg ax, cx, xmm0, xmm1;
     struct symbol *convert, *next;
-    union value limit;
+    jayl_value_t limit;
     int width;
 
     assert(is_real(val.type));

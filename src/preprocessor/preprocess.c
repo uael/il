@@ -16,7 +16,7 @@
  * Buffer of preprocessed tokens, ready to be consumed by the parser.
  * Filled lazily on calls to peek(0), peekn(1) and next(0).
  */
-static deque_of(struct token) lookahead;
+static deque_of(jayl_token_t) lookahead;
 
 /* Toggle for producing preprocessed output (-E). */
 static int output_preprocessed;
@@ -39,15 +39,15 @@ static void ensure_initialized(void)
     }
 }
 
-static struct token get_token(void)
+static jayl_token_t get_token(void)
 {
-    struct token r;
+    jayl_token_t r;
     char *endptr;
 
     if (!line_buffer && (line_buffer = getprepline()) == NULL) {
         r = basic_token[END];
     } else {
-        r = tokenize(line_buffer, &endptr);
+        r = jayl_tokenize(line_buffer, &endptr);
         line_buffer = endptr;
         if (r.token == END) {
             /*
@@ -72,7 +72,7 @@ static struct token get_token(void)
 static void read_macro_invocation(TokenArray *line, const struct macro *macro)
 {
     int nesting;
-    struct token t;
+    jayl_token_t t;
     assert(macro->type == FUNCTION_LIKE);
 
     t = get_token();
@@ -116,7 +116,7 @@ static void read_defined_operator(TokenArray *line)
 {
     int is_parens = 0;
     char *endptr;
-    struct token t = get_token();
+    jayl_token_t t = get_token();
 
     if (t.token == '(') {
         t = get_token();
@@ -130,9 +130,9 @@ static void read_defined_operator(TokenArray *line)
     }
 
     if (definition(t.d.string))
-        t = tokenize("1", &endptr);
+        t = jayl_tokenize("1", &endptr);
     else
-        t = tokenize("0", &endptr);
+        t = jayl_tokenize("0", &endptr);
 
     array_push_back(line, t);
     if (is_parens) {
@@ -148,9 +148,9 @@ static void read_defined_operator(TokenArray *line)
  * Get token at position i of existing line, or add new token from input
  * stream to line at posistion. Overwrite the trailing newline.
  */
-static struct token skip_or_get_token(TokenArray *line, int i)
+static jayl_token_t skip_or_get_token(TokenArray *line, int i)
 {
-    struct token t;
+    jayl_token_t t;
 
     if (i == array_len(line) - 1) {
         t = array_get(line, i);
@@ -185,7 +185,7 @@ static int skip_or_read_expansion(
     int i)
 {
     int start = i, nest;
-    struct token t;
+    jayl_token_t t;
 
     assert(def->type == FUNCTION_LIKE);
     t = skip_or_get_token(line, i++);
@@ -212,7 +212,7 @@ static int skip_or_read_expansion(
  * line. Always ends with a newline (\n) token, but never contains any
  * newlines in the array itself.
  */
-static int read_complete_line(TokenArray *line, struct token t, int directive)
+static int read_complete_line(TokenArray *line, jayl_token_t t, int directive)
 {
     int expandable = 1, macros = 0;
     const struct macro *def;
@@ -264,7 +264,7 @@ static int read_complete_line(TokenArray *line, struct token t, int directive)
 static int refill_expanding_line(TokenArray *line)
 {
     int i, n, len;
-    struct token t;
+    jayl_token_t t;
     const struct macro *def;
 
     n = 0;
@@ -299,10 +299,10 @@ static int refill_expanding_line(TokenArray *line)
  * adjacent string literals, and conversion from preprocessing number to
  * proper numeric values.
  */
-static void add_to_lookahead(struct token t)
+static void add_to_lookahead(jayl_token_t t)
 {
     String s;
-    struct token prev;
+    jayl_token_t prev;
 
     if (!output_preprocessed) {
         if (t.token == STRING && deque_len(&lookahead)) {
@@ -313,7 +313,7 @@ static void add_to_lookahead(struct token t)
                 goto added;
             }
         } else if (t.token == PREP_NUMBER) {
-            t = convert_preprocessing_number(t);
+            t = jayl_token_convert(t);
         }
     }
 
@@ -321,7 +321,7 @@ static void add_to_lookahead(struct token t)
 
 added:
     if (context.verbose) {
-        s = tokstr(t);
+        s = jayl_token_str(t);
         verbose("   token( %s )", str_raw(s));
     }
 }
@@ -335,7 +335,7 @@ added:
 static int is_lookahead_ready(int n)
 {
     unsigned len;
-    struct token last;
+    jayl_token_t last;
 
     len = deque_len(&lookahead);
     if (len < n) {
@@ -362,7 +362,7 @@ static void preprocess_line(int n)
     static TokenArray line;
 
     int i;
-    struct token t;
+    jayl_token_t t;
 
     ensure_initialized();
     do {
@@ -420,7 +420,7 @@ void inject_line(char *line)
     line_buffer = NULL;
 }
 
-struct token next(void)
+jayl_token_t next(void)
 {
     if (deque_len(&lookahead) < 1) {
         preprocess_line(1);
@@ -429,12 +429,12 @@ struct token next(void)
     return deque_pop_front(&lookahead);
 }
 
-struct token peek(void)
+jayl_token_t peek(void)
 {
     return peekn(1);
 }
 
-struct token peekn(int n)
+jayl_token_t peekn(int n)
 {
     assert(n > 0);
     if (deque_len(&lookahead) < n) {
@@ -444,25 +444,25 @@ struct token peekn(int n)
     return deque_get(&lookahead, n - 1);
 }
 
-struct token consume(enum token_type type)
+jayl_token_t consume(jayl_token_type_t token)
 {
     String s;
-    struct token t = next();
+    jayl_token_t t = next();
 
-    if (t.token != type) {
-        s = tokstr(t);
-        switch (type) {
+    if (t.token != token) {
+        s = jayl_token_str(t);
+        switch (token) {
         case IDENTIFIER:
         case NUMBER:
         case STRING:
             error("Unexpected token '%s', expected %s.",
                 str_raw(s),
-                (type == IDENTIFIER) ? "identifier" :
-                (type == NUMBER) ? "number" : "string");
+                (token == IDENTIFIER) ? "identifier" :
+                (token == NUMBER) ? "number" : "string");
             break;
         default:
             error("Unexpected token '%s', expected '%s'.",
-                str_raw(s), str_raw(basic_token[type].d.string));
+                str_raw(s), str_raw(basic_token[token].d.string));
             break;
         }
         exit(1);
@@ -473,7 +473,7 @@ struct token consume(enum token_type type)
 
 void preprocess(FILE *output)
 {
-    struct token t;
+    jayl_token_t t;
     String s;
 
     output_preprocessed = 1;
@@ -484,7 +484,7 @@ void preprocess(FILE *output)
         if (t.token == STRING) {
             fprintstr(output, t.d.string); 
         } else {
-            s = tokstr(t);
+            s = jayl_token_str(t);
             fprintf(output, "%s", str_raw(s));
         }
     }

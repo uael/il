@@ -13,7 +13,7 @@
 
 int is_immediate_true(struct expression expr)
 {
-    union value val;
+    jayl_value_t val;
     Type type;
 
     if (is_identity(expr) && expr.l.kind == IMMEDIATE) {
@@ -32,7 +32,7 @@ int is_immediate_true(struct expression expr)
 
 int is_immediate_false(struct expression expr)
 {
-    union value val;
+    jayl_value_t val;
     Type type;
 
     if (is_identity(expr) && expr.l.kind == IMMEDIATE) {
@@ -117,7 +117,7 @@ struct var var_int(int value)
     return var;
 }
 
-struct var var_numeric(Type type, union value val)
+struct var var_numeric(Type type, jayl_value_t val)
 {
     struct var var = {0};
     var.kind = IMMEDIATE;
@@ -128,7 +128,7 @@ struct var var_numeric(Type type, union value val)
 
 static struct var imm_signed(Type type, long n)
 {
-    union value val = {0};
+    jayl_value_t val = {0};
     assert(is_signed(type));
     val.i = n;
     return var_numeric(type, val);
@@ -136,7 +136,7 @@ static struct var imm_signed(Type type, long n)
 
 struct var imm_unsigned(Type type, unsigned long n)
 {
-    union value val = {0};
+    jayl_value_t val = {0};
 
     assert(is_unsigned(type));
     val.u = n;
@@ -152,21 +152,21 @@ struct var imm_unsigned(Type type, unsigned long n)
 
 static struct var imm_float(float n)
 {
-    union value val = {0};
+    jayl_value_t val = {0};
     val.f = n;
     return var_numeric(basic_type__float, val);
 }
 
 static struct var imm_double(double n)
 {
-    union value val = {0};
+    jayl_value_t val = {0};
     val.d = n;
     return var_numeric(basic_type__double, val);
 }
 
 static struct var imm_long_double(long double n)
 {
-    union value val = {0};
+    jayl_value_t val = {0};
     val.ld = n;
     return var_numeric(basic_type__long_double, val);
 }
@@ -327,7 +327,7 @@ struct var eval(
 
 
 
-union value convert(union value val, Type type, Type to)
+jayl_value_t convert(jayl_value_t val, Type type, Type to)
 {
     switch (type_of(to)) {
     case T_FLOAT:

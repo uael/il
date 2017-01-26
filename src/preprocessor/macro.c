@@ -153,20 +153,20 @@ static void ensure_initialized(void)
     }
 }
 
-static struct token get__line__token(void)
+static jayl_token_t get__line__token(void)
 {
     int len;
     char buf[32];
-    struct token t = basic_token[PREP_NUMBER];
+    jayl_token_t t = basic_token[PREP_NUMBER];
 
     len = snprintf(buf, sizeof(buf), "%d", current_file_line);
     t.d.string = str_register(buf, len);
     return t;
 }
 
-static struct token get__file__token(void)
+static jayl_token_t get__file__token(void)
 {
-    struct token t = {STRING};
+    jayl_token_t t = {STRING};
     t.d.string = current_file_path;
     return t;
 }
@@ -244,7 +244,7 @@ void print_token_array(const TokenArray *list)
 {
     int i;
     String s;
-    struct token t;
+    jayl_token_t t;
 
     putchar('[');
     for (i = 0; i < array_len(list); ++i) {
@@ -264,7 +264,7 @@ void print_token_array(const TokenArray *list)
             if (t.token == NEWLINE) {
                 printf("\\n");
             } else {
-                s = tokstr(t);
+                s = jayl_token_str(t);
                 printf("%s", str_raw(s));
             }
             putchar('\'');
@@ -274,9 +274,9 @@ void print_token_array(const TokenArray *list)
     printf("] (%u)\n", array_len(list));
 }
 
-static struct token paste(struct token left, struct token right)
+static jayl_token_t paste(jayl_token_t left, jayl_token_t right)
 {
-    struct token res;
+    jayl_token_t res;
     char *buf, *endptr;
     String ls, rs;
 
@@ -286,12 +286,12 @@ static struct token paste(struct token left, struct token right)
         return left;
     }
 
-    ls = tokstr(left);
-    rs = tokstr(right);
+    ls = jayl_token_str(left);
+    rs = jayl_token_str(right);
     buf = calloc(ls.len + rs.len + 1, sizeof(*buf));
     buf = strcpy(buf, str_raw(ls));
     buf = strcat(buf, str_raw(rs));
-    res = tokenize(buf, &endptr);
+    res = jayl_tokenize(buf, &endptr);
     if (endptr != buf + ls.len + rs.len) {
         error("Invalid token resulting from pasting '%s' and '%s'.",
             str_raw(ls), str_raw(rs));
@@ -303,7 +303,7 @@ static struct token paste(struct token left, struct token right)
     return res;
 }
 
-static enum token_type peek_token(const TokenArray *list, int i)
+static jayl_token_type_t peek_token(const TokenArray *list, int i)
 {
     if (i < array_len(list)) {
         return array_get(list, i).token;
@@ -365,7 +365,7 @@ static TokenArray expand_stringify_and_paste(
     TokenArray *args)
 {
     int len, d, i;
-    struct token t, s;
+    jayl_token_t t, s;
     TokenArray list = get_token_array();
 
     len = array_len(&def->replacement);
@@ -434,7 +434,7 @@ static TokenArray expand_macro(
     TokenArray *args)
 {
     int i, j;
-    struct token t;
+    jayl_token_t t;
     TokenArray list = expand_stringify_and_paste(def, args);
 
     if (def->params > 0) {
@@ -472,12 +472,12 @@ static TokenArray expand_macro(
     return list;
 }
 
-static const struct token *skip(const struct token *list, enum token_type token)
+static const jayl_token_t *skip(const jayl_token_t *list, jayl_token_type_t token)
 {
     String a, b;
     if (list->token != token) {
-        a = tokstr(basic_token[token]);
-        b = tokstr(*list);
+        a = jayl_token_str(basic_token[token]);
+        b = jayl_token_str(*list);
         error("Expected '%s', but got '%s'.", str_raw(a), str_raw(b));
         exit(1);
     }
@@ -492,11 +492,11 @@ static const struct token *skip(const struct token *list, enum token_type token)
  */
 static TokenArray read_arg(
     ExpandStack *scope,
-    const struct token *list,
-    const struct token **endptr)
+    const jayl_token_t *list,
+    const jayl_token_t **endptr)
 {
     int nesting = 0;
-    struct token t;
+    jayl_token_t t;
     TokenArray arg = get_token_array();
 
     while (nesting || (list->token != ',' && list->token != ')')) {
@@ -530,8 +530,8 @@ static TokenArray read_arg(
 static TokenArray *read_args(
     ExpandStack *scope,
     const struct macro *def,
-    const struct token *list,
-    const struct token **endptr)
+    const jayl_token_t *list,
+    const jayl_token_t **endptr)
 {
     int i;
     TokenArray *args = NULL;
@@ -557,9 +557,9 @@ static TokenArray *read_args(
 static int expand_line(ExpandStack *scope, TokenArray *list)
 {
     int size, i, n;
-    struct token t;
+    jayl_token_t t;
     const struct macro *def;
-    const struct token *endptr;
+    const jayl_token_t *endptr;
     TokenArray *args, expn;
 
     for (n = 0, i = 0; i < array_len(list); ++i) {
@@ -611,7 +611,7 @@ int expand(TokenArray *list)
     return n;
 }
 
-int tok_cmp(struct token a, struct token b)
+int tok_cmp(jayl_token_t a, jayl_token_t b)
 {
     if (a.token != b.token)
         return 1;
@@ -639,10 +639,10 @@ int tok_cmp(struct token a, struct token b)
  *   to a single space in the stringified result.
  * - Quotes and special characters in STRING tokens are escaped.
  */
-struct token stringify(const TokenArray *list)
+jayl_token_t stringify(const TokenArray *list)
 {
     int i;
-    struct token str = {0}, tok;
+    jayl_token_t str = {0}, tok;
     String strval;
     char *buf;
     size_t cap, len, ptr;
@@ -651,7 +651,7 @@ struct token stringify(const TokenArray *list)
         str.d.string = str_init("");
     } else if (array_len(list) == 1) {
         tok = array_get(list, 0);
-        str.d.string = tokstr(tok);
+        str.d.string = jayl_token_str(tok);
     } else {
         /* Estimate 7 characters per token. */
         cap = array_len(list) * 7 + 1;
@@ -674,7 +674,7 @@ struct token stringify(const TokenArray *list)
              * Reduce to a single space, and only insert between other
              * tokens in the list.
              */
-            strval = tokstr(tok);
+            strval = jayl_token_str(tok);
             len += strval.len + (tok.leading_whitespace && i);
             if (len >= cap) {
                 cap = len + array_len(list) + 1;
@@ -698,7 +698,7 @@ struct token stringify(const TokenArray *list)
 static TokenArray parse(char *str)
 {
     char *endptr;
-    struct token param = {PARAM};
+    jayl_token_t param = {PARAM};
     TokenArray arr = get_token_array();
 
     while (*str) {
@@ -706,7 +706,7 @@ static TokenArray parse(char *str)
             array_push_back(&arr, param);
             str++;
         } else {
-            array_push_back(&arr, tokenize(str, &endptr));
+            array_push_back(&arr, jayl_tokenize(str, &endptr));
             assert(str != endptr);
             str = endptr;
         }

@@ -36,7 +36,7 @@ static struct block *parse__builtin_va_start(
     Type type;
     const struct member *mb;
     const struct symbol *sym;
-    struct token param;
+    jayl_token_t param;
 
     consume('(');
     block = assignment_expression(def, block);
@@ -98,7 +98,7 @@ static struct block *primary_expression(
     struct block *block)
 {
     const struct symbol *sym;
-    struct token tok;
+    jayl_token_t tok;
 
     switch ((tok = next()).token) {
     case IDENTIFIER:
@@ -218,7 +218,7 @@ static struct block *postfix_expression(
     struct var value, copy;
     const struct member *mbr;
     const struct symbol *sym;
-    struct token tok;
+    jayl_token_t tok;
     int i;
     Type type;
     ExprArray *args;
@@ -501,7 +501,7 @@ static struct block *cast_expression(
     struct block *block)
 {
     struct var value;
-    struct token tok;
+    jayl_token_t tok;
     struct symbol *sym;
     Type type;
 
@@ -536,7 +536,7 @@ static struct block *multiplicative_expression(
     struct block *block)
 {
     struct var value;
-    struct token t;
+    jayl_token_t t;
 
     block = cast_expression(def, block);
     while (1) {
@@ -570,7 +570,7 @@ static struct block *additive_expression(
     struct block *block)
 {
     struct var value;
-    struct token t;
+    jayl_token_t t;
 
     block = multiplicative_expression(def, block);
     while (1) {
@@ -598,7 +598,7 @@ static struct block *shift_expression(
     struct block *block)
 {
     struct var value;
-    struct token t;
+    jayl_token_t t;
 
     block = additive_expression(def, block);
     while (1) {
@@ -670,7 +670,7 @@ static struct block *equality_expression(
 {
     enum optype op;
     struct var value;
-    struct token t;
+    jayl_token_t t;
 
     block = relational_expression(def, block);
     while (1) {

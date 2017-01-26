@@ -331,7 +331,7 @@ static struct block *switch_statement(
 struct block *statement(struct definition *def, struct block *parent)
 {
     struct symbol *sym;
-    struct token tok;
+    jayl_token_t tok;
 
     switch ((tok = peek()).token) {
     case ';':

@@ -362,7 +362,7 @@ struct symbol *sym_add(
     return sym;
 }
 
-struct symbol *sym_create_constant(Type type, union value val)
+struct symbol *sym_create_constant(Type type, jayl_value_t val)
 {
     static struct symbol data = {
         SHORT_STRING_INIT(".C"),

@@ -10,7 +10,6 @@ set(jay_SOURCES
     backend/x86_64/elf.c
     backend/x86_64/instr.c
     backend/compile.c
-    firm/opt.c
     optimizer/liveness.c
     optimizer/optimize.c
     optimizer/transform.c

@@ -7,10 +7,9 @@
 #include "preprocessor/input.h"
 #include "preprocessor/macro.h"
 #include "util/argparse.h"
-#include <libfirm/firm.h>
 #include <jayl/context.h>
-#include <jayl/ir.h>
 
+#include <jayl/ir.h>
 #include <assert.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -178,7 +177,6 @@ int main(int argc, char *argv[])
     init(filename);
     register_builtin_definitions();
     set_compile_target(output, filename);
-    ir_init();
 
     if (context.target == TARGET_NONE) {
         preprocess(output);

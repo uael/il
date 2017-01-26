@@ -2,10 +2,10 @@ dist: trusty
 sudo: false
 group: beta
 
-language: cpp
+language: c
 
 compiler:
-  - g++
+  - gcc
   - clang
 
 install:

@@ -1,5 +1,4 @@
 AM_CFLAGS = -Wall -I$(top_srcdir)/lib
-AM_CXXFLAGS = -Wall -std=c++11 -I$(top_srcdir)/lib
 
 check_LTLIBRARIES = libgtest.la
 

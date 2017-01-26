@@ -1,9 +1,15 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.0)
 project(jay)
 
-set(CMAKE_CXX_STANDARD 11)
+if(CMAKE_VERSION VERSION_LESS "3.1")
+    if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+        set(CMAKE_C_FLAGS "-std=c99 ${CMAKE_C_FLAGS}")
+    endif()
+else()
+    set(CMAKE_C_STANDARD 99)
+endif()
 
-include_directories(lib src)
+include_directories(include lib src)
 
 add_subdirectory(lib)
 add_subdirectory(src)

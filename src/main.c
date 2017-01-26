@@ -21,8 +21,8 @@
  * headers. This is set in the makefile, by default pointing to files
  * from the source tree under /include/stdlib/.
  */
-#ifndef LACC_STDLIB_PATH
-# define LACC_STDLIB_PATH "/usr/local/lib/jayl/include"
+#ifndef JAYL_STDLIB_PATH
+# define JAYL_STDLIB_PATH "/usr/local/lib/jayl/include"
 #endif
 
 const char *program;
@@ -162,7 +162,7 @@ static void register_builtin_declarations(void)
 static void add_include_search_paths(void)
 {
     add_include_search_path("/usr/local/include");
-    add_include_search_path(LACC_STDLIB_PATH);
+    add_include_search_path(JAYL_STDLIB_PATH);
     add_include_search_path("/usr/include/x86_64-linux-gnu");
     add_include_search_path("/usr/include");
 }

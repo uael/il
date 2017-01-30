@@ -17,5 +17,4 @@ install:
   - cmake ..
 
 script:
-  - ${CC} --version
-  - make check
+  - make

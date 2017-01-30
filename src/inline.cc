@@ -1,0 +1,854 @@
+#include "inline.h"
+
+#include "init.h"
+#include "temps.h"
+#include "intrinsics.h"
+#include "ir_builder.h"
+#include "ir_codegen.h"
+#include "ir_transforms.h"
+#include "grid_ops.h"
+#include "rw_analysis.h"
+#include "var_replace_rewriter.h"
+
+using namespace std;
+
+namespace jayl {
+  namespace ir {
+
+    bool CallRewriter::shouldInline(const CallStmt *op) {
+      // Check for non-element tensor arguments
+      for (auto arg : op->callee.getArguments()) {
+        if (!arg.getType().isTensor() ||
+          arg.getType().toTensor()->hasSystemDimensions()) {
+          return true;
+        }
+      }
+
+      // Check for non-element tensor results
+      for (auto res : op->callee.getResults()) {
+        if (!res.getType().isTensor() ||
+          res.getType().toTensor()->hasSystemDimensions()) {
+          return true;
+        }
+      }
+
+      // Check for writes to inout arguments that are not variables
+      ReadWriteAnalysis rwAnalysis(op->callee.getArguments());
+      op->callee.getBody().accept(&rwAnalysis);
+      for (size_t i = 0; i < op->actuals.size(); ++i) {
+        if (!isa<VarExpr>(op->actuals[i]) &&
+          util::contains(rwAnalysis.getWrites(), op->callee.getArguments()[i])) {
+          return true;
+        }
+      }
+
+      class ReferencesSet : public IRQuery {
+        using IRQuery::visit;
+
+        void visit(const VarExpr *op) {
+          // TODO: Check for references to extern variables
+          if (op->type.isSet()) {
+            result = true;
+          }
+        }
+
+        void visit(const VarDecl *op) {
+          if (!op->var.getType().isTensor() ||
+            op->var.getType().toTensor()->hasSystemDimensions()) {
+            result = true;
+          }
+        }
+
+        void visit(const For *op) {
+          result = true;
+        }
+      };
+
+      // Check for references to sets within function body
+      return ReferencesSet().query(op->callee.getBody());
+    }
+
+    std::set<Var> CallRewriter::getReferencedVars(const std::vector<Expr> &exprs) {
+      class CollectVars : public IRVisitor {
+        public:
+        CollectVars(std::set<Var> &vars) : vars(vars) {}
+
+        private:
+        using IRVisitor::visit;
+
+        void visit(const VarExpr *op) {
+          vars.insert(op->var);
+        }
+
+        std::set<Var> &vars;
+      };
+
+      std::set<Var> referencedVars;
+      CollectVars collector(referencedVars);
+
+      for (auto expr : exprs) {
+        expr.accept(&collector);
+      }
+
+      return referencedVars;
+    }
+
+    void CallRewriter::visit(const CallStmt *op) {
+      if (!op->callee.getBody().defined() || !shouldInline(op)) {
+        stmt = op;
+        return;
+      }
+
+      stmt = Scope::make(op->callee.getBody());
+
+      // Replace callee parameters with arguments
+      iassert(op->actuals.size() == op->callee.getArguments().size());
+      for (size_t i = 0; i < op->actuals.size(); ++i) {
+        stmt = replaceVarByExpr(stmt, op->callee.getArguments()[i], op->actuals[i]);
+      }
+
+      IRBuilder builder;
+      static util::NameGenerator names;
+
+      const std::set<Var> referencedVars = getReferencedVars(op->actuals);
+
+      // Replace callee result variables with assignment targets
+      iassert(op->results.size() == op->callee.getResults().size());
+      for (size_t i = 0; i < op->results.size(); ++i) {
+        if (util::contains(referencedVars, op->results[i])) {
+          const auto resName = op->callee.getResults()[i].getName();
+          const auto tmpName = names.getName(INTERNAL_PREFIX("inline_" + resName));
+
+          Var tmpRes(tmpName, op->results[i].getType());
+          stmt = replaceVar(stmt, op->callee.getResults()[i], tmpRes);
+
+          Stmt tmpDecl = VarDecl::make(tmpRes);
+          Expr copyTmp = builder.unaryElwiseExpr(IRBuilder::Copy, tmpRes);
+          Stmt assignRes = AssignStmt::make(op->results[i], copyTmp);
+          stmt = Block::make({tmpDecl, stmt, assignRes});
+        } else {
+          stmt = replaceVar(stmt, op->callee.getResults()[i], op->results[i]);
+        }
+      }
+
+      // Add comment
+      stmt = Comment::make(util::toString(*op), stmt, true, true);
+
+      // Add constants from inlined callee into environment
+      for (auto &c : op->callee.getEnvironment().getConstants()) {
+        env->addConstant(c.first, c.second);
+      }
+    }
+
+    Func inlineCalls(Func func) {
+      CallRewriter rewriter(&func.getStorage(), &func.getEnvironment());
+      Stmt body = rewriter.rewrite(func.getBody());
+
+      func = Func(func, body);
+      func = insertVarDecls(func);
+
+      return func;
+    }
+
+    Stmt inlineMapFunction(const Map *map, Var lv, vector<Var> ivs,
+      MapFunctionRewriter &rewriter, Storage *storage);
+
+    Stmt MapFunctionRewriter::inlineMapFunc(const Map *map, Var targetLoopVar,
+      Storage *storage,
+      Var endpoints,
+      std::map<TensorIndex, Var> locs,
+      std::map<vector<int>, Expr> clocs,
+      vector<Var> gridIndexVars) {
+      this->endpoints = endpoints;
+      this->locs = locs;
+      this->clocs = clocs;
+      this->reduction = map->reduction;
+      this->targetLoopVar = targetLoopVar;
+      this->gridIndexVars = gridIndexVars;
+      this->storage = storage;
+
+      Func kernel = map->function;
+      // TODO: revise this assert given map functions can have many params
+      //iassert(kernel.getArguments().size() == 1 || kernel.getArguments().size() == 2)
+      //    << "mapped functions must have exactly two arguments";
+
+      iassert(map->vars.size() == kernel.getResults().size());
+      for (size_t i = 0; i < kernel.getResults().size(); ++i) {
+        resultToMapVar[kernel.getResults()[i]] = map->vars[i];
+      }
+
+      this->targetSet = map->target;
+      this->neighborSets = map->neighbors;
+      this->throughSet = map->through;
+
+      iassert(kernel.getArguments().size() >= 1)
+        << "The function must have a target argument";
+
+      auto argIt = kernel.getArguments().begin() + map->partial_actuals.size();
+      this->target = *argIt++;
+
+      if (kernel.getArguments().size() >= (2 + map->partial_actuals.size())) {
+        // Bit hacky: distinguish between neighbors arg and through args
+        // Neighbors will be a tuple of elements, through args will be
+        // two sets.
+        auto maybeNeighbors = *argIt;
+        if (maybeNeighbors.getType().isUnnamedTuple() ||
+          maybeNeighbors.getType().isNamedTuple()) {
+          this->neighbors = maybeNeighbors;
+          argIt++;
+        }
+      }
+      if (this->throughSet.defined()) {
+        this->throughEdges = *argIt++;
+        // TODO: We assume the grid edge set refers to the point set
+        // by the extern variable.
+        Expr pointsSet = this->throughEdges.getType().toGridSet()
+          ->underlyingPointSet.getSet();
+        tassert(isa<VarExpr>(pointsSet))
+          << "Grid edge set " << this->throughEdges
+          << " must refer to underlying point set via the extern variable";
+        this->throughPoints = to<VarExpr>(pointsSet)->var;
+      }
+
+      return rewrite(kernel.getBody());
+    }
+
+    bool MapFunctionRewriter::isResult(Var var) {
+      return resultToMapVar.find(var) != resultToMapVar.end();
+    }
+
+    Var MapFunctionRewriter::getMapVar(Var resultVar) {
+      return resultToMapVar[resultVar];
+    }
+
+    void MapFunctionRewriter::visit(const FieldWrite *op) {
+      // Write a field from the target set
+      if (isa<VarExpr>(op->elementOrSet) &&
+        to<VarExpr>(op->elementOrSet)->var == target) {
+        Expr setFieldRead = FieldRead::make(targetSet, op->fieldName);
+        stmt = TensorWrite::make(setFieldRead, {targetLoopVar}, rewrite(op->value));
+      }
+        // Write a field from a (homogeneous) neighbor set
+      else if (isa<UnnamedTupleRead>(op->elementOrSet)) {
+        const auto tupleRead = to<UnnamedTupleRead>(op->elementOrSet);
+        if (isa<VarExpr>(tupleRead->tuple) &&
+          to<VarExpr>(tupleRead->tuple)->var == neighbors) {
+          Expr setFieldRead = FieldRead::make(neighborSets[0], op->fieldName);
+          Expr index = IRRewriter::rewrite(op->elementOrSet);
+          stmt = TensorWrite::make(setFieldRead, {index}, rewrite(op->value));
+        } else {
+          not_supported_yet;
+        }
+      }
+        // Write a field from a (heterogeneous) neighbor set
+      else if (isa<NamedTupleRead>(op->elementOrSet)) {
+        const auto tupleRead = to<NamedTupleRead>(op->elementOrSet);
+        if (isa<VarExpr>(tupleRead->tuple) &&
+          to<VarExpr>(tupleRead->tuple)->var == neighbors) {
+          const auto tupleType = tupleRead->tuple.type().toNamedTuple();
+          const auto neighborIdx = tupleType->elementIndex(tupleRead->elementName);
+
+          Expr setFieldRead = FieldRead::make(neighborSets[neighborIdx],
+            op->fieldName);
+          Expr index = IRRewriter::rewrite(op->elementOrSet);
+          stmt = TensorWrite::make(setFieldRead, {index}, rewrite(op->value));
+        } else {
+          not_supported_yet;
+        }
+      } else {
+        // TODO: Handle the case where the target var was reassigned
+        //       tmp = s; ... = tmp.a;
+        not_supported_yet;
+      }
+    }
+
+    void MapFunctionRewriter::visit(const FieldRead *op) {
+      // Read a field from the target set
+      if (isa<VarExpr>(op->elementOrSet) &&
+        to<VarExpr>(op->elementOrSet)->var == target) {
+        Expr setFieldRead = FieldRead::make(targetSet, op->fieldName);
+        expr = TensorRead::make(setFieldRead, {targetLoopVar});
+      }
+        // Read a field from a (homogeneous) neighbor set
+      else if (isa<UnnamedTupleRead>(op->elementOrSet)) {
+        const auto tupleRead = to<UnnamedTupleRead>(op->elementOrSet);
+        if (isa<VarExpr>(tupleRead->tuple) &&
+          to<VarExpr>(tupleRead->tuple)->var == neighbors) {
+          Expr setFieldRead = FieldRead::make(neighborSets[0], op->fieldName);
+          Expr index = IRRewriter::rewrite(op->elementOrSet);
+          expr = TensorRead::make(setFieldRead, {index});
+        } else {
+          not_supported_yet;
+        }
+      }
+        // Read a field from a (heterogeneous) neighbor set
+      else if (isa<NamedTupleRead>(op->elementOrSet)) {
+        const auto tupleRead = to<NamedTupleRead>(op->elementOrSet);
+        if (isa<VarExpr>(tupleRead->tuple) &&
+          to<VarExpr>(tupleRead->tuple)->var == neighbors) {
+          const auto tupleType = tupleRead->tuple.type().toNamedTuple();
+          const auto neighborIdx = tupleType->elementIndex(tupleRead->elementName);
+
+          Expr setFieldRead = FieldRead::make(neighborSets[neighborIdx],
+            op->fieldName);
+          Expr index = IRRewriter::rewrite(op->elementOrSet);
+          expr = TensorRead::make(setFieldRead, {index});
+        } else {
+          not_supported_yet;
+        }
+      }
+        // Read a field from a grid offset element
+      else if (isa<SetRead>(op->elementOrSet) &&
+        isa<VarExpr>(to<SetRead>(op->elementOrSet)->set)) {
+        const SetRead *sr = to<SetRead>(op->elementOrSet);
+        // Grid offset edges
+        if (to<VarExpr>(sr->set)->var == throughEdges) {
+          Expr setFieldRead = FieldRead::make(throughSet, op->fieldName);
+          Expr index = IRRewriter::rewrite(op->elementOrSet);
+          expr = TensorRead::make(setFieldRead, {index});
+        }
+          // Grid offset points
+        else if (to<VarExpr>(sr->set)->var == throughPoints) {
+          Expr setFieldRead = FieldRead::make(
+            throughSet.type().toGridSet()->underlyingPointSet.getSet(),
+            op->fieldName);
+          Expr index = IRRewriter::rewrite(op->elementOrSet);
+          expr = TensorRead::make(setFieldRead, {index});
+        } else {
+          not_supported_yet;
+        }
+      } else {
+        // TODO: Handle the case where the target var was reassigned
+        //       tmp = s; ... = tmp.a;
+        not_supported_yet;
+      }
+    }
+
+    void MapFunctionRewriter::visit(const UnnamedTupleRead *op) {
+      iassert(isa<VarExpr>(op->tuple))
+        << "This code assumes no expressions return a tuple";
+
+      if (to<VarExpr>(op->tuple)->var == neighbors) {
+        const UnnamedTupleType *tupleType = op->tuple.type().toUnnamedTuple();
+        int cardinality = tupleType->size;
+
+        Expr endpoints = IndexRead::make(targetSet, IndexRead::Endpoints);
+        Expr indexExpr = Add::make(Mul::make(targetLoopVar, cardinality),
+          op->index);
+        expr = Load::make(endpoints, indexExpr);
+      } else {
+        ierror << "Assumes tuples are only used for neighbor lists";
+      }
+    }
+
+    void MapFunctionRewriter::visit(const NamedTupleRead *op) {
+      iassert(isa<VarExpr>(op->tuple))
+        << "This code assumes no expressions return a tuple";
+
+      if (to<VarExpr>(op->tuple)->var == neighbors) {
+        const NamedTupleType *tupleType = op->tuple.type().toNamedTuple();
+        int cardinality = tupleType->elements.size();
+
+        Expr endpoints = IndexRead::make(targetSet, IndexRead::Endpoints);
+        Expr indexExpr = Add::make(Mul::make(targetLoopVar, cardinality),
+          (int) tupleType->elementIndex(op->elementName));
+        expr = Load::make(endpoints, indexExpr);
+      } else {
+        ierror << "Assumes tuples are only used for neighbor lists";
+      }
+    }
+
+    void MapFunctionRewriter::visit(const SetRead *op) {
+      iassert(isa<VarExpr>(op->set)) << "Set read set must be a variable";
+      const Var &setVar = to<VarExpr>(op->set)->var;
+      unsigned dims = throughEdges.getType().toGridSet()->dimensions;
+      if (setVar == throughEdges) {
+        iassert(op->indices.size() == dims * 2);
+        iassert(gridIndexVars.size() == dims);
+        // Index into grid edge set assuming canonical ordering
+        vector<int> offsets = getOffsets(op->indices);
+        vector<int> srcOff, sinkOff;
+        int dir = -1;
+        bool srcBase;
+        for (unsigned i = 0; i < dims; ++i) {
+          srcOff.push_back(offsets[i]);
+          sinkOff.push_back(offsets[dims + i]);
+          if (srcOff.back() != sinkOff.back()) {
+            iassert(dir == -1)
+              << "Cannot have multiple offsets in relative grid indexing";
+            iassert(abs(srcOff.back() - sinkOff.back()) == 1)
+              << "Cannot offset by more than 1 in grid edge indexing";
+            dir = i;
+            srcBase = (srcOff.back() < sinkOff.back());
+          }
+        }
+        iassert(dir != -1) << "Must have an offset in grid edge indexing";
+
+        // Convert index offsets to a single offset expr
+        vector<Expr> indices, base;
+        indices.push_back(dir); // Directional index innermost
+        for (int ind : (srcBase ? srcOff : sinkOff)) {
+          indices.push_back(ind);
+        }
+        base.push_back(Expr(0)); // Add directional base 0 value
+        for (const Var &v : gridIndexVars) {
+          base.push_back(v);
+        }
+        iassert(indices.size() == dims + 1);
+        iassert(base.size() == dims + 1);
+
+        vector<Expr> finalIndices = getGridEdgeOffsetIndices(
+          base, indices, throughSet);
+        expr = getGridEdgeCoord(finalIndices, throughSet);
+      } else if (setVar == throughPoints) {
+        vector<Expr> indices, base;
+        for (int ind : getOffsets(op->indices)) {
+          indices.emplace_back(ind);
+        }
+        for (const Var &v : gridIndexVars) {
+          base.emplace_back(v);
+        }
+        iassert(indices.size() == dims);
+        iassert(base.size() == dims);
+
+        vector<Expr> finalIndices = getGridPointOffsetIndices(
+          base, indices, throughSet);
+        expr = getGridPointCoord(finalIndices, throughSet);
+      } else {
+        not_supported_yet;
+      }
+    }
+
+    void MapFunctionRewriter::visit(const VarExpr *op) {
+      if (op->var == target) {
+        expr = targetLoopVar;
+      } else if (isResult(op->var)) {
+        expr = resultToMapVar[op->var];
+      } else {
+        expr = op;
+      }
+    }
+
+    StencilContent *buildStencilLocs(Func kernel, Var stencilVar, Var loopVar,
+      Var gridSet,
+      std::map<vector<int>, Expr> &clocs) {
+      StencilContent *content = buildStencil(kernel, stencilVar, gridSet);
+      // Build clocs relative to loop var
+      for (auto &kv : content->layout) {
+        clocs[kv.first] = loopVar * Expr((int) content->layout.size()) + kv.second;
+      }
+      return content;
+    }
+
+/// Emit code to store the endpoints of the edge set. This avoids
+/// index computations in the locs loops
+/// ~~~~~~~~~~~~~~~
+///   % Gather endpoints
+///   var .eps : tensor[0:2](int)';
+///   for i in 0:2
+///     .eps(i) = E.endpoints[(s * 2) + i];
+///   end
+/// ~~~~~~~~~~~~~~~
+    static Stmt gatherEps(Expr target, int cardinality, Var lv, Var *eps) {
+      Var i("i", Int);
+      Type type = TensorType::make(ScalarType::Int, {IndexDomain(cardinality)});
+      *eps = Var(INTERNAL_PREFIX("eps"), type);
+      Stmt epsDelc = VarDecl::make(*eps);
+      Expr epsRead = IndexRead::make(target, IndexRead::Endpoints);
+      Expr epLoc = Add::make(Mul::make(lv, cardinality), i);
+      Expr ep = Load::make(epsRead, epLoc);
+      Stmt gatherEp = TensorWrite::make(*eps, {i}, ep);
+      Stmt loop = ForRange::make(i, 0, cardinality, gatherEp);
+      Stmt gatherEps = Block::make(epsDelc, loop);
+      return Comment::make("Gather endpoints", gatherEps, true);
+    }
+
+    static const string LOCS_POSTFIX = "_locs";
+
+    static bool isHomogeneous(const std::vector<Expr *> &endpointSets) {
+      const auto end = *endpointSets[0];
+
+      for (size_t i = 1; i < endpointSets.size(); ++i) {
+        if (*endpointSets[i] != end) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+/// Emit code to gather the locations of the result vv matrices:
+/// ~~~~~~~~~~~~~~~
+///   % Gather locs from As_index
+///   var .As_index_locs : tensor[0:2,0:2](int);
+///   for i in 0:2
+///     for j in 0:2
+///       var .locVar : int;
+///       .locVar = __loc(.eps[i], .eps[j], As_index.coords, As_index.sinks);
+///       .As_index_locs(i,j) = .locVar;
+///     end
+///   end
+/// ~~~~~~~~~~~~~~~
+/// (Locations for matrices with the same index are only computed once.)
+    static Stmt gatherVVLocs(TensorIndex index, const std::vector<Expr *> &endpoints,
+      const std::vector<IndexSet> &dims, Var eps,
+      std::map<TensorIndex, Var> *indexToLocs) {
+      const int cardinality = endpoints.size();
+
+      Type locsType = TensorType::make(ScalarType::Int,
+        {
+          IndexDomain(cardinality),
+          IndexDomain(cardinality)
+        });
+      Var locs(INTERNAL_PREFIX(index.getName() + LOCS_POSTFIX), locsType);
+      (*indexToLocs)[index] = locs;
+
+      Stmt locsDecl = VarDecl::make(locs);
+
+      Expr ptr = index.getRowptrArray();
+      Expr idx = index.getColidxArray();
+
+      Var i("i", Int);
+      Var j("j", Int);
+
+      Var locVar(INTERNAL_PREFIX("locVar"), Int);
+      Stmt locStmt = CallStmt::make({locVar}, intrinsics::loc(),
+        {Load::make(eps, i), Load::make(eps, j), ptr, idx});
+      Stmt locsInit = Block::make({locStmt, TensorWrite::make(locs, {i, j}, locVar)});
+
+      if (isHomogeneous(endpoints)) {
+        Stmt locsInitLoop = ForRange::make(j, 0, cardinality, locsInit);
+        locsInitLoop = ForRange::make(i, 0, cardinality, locsInitLoop);
+
+        return Block::make(locsDecl, locsInitLoop);
+      }
+
+      // Heterogeneous edge sets need to be handled separately from homogeneous
+      // edge sets since heterogeneous edges contain endpoints that cannot be used
+      // to index into a row or column of the result matrix.
+      // TODO: If all tuple elements that can be used to index into the result
+      //       matrix are adjacent, emitting a loop might still be more efficient.
+      Stmt locsInits = locsDecl;
+      for (int ii = 0; ii < cardinality; ++ii) {
+        if (*endpoints[ii] != dims[0].getSet()) {
+          continue;
+        }
+
+        locsInits = Block::make(locsInits, AssignStmt::make(i, ii));
+        for (int jj = 0; jj < cardinality; ++jj) {
+          if (*endpoints[jj] != dims[1].getSet()) {
+            continue;
+          }
+
+          locsInits = Block::make({locsInits, AssignStmt::make(j, jj), locsInit});
+        }
+      }
+
+      return locsInits;
+    }
+
+/// Emit code to gather the locations of the result ve matrices:
+/// ~~~~~~~~~~~~~~~
+///   for e in E
+///     ...
+///     % Gather locs from As_index
+///     var .As_index_locs : tensor[0:2](int);
+///     for i in 0:2
+///       var .locVar : int;
+///       .locVar = __loc(.eps[i], e, As_index.coords, As_index.sinks);
+///       .As_index_locs(i) = .locVar;
+///     end
+///     ...
+///   end
+/// ~~~~~~~~~~~~~~~
+/// (Locations for matrices with the same index are only computed once.)
+    static Stmt gatherVELocs(TensorIndex index, const std::vector<Expr *> &endpoints,
+      IndexSet vDim, Var eps, Var lv,
+      std::map<TensorIndex, Var> *indexToLocs) {
+      const int cardinality = endpoints.size();
+
+      Type locsType = TensorType::make(ScalarType::Int, {IndexDomain(cardinality)});
+      Var locs(INTERNAL_PREFIX(index.getName() + LOCS_POSTFIX), locsType);
+      (*indexToLocs)[index] = locs;
+
+      Stmt locsDecl = VarDecl::make(locs);
+
+      Expr ptr = index.getRowptrArray();
+      Expr idx = index.getColidxArray();
+
+      Var i("i", Int);
+
+      Var locVar(INTERNAL_PREFIX("locVar"), Int);
+      Stmt locStmt = CallStmt::make({locVar}, intrinsics::loc(),
+        {Load::make(eps, i), lv, ptr, idx});
+      Stmt locsInit = Block::make({locStmt, TensorWrite::make(locs, {i}, locVar)});
+
+      if (isHomogeneous(endpoints)) {
+        Stmt locsInitLoop = ForRange::make(i, 0, cardinality, locsInit);
+
+        return Block::make(locsDecl, locsInitLoop);
+      }
+
+      // Heterogeneous edge sets need to be handled separately from homogeneous
+      // edge sets since heterogeneous edges contain endpoints that cannot be used
+      // to index into a row or column of the result matrix.
+      // TODO: If all tuple elements that can be used to index into the result
+      //       matrix are adjacent, emitting a loop might still be more efficient.
+      Stmt locsInits = locsDecl;
+      for (int ii = 0; ii < cardinality; ++ii) {
+        if (*endpoints[ii] == vDim.getSet()) {
+          locsInits = Block::make({locsInits, AssignStmt::make(i, ii), locsInit});
+        }
+      }
+
+      return locsInits;
+    }
+
+/// Emit code to gather the locations of the result ev matrices:
+/// ~~~~~~~~~~~~~~~
+///   for e in E
+///     ...
+///     % Gather locs from A_index
+///     var .A_index_locs : tensor[0:2](int)';
+///     for i in 0:2
+///       .A_index_locs(i) = (e * 2) + i;
+///     end
+///     ...
+///   end
+/// ~~~~~~~~~~~~~~~
+/// (Locations for matrices with the same index are only computed once.)
+    static Stmt gatherEVLocs(TensorIndex index, const std::vector<Expr *> &endpoints,
+      IndexSet vDom, Var eps, Var lv,
+      std::map<TensorIndex, Var> *indexToLocs) {
+      const int cardinality = endpoints.size();
+
+      Type locsType = TensorType::make(ScalarType::Int, {IndexDomain(cardinality)});
+      Var locs(INTERNAL_PREFIX(index.getName() + LOCS_POSTFIX), locsType);
+      (*indexToLocs)[index] = locs;
+
+      Stmt locsDecl = VarDecl::make(locs);
+
+      if (isHomogeneous(endpoints)) {
+        Var i("i", Int);
+
+        Stmt locsInit = TensorWrite::make(locs, {i}, lv * cardinality + i);
+        Stmt locsInitLoop = ForRange::make(i, 0, cardinality, locsInit);
+
+        return Block::make(locsDecl, locsInitLoop);
+      }
+
+      const int nnzPerRow = std::count_if(endpoints.begin(), endpoints.end(),
+        [vDom](const Expr *e) { return *e == vDom.getSet(); });
+
+      // Heterogeneous edge sets need to be handled separately from homogeneous
+      // edge sets since heterogeneous edges contain endpoints that cannot be used
+      // to index into a row or column of the result matrix.
+      // TODO: If all tuple elements that can be used to index into the result
+      //       matrix are adjacent, emitting a loop might still be more efficient.
+      Stmt locsInits = locsDecl;
+      for (int i = 0, j = 0; i < cardinality; ++i) {
+        if (*endpoints[i] == vDom.getSet()) {
+          Stmt locsInit = TensorWrite::make(locs, {i}, lv * nnzPerRow + (j++));
+          locsInits = Block::make(locsInits, locsInit);
+        }
+      }
+
+      return locsInits;
+    }
+
+/// Inlines the mapped function with respect to the given loop variable over
+/// the target set, using the given rewriter.
+    Stmt inlineMapFunction(const Map *map, Var lv, vector<Var> ivs,
+      MapFunctionRewriter &rewriter, Storage *storage) {
+      // Compute locations of the mapped edge
+      bool returnsMatrix = false;
+
+      auto vars = map->vars;
+      auto results = map->function.getResults();
+      iassert(results.size() == vars.size())
+        << "Should be same number of results as assigned to vars";
+      for (size_t i = 0; i < results.size(); ++i) {
+        auto var = vars[i];
+        auto result = results[i];
+
+        Type type = result.getType();
+        if (type.isTensor() && type.toTensor()->order() == 2) {
+          returnsMatrix = true;
+        }
+      }
+
+      Expr target = map->target;
+      iassert(map->target.type().isSet());
+
+      const auto &endpoints = map->target.type().toUnstructuredSet()->endpointSets;
+      const int cardinality = endpoints.size();
+
+      // Map over edge set to build matrix
+      if (returnsMatrix && cardinality > 0) {
+        iassert(ivs.size() == 0);
+        std::map<TensorIndex, Var> indexToLocs;
+        vector<Stmt> initLocs;
+
+        Var eps;
+        initLocs.push_back(gatherEps(target, cardinality, lv, &eps));
+
+        for (size_t i = 0; i < results.size(); ++i) {
+          auto var = vars[i];
+          iassert(storage->hasStorage(var));
+          auto varStorage = storage->getStorage(var);
+          if (varStorage.getKind() == TensorStorage::Indexed) {
+            iassert(varStorage.getTensorIndex().defined());
+
+            auto result = results[i];
+            auto index = varStorage.getTensorIndex();
+
+            if (util::contains(indexToLocs, index)) continue;
+            if (!result.getType().isTensor()) continue;
+
+            auto type = result.getType().toTensor();
+            tassert(type->order() == 2) << "Only matrix indices supported";
+
+            auto dims = type->getOuterDimensions();
+
+            // Compute locations to use to index into the result matrix. E.g.:
+            // ~~~~~~~~~~~~~~~
+            //   As(.As_index_locs(0,0)) += 1;
+            //   As(.As_index_locs(0,1)) += 1;
+            //   As(.As_index_locs(1,0)) += 1;
+            //   As(.As_index_locs(1,1)) += 1;
+            // ~~~~~~~~~~~~~~~
+            Stmt gatherLocs;
+            if (dims[0] != target && dims[1] != target) {
+              // vv matrix
+              gatherLocs = gatherVVLocs(index, endpoints, dims, eps, &indexToLocs);
+            } else if (dims[0] != target && dims[1] == target) {
+              // ve matrix
+              gatherLocs = gatherVELocs(index, endpoints, dims[0], eps, lv,
+                &indexToLocs);
+            } else if (dims[0] == target && dims[1] != target) {
+              // ev matrix
+              gatherLocs = gatherEVLocs(index, endpoints, dims[1], eps, lv,
+                &indexToLocs);
+            } else {
+              unreachable;
+            }
+            initLocs.push_back(Comment::make("Gather locs from " + index.getName(),
+              gatherLocs, true));
+          }
+        }
+
+        return Block::make(Block::make(initLocs),
+          rewriter.inlineMapFunc(map, lv, storage, eps, indexToLocs));
+      } else if (returnsMatrix && map->through.defined()) {
+        // Map through local coordinate structure to build matrix
+        // If we're assemblying using local coordinate structure, we can build
+        // locs at compile time (clocs) and use this in lowering the map to generate
+        // the proper indices.
+        std::map<vector<int>, Expr> clocs;
+        Var stencilVar, mapVar;
+        iassert(map->vars.size() == map->function.getResults().size());
+        for (unsigned i = 0; i < map->vars.size(); ++i) {
+          auto var = map->vars[i];
+          auto res = map->function.getResults()[i];
+          if (storage->getStorage(var).getKind() == TensorStorage::Kind::Stencil) {
+            iassert(!stencilVar.defined());
+            iassert(storage->getStorage(var).getTensorIndex().getStencilLayout()
+              .getStencilFunc() == map->function.getName());
+            iassert(storage->getStorage(var).getTensorIndex().getStencilLayout()
+              .getStencilVar() == var.getName());
+            mapVar = var;
+            stencilVar = res;
+          } else if (storage->getStorage(var).getKind()
+            == TensorStorage::Kind::Indexed) {
+            iassert(!stencilVar.defined());
+            mapVar = var;
+            stencilVar = res;
+          }
+        }
+        // Must have exactly one stencil-assembled output
+        iassert(stencilVar.defined())
+          << "map with through must assemble exactly one stencil-assembled var";
+        // Build compile-time locs
+        StencilLayout s = buildStencilLocs(
+          map->function, stencilVar, lv, to<VarExpr>(map->through)->var, clocs);
+        if (kIndexlessStencils) {
+          // Resolve StencilLayout in storage
+          storage->getStorage(mapVar).getTensorIndex().setStencilLayout(s);
+        }
+        iassert(ivs.size() > 0);
+        return rewriter.inlineMapFunc(map, lv, storage, Var(),
+          std::map<TensorIndex, Var>(), clocs, ivs);
+      } else {
+        return rewriter.inlineMapFunc(map, lv, storage);
+      }
+    }
+
+    Stmt inlineMap(const Map *map, MapFunctionRewriter &rewriter,
+      Storage *storage) {
+      Func kernel = map->function;
+      kernel = insertTemporaries(kernel);
+
+      // The function must have at least one argument, namely the target. It may
+      // also have a neighbor set, as well as other arguments.
+      iassert(kernel.getArguments().size() >= 1)
+        << "The function must have a target argument";
+
+      Var targetVar = kernel.getArguments()[map->partial_actuals.size()];
+
+      Var loopVar(targetVar.getName(), Int);
+      int ndims = map->through.defined() ?
+        map->through.type().toGridSet()->dimensions : 0;
+      vector<Var> gridIndexVars;
+      for (int i = 0; i < ndims; ++i) {
+        gridIndexVars.emplace_back(targetVar.getName() + "_d" + to_string(i), Int);
+      }
+
+      Stmt inlinedMapFunc = inlineMapFunction(map, loopVar, gridIndexVars,
+        rewriter, storage);
+
+      Stmt inlinedMap;
+      auto initializers = vector<Stmt>();
+      for (size_t i = 0; i < map->partial_actuals.size(); i++) {
+        Var tvar = kernel.getArguments()[i];
+        Expr rval = map->partial_actuals[i];
+        initializers.push_back(AssignStmt::make(tvar, rval));
+      }
+
+      Stmt loop;
+      if (!map->through.defined()) {
+        iassert(gridIndexVars.size() == 0);
+        ForDomain domain(map->target);
+        loop = For::make(loopVar, domain, inlinedMapFunc);
+      } else {
+        iassert(map->through.type().isGridSet());
+        initializers.push_back(AssignStmt::make(loopVar, 0));
+        int dims = map->through.type().toGridSet()->dimensions;
+        loop = Block::make(inlinedMapFunc, AssignStmt::make(
+          loopVar, 1, CompoundOperator::Add));
+        for (int i = 0; i < dims; ++i) {
+          loop = ForRange::make(gridIndexVars[i], 0, IndexRead::make(
+            map->through, IndexRead::GridDim, i), loop);
+        }
+      }
+
+      if (initializers.size() > 0) {
+        auto initializersBlock = Block::make(initializers);
+        inlinedMap = Block::make(initializersBlock, loop);
+      } else {
+        inlinedMap = loop;
+      }
+
+      if (map->reduction.getKind() != ReductionOperator::Undefined) {
+        for (auto &var : map->vars) {
+          iassert(var.getType().isTensor());
+          Stmt init = AssignStmt::make(var, var);
+          init = initializeLhsToZero(init);
+          inlinedMap = Block::make(init, inlinedMap);
+        }
+      }
+
+      return inlinedMap;
+    }
+
+  }
+}

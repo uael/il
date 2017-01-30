@@ -1,0 +1,7 @@
+file(GLOB JAYL_HEADERS ${JAYL_HEADERS} *.h)
+file(GLOB JAYL_SOURCES ${JAYL_SOURCES} *.cc)
+
+add_subdirectory(index_expressions)
+
+set(JAYL_SOURCES ${JAYL_SOURCES} PARENT_SCOPE)
+set(JAYL_HEADERS ${JAYL_HEADERS} PARENT_SCOPE)

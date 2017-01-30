@@ -1,39 +1,36 @@
-include_directories(${libfirm_INCLUDE_DIRS})
+# Jayl
+set(CMAKE_MACOSX_RPATH 1)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wno-missing-braces -Wno-psabi")
+if (JAYL_SHARED_LIBRARY)
+    set(JAYL_LIBRARY_TYPE SHARED)
+    message("-- Shared library")
+else ()
+    set(JAYL_LIBRARY_TYPE STATIC)
+    message("-- Static library")
+endif ()
 
-set(jay_SOURCES
-    ${jayl_INCLUDES}
-    backend/graphviz/dot.c
-    backend/x86_64/abi.c
-    backend/x86_64/assemble.c
-    backend/x86_64/elf.c
-    backend/x86_64/instr.c
-    backend/compile.c
-    optimizer/liveness.c
-    optimizer/optimize.c
-    optimizer/transform.c
-    parser/declaration.c
-    parser/eval.c
-    parser/expression.c
-    parser/parse.c
-    parser/expression.c
-    parser/parse.c
-    parser/statement.c
-    parser/symtab.c
-    parser/typetree.c
-    preprocessor/directive.c
-    preprocessor/input.c
-    preprocessor/macro.c
-    preprocessor/preprocess.c
-    preprocessor/strtab.c
-    preprocessor/tokenize.c
-    util/argparse.c
-    util/hash.c
-    util/string.c
-    context.c
-    main.c
-)
+set(JAYL_SOURCE_DIRS . interfaces util)
 
-add_executable(jay ${jay_SOURCES})
-target_link_libraries(jay firm)
+foreach (dir ${JAYL_SOURCE_DIRS})
+    file(GLOB JAYL_HEADERS ${JAYL_HEADERS} ${dir}/*.h)
+    file(GLOB JAYL_SOURCES ${JAYL_SOURCES} ${dir}/*.cc)
+endforeach ()
+list(REMOVE_ITEM JAYL_SOURCES ${CMAKE_CURRENT_LIST_DIR}/main.cc)
+
+set(JAYL_HEADERS ${JAYL_HEADERS})
+set(JAYL_SOURCES ${JAYL_SOURCES})
+set(JAYL_SOURCES_NO_RTTI "")
+
+add_subdirectory(backend)
+add_subdirectory(frontend)
+add_subdirectory(lower)
+
+add_definitions(${JAYL_DEFINITIONS})
+include_directories(${JAYL_INCLUDE_DIRS})
+add_library(${PROJECT_NAME} ${JAYL_LIBRARY_TYPE} ${JAYL_HEADERS} ${JAYL_SOURCES})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${JAYL_LIBRARIES})
+add_executable(jay main.cc)
+target_link_libraries(jay ${PROJECT_NAME})
+
+# Handle no RTTI sources
+set_source_files_properties(${JAYL_SOURCES_NO_RTTI} PROPERTIES COMPILE_FLAGS "-fno-rtti")

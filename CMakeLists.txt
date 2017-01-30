@@ -1,31 +1,74 @@
-cmake_minimum_required(VERSION 3.0)
-project(jay)
+cmake_minimum_required(VERSION 2.8.3 FATAL_ERROR)
+project(jayl)
 
-if(CMAKE_VERSION VERSION_LESS "3.1")
-    if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-        set(CMAKE_C_FLAGS "-std=c99 ${CMAKE_C_FLAGS}")
-    endif()
-else()
-    set(CMAKE_C_STANDARD 99)
+SET(CMAKE_CONFIGURATION_TYPES "Release;Debug;MinSizeRel;RelWithDebInfo")
+
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
+    "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel."
+    FORCE)
+endif(NOT CMAKE_BUILD_TYPE)
+
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+  message("-- Debug Build")
+  add_definitions(-DJAYL_DEBUG)
+  add_definitions(-DJAYL_ASSERTS)
+  set(JAYL_DEBUG 1)
+elseif (CMAKE_BUILD_TYPE MATCHES RelWithDebInfo)
+  message("-- Release Build with Debug Information")
+  add_definitions(-DJAYL_DEBUG)
+  add_definitions(-DJAYL_ASSERTS)
+  set(JAYL_DEBUG 1)
+elseif (CMAKE_BUILD_TYPE MATCHES Release)
+  message("-- Release Build")
+elseif (CMAKE_BUILD_TYPE MATCHES MinSizeRel)
+  message("-- Release Build with Minimal Size")
+endif ()
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+  set(WINDOWS TRUE)
+elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  set(LINUX TRUE)
+elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  set(DARWIN TRUE)
 endif()
 
-set(jayl_INCLUDES
-    ${CMAKE_CURRENT_LIST_DIR}/include/jayl/array.h
-    ${CMAKE_CURRENT_LIST_DIR}/include/jayl/context.h
-    ${CMAKE_CURRENT_LIST_DIR}/include/jayl/deque.h
-    ${CMAKE_CURRENT_LIST_DIR}/include/jayl/hash.h
-    ${CMAKE_CURRENT_LIST_DIR}/include/jayl/ir.h
-    ${CMAKE_CURRENT_LIST_DIR}/include/jayl/string.h
-    ${CMAKE_CURRENT_LIST_DIR}/include/jayl/symbol.h
-    ${CMAKE_CURRENT_LIST_DIR}/include/jayl/token.h
-    ${CMAKE_CURRENT_LIST_DIR}/include/jayl/type.h
-    ${CMAKE_CURRENT_LIST_DIR}/include/stdlib/float.h
-    ${CMAKE_CURRENT_LIST_DIR}/include/stdlib/stdarg.h
-    ${CMAKE_CURRENT_LIST_DIR}/include/stdlib/stddef.h
-)
+if ($ENV{JAYL_ASSERTS})
+  add_definitions(-DJAYL_ASSERTS)
+endif ()
 
-include_directories(include lib src)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-add_subdirectory(lib)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  add_definitions(-DOSX)
+endif()
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+
+set(OPTIMIZE "-O3" CACHE STRING "Optimization level")
+if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+# Turn off excessive warnings on Linux/GCC
+  set(C_CXX_FLAGS "-Wno-unused-parameter -Wno-missing-field-initializers -Wno-deprecated")
+else()
+  set(C_CXX_FLAGS "-Wall -Wextra -pedentic")
+endif()
+if (DEFINED ENV{WERROR})
+  # Promote warnings to errors based on env variable
+  set(C_CXX_FLAGS "${C_CXX_FLAGS} -Werror")
+  message("-- Promoting warnings to errors")
+endif()
+set(CMAKE_C_FLAGS "${C_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "${C_CXX_FLAGS} -std=c++11")
+
+set(JAYL_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
+set(JAYL_TEST_DIR   ${CMAKE_CURRENT_LIST_DIR}/test)
+
+set(JAYL_INCLUDE_DIR ${JAYL_SOURCE_DIR})
+include_directories ("${JAYL_INCLUDE_DIR}")
+set(JAYL_GENERATED_SOURCE_DIR ${JAYL_SOURCE_DIR})
+include_directories ("${JAYL_GENERATED_SOURCE_DIR}")
+
 add_subdirectory(src)
 add_subdirectory(test)

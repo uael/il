@@ -9,22 +9,12 @@ else()
     set(CMAKE_C_STANDARD 99)
 endif()
 
-set(jayl_INCLUDES
-    ${CMAKE_CURRENT_LIST_DIR}/include/jayl/array.h
-    ${CMAKE_CURRENT_LIST_DIR}/include/jayl/context.h
-    ${CMAKE_CURRENT_LIST_DIR}/include/jayl/deque.h
-    ${CMAKE_CURRENT_LIST_DIR}/include/jayl/hash.h
-    ${CMAKE_CURRENT_LIST_DIR}/include/jayl/ir.h
-    ${CMAKE_CURRENT_LIST_DIR}/include/jayl/string.h
-    ${CMAKE_CURRENT_LIST_DIR}/include/jayl/symbol.h
-    ${CMAKE_CURRENT_LIST_DIR}/include/jayl/token.h
-    ${CMAKE_CURRENT_LIST_DIR}/include/jayl/type.h
-    ${CMAKE_CURRENT_LIST_DIR}/include/stdlib/float.h
-    ${CMAKE_CURRENT_LIST_DIR}/include/stdlib/stdarg.h
-    ${CMAKE_CURRENT_LIST_DIR}/include/stdlib/stddef.h
-)
+set(jayl_INCLUDE_DIRS include include/jayl include/stdlib)
+foreach(dir ${jayl_INCLUDE_DIRS})
+    file(GLOB jayl_HEADERS ${jayl_HEADERS} ${dir}/*.h)
+endforeach()
 
-include_directories(include lib src)
+include_directories(include)
 
 add_subdirectory(lib)
 add_subdirectory(src)

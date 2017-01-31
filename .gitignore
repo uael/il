@@ -1,24 +1,5 @@
-# http://www.gnu.org/software/automake
-
+# make
 Makefile
-Makefile.in
-
-# http://www.gnu.org/software/autoconf
-
-/autom4te.cache/
-/aclocal.m4
-/config.*
-/configure
-
-libtool
-ltmain.sh
-stamp-h?
-
-.deps/
-.dirstamp
-.libs/
-*.l[ao]
-*~
 
 # Object files
 *.o
@@ -41,18 +22,8 @@ stamp-h?
 # doxygen
 /doxygen-html/
 
-# src
-*.hh
-
 # binary
-jay
-
-# usr
-/build/
-/scripts/
-
-# m4
-/m4/
+test/hello
 
 # Clion
 /cmake-build-debug/

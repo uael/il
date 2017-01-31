@@ -124,7 +124,7 @@ static char *parse_program_arguments(int argc, char *argv[])
     program = argv[0];
     output = stdout;
     context.standard = STD_C89;
-    context.target = TARGET_IR_DOT;
+    context.target = TARGET_x86_64_ELF;
     c = parse_args(sizeof(optv)/sizeof(optv[0]), optv, argc, argv);
     if (c == argc - 1) {
         input = argv[c];

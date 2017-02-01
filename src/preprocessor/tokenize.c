@@ -14,8 +14,8 @@
  * that can fit inline.
  */
 #define EMPTY {(jayl_token_type_t) 0}
-#define TOK(t, s) {(t), 0, 0, 0, 0, {0}, {SHORT_STRING_INIT(s)}}
-#define IDN(t, s) {(t), 0, 1, 0, 0, {0}, {SHORT_STRING_INIT(s)}}
+#define TOK(t, s) {(t), 0, 0, 0, 0, {0}, SHORT_STRING_INIT(s)}
+#define IDN(t, s) {(t), 0, 1, 0, 0, {0}, SHORT_STRING_INIT(s)}
 
 const jayl_token_t basic_token[] = {
   /* 0x00 */
@@ -190,10 +190,7 @@ const jayl_token_t basic_token[] = {
  * There is no such thing as a negative literal; expressions like '-2'
  * is the unary operator applied to the number 2.
  *
- * Regular expression:
- *
- *      (\.)?(0-9){\.a-zA-Z_0-9(e+|e-|E+|E-)}*
- *
+ * Regular expression: (\.)?(0-9){\.a-zA-Z_0-9(e+|e-|E+|E-)}*
  */
 static jayl_token_t strtonum(char *in, char **endptr) {
   char *ptr = in;
@@ -305,64 +302,6 @@ static const Type constant_integer_type(
   }
 
   return type;
-}
-
-jayl_token_t jayl_token_convert(jayl_token_t token) {
-  const char *str;
-  char *endptr;
-  int len;
-  enum suffix suffix;
-  jayl_token_t tok = {NUMBER};
-
-  assert(token.token == PREP_NUMBER);
-  str = str_raw(token.d.string);
-  len = token.d.string.len;
-  tok.leading_whitespace = token.leading_whitespace;
-
-  /*
-   * Try to read as integer. Handle suffixes u, l, ll, ul, ull, in all
-   * permutations of upper- and lower case.
-   */
-  errno = 0;
-  tok.d.val.u = strtoul(str, &endptr, 0);
-  suffix = read_integer_suffix(endptr, &endptr);
-  if (endptr - str == len) {
-    assert(isdigit(*str));
-    tok.type = constant_integer_type(tok.d.val.u, suffix, *str != '0');
-  } else {
-    /*
-     * If the integer conversion did not consume the whole token,
-     * try to read as floating point number.
-     *
-     * Note: not using strtold for long double conversion, so might
-     * get incorrect results compared to other compilers.
-     */
-    errno = 0;
-    tok.type = basic_type__double;
-    tok.d.val.d = strtod(str, &endptr);
-    if (endptr - str < len) {
-      if (*endptr == 'f' || *endptr == 'F') {
-        tok.type = basic_type__float;
-        tok.d.val.f = (float) tok.d.val.d;
-        endptr++;
-      } else if (*endptr == 'l' || *endptr == 'L') {
-        tok.type = basic_type__long_double;
-        tok.d.val.ld = (long double) tok.d.val.d;
-        endptr++;
-      }
-    }
-  }
-
-  if (errno || (endptr - str != len)) {
-    if (errno == ERANGE) {
-      error("Numeric literal '%s' is out of range.", str);
-    } else {
-      error("Invalid numeric literal '%s'.", str);
-    }
-    exit(1);
-  }
-
-  return tok;
 }
 
 #define isoctal(c) ((c) >= '0' && (c) < '8')
@@ -765,6 +704,64 @@ static size_t write_escaped_string(String str, char *buf) {
 
   buf[j++] = '\"';
   return j;
+}
+
+jayl_token_t jayl_token_convert(jayl_token_t token) {
+  const char *str;
+  char *endptr;
+  int len;
+  enum suffix suffix;
+  jayl_token_t tok = {NUMBER};
+
+  assert(token.token == PREP_NUMBER);
+  str = str_raw(token.d.string);
+  len = token.d.string.len;
+  tok.leading_whitespace = token.leading_whitespace;
+
+  /*
+   * Try to read as integer. Handle suffixes u, l, ll, ul, ull, in all
+   * permutations of upper- and lower case.
+   */
+  errno = 0;
+  tok.d.val.u = strtoul(str, &endptr, 0);
+  suffix = read_integer_suffix(endptr, &endptr);
+  if (endptr - str == len) {
+    assert(isdigit(*str));
+    tok.type = constant_integer_type(tok.d.val.u, suffix, *str != '0');
+  } else {
+    /*
+     * If the integer conversion did not consume the whole token,
+     * try to read as floating point number.
+     *
+     * Note: not using strtold for long double conversion, so might
+     * get incorrect results compared to other compilers.
+     */
+    errno = 0;
+    tok.type = basic_type__double;
+    tok.d.val.d = strtod(str, &endptr);
+    if (endptr - str < len) {
+      if (*endptr == 'f' || *endptr == 'F') {
+        tok.type = basic_type__float;
+        tok.d.val.f = (float) tok.d.val.d;
+        endptr++;
+      } else if (*endptr == 'l' || *endptr == 'L') {
+        tok.type = basic_type__long_double;
+        tok.d.val.ld = (long double) tok.d.val.d;
+        endptr++;
+      }
+    }
+  }
+
+  if (errno || (endptr - str != len)) {
+    if (errno == ERANGE) {
+      error("Numeric literal '%s' is out of range.", str);
+    } else {
+      error("Invalid numeric literal '%s'.", str);
+    }
+    exit(1);
+  }
+
+  return tok;
 }
 
 String jayl_token_str(jayl_token_t token) {

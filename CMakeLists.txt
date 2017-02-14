@@ -15,6 +15,7 @@ foreach(dir ${jayl_INCLUDE_DIRS})
 endforeach()
 
 include_directories(include)
+include_directories(lib/p99/p99)
 
 add_subdirectory(src)
 add_subdirectory(test)

@@ -1,4 +1,4 @@
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic -Wno-missing-braces -Wno-psabi")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-missing-braces -Wno-psabi")
 
 set(jayl_SOURCE_DIRS . util)
 

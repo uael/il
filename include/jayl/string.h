@@ -1,5 +1,5 @@
-#ifndef STRING_H
-#define STRING_H
+#ifndef _JAYL_STRING_H_
+#define _JAYL_STRING_H_
 
 #include <stddef.h>
 #include <stdio.h>
@@ -12,16 +12,16 @@
  * the object itself. This type fits in 2 eightbytes.
  */
 typedef union {
-    struct {
-        unsigned short len;
-        char str[SHORT_STRING_LEN];
-    } a;
-    struct {
-        unsigned short len;
-        const char *str;
-    } p;
+  struct {
     unsigned short len;
-} String;
+    char str[SHORT_STRING_LEN];
+  } a;
+  struct {
+    unsigned short len;
+    const char *str;
+  } p;
+  unsigned short len;
+} string_t;
 
 /* Inline construct a String object which fits in the small variant. */
 #define SHORT_STRING_INIT(s) {{sizeof(s) - 1, s}}
@@ -31,19 +31,33 @@ typedef union {
  * type of string, whether it is short or long.
  */
 #define str_raw(s) \
-    ((s).len == 0 ? (const char *) "" \
-        : (s).len < SHORT_STRING_LEN ? (const char *) (s).a.str : (s).p.str)
+  ((s).len == 0 ? (const char *) "" \
+    : (s).len < SHORT_STRING_LEN ? (const char *) (s).a.str : (s).p.str)
+
+#define str_short_raw(s) ((const char *) (s).a.str)
 
 /* Initialize string, where the length can be determined by strlen. */
-String str_init(const char *str);
+static inline string_t str_init(const char *str) {
+  string_t s;
+
+  s.len = (unsigned short) strlen(str);
+  if (s.len < SHORT_STRING_LEN) {
+    memcpy(s.a.str, str, s.len);
+    s.a.str[s.len] = '\0';
+  } else {
+    s.p.str = str;
+  }
+
+  return s;
+}
 
 /* Compare two strings, returning 0 if equal. */
-int str_cmp(String s1, String s2);
+int str_cmp(string_t s1, string_t s2);
 
 /*
  * Output string to stream, in safe encoding for textual assembly or as
  * plain C code.
  */
-int fprintstr(FILE *stream, String str);
+int fprintstr(FILE *stream, string_t str);
 
-#endif
+#endif /* _JAYL_STRING_H_ */

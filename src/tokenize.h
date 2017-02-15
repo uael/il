@@ -8,6 +8,6 @@
  * corresponding token type. To get a token of a particular type,
  * access tokens[ir_tok].
  */
-extern const ir_token_t tokens[128];
+extern const ir_tok_t tokens[128];
 
 #endif /* _JAYL_TOKENIZE_H_ */

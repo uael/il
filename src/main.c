@@ -1,18 +1,20 @@
-#include <stdlib.h>
-#include <stdio.h>
 #include "util/opt.h"
 #include "parser.h"
 
-static void help(opt_t *this, jayl_ctx_t *ctx) {
+#include <stdlib.h>
+#include <stdio.h>
+#include <assert.h>
+
+static void help(opt_t *this, ctx_t *ctx) {
   fprintf(
-    stderr,
+    stdout,
     "Usage: %s [-(S|E|c)] [-v] [-I <path>] [-o <file>] <file>\n",
     ctx->program
   );
   exit(1);
 }
 
-static void flag(opt_t *this, jayl_ctx_t *ctx) {
+static void flag(opt_t *this, ctx_t *ctx) {
   switch (*this->o) {
     case 'v':
       ctx->verbose = true;
@@ -23,18 +25,17 @@ static void flag(opt_t *this, jayl_ctx_t *ctx) {
   }
 }
 
-static void output(opt_t *this, jayl_ctx_t *ctx) {
+static void output(opt_t *this, ctx_t *ctx) {
   ctx->out = this->v;
 }
 
-static void std(opt_t *this, jayl_ctx_t *ctx) {
+static void std(opt_t *this, ctx_t *ctx) {
 
 }
 
 int main(int argc, char *argv[]) {
   int i;
-  jayl_ctx_t ctx = {};
-  ir_ts_t token_stream;
+  ctx_t ctx = {};
   opt_t optv[] = {
     {"-v:",     &flag},
     {"-o:",     &output},
@@ -51,11 +52,8 @@ int main(int argc, char *argv[]) {
   }
 
   ctx_ctor(&ctx);
-  token_stream = ctx.lexer->lex(ctx.lexer);
 
-  for (i = 0; i < deque_len(&token_stream); ++i) {
-    printf("token: %s\n", str_raw(deque_get(&token_stream, i).d.string));
-  }
+  ctx.parser->parse(ctx.parser);
 
   ctx_dtor(&ctx);
 

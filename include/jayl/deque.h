@@ -32,6 +32,9 @@
 #define deque_back(deq) \
     deque_get(deq, deque_len(deq) - 1)
 
+#define deque_front(deq) \
+    deque_get(deq, 0)
+
 #define deque_pop_back(deq) \
     array_pop_back(&(deq)->array)
 

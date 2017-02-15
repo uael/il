@@ -1,12 +1,19 @@
 #include "context.h"
-#include "scanner.h"
+#include "lexer.h"
+#include "parser.h"
 
-void ctx_ctor(jayl_ctx_t *this) {
-  this->lexer = malloc(sizeof(ir_lexer_t));
-  ir_lexer_ctor(this->lexer, this);
+void ctx_ctor(ctx_t *this) {
+  this->lexer = malloc(sizeof(lexer_t));
+  lexer_ctor(this->lexer, this);
+
+  this->parser = malloc(sizeof(parser_t));
+  parser_ctor(this->parser, this);
 }
 
-void ctx_dtor(jayl_ctx_t *this) {
-  ir_lexer_dtor(this->lexer);
+void ctx_dtor(ctx_t *this) {
+  lexer_dtor(this->lexer);
   free(this->lexer);
+
+  parser_dtor(this->parser);
+  free(this->parser);
 }

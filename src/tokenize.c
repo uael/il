@@ -8,7 +8,7 @@
 #define TOK(t, s) {(t), 0, 0, 0, 0, {(ir_type) 0}, SHORT_STRING_INIT(s), {NULL}}
 #define IDN(t, s) {(t), 0, 1, 0, 0, {(ir_type) 0}, SHORT_STRING_INIT(s), {NULL}}
 
-const ir_token_t tokens[] = {
+const ir_tok_t tokens[] = {
   /* 0x00 */
   TOK(IR_TOK_END, "$"),
   IDN(IR_TOK_AUTO, "auto"),
@@ -74,7 +74,7 @@ const ir_token_t tokens[] = {
   TOK(IR_TOK_DCOLON, "::"),
   TOK(IR_TOK_DARROW, "=>"),
   TOK(IR_TOK_DQUESTION, "??"),
-  EMPTY,
+  IDN(IR_TOK_NAMESPACE, "namespace"),
   EMPTY,
   EMPTY,
   EMPTY,

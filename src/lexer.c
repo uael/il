@@ -1,7 +1,7 @@
 #include <p99.h>
 #include <jayl/ir.h>
 #include <util/strtab.h>
-#include "scanner.h"
+#include "lexer.h"
 #include "tokenize.h"
 
 static char *buffer;
@@ -16,6 +16,15 @@ static size_t size;
     tok.loc = loc; \
     deque_push_back(&result, tok); \
   } while (0)
+#define push_string(...) do { \
+    P99_IF_EMPTY(__VA_ARGS__)()({ \
+      tok = tokens[__VA_ARGS__]; \
+      tok.d.string = str_register(string, i); \
+    }) \
+    tok.loc = loc; \
+    tok.loc.col -= i; \
+    deque_push_back(&result, tok); \
+  } while (0)
 
 #define M(n, i, c) string[i + n] == (c)
 #define M1(n, a) M(n, 0, a)
@@ -24,6 +33,8 @@ static size_t size;
 #define M4(n, a, b, c, d) M3(n, a, b, c) && M(n, 3, d)
 #define M5(n, a, b, c, d, e) M4(n, a, b, c, d) && M(n, 4, e)
 #define M6(n, a, b, c, d, e, f) M5(n, a, b, c, d, e) && M(n, 5, f)
+#define M7(n, a, b, c, d, e, f, g) M6(n, a, b, c, d, e, f) && M(n, 6, g)
+#define M8(n, a, b, c, d, e, f, g, h) M7(n, a, b, c, d, e, f, g) && M(n, 7, h)
 
 #define MATCH_(n, op, ...) \
   (P99_NARG(__VA_ARGS__) + n op i && (P99_PASTE2(M, P99_NARG(__VA_ARGS__)(n, __VA_ARGS__))))
@@ -41,11 +52,11 @@ void cleanup() {
   free(buffer);
 }
 
-ir_ts_t lex(ir_lexer_t *this) {
+ir_toks_t lex(lexer_t *this) {
   char *ptr;
   FILE *stream;
   size_t tail;
-  ir_ts_t result = {0};
+  ir_toks_t result = {0};
 
   assert(this->filename);
   stream = fopen(this->filename, "r");
@@ -77,11 +88,11 @@ ir_ts_t lex(ir_lexer_t *this) {
   return result;
 }
 
-ir_ts_t lex_str(ir_lexer_t *this, const char *buffer) {
+ir_toks_t lex_str(lexer_t *this, const char *buffer) {
   const char *ptr;
   char string[255];
-  ir_ts_t result = {0};
-  ir_token_t tok;
+  ir_toks_t result = {0};
+  ir_tok_t tok;
   ir_loc_t loc = {this->filename, 0, 0};
   unsigned i;
 
@@ -136,6 +147,8 @@ ir_ts_t lex_str(ir_lexer_t *this, const char *buffer) {
           }
         case 'l':
           TRY_MATCH(IR_TOK_LONG, 1, 'o', 'n', 'g');
+        case 'n':
+          TRY_MATCH(IR_TOK_NAMESPACE, 1, 'a', 'm', 'e', 's', 'p', 'a', 'c', 'e');
         case 'r':
           if (MATCH(1, 'e')) {
             TRY_MATCH(IR_TOK_REGISTER, 2, 'g', 'i', 's', 't', 'e', 'r');
@@ -168,24 +181,17 @@ ir_ts_t lex_str(ir_lexer_t *this, const char *buffer) {
         case 'w':
           TRY_MATCH(IR_TOK_WHILE, 1, 'h', 'i', 'l', 'e');
         default:
-          tok = tokens[IR_TOK_IDENTIFIER];
-          tok.loc = loc;
-          tok.loc.col -= i;
-          tok.d.string = str_register(string, i);
-          deque_push_back(&result, tok);
+          push_string(IR_TOK_IDENTIFIER);
           break;
         token:
-          tok.loc = loc;
-          tok.loc.col -= i;
-          deque_push_back(&result, tok);
+          push_string();
           break;
       }
     } else if (isdigit(peek()) || (peek() == '.' && isdigit(peekn(1)))) {
       string[i = 0] = peek();
       while (1) {
-        if (isdigit(peek()) || peek() == '.' || peek() == '_') {
+        if (isdigit(next()) || peek() == '.' || peek() == '_') {
           string[++i] = peek();
-          next();
         } else if (isalpha(peek())) {
           if ((tolower(peek()) == 'e' || (tolower(peek()) == 'p'))
             && (peekn(1) == '+' || peekn(1) == '-')) {
@@ -193,11 +199,12 @@ ir_ts_t lex_str(ir_lexer_t *this, const char *buffer) {
             next();
           }
           string[++i] = peek();
-          next();
         } else {
+          string[++i] = '\0';
           break;
         }
       }
+      push_string(IR_TOK_PREP_NUMBER);
     } else {
       switch (peek()) {
         case IR_TOK_NOT:
@@ -488,16 +495,17 @@ ir_ts_t lex_str(ir_lexer_t *this, const char *buffer) {
       }
     }
   }
+  push(IR_TOK_END);
 
   return result;
 }
 
-void ir_lexer_ctor(ir_lexer_t *this, jayl_ctx_t *ctx) {
+void lexer_ctor(lexer_t *this, ctx_t *ctx) {
   this->filename = ctx->in;
   this->lex = lex;
   this->lex_str = lex_str;
 }
 
-void ir_lexer_dtor(ir_lexer_t *this) {
+void lexer_dtor(lexer_t *this) {
 
 }

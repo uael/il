@@ -1,51 +1,26 @@
 #ifndef _JAYL_PARSER_H_
 #define _JAYL_PARSER_H_
 
-#include "scanner.h"
+#include "lexer.h"
 
-typedef array_of(ir_tu_t) ir_prog_t;
+typedef deque_of(ir_tu_t) ir_prog_t;
 
-///**
-// * Parse the token stream into an array of translation unit.
-// * @param ts The token stream.
-// * @return An array of translation unit.
-// */
-//ir_prog_t parse(ir_ts_t *ts);
-//
-///**
-// * Peek lookahead of 1.
-// * @param ts The token stream.
-// * @return The next token.
-// */
-//ir_token_t peek(ir_ts_t *ts);
-//
-///**
-// * Peek lookahead of n.
-// * @param ts The token stream.
-// * @param n The number of token to peek.
-// * @return The next token.
-// */
-//ir_token_t peekn(ir_ts_t *ts, int n);
-//
-///**
-// * Consume and return next token.
-// * @param ts The token stream.
-// * @return The next token.
-// */
-//ir_token_t next(ir_ts_t *ts);
-//
-///**
-// * Skip the next token.
-// * @param ts The token stream.
-// */
-//void skip(ir_ts_t *ts);
-//
-///**
-// * Consume and return next token, or fail of not of expected type.
-// * @param ts The token stream.
-// * @param token The token to consume.
-// * @return The next token.
-// */
-//ir_token_t consume(ir_ts_t *ts, ir_tok tok);
+typedef struct _parser_t {
+  lexer_t *lexer;
+  ir_toks_t toks;
+
+  ir_prog_t (*parse)(struct _parser_t *this);
+  ir_prog_t (*parse_str)(struct _parser_t *this, const char *buffer);
+  ir_prog_t (*parse_toks)(struct _parser_t *this, ir_toks_t *toks);
+
+  ir_tok_t (*peek)(struct _parser_t *this);
+  ir_tok_t (*peekn)(struct _parser_t *this, unsigned n);
+  ir_tok_t (*next)(struct _parser_t *this);
+  ir_tok_t (*consume)(struct _parser_t *this, ir_tok tok);
+} parser_t;
+
+void parser_ctor(parser_t *parser, ctx_t *ctx);
+
+void parser_dtor(parser_t *parser);
 
 #endif /* _JAYL_PARSER_H_ */

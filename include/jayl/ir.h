@@ -2,6 +2,7 @@
 #define _JAYL_IR_H_
 
 #include <p99.h>
+#include "deque.h"
 #include "string.h"
 
 typedef enum {
@@ -113,6 +114,7 @@ typedef enum {
   IR_TOK_DCOLON, /* :: */
   IR_TOK_DARROW, /* => */
   IR_TOK_DQUESTION, /* ?? */
+  IR_TOK_NAMESPACE,
 
   IR_TOK_COLON = ':',
   IR_TOK_SEMICOLON = ';',
@@ -289,7 +291,9 @@ typedef struct {
     ir_value_t val;
   } d;
   ir_loc_t loc;
-} ir_token_t;
+} ir_tok_t;
+
+typedef deque_of(ir_tok_t) ir_toks_t;
 
 /**
  * A ir_sym_t represents declarations that may have a storage location at

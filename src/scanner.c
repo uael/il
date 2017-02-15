@@ -1,5 +1,6 @@
 #include <p99.h>
 #include <jayl/ir.h>
+#include <util/strtab.h>
 #include "scanner.h"
 #include "tokenize.h"
 
@@ -16,7 +17,7 @@ static size_t size;
     deque_push_back(&result, tok); \
   } while (0)
 
-#define M(n, i, c) ident[i + n] == (c)
+#define M(n, i, c) string[i + n] == (c)
 #define M1(n, a) M(n, 0, a)
 #define M2(n, a, b) M1(n, a) && M(n, 1, b)
 #define M3(n, a, b, c) M2(n, a, b) && M(n, 2, c)
@@ -36,23 +37,56 @@ static size_t size;
     goto token; \
   }
 
-/**
- *
- * @param buffer
- * @param filename
- * @return
- */
-ir_ts_t lex(const char *buffer, const char *filename) {
+void cleanup() {
+  free(buffer);
+}
+
+ir_ts_t lex(ir_lexer_t *this) {
+  char *ptr;
+  FILE *stream;
+  size_t tail;
+  ir_ts_t result = {0};
+
+  assert(this->filename);
+  stream = fopen(this->filename, "r");
+  assert(stream);
+
+  fseek(stream, 0L, SEEK_END);
+  tail = (size_t) ftell(stream);
+  rewind(stream);
+  if (!tail) {
+    return result;
+  }
+
+  if (!buffer) {
+    buffer = malloc(tail + 1);
+    size = tail;
+    atexit(cleanup);
+  } else if (tail > size) {
+    buffer = realloc(buffer, tail + 1);
+    size = tail;
+  }
+
+  fread(buffer, size, 1, stream);
+  fclose(stream);
+  buffer[tail] = IR_TOK_END;
+  ptr = strdup(buffer);
+  result = this->lex_str(this, ptr);
+  free(ptr);
+
+  return result;
+}
+
+ir_ts_t lex_str(ir_lexer_t *this, const char *buffer) {
   const char *ptr;
-  char ident[255];
+  char string[255];
   ir_ts_t result = {0};
   ir_token_t tok;
-  ir_loc_t loc = {filename, 0, 0};
+  ir_loc_t loc = {this->filename, 0, 0};
   unsigned i;
-  char c;
 
-  if (!buffer && filename) {
-    return lex_file(filename);
+  if (!buffer && this->filename) {
+    return this->lex(this);
   }
 
   assert(buffer);
@@ -60,13 +94,13 @@ ir_ts_t lex(const char *buffer, const char *filename) {
 
   while (peek() != IR_TOK_END) {
     if (peek() == '_' || isalpha(peek())) {
-      ident[i = 0] = peek();
+      string[i = 0] = peek();
       while (next() == '_' || isalnum(peek())) {
-        ident[++i] = peek();
+        string[++i] = peek();
       }
-      ident[++i] = '\0';
+      string[++i] = '\0';
 
-      switch (ident[0]) {
+      switch (string[0]) {
         case 'a':
           TRY_MATCH(IR_TOK_AUTO, 1, 'u', 't', 'o');
         case 'b':
@@ -137,7 +171,7 @@ ir_ts_t lex(const char *buffer, const char *filename) {
           tok = tokens[IR_TOK_IDENTIFIER];
           tok.loc = loc;
           tok.loc.col -= i;
-          tok.d.string = str_init(ident);
+          tok.d.string = str_register(string, i);
           deque_push_back(&result, tok);
           break;
         token:
@@ -147,18 +181,18 @@ ir_ts_t lex(const char *buffer, const char *filename) {
           break;
       }
     } else if (isdigit(peek()) || (peek() == '.' && isdigit(peekn(1)))) {
-      ident[i = 0] = peek();
+      string[i = 0] = peek();
       while (1) {
         if (isdigit(peek()) || peek() == '.' || peek() == '_') {
-          ident[++i] = peek();
+          string[++i] = peek();
           next();
         } else if (isalpha(peek())) {
           if ((tolower(peek()) == 'e' || (tolower(peek()) == 'p'))
             && (peekn(1) == '+' || peekn(1) == '-')) {
-            ident[++i] = peek();
+            string[++i] = peek();
             next();
           }
-          ident[++i] = peek();
+          string[++i] = peek();
           next();
         } else {
           break;
@@ -449,6 +483,7 @@ ir_ts_t lex(const char *buffer, const char *filename) {
           next();
           break;
         default:
+          next();
           break;
       }
     }
@@ -457,37 +492,12 @@ ir_ts_t lex(const char *buffer, const char *filename) {
   return result;
 }
 
-ir_ts_t lex_file(const char *filename) {
-  char *ptr;
-  FILE *stream;
-  size_t tail;
-  ir_ts_t result = {0};
+void ir_lexer_ctor(ir_lexer_t *this, jayl_ctx_t *ctx) {
+  this->filename = ctx->in;
+  this->lex = lex;
+  this->lex_str = lex_str;
+}
 
-  assert(filename);
-  stream = fopen(filename, "r");
-  assert(stream);
+void ir_lexer_dtor(ir_lexer_t *this) {
 
-  fseek(stream, 0L, SEEK_END);
-  tail = (size_t) ftell(stream);
-  rewind(stream);
-  if (!tail) {
-    return result;
-  }
-
-  if (!buffer) {
-    buffer = malloc(tail + 1);
-    size = tail;
-  } else if (tail > size) {
-    buffer = realloc(buffer, tail + 1);
-    size = tail;
-  }
-
-  fread(buffer, size, 1, stream);
-  fclose(stream);
-  buffer[tail] = IR_TOK_END;
-  ptr = strdup(buffer);
-  result = lex(ptr, filename);
-  free(ptr);
-
-  return result;
 }

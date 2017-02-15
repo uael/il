@@ -37,19 +37,7 @@ typedef union {
 #define str_short_raw(s) ((const char *) (s).a.str)
 
 /* Initialize string, where the length can be determined by strlen. */
-static inline string_t str_init(const char *str) {
-  string_t s;
-
-  s.len = (unsigned short) strlen(str);
-  if (s.len < SHORT_STRING_LEN) {
-    memcpy(s.a.str, str, s.len);
-    s.a.str[s.len] = '\0';
-  } else {
-    s.p.str = str;
-  }
-
-  return s;
-}
+string_t str_init(const char *str);
 
 /* Compare two strings, returning 0 if equal. */
 int str_cmp(string_t s1, string_t s2);

@@ -1,4 +1,6 @@
 #include <jayl/ir.h>
+#include <stdlib.h>
+#include <assert.h>
 #include "parser.h"
 
 #define _peek() deque_front(&this->toks)

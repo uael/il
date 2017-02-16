@@ -5,6 +5,7 @@
 void ctx_ctor(fir_ctx_t *this) {
   char *sep;
 
+  assert(this);
   assert(this->in);
 
   if ((sep = strrchr(this->in, '/'))) {
@@ -21,6 +22,8 @@ void ctx_ctor(fir_ctx_t *this) {
 }
 
 void ctx_dtor(fir_ctx_t *this) {
+  assert(this);
+
   fir_lexer_dtor(this->lexer);
   free(this->lexer);
 

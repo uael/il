@@ -1,7 +1,7 @@
 #ifndef _JAYL_JAYL_PARSER_H_
 #define _JAYL_JAYL_PARSER_H_
 
-#include "parser.h"
+#include "fir_parser.h"
 
 #define JAYL_SRC_EXT ".jay"
 

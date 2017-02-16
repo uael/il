@@ -1,7 +1,7 @@
 #ifndef _JAYL_STRTAB_H_
 #define _JAYL_STRTAB_H_
 
-#include "jayl/string.h"
+#include "adt/string.h"
 
 #include <stddef.h>
 

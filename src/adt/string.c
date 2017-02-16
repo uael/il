@@ -1,4 +1,4 @@
-#include <jayl/string.h>
+#include "string.h"
 
 #include <ctype.h>
 #include <string.h>

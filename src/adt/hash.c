@@ -1,8 +1,8 @@
-#include <jayl/hash.h>
-
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "hash.h"
 
 struct hash_entry {
   void *data;

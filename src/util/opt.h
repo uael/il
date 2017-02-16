@@ -1,8 +1,7 @@
 #ifndef _JAYL_OPT_H_
 #define _JAYL_OPT_H_
 
-#include <jayl/hash.h>
-#include "context.h"
+#include "fir_ctx.h"
 
 /**
  * Specify command line argument pattern as a rule template with an
@@ -21,7 +20,7 @@
 typedef struct _opt_t {
   const char *rule;
 
-  void (*callback)(struct _opt_t *this, ctx_t *ctx);
+  void (*callback)(struct _opt_t *this, fir_ctx_t *ctx);
 
   const char *o, *v;
 } opt_t;
@@ -31,6 +30,6 @@ typedef struct _opt_t {
  * return the number of tokens consumed in the process. Reshuffle argv
  * to have non-matching tokens at the end.
  */
-int parse_args(int optc, opt_t *optv, int argc, char *argv[], ctx_t *ctx);
+int parse_args(int optc, opt_t *optv, int argc, char *argv[], fir_ctx_t *ctx);
 
 #endif /* _JAYL_OPT_H_ */

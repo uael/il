@@ -1,11 +1,11 @@
 #include "util/opt.h"
-#include "parser.h"
+#include "fir_parser.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
 
-static void help(opt_t *this, ctx_t *ctx) {
+static void help(opt_t *this, fir_ctx_t *ctx) {
   fprintf(
     stdout,
     "Usage: %s [-(S|E|c)] [-v] [-I <path>] [-o <file>] <file>\n",
@@ -14,7 +14,7 @@ static void help(opt_t *this, ctx_t *ctx) {
   exit(1);
 }
 
-static void flag(opt_t *this, ctx_t *ctx) {
+static void flag(opt_t *this, fir_ctx_t *ctx) {
   switch (*this->o) {
     case 'v':
       ctx->verbose = true;
@@ -25,17 +25,17 @@ static void flag(opt_t *this, ctx_t *ctx) {
   }
 }
 
-static void output(opt_t *this, ctx_t *ctx) {
+static void output(opt_t *this, fir_ctx_t *ctx) {
   ctx->out = this->v;
 }
 
-static void std(opt_t *this, ctx_t *ctx) {
+static void std(opt_t *this, fir_ctx_t *ctx) {
 
 }
 
 int main(int argc, char *argv[]) {
   int i;
-  ctx_t ctx = {};
+  fir_ctx_t ctx = {};
   opt_t optv[] = {
     {"-v:",     &flag},
     {"-o:",     &output},

@@ -9,12 +9,6 @@ else()
     set(CMAKE_C_STANDARD 99)
 endif()
 
-set(jayl_INCLUDE_DIRS include include/jayl include/stdlib)
-foreach(dir ${jayl_INCLUDE_DIRS})
-    file(GLOB jayl_HEADERS ${jayl_HEADERS} ${dir}/*.h)
-endforeach()
-
-include_directories(include)
 include_directories(lib/p99/include)
 
 add_subdirectory(src)

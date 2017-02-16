@@ -1,8 +1,6 @@
-#include <p99.h>
-#include <jayl/ir.h>
-#include <util/strtab.h>
-#include "lexer.h"
-#include "tokenize.h"
+#include "fir_lexer.h"
+
+#include "util/strtab.h"
 
 static char *buffer;
 static size_t size;
@@ -52,7 +50,7 @@ void cleanup() {
   free(buffer);
 }
 
-void lex(lexer_t *this, fir_toks_t *token_stream) {
+void lex(fir_lexer_t *this, fir_toks_t *token_stream) {
   char *ptr;
   FILE *stream;
   size_t tail;
@@ -79,17 +77,17 @@ void lex(lexer_t *this, fir_toks_t *token_stream) {
 
   fread(buffer, size, 1, stream);
   fclose(stream);
-  buffer[tail] = IR_TOK_END;
+  buffer[tail] = FIR_TOK_END;
   ptr = strdup(buffer);
   this->lex_str(this, ptr, token_stream);
   free(ptr);
 }
 
-void lex_str(lexer_t *this, const char *buffer, fir_toks_t *token_stream) {
+void lex_str(fir_lexer_t *this, const char *buffer, fir_toks_t *token_stream) {
   const char *ptr;
   char string[255];
-  ir_tok_t tok;
-  ir_loc_t loc = {this->filename, 0, 0};
+  fir_tok_t tok;
+  fir_loc_t loc = {this->filename, 0, 0};
   unsigned i;
 
   if (!buffer && this->filename) {
@@ -100,7 +98,7 @@ void lex_str(lexer_t *this, const char *buffer, fir_toks_t *token_stream) {
   assert(buffer);
   ptr = buffer;
 
-  while (peek() != IR_TOK_END) {
+  while (peek() != FIR_TOK_END) {
     if (peek() == '_' || isalpha(peek())) {
       string[i = 0] = peek();
       while (next() == '_' || isalnum(peek())) {
@@ -110,75 +108,75 @@ void lex_str(lexer_t *this, const char *buffer, fir_toks_t *token_stream) {
 
       switch (string[0]) {
         case 'a':
-          TRY_MATCH(IR_TOK_AUTO, 1, 'u', 't', 'o');
+          TRY_MATCH(FIR_TOK_AUTO, 1, 'u', 't', 'o');
         case 'b':
-          TRY_MATCH(IR_TOK_BREAK, 1, 'r', 'e', 'a', 'k');
+          TRY_MATCH(FIR_TOK_BREAK, 1, 'r', 'e', 'a', 'k');
         case 'c':
-          TRY_MATCH(IR_TOK_CASE, 1, 'a', 's', 'e');
-          TRY_MATCH(IR_TOK_CHAR, 1, 'h', 'a', 'r');
+          TRY_MATCH(FIR_TOK_CASE, 1, 'a', 's', 'e');
+          TRY_MATCH(FIR_TOK_CHAR, 1, 'h', 'a', 'r');
           if (MATCH(1, 'o', 'n')) {
-            TRY_MATCH(IR_TOK_CONST, 3, 's', 't');
-            TRY_MATCH(IR_TOK_CONTINUE, 3, 't', 'i', 'n', 'u', 'e');
+            TRY_MATCH(FIR_TOK_CONST, 3, 's', 't');
+            TRY_MATCH(FIR_TOK_CONTINUE, 3, 't', 'i', 'n', 'u', 'e');
           }
         case 'd':
-          TRY_MATCH(IR_TOK_DEFAULT, 1, 'e', 'f', 'a', 'u', 'l', 't');
+          TRY_MATCH(FIR_TOK_DEFAULT, 1, 'e', 'f', 'a', 'u', 'l', 't');
           if (MATCH(1, 'o')) {
-            TRY_MATCH(IR_TOK_DOUBLE, 2, 'u', 'b', 'l', 'e');
-            TRY_MATCH(IR_TOK_DO, 2, 'o');
+            TRY_MATCH(FIR_TOK_DOUBLE, 2, 'u', 'b', 'l', 'e');
+            TRY_MATCH(FIR_TOK_DO, 2, 'o');
           }
         case 'e':
-          TRY_MATCH(IR_TOK_ELSE, 1, 'l', 's', 'e');
-          TRY_MATCH(IR_TOK_ENUM, 1, 'n', 'u', 'm');
-          TRY_MATCH(IR_TOK_EXTERN, 1, 'x', 't', 'e', 'r', 'n');
+          TRY_MATCH(FIR_TOK_ELSE, 1, 'l', 's', 'e');
+          TRY_MATCH(FIR_TOK_ENUM, 1, 'n', 'u', 'm');
+          TRY_MATCH(FIR_TOK_EXTERN, 1, 'x', 't', 'e', 'r', 'n');
         case 'f':
-          TRY_MATCH(IR_TOK_FLOAT, 1, 'l', 'o', 'a', 't');
-          TRY_MATCH(IR_TOK_FOR, 1, 'o', 'r');
+          TRY_MATCH(FIR_TOK_FLOAT, 1, 'l', 'o', 'a', 't');
+          TRY_MATCH(FIR_TOK_FOR, 1, 'o', 'r');
         case 'g':
-          TRY_MATCH(IR_TOK_GOTO, 1, 'o', 't', 'o');
+          TRY_MATCH(FIR_TOK_GOTO, 1, 'o', 't', 'o');
         case 'i':
-          TRY_MATCH(IR_TOK_IF, 1, 'f');
+          TRY_MATCH(FIR_TOK_IF, 1, 'f');
           if (MATCH(1, 'n')) {
-            TRY_MATCH(IR_TOK_INT, 2, 't');
-            TRY_MATCH(IR_TOK_INLINE, 2, 'l', 'i', 'n', 'e');
-            TRY_MATCH(IR_TOK_INCLUDE, 2, 'c', 'l', 'u', 'd', 'e');
+            TRY_MATCH(FIR_TOK_INT, 2, 't');
+            TRY_MATCH(FIR_TOK_INLINE, 2, 'l', 'i', 'n', 'e');
+            TRY_MATCH(FIR_TOK_INCLUDE, 2, 'c', 'l', 'u', 'd', 'e');
           }
         case 'l':
-          TRY_MATCH(IR_TOK_LONG, 1, 'o', 'n', 'g');
+          TRY_MATCH(FIR_TOK_LONG, 1, 'o', 'n', 'g');
         case 'n':
-          TRY_MATCH(IR_TOK_NAMESPACE, 1, 'a', 'm', 'e', 's', 'p', 'a', 'c', 'e');
+          TRY_MATCH(FIR_TOK_NAMESPACE, 1, 'a', 'm', 'e', 's', 'p', 'a', 'c', 'e');
         case 'r':
           if (MATCH(1, 'e')) {
-            TRY_MATCH(IR_TOK_REGISTER, 2, 'g', 'i', 's', 't', 'e', 'r');
-            TRY_MATCH(IR_TOK_RETURN, 2, 't', 'u', 'r', 'n');
+            TRY_MATCH(FIR_TOK_REGISTER, 2, 'g', 'i', 's', 't', 'e', 'r');
+            TRY_MATCH(FIR_TOK_RETURN, 2, 't', 'u', 'r', 'n');
           }
         case 's':
-          TRY_MATCH(IR_TOK_SHORT, 1, 'h', 'o', 'r', 't');
-          TRY_MATCH(IR_TOK_SWITCH, 1, 'w', 'i', 't', 'c', 'h');
+          TRY_MATCH(FIR_TOK_SHORT, 1, 'h', 'o', 'r', 't');
+          TRY_MATCH(FIR_TOK_SWITCH, 1, 'w', 'i', 't', 'c', 'h');
           if (MATCH(1, 'i')) {
-            TRY_MATCH(IR_TOK_SIGNED, 2, 'g', 'n', 'e', 'd');
-            TRY_MATCH(IR_TOK_SIZEOF, 2, 'z', 'e', 'o', 'f');
+            TRY_MATCH(FIR_TOK_SIGNED, 2, 'g', 'n', 'e', 'd');
+            TRY_MATCH(FIR_TOK_SIZEOF, 2, 'z', 'e', 'o', 'f');
           } else if (MATCH(1, 't')) {
-            TRY_MATCH(IR_TOK_STATIC, 2, 'a', 't', 'i', 'c');
-            TRY_MATCH(IR_TOK_STRUCT, 2, 'r', 'u', 'c', 't');
+            TRY_MATCH(FIR_TOK_STATIC, 2, 'a', 't', 'i', 'c');
+            TRY_MATCH(FIR_TOK_STRUCT, 2, 'r', 'u', 'c', 't');
           }
         case 't':
-          TRY_MATCH(IR_TOK_TYPEDEF, 1, 'y', 'p', 'e', 'd', 'e', 'f');
+          TRY_MATCH(FIR_TOK_TYPEDEF, 1, 'y', 'p', 'e', 'd', 'e', 'f');
         case 'u':
           if (MATCH(1, 'n')) {
-            TRY_MATCH(IR_TOK_UNION, 2, 'i', 'o', 'n');
-            TRY_MATCH(IR_TOK_UNSIGNED, 2, 's', 'i', 'g', 'n', 'e', 'd');
+            TRY_MATCH(FIR_TOK_UNION, 2, 'i', 'o', 'n');
+            TRY_MATCH(FIR_TOK_UNSIGNED, 2, 's', 'i', 'g', 'n', 'e', 'd');
           } else {
-            TRY_MATCH(IR_TOK_USE, 1, 's', 'e');
+            TRY_MATCH(FIR_TOK_USE, 1, 's', 'e');
           }
         case 'v':
           if (MATCH(1, 'o')) {
-            TRY_MATCH(IR_TOK_VOID, 2, 'i', 'd');
-            TRY_MATCH(IR_TOK_VOLATILE, 2, 'l', 'a', 't', 'i', 'l', 'e');
+            TRY_MATCH(FIR_TOK_VOID, 2, 'i', 'd');
+            TRY_MATCH(FIR_TOK_VOLATILE, 2, 'l', 'a', 't', 'i', 'l', 'e');
           }
         case 'w':
-          TRY_MATCH(IR_TOK_WHILE, 1, 'h', 'i', 'l', 'e');
+          TRY_MATCH(FIR_TOK_WHILE, 1, 'h', 'i', 'l', 'e');
         default:
-          push_string(IR_TOK_IDENTIFIER);
+          push_string(FIR_TOK_IDENTIFIER);
           break;
         token:
           push_string();
@@ -201,135 +199,135 @@ void lex_str(lexer_t *this, const char *buffer, fir_toks_t *token_stream) {
           break;
         }
       }
-      push_string(IR_TOK_PREP_NUMBER);
+      push_string(FIR_TOK_PREP_NUMBER);
     } else {
       switch (peek()) {
-        case IR_TOK_NOT:
-          if (peekn(1) == IR_TOK_ASSIGN) {
-            push(IR_TOK_NEQ);
+        case FIR_TOK_NOT:
+          if (peekn(1) == FIR_TOK_ASSIGN) {
+            push(FIR_TOK_NEQ);
             nextn(2);
             break;
           }
-          push(IR_TOK_NOT);
+          push(FIR_TOK_NOT);
           next();
           break;
-        case IR_TOK_HASH:
-          if (peekn(1) == IR_TOK_HASH) {
-            push(IR_TOK_TOKEN_PASTE);
+        case FIR_TOK_HASH:
+          if (peekn(1) == FIR_TOK_HASH) {
+            push(FIR_TOK_TOKEN_PASTE);
             nextn(2);
             break;
           }
-          push(IR_TOK_HASH);
+          push(FIR_TOK_HASH);
           next();
           break;
-        case IR_TOK_MODULO:
-          if (peekn(1) == IR_TOK_ASSIGN) {
-            push(IR_TOK_MOD_ASSIGN);
+        case FIR_TOK_MODULO:
+          if (peekn(1) == FIR_TOK_ASSIGN) {
+            push(FIR_TOK_MOD_ASSIGN);
             nextn(2);
             break;
           }
-          push(IR_TOK_MODULO);
+          push(FIR_TOK_MODULO);
           next();
           break;
-        case IR_TOK_AND:
-          if (peekn(1) == IR_TOK_AND) {
-            push(IR_TOK_LOGICAL_AND);
+        case FIR_TOK_AND:
+          if (peekn(1) == FIR_TOK_AND) {
+            push(FIR_TOK_LOGICAL_AND);
             nextn(2);
             break;
           }
-          if (peekn(1) == IR_TOK_ASSIGN) {
-            push(IR_TOK_AND_ASSIGN);
+          if (peekn(1) == FIR_TOK_ASSIGN) {
+            push(FIR_TOK_AND_ASSIGN);
             nextn(2);
             break;
           }
-          push(IR_TOK_AND);
+          push(FIR_TOK_AND);
           next();
           break;
-        case IR_TOK_OPEN_PAREN:
-          push(IR_TOK_OPEN_PAREN);
+        case FIR_TOK_OPEN_PAREN:
+          push(FIR_TOK_OPEN_PAREN);
           next();
           break;
-        case IR_TOK_CLOSE_PAREN:
-          push(IR_TOK_CLOSE_PAREN);
+        case FIR_TOK_CLOSE_PAREN:
+          push(FIR_TOK_CLOSE_PAREN);
           next();
           break;
-        case IR_TOK_STAR:
-          if (peekn(1) == IR_TOK_ASSIGN) {
-            push(IR_TOK_MUL_ASSIGN);
+        case FIR_TOK_STAR:
+          if (peekn(1) == FIR_TOK_ASSIGN) {
+            push(FIR_TOK_MUL_ASSIGN);
             nextn(2);
             break;
           }
-          push(IR_TOK_STAR);
+          push(FIR_TOK_STAR);
           next();
           break;
-        case IR_TOK_PLUS:
-          if (peekn(1) == IR_TOK_ASSIGN) {
-            push(IR_TOK_PLUS_ASSIGN);
+        case FIR_TOK_PLUS:
+          if (peekn(1) == FIR_TOK_ASSIGN) {
+            push(FIR_TOK_PLUS_ASSIGN);
             nextn(2);
             break;
           }
-          if (peekn(1) == IR_TOK_PLUS) {
-            push(IR_TOK_INCREMENT);
+          if (peekn(1) == FIR_TOK_PLUS) {
+            push(FIR_TOK_INCREMENT);
             nextn(2);
             break;
           }
-          push(IR_TOK_PLUS);
+          push(FIR_TOK_PLUS);
           next();
           break;
-        case IR_TOK_COMMA:
-          push(IR_TOK_COMMA);
+        case FIR_TOK_COMMA:
+          push(FIR_TOK_COMMA);
           next();
           break;
-        case IR_TOK_MINUS:
-          if (peekn(1) == IR_TOK_MINUS) {
-            push(IR_TOK_MINUS_ASSIGN);
+        case FIR_TOK_MINUS:
+          if (peekn(1) == FIR_TOK_MINUS) {
+            push(FIR_TOK_MINUS_ASSIGN);
             nextn(2);
             break;
           }
-          if (peekn(1) == IR_TOK_MINUS) {
-            push(IR_TOK_DECREMENT);
+          if (peekn(1) == FIR_TOK_MINUS) {
+            push(FIR_TOK_DECREMENT);
             nextn(2);
             break;
           }
-          push(IR_TOK_MINUS);
+          push(FIR_TOK_MINUS);
           next();
           break;
-        case IR_TOK_DOT:
-          if (peekn(1) == IR_TOK_DOT && peekn(2) == IR_TOK_DOT) {
-            push(IR_TOK_DOTS);
+        case FIR_TOK_DOT:
+          if (peekn(1) == FIR_TOK_DOT && peekn(2) == FIR_TOK_DOT) {
+            push(FIR_TOK_DOTS);
             nextn(3);
             break;
           }
-          push(IR_TOK_DOT);
+          push(FIR_TOK_DOT);
           next();
           break;
-        case IR_TOK_SLASH:
-          if (peekn(1) == IR_TOK_STAR) {
-            while (next() != IR_TOK_END) {
-              if (peek() == IR_TOK_STAR) {
-                while (next() == IR_TOK_STAR);
-                if (peek() == IR_TOK_SLASH) {
+        case FIR_TOK_SLASH:
+          if (peekn(1) == FIR_TOK_STAR) {
+            while (next() != FIR_TOK_END) {
+              if (peek() == FIR_TOK_STAR) {
+                while (next() == FIR_TOK_STAR);
+                if (peek() == FIR_TOK_SLASH) {
                   next();
                   break;
                 }
-              } else if (peekn(1) == IR_TOK_END) {
+              } else if (peekn(1) == FIR_TOK_END) {
                 exit(1);
               } else {
                 switch (peek()) {
                   case '\r':
                     next();
-                    if (peek() == IR_TOK_EOL) {
+                    if (peek() == FIR_TOK_EOL) {
                       next();
                     }
-                    push(IR_TOK_EOL);
+                    push(FIR_TOK_EOL);
                     ++loc.line;
                     loc.col = 0;
                     break;
                   case '\v':
                   case '\f':
-                  case IR_TOK_EOL:
+                  case FIR_TOK_EOL:
                     next();
-                    push(IR_TOK_EOL);
+                    push(FIR_TOK_EOL);
                     ++loc.line;
                     loc.col = 0;
                     break;
@@ -340,144 +338,144 @@ void lex_str(lexer_t *this, const char *buffer, fir_toks_t *token_stream) {
             }
             break;
           }
-          if (peekn(1) == IR_TOK_ASSIGN) {
-            push(IR_TOK_DIV_ASSIGN);
+          if (peekn(1) == FIR_TOK_ASSIGN) {
+            push(FIR_TOK_DIV_ASSIGN);
             nextn(2);
             break;
           }
-          push(IR_TOK_SLASH);
+          push(FIR_TOK_SLASH);
           next();
           break;
-        case IR_TOK_COLON:
-          if (peekn(1) == IR_TOK_COLON) {
-            push(IR_TOK_DCOLON);
+        case FIR_TOK_COLON:
+          if (peekn(1) == FIR_TOK_COLON) {
+            push(FIR_TOK_DCOLON);
             nextn(2);
             break;
           }
-          push(IR_TOK_COLON);
+          push(FIR_TOK_COLON);
           next();
           break;
-        case IR_TOK_SEMICOLON:
-          push(IR_TOK_SEMICOLON);
+        case FIR_TOK_SEMICOLON:
+          push(FIR_TOK_SEMICOLON);
           next();
           break;
-        case IR_TOK_LT:
-          if (peekn(1) == IR_TOK_LT) {
-            if (peekn(2) == IR_TOK_ASSIGN) {
-              push(IR_TOK_LSHIFT_ASSIGN);
+        case FIR_TOK_LT:
+          if (peekn(1) == FIR_TOK_LT) {
+            if (peekn(2) == FIR_TOK_ASSIGN) {
+              push(FIR_TOK_LSHIFT_ASSIGN);
               nextn(3);
               break;
             }
-            push(IR_TOK_LSHIFT);
+            push(FIR_TOK_LSHIFT);
             nextn(2);
             break;
           }
-          if (peekn(1) == IR_TOK_ASSIGN) {
-            push(IR_TOK_LEQ);
+          if (peekn(1) == FIR_TOK_ASSIGN) {
+            push(FIR_TOK_LEQ);
             nextn(2);
             break;
           }
-          push(IR_TOK_LT);
+          push(FIR_TOK_LT);
           next();
           break;
-        case IR_TOK_ASSIGN:
-          if (peekn(1) == IR_TOK_ASSIGN) {
-            push(IR_TOK_EQ);
+        case FIR_TOK_ASSIGN:
+          if (peekn(1) == FIR_TOK_ASSIGN) {
+            push(FIR_TOK_EQ);
             nextn(2);
             break;
           }
-          if (peekn(1) == IR_TOK_GT) {
-            push(IR_TOK_DARROW);
+          if (peekn(1) == FIR_TOK_GT) {
+            push(FIR_TOK_DARROW);
             nextn(2);
             break;
           }
-          push(IR_TOK_ASSIGN);
+          push(FIR_TOK_ASSIGN);
           next();
           break;
-        case IR_TOK_GT:
-          if (peekn(1) == IR_TOK_GT) {
-            if (peekn(2) == IR_TOK_ASSIGN) {
-              push(IR_TOK_RSHIFT_ASSIGN);
+        case FIR_TOK_GT:
+          if (peekn(1) == FIR_TOK_GT) {
+            if (peekn(2) == FIR_TOK_ASSIGN) {
+              push(FIR_TOK_RSHIFT_ASSIGN);
               nextn(3);
               break;
             }
-            push(IR_TOK_RSHIFT);
+            push(FIR_TOK_RSHIFT);
             nextn(2);
             break;
           }
-          if (peekn(1) == IR_TOK_ASSIGN) {
-            push(IR_TOK_GEQ);
+          if (peekn(1) == FIR_TOK_ASSIGN) {
+            push(FIR_TOK_GEQ);
             nextn(2);
             break;
           }
-          push(IR_TOK_GT);
+          push(FIR_TOK_GT);
           next();
           break;
-        case IR_TOK_QUESTION:
-          if (peekn(1) == IR_TOK_QUESTION) {
-            push(IR_TOK_DQUESTION);
+        case FIR_TOK_QUESTION:
+          if (peekn(1) == FIR_TOK_QUESTION) {
+            push(FIR_TOK_DQUESTION);
             nextn(2);
             break;
           }
-          push(IR_TOK_QUESTION);
+          push(FIR_TOK_QUESTION);
           next();
           break;
-        case IR_TOK_OPEN_BRACKET:
-          push(IR_TOK_OPEN_BRACKET);
+        case FIR_TOK_OPEN_BRACKET:
+          push(FIR_TOK_OPEN_BRACKET);
           next();
           break;
-        case IR_TOK_CLOSE_BRACKET:
-          push(IR_TOK_CLOSE_BRACKET);
+        case FIR_TOK_CLOSE_BRACKET:
+          push(FIR_TOK_CLOSE_BRACKET);
           next();
           break;
-        case IR_TOK_XOR:
-          if (peekn(1) == IR_TOK_ASSIGN) {
-            push(IR_TOK_XOR_ASSIGN);
+        case FIR_TOK_XOR:
+          if (peekn(1) == FIR_TOK_ASSIGN) {
+            push(FIR_TOK_XOR_ASSIGN);
             nextn(2);
             break;
           }
-          push(IR_TOK_XOR);
+          push(FIR_TOK_XOR);
           next();
           break;
-        case IR_TOK_OPEN_CURLY:
-          push(IR_TOK_OPEN_CURLY);
+        case FIR_TOK_OPEN_CURLY:
+          push(FIR_TOK_OPEN_CURLY);
           next();
           break;
-        case IR_TOK_OR:
-          if (peekn(1) == IR_TOK_OR) {
-            push(IR_TOK_LOGICAL_OR);
+        case FIR_TOK_OR:
+          if (peekn(1) == FIR_TOK_OR) {
+            push(FIR_TOK_LOGICAL_OR);
             nextn(2);
             break;
           }
-          if (peekn(1) == IR_TOK_ASSIGN) {
-            push(IR_TOK_OR_ASSIGN);
+          if (peekn(1) == FIR_TOK_ASSIGN) {
+            push(FIR_TOK_OR_ASSIGN);
             nextn(2);
             break;
           }
-          push(IR_TOK_OR);
+          push(FIR_TOK_OR);
           next();
           break;
-        case IR_TOK_CLOSE_CURLY:
-          push(IR_TOK_CLOSE_CURLY);
+        case FIR_TOK_CLOSE_CURLY:
+          push(FIR_TOK_CLOSE_CURLY);
           next();
           break;
-        case IR_TOK_NEG:
-          push(IR_TOK_NEG);
+        case FIR_TOK_NEG:
+          push(FIR_TOK_NEG);
           next();
           break;
         case '\r':
-          if (peek() == IR_TOK_EOL) {
+          if (peek() == FIR_TOK_EOL) {
             next();
           }
-          push(IR_TOK_EOL);
+          push(FIR_TOK_EOL);
           next();
           ++loc.line;
           loc.col = 0;
           break;
         case '\v':
         case '\f':
-        case IR_TOK_EOL:
-          push(IR_TOK_EOL);
+        case FIR_TOK_EOL:
+          push(FIR_TOK_EOL);
           next();
           ++loc.line;
           loc.col = 0;
@@ -492,20 +490,20 @@ void lex_str(lexer_t *this, const char *buffer, fir_toks_t *token_stream) {
       }
     }
   }
-  push(IR_TOK_END);
+  push(FIR_TOK_END);
 }
 
-void lexer_ctor(lexer_t *this, ctx_t *ctx) {
-  lexer_ctor2(this, ctx, ctx->in);
+void fir_lexer_ctor(fir_lexer_t *this, fir_ctx_t *ctx) {
+  fir_lexer_ctor2(this, ctx, ctx->in);
 }
 
-void lexer_ctor2(lexer_t *this, ctx_t *ctx, const char *in) {
+void fir_lexer_ctor2(fir_lexer_t *this, fir_ctx_t *ctx, const char *in) {
   this->ctx = ctx;
   this->filename = in;
   this->lex = lex;
   this->lex_str = lex_str;
 }
 
-void lexer_dtor(lexer_t *this) {
+void fir_lexer_dtor(fir_lexer_t *this) {
 
 }

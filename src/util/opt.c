@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <p99.h>
 
 #define IS_FLAG(opt) ((strlen(opt.rule) == 2) && (opt.rule[0] == '-'))
 
@@ -15,7 +16,7 @@
  * consumed. In case of flag option, return number of characters
  * matched. Otherwise, return 0.
  */
-static int match_arg(opt_t opt, int argc, char *argv[], ctx_t *ctx) {
+static int match_arg(opt_t opt, int argc, char *argv[], fir_ctx_t *ctx) {
   int i;
   size_t rulelen, arglen;
   char lastchar, flag;
@@ -86,7 +87,7 @@ static int match_arg(opt_t opt, int argc, char *argv[], ctx_t *ctx) {
  * Unmatched tokens are bubbled up to the last argv position. First
  * token is skipped, as it is assumed to contain program name.
  */
-int parse_args(int optc, opt_t *optv, int argc, char *argv[], ctx_t *ctx) {
+int parse_args(int optc, opt_t *optv, int argc, char *argv[], fir_ctx_t *ctx) {
   char *tmp;
   int i = 1, j, c;
 

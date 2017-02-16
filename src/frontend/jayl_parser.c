@@ -1,7 +1,6 @@
-#include <jayl/ir.h>
 #include "jayl_parser.h"
 
-void parseUse(struct _parser_t *this, fir_tus_t *translation_units);
+void parseUse(struct _fir_parser_t *this, fir_tus_t *translation_units);
 
 #if defined(WIN32) || defined(_WIN32)
 #define DS "\\"
@@ -9,37 +8,37 @@ void parseUse(struct _parser_t *this, fir_tus_t *translation_units);
 #define DS "/"
 #endif
 
-#define IR_TOK_NS_SEP IR_TOK_DCOLON
+#define FIR_TOK_NS_SEP FIR_TOK_DCOLON
 
 #define peek() this->peek(this)
 #define peekn(n) this->peekn(this, n)
 #define next() this->next(this)
 #define consume(t) this->consume(this, t)
 
-#define iseot(t) (/*t == IR_TOK_EOL || */t == IR_TOK_SEMICOLON)
+#define iseot(t) (/*t == FIR_TOK_EOL || */t == FIR_TOK_SEMICOLON)
 
-void jayl_parse_str(struct _parser_t *this, const char *buffer, fir_tus_t *translation_units) {
+void jayl_parse_str(struct _fir_parser_t *this, const char *buffer, fir_tus_t *translation_units) {
   this->lexer->lex_str(this->lexer, buffer, &this->toks);
   return this->parse(this, translation_units);
 }
 
-void jayl_parse(struct _parser_t *this, fir_tus_t *translation_units) {
-  ir_tok_t tok;
+void jayl_parse(struct _fir_parser_t *this, fir_tus_t *translation_units) {
+  fir_tok_t tok;
 
   if (!deque_len(&this->toks)) {
     this->lexer->lex(this->lexer, &this->toks);
   }
 
-  while ((tok = peek()).kind != IR_TOK_END) {
+  while ((tok = peek()).kind != FIR_TOK_END) {
     switch (tok.kind) {
-      case IR_TOK_INCLUDE:
+      case FIR_TOK_INCLUDE:
         perror("Implementation pending.");
         exit(1);
-      case IR_TOK_USE:
+      case FIR_TOK_USE:
         parseUse(this, translation_units);
         break;
-      case IR_TOK_NAMESPACE:
-      case IR_TOK_IDENTIFIER:
+      case FIR_TOK_NAMESPACE:
+      case FIR_TOK_IDENTIFIER:
       default:
         printf("token: %s\n", str_raw(tok.d.string));
         next();
@@ -48,13 +47,13 @@ void jayl_parse(struct _parser_t *this, fir_tus_t *translation_units) {
   }
 }
 
-void parseUse(struct _parser_t *this, fir_tus_t *translation_units) {
-  ir_tok_t tok;
-  lexer_t lexer = P99_INIT;
+void parseUse(struct _fir_parser_t *this, fir_tus_t *translation_units) {
+  fir_tok_t tok;
+  fir_lexer_t lexer = P99_INIT;
   fir_parser_t parser = P99_INIT;
   char path[256];
 
-  if (!(tok = consume(IR_TOK_USE)).is_id_or_kw) {
+  if (!(tok = consume(FIR_TOK_USE)).is_id_or_kw) {
     perror("Expected identifier or keyword.");
     exit(1);
   }
@@ -68,7 +67,7 @@ void parseUse(struct _parser_t *this, fir_tus_t *translation_units) {
     if (iseot(tok.kind)) {
       break;
     }
-    if (!(tok = consume(IR_TOK_NS_SEP)).is_id_or_kw) {
+    if (!(tok = consume(FIR_TOK_NS_SEP)).is_id_or_kw) {
       fprintf(stderr,
         "Syntax Error: Expected identifier or keyword, got '%s'.\n",
         str_raw(tok.d.string)
@@ -79,12 +78,12 @@ void parseUse(struct _parser_t *this, fir_tus_t *translation_units) {
     strcat(path, str_raw(tok.d.string));
     next();
   }
-  consume(IR_TOK_SEMICOLON);
+  consume(FIR_TOK_SEMICOLON);
 
   strcat(path, JAYL_SRC_EXT);
 
-  lexer_ctor2(&lexer, this->ctx, path);
-  parser_ctor2(&parser, this->ctx, &lexer, this->src_dir);
+  fir_lexer_ctor2(&lexer, this->ctx, path);
+  fir_parser_ctor2(&parser, this->ctx, &lexer, this->src_dir);
 
   parser.parse(&parser, translation_units);
 }

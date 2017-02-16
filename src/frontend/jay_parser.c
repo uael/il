@@ -1,4 +1,4 @@
-#include "jayl_parser.h"
+#include "jay_parser.h"
 
 void parseUse(struct _fir_parser_t *this, fir_tus_t *translation_units);
 
@@ -17,12 +17,12 @@ void parseUse(struct _fir_parser_t *this, fir_tus_t *translation_units);
 
 #define iseot(t) (/*t == FIR_TOK_EOL || */t == FIR_TOK_SEMICOLON)
 
-void jayl_parse_str(struct _fir_parser_t *this, const char *buffer, fir_tus_t *translation_units) {
+void jay_parse_str(struct _fir_parser_t *this, const char *buffer, fir_tus_t *translation_units) {
   this->lexer->lex_str(this->lexer, buffer, &this->toks);
   return this->parse(this, translation_units);
 }
 
-void jayl_parse(struct _fir_parser_t *this, fir_tus_t *translation_units) {
+void jay_parse(struct _fir_parser_t *this, fir_tus_t *translation_units) {
   fir_tok_t tok;
 
   if (!deque_len(&this->toks)) {
@@ -80,7 +80,7 @@ void parseUse(struct _fir_parser_t *this, fir_tus_t *translation_units) {
   }
   consume(FIR_TOK_SEMICOLON);
 
-  strcat(path, JAYL_SRC_EXT);
+  strcat(path, JAY_SRC_EXT);
 
   fir_lexer_ctor2(&lexer, this->ctx, path);
   fir_parser_ctor2(&parser, this->ctx, &lexer, this->src_dir);

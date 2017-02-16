@@ -8,10 +8,9 @@ foreach(dir ${jayl_SOURCE_DIRS})
 endforeach()
 
 add_subdirectory(adt)
-# add_subdirectory(backend)
-# add_subdirectory(optimizer)
+add_subdirectory(backend)
 add_subdirectory(frontend)
-# add_subdirectory(preprocessor)
+add_subdirectory(lower)
 
 set(jayl_HEADERS ${jayl_HEADERS})
 set(jayl_SOURCES ${jayl_SOURCES})

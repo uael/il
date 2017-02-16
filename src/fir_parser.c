@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "frontend/jayl_parser.h"
+#include "frontend/jay_parser.h"
 
 #define _peek() deque_front(&this->toks)
 #define _peekn(n) deque_get(&this->toks, n)
@@ -47,8 +47,8 @@ void fir_parser_ctor2(fir_parser_t *this, fir_ctx_t *ctx, fir_lexer_t *lexer, ch
   this->peekn = __peekn;
   this->next = __next;
   this->consume = __consume;
-  this->parse = jayl_parse;
-  this->parse_str = jayl_parse_str;
+  this->parse = jay_parse;
+  this->parse_str = jay_parse_str;
 }
 
 void fir_parser_dtor(fir_parser_t *parser) {

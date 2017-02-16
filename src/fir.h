@@ -303,7 +303,7 @@ extern const fir_tok_t tokens[128];
 typedef deque_of(fir_tok_t) fir_toks_t;
 
 /**
- * A ir_sym_t represents declarations that may have a storage location at
+ * A fir_sym_t represents declarations that may have a storage location at
  * runtime, such as functions, static and local variables. Store offset
  * to base pointer for automatic variables and function arguments.
  */

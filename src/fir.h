@@ -23,9 +23,10 @@ typedef enum {
 } fir_type;
 
 typedef enum {
-  FIR_QUAL_UNSIGNED = 0,
-  FIR_QUAL_CONST,
-  FIR_QUAL_VOLATILE
+  FIR_QUAL_UNSIGNED = 0 << 1,
+  FIR_QUAL_CONST = 0 << 2,
+  FIR_QUAL_VOLATILE = 0 << 3,
+  FIR_QUAL_POINTER = 0 << 4
 } fir_qual;
 
 typedef enum {
@@ -249,6 +250,33 @@ typedef struct {
   fir_qual qualifiers : 8;
   int ref : 16;
 } fir_sign_t;
+
+extern const fir_sign_t basic_types[14];
+
+#define type_of(t) ((t).qualifiers & FIR_QUAL_POINTER ? FIR_TYPE_POINTER : (t).type)
+
+#define is_object(t) (!is_function(t))
+#define is_function(t) (type_of(t) == FIR_TYPE_FUNCTION)
+#define is_struct_or_union(t) (is_struct(t) || is_union(t))
+#define is_char(t) (type_of(t) == FIR_TYPE_CHAR)
+#define is_int(t) (type_of(t) == FIR_TYPE_INT)
+#define is_integer(t) (type_of(t) >= FIR_TYPE_CHAR && type_of(t) <= FIR_TYPE_LONG)
+#define is_signed(t) (!is_unsigned(t) && is_integer(t))
+#define is_unsigned(t) (!((t).qualifiers & FIR_QUAL_POINTER) && (t).qualifiers & FIR_QUAL_UNSIGNED)
+#define is_pointer(t) (type_of(t) == FIR_TYPE_POINTER)
+#define is_real(t) (type_of(t) >= FIR_TYPE_FLOAT && type_of(t) <= FIR_TYPE_LDOUBLE)
+#define is_float(t) (type_of(t) == FIR_TYPE_FLOAT)
+#define is_double(t) (type_of(t) == FIR_TYPE_DOUBLE)
+#define is_long_double(t) (type_of(t) == FIR_TYPE_LDOUBLE)
+#define is_arithmetic(t) (type_of(t) >= FIR_TYPE_CHAR && type_of(t) <= FIR_TYPE_LDOUBLE)
+#define is_scalar(t) (type_of(t) >= FIR_TYPE_CHAR && type_of(t) <= FIR_TYPE_POINTER)
+#define is_aggregate(t) (is_array(t) || is_struct_or_union(t))
+#define is_void(t) (type_of(t) == FIR_TYPE_VOID)
+#define is_array(t) (type_of(t) == FIR_TYPE_ARRAY)
+#define is_struct(t) (type_of(t) == FIR_TYPE_STRUCT)
+#define is_union(t) (type_of(t) == FIR_TYPE_UNION)
+#define is_const(t) ((t).qualifiers & FIR_QUAL_CONST)
+#define is_volatile(t) ((t).qualifiers & FIR_QUAL_VOLATILE)
 
 struct _fir_tu_t;
 typedef deque_of(struct _fir_tu_t) fir_tus_t;

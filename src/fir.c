@@ -1,5 +1,22 @@
 #include "fir.h"
 
+const fir_sign_t basic_types[] = {
+  {FIR_TYPE_VOID},
+  {FIR_TYPE_CHAR},
+  {FIR_TYPE_SHORT},
+  {FIR_TYPE_INT},
+  {FIR_TYPE_LONG},
+  {FIR_TYPE_FLOAT},
+  {FIR_TYPE_DOUBLE},
+  {FIR_TYPE_LDOUBLE},
+  {FIR_TYPE_POINTER},
+  {FIR_TYPE_FUNCTION},
+  {FIR_TYPE_ARRAY},
+  {FIR_TYPE_STRUCT},
+  {FIR_TYPE_UNION},
+  {FIR_TYPE_NAMESPACE}
+};
+
 /**
  * Static initializer for token. Only works with string representation
  * that can fit inline.

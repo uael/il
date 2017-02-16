@@ -1,18 +1,19 @@
 #include <jayl/ir.h>
 #include <stdlib.h>
 #include <assert.h>
+
 #include "parser.h"
+#include "frontend/jayl_parser.h"
 
 #define _peek() deque_front(&this->toks)
 #define _peekn(n) deque_get(&this->toks, n)
 #define _next() deque_pop_front(&this->toks)
 #define _consume(tok) ({ \
-    ir_tok_t t = _next(); \
-    if (t.kind != tok) { \
+    if (_peek().kind != tok) { \
       puts("unexpected token"); \
       exit(1); \
     } \
-    t; \
+    _next(); _peek(); \
   })
 
 static inline ir_tok_t __peek(struct _parser_t *this) {
@@ -31,50 +32,25 @@ static inline ir_tok_t __consume(struct _parser_t *this, ir_tok tok) {
   return _consume(tok);
 }
 
-ir_prog_t parse(struct _parser_t *this);
-
-ir_prog_t parse_str(struct _parser_t *this, const char *buffer);
-
-void parser_ctor(parser_t *parser, ctx_t *ctx) {
+void parser_ctor(fir_parser_t *this, ctx_t *ctx) {
   assert(ctx->lexer);
-  parser->lexer = ctx->lexer;
-  parser->peek = __peek;
-  parser->peekn = __peekn;
-  parser->next = __next;
-  parser->consume = __consume;
-  parser->parse = parse;
-  parser->parse_str = parse_str;
+  parser_ctor2(this, ctx, ctx->lexer, ctx->src_dir);
 }
 
-void parser_dtor(parser_t *parser) {
+void parser_ctor2(fir_parser_t *this, ctx_t *ctx, lexer_t *lexer, char *src_dir) {
+  this->ctx = ctx;
+  this->lexer = lexer;
 
+  strcpy(this->src_dir, src_dir);
+
+  this->peek = __peek;
+  this->peekn = __peekn;
+  this->next = __next;
+  this->consume = __consume;
+  this->parse = jayl_parse;
+  this->parse_str = jayl_parse_str;
 }
 
-ir_prog_t parse(struct _parser_t *this) {
-  ir_prog_t result = {};
-  ir_tok_t tok;
+void parser_dtor(fir_parser_t *parser) {
 
-  if (!deque_len(&this->toks)) {
-    this->toks = this->lexer->lex(this->lexer);
-  }
-
-  while ((tok = this->peek(this)).kind != IR_TOK_END) {
-    switch (tok.kind) {
-      case IR_TOK_INCLUDE:
-      case IR_TOK_USE:
-      case IR_TOK_NAMESPACE:
-      case IR_TOK_IDENTIFIER:
-      default:
-        printf("token: %s\n", str_raw(tok.d.string));
-        this->next(this);
-        break;
-    }
-  }
-
-  return result;
-}
-
-ir_prog_t parse_str(struct _parser_t *this, const char *buffer) {
-  this->toks = this->lexer->lex_str(this->lexer, buffer);
-  return this->parse(this);
 }

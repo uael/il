@@ -9,7 +9,7 @@ endforeach()
 
 # add_subdirectory(backend)
 # add_subdirectory(optimizer)
-# add_subdirectory(parser)
+add_subdirectory(frontend)
 # add_subdirectory(preprocessor)
 
 set(jayl_HEADERS ${jayl_HEADERS})

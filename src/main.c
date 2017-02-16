@@ -53,7 +53,8 @@ int main(int argc, char *argv[]) {
 
   ctx_ctor(&ctx);
 
-  ctx.parser->parse(ctx.parser);
+  fir_tus_t translation_units = {};
+  ctx.parser->parse(ctx.parser, &translation_units);
 
   ctx_dtor(&ctx);
 

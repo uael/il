@@ -10,6 +10,7 @@ typedef struct _ctx_t {
   const char *program;
   const char *in;
   const char *out;
+  char src_dir[256];
   bool verbose;
   struct _lexer_t *lexer;
   struct _parser_t *parser;

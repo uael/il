@@ -282,7 +282,7 @@ typedef struct {
 typedef struct {
   ir_tok kind;
   uint leading_whitespace : 16;
-  uint is_ident : 1;
+  uint is_id_or_kw : 1;
   uint is_char_literal : 1;
   uint disable_expand : 1;
   ir_sign_t type;
@@ -293,7 +293,7 @@ typedef struct {
   ir_loc_t loc;
 } ir_tok_t;
 
-typedef deque_of(ir_tok_t) ir_toks_t;
+typedef deque_of(ir_tok_t) fir_toks_t;
 
 /**
  * A ir_sym_t represents declarations that may have a storage location at

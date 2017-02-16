@@ -14,7 +14,7 @@ static size_t size;
 #define push(id) do { \
     tok = tokens[id]; \
     tok.loc = loc; \
-    deque_push_back(&result, tok); \
+    deque_push_back(token_stream, tok); \
   } while (0)
 #define push_string(...) do { \
     P99_IF_EMPTY(__VA_ARGS__)()({ \
@@ -23,7 +23,7 @@ static size_t size;
     }) \
     tok.loc = loc; \
     tok.loc.col -= i; \
-    deque_push_back(&result, tok); \
+    deque_push_back(token_stream, tok); \
   } while (0)
 
 #define M(n, i, c) string[i + n] == (c)
@@ -52,11 +52,10 @@ void cleanup() {
   free(buffer);
 }
 
-ir_toks_t lex(lexer_t *this) {
+void lex(lexer_t *this, fir_toks_t *token_stream) {
   char *ptr;
   FILE *stream;
   size_t tail;
-  ir_toks_t result = {0};
 
   assert(this->filename);
   stream = fopen(this->filename, "r");
@@ -66,7 +65,7 @@ ir_toks_t lex(lexer_t *this) {
   tail = (size_t) ftell(stream);
   rewind(stream);
   if (!tail) {
-    return result;
+    return;
   }
 
   if (!buffer) {
@@ -82,22 +81,20 @@ ir_toks_t lex(lexer_t *this) {
   fclose(stream);
   buffer[tail] = IR_TOK_END;
   ptr = strdup(buffer);
-  result = this->lex_str(this, ptr);
+  this->lex_str(this, ptr, token_stream);
   free(ptr);
-
-  return result;
 }
 
-ir_toks_t lex_str(lexer_t *this, const char *buffer) {
+void lex_str(lexer_t *this, const char *buffer, fir_toks_t *token_stream) {
   const char *ptr;
   char string[255];
-  ir_toks_t result = {0};
   ir_tok_t tok;
   ir_loc_t loc = {this->filename, 0, 0};
   unsigned i;
 
   if (!buffer && this->filename) {
-    return this->lex(this);
+    this->lex(this, token_stream);
+    return;
   }
 
   assert(buffer);
@@ -496,12 +493,15 @@ ir_toks_t lex_str(lexer_t *this, const char *buffer) {
     }
   }
   push(IR_TOK_END);
-
-  return result;
 }
 
 void lexer_ctor(lexer_t *this, ctx_t *ctx) {
-  this->filename = ctx->in;
+  lexer_ctor2(this, ctx, ctx->in);
+}
+
+void lexer_ctor2(lexer_t *this, ctx_t *ctx, const char *in) {
+  this->ctx = ctx;
+  this->filename = in;
   this->lex = lex;
   this->lex_str = lex_str;
 }

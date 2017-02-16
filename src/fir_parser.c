@@ -51,6 +51,7 @@ void fir_parser_ctor2(fir_parser_t *this, fir_ctx_t *ctx, fir_lexer_t *lexer, ch
   this->parse_str = jay_parse_str;
 }
 
-void fir_parser_dtor(fir_parser_t *parser) {
-  assert(parser);
+void fir_parser_dtor(fir_parser_t *this) {
+  assert(this);
+  deque_destroy(&this->toks);
 }

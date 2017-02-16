@@ -18,7 +18,11 @@ void parseUse(struct _fir_parser_t *this, fir_tus_t *translation_units);
 #define iseot(t) (/*t == FIR_TOK_EOL || */t == FIR_TOK_SEMICOLON)
 
 void jay_parse_str(struct _fir_parser_t *this, const char *buffer, fir_tus_t *translation_units) {
+  if (!translation_units) {
+    translation_units = &this->ctx->prg.tus;
+  }
   this->lexer->lex_str(this->lexer, buffer, &this->toks);
+
   return this->parse(this, translation_units);
 }
 
@@ -27,6 +31,9 @@ void jay_parse(struct _fir_parser_t *this, fir_tus_t *translation_units) {
 
   if (!deque_len(&this->toks)) {
     this->lexer->lex(this->lexer, &this->toks);
+  }
+  if (!translation_units) {
+    translation_units = &this->ctx->prg.tus;
   }
 
   while ((tok = peek()).kind != FIR_TOK_END) {

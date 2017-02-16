@@ -1,6 +1,7 @@
 #include "fir_ctx.h"
 #include "fir_lexer.h"
 #include "fir_parser.h"
+#include "fir.h"
 
 void ctx_ctor(fir_ctx_t *this) {
   char *sep;
@@ -29,4 +30,7 @@ void ctx_dtor(fir_ctx_t *this) {
 
   fir_parser_dtor(this->parser);
   free(this->parser);
+
+  deque_destroy(&this->prg.types);
+  deque_destroy(&this->prg.tus);
 }

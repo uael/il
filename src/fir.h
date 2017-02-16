@@ -250,6 +250,20 @@ typedef struct {
   int ref : 16;
 } fir_sign_t;
 
+struct _fir_tu_t;
+typedef deque_of(struct _fir_tu_t) fir_tus_t;
+
+typedef struct {
+  fir_type type : 8;
+  fir_qual qualifiers : 8;
+  size_t size;
+  fir_tus_t tus;
+  fir_sign_t next;
+  string_t tag;
+} fir_type_t;
+
+typedef deque_of(fir_type_t) fir_types_t;
+
 /**
  * The type fir_value_t
  *
@@ -334,8 +348,6 @@ typedef struct _fir_tu_t {
   struct _fir_stmt_t *body;
 } fir_tu_t;
 
-typedef deque_of(fir_tu_t) fir_tus_t;
-
 typedef struct _fir_expr_t {
   __FIR_NODE_PROPERTIES;
   fir_op op;
@@ -350,6 +362,11 @@ typedef struct _fir_stmt_t {
   fir_expr_t *expr;
   struct _fir_stmt_t *down, *right;
 } fir_stmt_t;
+
+typedef struct {
+  fir_types_t types;
+  fir_tus_t tus;
+} fir_prg_t;
 
 /**
  * @brief Get the number of struct or union members, or function parameters.

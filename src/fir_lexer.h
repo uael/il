@@ -1,7 +1,6 @@
 #ifndef _JAYL_FIR_LEXER_H_
 #define _JAYL_FIR_LEXER_H_
 
-#include "fir.h"
 #include "fir_ctx.h"
 
 /**

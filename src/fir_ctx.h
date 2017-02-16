@@ -1,7 +1,7 @@
 #ifndef _JAYL_FIR_CTX_H_
 #define _JAYL_FIR_CTX_H_
 
-#include <p99.h>
+#include "fir.h"
 
 struct _fir_lexer_t;
 struct _fir_parser_t;
@@ -19,6 +19,8 @@ typedef struct _fir_ctx_t {
 
   struct _fir_lexer_t *lexer;
   struct _fir_parser_t *parser;
+
+  fir_prg_t prg;
 } fir_ctx_t;
 
 /**

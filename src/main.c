@@ -1,8 +1,6 @@
 #include "util/opt.h"
 #include "fir_parser.h"
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <assert.h>
 
 static void help(opt_t *this, fir_ctx_t *ctx) {

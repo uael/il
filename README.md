@@ -14,7 +14,7 @@ main() : int => {
 
 ##Deps
 ```bash
-$ sudo apt install build-essential make cmake g++
+$ sudo apt install build-essential make cmake gcc
 ```
 
 ##Build

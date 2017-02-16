@@ -35,7 +35,8 @@ static void std(opt_t *this, fir_ctx_t *ctx) {
 
 int main(int argc, char *argv[]) {
   int i;
-  fir_ctx_t ctx = {};
+  fir_ctx_t ctx = P99_INIT;
+  fir_tus_t translation_units = P99_INIT;
   opt_t optv[] = {
     {"-v:",     &flag},
     {"-o:",     &output},
@@ -52,8 +53,6 @@ int main(int argc, char *argv[]) {
   }
 
   ctx_ctor(&ctx);
-
-  fir_tus_t translation_units = {};
   ctx.parser->parse(ctx.parser, &translation_units);
 
   ctx_dtor(&ctx);

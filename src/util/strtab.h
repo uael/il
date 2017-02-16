@@ -1,9 +1,9 @@
 #ifndef _JAYL_STRTAB_H_
 #define _JAYL_STRTAB_H_
 
-#include "adt/string.h"
-
 #include <stddef.h>
+
+#include "adt/string.h"
 
 /**
  * Register a string and store it internally, allocating a new copy if

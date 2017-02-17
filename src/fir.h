@@ -23,6 +23,7 @@ typedef enum {
 } fir_type;
 
 typedef enum {
+  FIR_QUAL_NONE = 0,
   FIR_QUAL_UNSIGNED = 0 << 1,
   FIR_QUAL_CONST = 0 << 2,
   FIR_QUAL_VOLATILE = 0 << 3,
@@ -231,29 +232,7 @@ typedef enum {
 struct _fir_visitor_t;
 struct _fir_stmt_t;
 
-/**
- * Internal representation of a type.
- *
- * Optimize for space and treat as a value type. This should fit in 32
- * bits, and be able to encode basic types such as:
- *
- *     int
- *     const int * volatile
- *     unsigned short const * const.
- *
- * For function, array, aggregate, and deeper pointer types, the type is
- * encoded in an opaque structure referenced by ref. All other types are
- * completely represented by this object, and have ref value 0.
- */
-typedef struct {
-  fir_type type : 8;
-  fir_qual qualifiers : 8;
-  int ref : 16;
-} fir_sign_t;
-
-extern const fir_sign_t basic_types[14];
-
-#define type_of(t) ((t).qualifiers & FIR_QUAL_POINTER ? FIR_TYPE_POINTER : (t).type)
+#define type_of(t) ((t)->qualifiers & FIR_QUAL_POINTER ? FIR_TYPE_POINTER : (t)->type)
 
 #define is_object(t) (!is_function(t))
 #define is_function(t) (type_of(t) == FIR_TYPE_FUNCTION)
@@ -262,7 +241,7 @@ extern const fir_sign_t basic_types[14];
 #define is_int(t) (type_of(t) == FIR_TYPE_INT)
 #define is_integer(t) (type_of(t) >= FIR_TYPE_CHAR && type_of(t) <= FIR_TYPE_LONG)
 #define is_signed(t) (!is_unsigned(t) && is_integer(t))
-#define is_unsigned(t) (!((t).qualifiers & FIR_QUAL_POINTER) && (t).qualifiers & FIR_QUAL_UNSIGNED)
+#define is_unsigned(t) (!((t)->qualifiers & FIR_QUAL_POINTER) && (t)->qualifiers & FIR_QUAL_UNSIGNED)
 #define is_pointer(t) (type_of(t) == FIR_TYPE_POINTER)
 #define is_real(t) (type_of(t) >= FIR_TYPE_FLOAT && type_of(t) <= FIR_TYPE_LDOUBLE)
 #define is_float(t) (type_of(t) == FIR_TYPE_FLOAT)
@@ -275,22 +254,25 @@ extern const fir_sign_t basic_types[14];
 #define is_array(t) (type_of(t) == FIR_TYPE_ARRAY)
 #define is_struct(t) (type_of(t) == FIR_TYPE_STRUCT)
 #define is_union(t) (type_of(t) == FIR_TYPE_UNION)
-#define is_const(t) ((t).qualifiers & FIR_QUAL_CONST)
-#define is_volatile(t) ((t).qualifiers & FIR_QUAL_VOLATILE)
+#define is_const(t) ((t)->qualifiers & FIR_QUAL_CONST)
+#define is_volatile(t) ((t)->qualifiers & FIR_QUAL_VOLATILE)
 
 struct _fir_tu_t;
 typedef deque_of(struct _fir_tu_t) fir_tus_t;
 
-typedef struct {
+typedef struct _fir_type_t {
   fir_type type : 8;
   fir_qual qualifiers : 8;
   size_t size;
   fir_tus_t tus;
-  fir_sign_t next;
+  struct _fir_type_t *next;
   string_t tag;
+  unsigned ref;
 } fir_type_t;
 
-typedef deque_of(fir_type_t) fir_types_t;
+extern const fir_type_t basic_types[14];
+
+typedef array_of(fir_type_t) fir_types_t;
 
 /**
  * The type fir_value_t
@@ -327,7 +309,7 @@ typedef struct {
   uint is_id_or_kw : 1;
   uint is_char_literal : 1;
   uint disable_expand : 1;
-  fir_sign_t type;
+  fir_type_t type;
   union {
     string_t string;
     fir_value_t val;
@@ -352,7 +334,7 @@ typedef deque_of(fir_tok_t) fir_toks_t;
 typedef struct {
   fir_sym sym;
   string_t name;
-  fir_sign_t sign;
+  fir_type_t *type;
   fir_link linkage;
   union {
     fir_value_t constant;
@@ -379,7 +361,7 @@ typedef struct _fir_tu_t {
 typedef struct _fir_expr_t {
   __FIR_NODE_PROPERTIES;
   fir_op op;
-  fir_sign_t sign;
+  fir_type_t *type;
   struct _fir_expr_t *left, *right;
 } fir_expr_t;
 
@@ -395,19 +377,5 @@ typedef struct {
   fir_types_t types;
   fir_tus_t tus;
 } fir_prg_t;
-
-/**
- * @brief Get the number of struct or union members, or function parameters.
- * @param sign The signature
- * @return The number of members
- */
-unsigned fir_nmem(fir_sign_t sign);
-fir_tu_t *fir_mem(fir_sign_t sign, int n);
-fir_sign_t fir_next(fir_sign_t sign);
-bool fis_vararg(fir_sign_t sign);
-size_t size_of(fir_sign_t sign);
-size_t type_alignment(fir_sign_t sign);
-bool type_equal(fir_sign_t l, fir_sign_t r);
-fir_sign_t usual_arithmetic_conversion(fir_sign_t t1, fir_sign_t t2);
 
 #endif /* _JAYL_FIR_H_ */

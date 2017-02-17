@@ -1,6 +1,6 @@
 #include "fir.h"
 
-const fir_sign_t basic_types[] = {
+const fir_type_t basic_types[] = {
   {FIR_TYPE_VOID},
   {FIR_TYPE_CHAR},
   {FIR_TYPE_SHORT},

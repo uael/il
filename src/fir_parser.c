@@ -24,7 +24,7 @@ static fir_tok_t consume(struct _fir_parser_t *this, fir_tok tok) {
       puts("unexpected token"); \
       exit(1); \
     } \
-    __next();
+ (void) __next();
   return __peek();
 }
 

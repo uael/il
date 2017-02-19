@@ -2,6 +2,8 @@
 
 void parseUse(struct _fir_parser_t *this, fir_tus_t *translation_units);
 
+void parseNamespace(struct _fir_parser_t *this, fir_tus_t *translation_units);
+
 #if defined(WIN32) || defined(_WIN32)
 #define DS "\\"
 #else

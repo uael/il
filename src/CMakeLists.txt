@@ -14,11 +14,19 @@ add_subdirectory(lower)
 
 set(jayl_HEADERS ${jayl_HEADERS})
 set(jayl_SOURCES ${jayl_SOURCES})
+set(jayl_INCLUDES ${jayl_INCLUDES})
+set(jayl_DEPS ${jayl_DEPS})
+set(jayl_LDADD ${jayl_LDADD})
 
-# list(REMOVE_ITEM jayl_SOURCES ./main.c)
+list(REMOVE_ITEM jayl_SOURCES ./main.c)
 
-include_directories(.)
+set(jayl_INCLUDES ${jayl_INCLUDES} .)
 
-add_executable(${PROJECT_NAME} ${jayl_SOURCES} ${jayl_HEADERS})
-add_dependencies(${PROJECT_NAME} libfirm)
-target_link_libraries(${PROJECT_NAME} ${libfirm_LIBRARIES})
+include_directories(${jayl_INCLUDES})
+
+add_library(${PROJECT_NAME}so ${jayl_SOURCES} ${jayl_HEADERS})
+add_dependencies(${PROJECT_NAME}so ${jayl_DEPS})
+target_link_libraries(${PROJECT_NAME}so ${jayl_LDADD})
+
+add_executable(${PROJECT_NAME} ./main.c)
+target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}so)

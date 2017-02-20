@@ -1,3 +1,5 @@
+set(jayl_INCLUDES ${jayl_INCLUDES} ${CMAKE_CURRENT_LIST_DIR}/p99/include)
+
 include(ExternalProject)
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
@@ -9,11 +11,12 @@ endif()
 
 set(libfirm_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/ir)
 set(libfirm_BINARY_DIR ${libfirm_SOURCE_DIR}/build)
+set(libfirm_INSTALL_DIR ${CMAKE_BINARY_DIR}/libfirm)
 
 ExternalProject_Add(libfirm
     SOURCE_DIR "${libfirm_SOURCE_DIR}"
     BINARY_DIR "${libfirm_BINARY_DIR}"
-    INSTALL_DIR "${CMAKE_BINARY_DIR}/libfirm"
+    INSTALL_DIR "${libfirm_INSTALL_DIR}"
     CONFIGURE_COMMAND ""
     BUILD_COMMAND $(MAKE)
         -C "${libfirm_SOURCE_DIR}"
@@ -24,10 +27,12 @@ ExternalProject_Add(libfirm
         "variant=${libfirm_VARIANT}"
         "top_builddir=${libfirm_BINARY_DIR}"
         "PREFIX=/"
-        "DESTDIR=${CMAKE_BINARY_DIR}/libfirm"
+        "DESTDIR=${libfirm_INSTALL_DIR}"
         "install"
 )
 
-set(libfirm_LIBRARIES "-lfirm -lm")
+find_library(libfirm_LIBRARY firm ${libfirm_INSTALL_DIR}/lib)
 
-include_directories(${libfirm_SOURCE_DIR}/include ${libfirm_BINARY_DIR}/include)
+set(jayl_DEPS ${jayl_DEPS} libfirm PARENT_SCOPE)
+set(jayl_LDADD ${jayl_LDADD} ${libfirm_LIBRARY} PARENT_SCOPE)
+set(jayl_INCLUDES ${jayl_INCLUDES} ${libfirm_INSTALL_DIR}/include PARENT_SCOPE)

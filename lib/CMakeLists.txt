@@ -9,7 +9,7 @@ else()
     set(libfirm_VARIANT "optimize")
 endif()
 
-set(libfirm_PREFIX ir)
+set(libfirm_PREFIX firm)
 set(libfirm_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/${libfirm_PREFIX})
 set(libfirm_BINARY_DIR ${CMAKE_BINARY_DIR}/lib/${libfirm_PREFIX})
 set(libfirm_INSTALL_DIR ${CMAKE_BINARY_DIR}/libfirm)

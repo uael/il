@@ -9,8 +9,9 @@ else()
     set(libfirm_VARIANT "optimize")
 endif()
 
-set(libfirm_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/ir)
-set(libfirm_BINARY_DIR ${libfirm_SOURCE_DIR}/build)
+set(libfirm_PREFIX ir)
+set(libfirm_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/${libfirm_PREFIX})
+set(libfirm_BINARY_DIR ${CMAKE_BINARY_DIR}/lib/${libfirm_PREFIX})
 set(libfirm_INSTALL_DIR ${CMAKE_BINARY_DIR}/libfirm)
 
 ExternalProject_Add(libfirm
@@ -18,6 +19,7 @@ ExternalProject_Add(libfirm
     BINARY_DIR "${libfirm_BINARY_DIR}"
     INSTALL_DIR "${libfirm_INSTALL_DIR}"
     CONFIGURE_COMMAND ""
+    PREFIX "${libfirm_PREFIX}"
     BUILD_COMMAND $(MAKE)
         -C "${libfirm_SOURCE_DIR}"
         "variant=${libfirm_VARIANT}"

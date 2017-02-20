@@ -25,11 +25,11 @@ set(jayl_INCLUDES ${jayl_INCLUDES} .)
 
 include_directories(${jayl_INCLUDES})
 
+add_definitions(${jayl_DEFS})
+
 add_library(${PROJECT_NAME}so ${jayl_SOURCES} ${jayl_HEADERS})
 add_dependencies(${PROJECT_NAME}so ${jayl_DEPS})
 target_link_libraries(${PROJECT_NAME}so ${jayl_LDADD})
-target_compile_definitions(${PROJECT_NAME}so PRIVATE ${jayl_DEFS})
 
 add_executable(${PROJECT_NAME} ./main.c)
 target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}so)
-target_compile_definitions(${PROJECT_NAME} PRIVATE ${jayl_DEFS})

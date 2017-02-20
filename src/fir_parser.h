@@ -62,17 +62,10 @@ typedef struct _fir_parser_t {
  * The fir_parser_t ctor.
  * @param this The fir_parser_t instance to init.
  * @param ctx The current fir context instance.
- */
-void fir_parser_ctor(fir_parser_t *this, fir_ctx_t *ctx);
-
-/**
- * The fir_parser_t ctor.
- * @param this The fir_parser_t instance to init.
- * @param ctx The current fir context instance.
  * @param lexer The lexer to use on parse.
  * @param src_dir The src directory, where files will be peeked at.
  */
-void fir_parser_ctor2(fir_parser_t *this, fir_ctx_t *ctx, fir_lexer_t *lexer, char *src_dir);
+void fir_parser_ctor(fir_parser_t *this, fir_ctx_t *ctx, fir_lexer_t *lexer, char *src_dir);
 
 /**
  * The fir_parser_t dtor.

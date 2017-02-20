@@ -91,8 +91,8 @@ void parseUse(struct _fir_parser_t *this, fir_tus_t *translation_units) {
 
   strcat(path, JAY_SRC_EXT);
 
-  fir_lexer_ctor2(&lexer, this->ctx, path);
-  fir_parser_ctor2(&parser, this->ctx, &lexer, this->src_dir);
+  fir_lexer_ctor(&lexer, this->ctx, path);
+  fir_parser_ctor(&parser, this->ctx, &lexer, this->src_dir);
 
   parser.parse(&parser, translation_units);
 }

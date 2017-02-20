@@ -32,16 +32,9 @@ typedef struct _fir_lexer_t {
  * The fir_lexer_t ctor.
  * @param this The fir_lexer_t instance to init.
  * @param ctx The current fir context.
- */
-void fir_lexer_ctor(fir_lexer_t *this, fir_ctx_t *ctx);
-
-/**
- * The fir_lexer_t ctor.
- * @param this The fir_lexer_t instance to init.
- * @param ctx The current fir context.
  * @param in The input file to lex.
  */
-void fir_lexer_ctor2(fir_lexer_t *this, fir_ctx_t *ctx, const char *in);
+void fir_lexer_ctor(fir_lexer_t *this, fir_ctx_t *ctx, const char *in);
 
 /**
  * The fir_lexer_t dtor.

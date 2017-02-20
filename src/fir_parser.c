@@ -28,20 +28,15 @@ static fir_tok_t consume(struct _fir_parser_t *this, fir_tok tok) {
   return __peek();
 }
 
-void fir_parser_ctor(fir_parser_t *this, fir_ctx_t *ctx) {
-  fir_parser_ctor2(this, ctx, ctx->lexer, ctx->src_dir);
-}
-
-void fir_parser_ctor2(fir_parser_t *this, fir_ctx_t *ctx, fir_lexer_t *lexer, char *src_dir) {
+void fir_parser_ctor(fir_parser_t *this, fir_ctx_t *ctx, fir_lexer_t *lexer, char *src_dir) {
   assert(this);
   assert(ctx);
   assert(lexer);
-  assert(src_dir);
 
   this->ctx = ctx;
   this->lexer = lexer;
 
-  strcpy(this->src_dir, src_dir);
+  strcpy(this->src_dir, src_dir ? src_dir : ctx->src_dir);
 
   this->peek = peek;
   this->peekn = peekn;

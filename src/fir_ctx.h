@@ -3,8 +3,8 @@
 
 #include "fir.h"
 
-struct _fir_lexer_t;
 struct _fir_parser_t;
+struct _be_t;
 
 /**
  * The type struct fir_ctx_t.
@@ -17,8 +17,8 @@ typedef struct _fir_ctx_t {
   char src_dir[256];
   bool verbose;
 
-  struct _fir_lexer_t *lexer;
   struct _fir_parser_t *parser;
+  struct _be_t *be;
 
   fir_prg_t prg;
 } fir_ctx_t;
@@ -27,7 +27,7 @@ typedef struct _fir_ctx_t {
  * fir_ctx_t ctor.
  * @param this The fir_ctx_t ptr to ctor.
  */
-void ctx_ctor(fir_ctx_t *this);
+void ctx_ctor(fir_ctx_t *this, struct _fir_parser_t *parser, struct _be_t *be);
 
 /**
  * fir_ctx_t dtor.

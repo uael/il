@@ -2,10 +2,7 @@
 #include "fir_parser.h"
 
 #include <assert.h>
-
-#ifdef WITH_LIBFIRM
-#include <libfirm/adt/obstack.h>
-#endif
+#include <backend/be.h>
 
 static void help(opt_t *this, fir_ctx_t *ctx) {
   fprintf(
@@ -38,6 +35,9 @@ static void std(opt_t *this, fir_ctx_t *ctx) {
 int main(int argc, char *argv[]) {
   int i;
   fir_ctx_t ctx = P99_INIT;
+  fir_parser_t parser = P99_INIT;
+  fir_lexer_t lexer = P99_INIT;
+  be_t be = P99_INIT;
   opt_t optv[] = {
     {"-v:",     &flag},
     {"-o:",     &output},
@@ -53,9 +53,20 @@ int main(int argc, char *argv[]) {
     help(NULL, &ctx);
   }
 
-  ctx_ctor(&ctx);
+  ctx_ctor(&ctx, &parser, &be);
+  fir_parser_ctor(&parser, &ctx, &lexer, NULL);
+  fir_lexer_ctor(&lexer, &ctx, NULL);
+  be_ctor(&be);
+
+  be.init(&be, &ctx);
+
   ctx.parser->parse(ctx.parser, NULL);
+
+  be.flush(&be, &ctx);
+
   ctx_dtor(&ctx);
+  fir_parser_dtor(&parser);
+  fir_lexer_dtor(&lexer);
 
   return EXIT_SUCCESS;
 }

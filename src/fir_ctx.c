@@ -3,7 +3,7 @@
 #include "fir_lexer.h"
 #include "fir_parser.h"
 
-void ctx_ctor(fir_ctx_t *this) {
+void ctx_ctor(fir_ctx_t *this, struct _fir_parser_t *parser, struct _be_t *be) {
   char *sep;
 
   assert(this);
@@ -15,21 +15,12 @@ void ctx_ctor(fir_ctx_t *this) {
     strcpy(this->src_dir, ".");
   }
 
-  this->lexer = malloc(sizeof(fir_lexer_t));
-  fir_lexer_ctor(this->lexer, this);
-
-  this->parser = malloc(sizeof(fir_parser_t));
-  fir_parser_ctor(this->parser, this);
+  this->parser = parser;
+  this->be = be;
 }
 
 void ctx_dtor(fir_ctx_t *this) {
   assert(this);
-
-  fir_lexer_dtor(this->lexer);
-  free(this->lexer);
-
-  fir_parser_dtor(this->parser);
-  free(this->parser);
 
   array_clear(&this->prg.types);
   deque_destroy(&this->prg.tus);

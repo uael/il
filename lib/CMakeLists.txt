@@ -31,8 +31,6 @@ ExternalProject_Add(libfirm
         "install"
 )
 
-find_library(libfirm_LIBRARY firm ${libfirm_INSTALL_DIR}/lib)
-
 set(jayl_DEPS ${jayl_DEPS} libfirm PARENT_SCOPE)
-set(jayl_LDADD ${jayl_LDADD} ${libfirm_LIBRARY} PARENT_SCOPE)
+set(jayl_LDADD ${jayl_LDADD} ${libfirm_INSTALL_DIR}/lib/libfirm.so m PARENT_SCOPE)
 set(jayl_INCLUDES ${jayl_INCLUDES} ${libfirm_INSTALL_DIR}/include PARENT_SCOPE)

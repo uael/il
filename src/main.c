@@ -3,6 +3,10 @@
 
 #include <assert.h>
 
+#ifdef WITH_LIBFIRM
+#include <libfirm/adt/obstack.h>
+#endif
+
 static void help(opt_t *this, fir_ctx_t *ctx) {
   fprintf(
     stdout,

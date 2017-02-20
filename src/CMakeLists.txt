@@ -20,3 +20,5 @@ set(jayl_SOURCES ${jayl_SOURCES})
 include_directories(.)
 
 add_executable(${PROJECT_NAME} ${jayl_SOURCES} ${jayl_HEADERS})
+add_dependencies(${PROJECT_NAME} libfirm)
+target_link_libraries(${PROJECT_NAME} ${libfirm_LIBRARIES})

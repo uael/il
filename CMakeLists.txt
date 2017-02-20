@@ -11,5 +11,6 @@ endif()
 
 include_directories(lib/p99/include)
 
+add_subdirectory(lib)
 add_subdirectory(src)
 add_subdirectory(test)

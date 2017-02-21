@@ -9,7 +9,7 @@ void cleanup() {
   free(buffer);
 }
 
-void jay_lex(fir_lexer_t *this, fir_toks_t *token_stream) {
+void jay_lex(lexer_t *this, fir_toks_t *token_stream) {
   char *ptr;
   FILE *stream;
   size_t tail;
@@ -83,7 +83,7 @@ void jay_lex(fir_lexer_t *this, fir_toks_t *token_stream) {
     goto token; \
   }
 
-void jay_lex_str(fir_lexer_t *this, const char *buffer, fir_toks_t *token_stream) {
+void jay_lex_str(lexer_t *this, const char *buffer, fir_toks_t *token_stream) {
   const char *ptr;
   char string[255];
   fir_tok_t tok;

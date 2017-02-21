@@ -1,8 +1,8 @@
 #include "jay_parser.h"
 
-void parseUse(struct _fir_parser_t *this, fir_tus_t *translation_units);
+void parseUse(struct _parser_t *this, fir_tus_t *translation_units);
 
-void parseNamespace(struct _fir_parser_t *this, fir_tus_t *translation_units);
+void parseNamespace(struct _parser_t *this, fir_tus_t *translation_units);
 
 #if defined(WIN32) || defined(_WIN32)
 #define DS "\\"
@@ -19,7 +19,7 @@ void parseNamespace(struct _fir_parser_t *this, fir_tus_t *translation_units);
 
 #define iseot(t) (/*t == FIR_TOK_EOL || */t == FIR_TOK_SEMICOLON)
 
-void jay_parse_str(struct _fir_parser_t *this, const char *buffer, fir_tus_t *translation_units) {
+void jay_parse_str(struct _parser_t *this, const char *buffer, fir_tus_t *translation_units) {
   if (!translation_units) {
     translation_units = &this->ctx->prg.tus;
   }
@@ -28,7 +28,7 @@ void jay_parse_str(struct _fir_parser_t *this, const char *buffer, fir_tus_t *tr
   return this->parse(this, translation_units);
 }
 
-void jay_parse(struct _fir_parser_t *this, fir_tus_t *translation_units) {
+void jay_parse(struct _parser_t *this, fir_tus_t *translation_units) {
   fir_tok_t tok;
 
   if (!deque_len(&this->toks)) {
@@ -56,10 +56,10 @@ void jay_parse(struct _fir_parser_t *this, fir_tus_t *translation_units) {
   }
 }
 
-void parseUse(struct _fir_parser_t *this, fir_tus_t *translation_units) {
+void parseUse(struct _parser_t *this, fir_tus_t *translation_units) {
   fir_tok_t tok;
-  fir_lexer_t lexer = P99_INIT;
-  fir_parser_t parser = P99_INIT;
+  lexer_t lexer = P99_INIT;
+  parser_t parser = P99_INIT;
   char path[256];
 
   if (!(tok = consume(FIR_TOK_USE)).is_id_or_kw) {
@@ -91,8 +91,8 @@ void parseUse(struct _fir_parser_t *this, fir_tus_t *translation_units) {
 
   strcat(path, JAY_SRC_EXT);
 
-  fir_lexer_ctor(&lexer, this->ctx, path);
-  fir_parser_ctor(&parser, this->ctx, &lexer, this->src_dir);
+  lexer_ctor(&lexer, this->ctx, path);
+  parser_ctor(&parser, this->ctx, &lexer, this->src_dir);
 
   parser.parse(&parser, translation_units);
 }

@@ -1,9 +1,8 @@
-#include "fir_ctx.h"
+#include "jay_ctx.h"
 
-#include "fir_lexer.h"
-#include "fir_parser.h"
+#include "frontend/parser.h"
 
-void ctx_ctor(fir_ctx_t *this, struct _fir_parser_t *parser, struct _be_t *be) {
+void ctx_ctor(jay_ctx_t *this, struct _parser_t *parser, struct _be_t *be) {
   char *sep;
 
   assert(this);
@@ -19,7 +18,7 @@ void ctx_ctor(fir_ctx_t *this, struct _fir_parser_t *parser, struct _be_t *be) {
   this->be = be;
 }
 
-void ctx_dtor(fir_ctx_t *this) {
+void ctx_dtor(jay_ctx_t *this) {
   assert(this);
 
   array_clear(&this->prg.types);

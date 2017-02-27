@@ -49,7 +49,7 @@ void jay_lex(lexer_t *this, fir_toks_t *token_stream) {
 #define push(id) do { \
     tok = tokens[id]; \
     tok.loc = loc; \
-    deque_push_back(token_stream, tok); \
+    P99_VECTOR_PUSH(token_stream, tok); \
   } while (0)
 #define push_string(...) do { \
     P99_IF_EMPTY(__VA_ARGS__)()({ \
@@ -58,7 +58,7 @@ void jay_lex(lexer_t *this, fir_toks_t *token_stream) {
     }) \
     tok.loc = loc; \
     tok.loc.col -= i; \
-    deque_push_back(token_stream, tok); \
+    P99_VECTOR_PUSH(token_stream, tok); \
   } while (0)
 
 #define M(n, i, c) string[i + n] == (c)

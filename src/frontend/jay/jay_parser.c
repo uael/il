@@ -31,7 +31,7 @@ void jay_parse_str(struct _parser_t *this, const char *buffer, fir_tus_t *transl
 void jay_parse(struct _parser_t *this, fir_tus_t *translation_units) {
   fir_tok_t tok;
 
-  if (!deque_len(&this->toks)) {
+  if (!P99_VECTOR_SIZE(&this->toks)) {
     this->lexer->lex(this->lexer, &this->toks);
   }
   if (!translation_units) {

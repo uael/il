@@ -2,6 +2,7 @@
 #define _JAYL_FIR_H_
 
 #include <p99.h>
+#include <p99_vector.h>
 #include "adt/deque.h"
 #include "adt/string.h"
 
@@ -324,7 +325,7 @@ typedef struct {
  */
 extern const fir_tok_t tokens[128];
 
-typedef deque_of(fir_tok_t) fir_toks_t;
+typedef P99_VECTOR_OF(fir_tok_t) fir_toks_t;
 
 /**
  * A fir_sym_t represents declarations that may have a storage location at

@@ -31,6 +31,9 @@ branches:
   only:
     - master
 
+install:
+  - git submodule update --init --recursive
+
 # scripts to run before build
 before_build:
   - cmd: cd C:\projects\jay

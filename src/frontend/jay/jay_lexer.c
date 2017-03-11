@@ -137,168 +137,6 @@ enum {
 #define TOK(t, s) {(t), {0}, s, sizeof(s)-1}
 #define IDN(t, s) {(t), {0}, s, sizeof(s)-1}
 
-const jl_token_t tokens[] = {
-  /* 0x00 */
-  TOK(JAY_TOK_END, "$"),
-  IDN(JAY_TOK_AUTO, "auto"),
-  IDN(JAY_TOK_BREAK, "break"),
-  IDN(JAY_TOK_CASE, "case"),
-  IDN(JAY_TOK_CHAR, "char"),
-  IDN(JAY_TOK_CONST, "const"),
-  IDN(JAY_TOK_CONTINUE, "continue"),
-  IDN(JAY_TOK_DEFAULT, "default"),
-
-  /* 0x08 */
-  IDN(JAY_TOK_DO, "do"),
-  IDN(JAY_TOK_DOUBLE, "double"),
-  TOK(JAY_TOK_EOL, "\n"),
-  IDN(JAY_TOK_ELSE, "else"),
-  IDN(JAY_TOK_ENUM, "enum"),
-  IDN(JAY_TOK_EXTERN, "extern"),
-  IDN(JAY_TOK_FLOAT, "float"),
-  IDN(JAY_TOK_FOR, "for"),
-
-  /* 0x10 */
-  IDN(JAY_TOK_GOTO, "goto"),
-  IDN(JAY_TOK_IF, "if"),
-  IDN(JAY_TOK_INT, "int"),
-  IDN(JAY_TOK_LONG, "long"),
-  IDN(JAY_TOK_REGISTER, "register"),
-  IDN(JAY_TOK_RETURN, "return"),
-  IDN(JAY_TOK_SHORT, "short"),
-  IDN(JAY_TOK_SIGNED, "signed"),
-
-  /* 0x18 */
-  IDN(JAY_TOK_SIZEOF, "sizeof"),
-  IDN(JAY_TOK_STATIC, "static"),
-  IDN(JAY_TOK_STRUCT, "struct"),
-  IDN(JAY_TOK_SWITCH, "switch"),
-  IDN(JAY_TOK_TYPEDEF, "typedef"),
-  IDN(JAY_TOK_UNION, "union"),
-  IDN(JAY_TOK_UNSIGNED, "unsigned"),
-  IDN(JAY_TOK_VOID, "void"),
-
-  /* 0x20 */
-  IDN(JAY_TOK_INLINE, "inline"),
-  TOK(JAY_TOK_NOT, "!"),
-  IDN(JAY_TOK_VOLATILE, "volatile"),
-  TOK(JAY_TOK_HASH, "#"),
-  IDN(JAY_TOK_WHILE, "while"),
-  TOK(JAY_TOK_MODULO, "%"),
-  TOK(JAY_TOK_AND, "&"),
-  IDN(JAY_TOK_INCLUDE, "include"),
-
-  /* 0x28 */
-  TOK(JAY_TOK_OPEN_PAREN, "("),
-  TOK(JAY_TOK_CLOSE_PAREN, ")"),
-  TOK(JAY_TOK_STAR, "*"),
-  TOK(JAY_TOK_PLUS, "+"),
-  TOK(JAY_TOK_COMMA, ","),
-  TOK(JAY_TOK_MINUS, "-"),
-  TOK(JAY_TOK_DOT, "."),
-  TOK(JAY_TOK_SLASH, "/"),
-
-  /* 0x30 */
-  IDN(JAY_TOK_USE, "use"),
-  TOK(JAY_TOK_DCOLON, "::"),
-  TOK(JAY_TOK_DARROW, "=>"),
-  TOK(JAY_TOK_DQUESTION, "??"),
-  IDN(JAY_TOK_NAMESPACE, "namespace"),
-  EMPTY,
-  EMPTY,
-  EMPTY,
-
-  /* 0x38 */
-  EMPTY,
-  EMPTY,
-  TOK(JAY_TOK_COLON, ":"),
-  TOK(JAY_TOK_SEMICOLON, ";"),
-  TOK(JAY_TOK_LT, "<"),
-  TOK(JAY_TOK_ASSIGN, "="),
-  TOK(JAY_TOK_GT, ">"),
-  TOK(JAY_TOK_QUESTION, "?"),
-
-  /* 0x40 */
-  TOK(JAY_TOK_DOTS, "..."),
-  TOK(JAY_TOK_LOGICAL_OR, "||"),
-  TOK(JAY_TOK_LOGICAL_AND, "&&"),
-  TOK(JAY_TOK_LEQ, "<="),
-  TOK(JAY_TOK_GEQ, ">="),
-  TOK(JAY_TOK_EQ, "=="),
-  TOK(JAY_TOK_NEQ, "!="),
-  TOK(JAY_TOK_ARROW, "->"),
-
-  /* 0x48 */
-  TOK(JAY_TOK_INCREMENT, "++"),
-  TOK(JAY_TOK_DECREMENT, "--"),
-  TOK(JAY_TOK_LSHIFT, "<<"),
-  TOK(JAY_TOK_RSHIFT, ">>"),
-  TOK(JAY_TOK_MUL_ASSIGN, "*="),
-  TOK(JAY_TOK_DIV_ASSIGN, "/="),
-  TOK(JAY_TOK_MOD_ASSIGN, "%="),
-  TOK(JAY_TOK_PLUS_ASSIGN, "+="),
-
-  /* 0x50 */
-  TOK(JAY_TOK_MINUS_ASSIGN, "-="),
-  TOK(JAY_TOK_LSHIFT_ASSIGN, "<<="),
-  TOK(JAY_TOK_RSHIFT_ASSIGN, ">>="),
-  TOK(JAY_TOK_AND_ASSIGN, "&="),
-  TOK(JAY_TOK_XOR_ASSIGN, "^="),
-  TOK(JAY_TOK_OR_ASSIGN, "|="),
-  TOK(JAY_TOK_TOKEN_PASTE, "##"),
-  EMPTY,
-
-  /* 0x58 */
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  TOK(JAY_TOK_OPEN_BRACKET, "["),
-  EMPTY,
-  TOK(JAY_TOK_CLOSE_BRACKET, "]"),
-  TOK(JAY_TOK_XOR, "^"),
-  EMPTY,
-
-  /* 0x60 */
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-
-  /* 0x68 */
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-
-  /* 0x70 */
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  {JAY_TOK_NUMBER},
-  {JAY_TOK_IDENTIFIER, 1, 1},
-  {JAY_TOK_STRING},
-  {JAY_TOK_PARAM},
-
-  /* 0x78 */
-  {JAY_TOK_EMPTY_ARG},
-  {JAY_TOK_PREP_NUMBER},
-  EMPTY,
-  TOK(JAY_TOK_OPEN_CURLY, "{"),
-  TOK(JAY_TOK_OR, "|"),
-  TOK(JAY_TOK_CLOSE_CURLY, "}"),
-  TOK(JAY_TOK_NEG, "~"),
-  EMPTY
-};
-
 #define peek *ptr
 #define peekn(n) ptr[n]
 #define next (self->loc.colno++, self->loc.position++, *++ptr)
@@ -325,6 +163,167 @@ const jl_token_t tokens[] = {
 
 
 void jay_lexer_stack(jl_lexer_t *self, unsigned n) {
+  static const jl_token_t tokens[] = {
+    /* 0x00 */
+    TOK(JAY_TOK_END, "$"),
+    IDN(JAY_TOK_AUTO, "auto"),
+    IDN(JAY_TOK_BREAK, "break"),
+    IDN(JAY_TOK_CASE, "case"),
+    IDN(JAY_TOK_CHAR, "char"),
+    IDN(JAY_TOK_CONST, "const"),
+    IDN(JAY_TOK_CONTINUE, "continue"),
+    IDN(JAY_TOK_DEFAULT, "default"),
+
+    /* 0x08 */
+    IDN(JAY_TOK_DO, "do"),
+    IDN(JAY_TOK_DOUBLE, "double"),
+    TOK(JAY_TOK_EOL, "\n"),
+    IDN(JAY_TOK_ELSE, "else"),
+    IDN(JAY_TOK_ENUM, "enum"),
+    IDN(JAY_TOK_EXTERN, "extern"),
+    IDN(JAY_TOK_FLOAT, "float"),
+    IDN(JAY_TOK_FOR, "for"),
+
+    /* 0x10 */
+    IDN(JAY_TOK_GOTO, "goto"),
+    IDN(JAY_TOK_IF, "if"),
+    IDN(JAY_TOK_INT, "int"),
+    IDN(JAY_TOK_LONG, "long"),
+    IDN(JAY_TOK_REGISTER, "register"),
+    IDN(JAY_TOK_RETURN, "return"),
+    IDN(JAY_TOK_SHORT, "short"),
+    IDN(JAY_TOK_SIGNED, "signed"),
+
+    /* 0x18 */
+    IDN(JAY_TOK_SIZEOF, "sizeof"),
+    IDN(JAY_TOK_STATIC, "static"),
+    IDN(JAY_TOK_STRUCT, "struct"),
+    IDN(JAY_TOK_SWITCH, "switch"),
+    IDN(JAY_TOK_TYPEDEF, "typedef"),
+    IDN(JAY_TOK_UNION, "union"),
+    IDN(JAY_TOK_UNSIGNED, "unsigned"),
+    IDN(JAY_TOK_VOID, "void"),
+
+    /* 0x20 */
+    IDN(JAY_TOK_INLINE, "inline"),
+    TOK(JAY_TOK_NOT, "!"),
+    IDN(JAY_TOK_VOLATILE, "volatile"),
+    TOK(JAY_TOK_HASH, "#"),
+    IDN(JAY_TOK_WHILE, "while"),
+    TOK(JAY_TOK_MODULO, "%"),
+    TOK(JAY_TOK_AND, "&"),
+    IDN(JAY_TOK_INCLUDE, "include"),
+
+    /* 0x28 */
+    TOK(JAY_TOK_OPEN_PAREN, "("),
+    TOK(JAY_TOK_CLOSE_PAREN, ")"),
+    TOK(JAY_TOK_STAR, "*"),
+    TOK(JAY_TOK_PLUS, "+"),
+    TOK(JAY_TOK_COMMA, ","),
+    TOK(JAY_TOK_MINUS, "-"),
+    TOK(JAY_TOK_DOT, "."),
+    TOK(JAY_TOK_SLASH, "/"),
+
+    /* 0x30 */
+    IDN(JAY_TOK_USE, "use"),
+    TOK(JAY_TOK_DCOLON, "::"),
+    TOK(JAY_TOK_DARROW, "=>"),
+    TOK(JAY_TOK_DQUESTION, "??"),
+    IDN(JAY_TOK_NAMESPACE, "namespace"),
+    EMPTY,
+    EMPTY,
+    EMPTY,
+
+    /* 0x38 */
+    EMPTY,
+    EMPTY,
+    TOK(JAY_TOK_COLON, ":"),
+    TOK(JAY_TOK_SEMICOLON, ";"),
+    TOK(JAY_TOK_LT, "<"),
+    TOK(JAY_TOK_ASSIGN, "="),
+    TOK(JAY_TOK_GT, ">"),
+    TOK(JAY_TOK_QUESTION, "?"),
+
+    /* 0x40 */
+    TOK(JAY_TOK_DOTS, "..."),
+    TOK(JAY_TOK_LOGICAL_OR, "||"),
+    TOK(JAY_TOK_LOGICAL_AND, "&&"),
+    TOK(JAY_TOK_LEQ, "<="),
+    TOK(JAY_TOK_GEQ, ">="),
+    TOK(JAY_TOK_EQ, "=="),
+    TOK(JAY_TOK_NEQ, "!="),
+    TOK(JAY_TOK_ARROW, "->"),
+
+    /* 0x48 */
+    TOK(JAY_TOK_INCREMENT, "++"),
+    TOK(JAY_TOK_DECREMENT, "--"),
+    TOK(JAY_TOK_LSHIFT, "<<"),
+    TOK(JAY_TOK_RSHIFT, ">>"),
+    TOK(JAY_TOK_MUL_ASSIGN, "*="),
+    TOK(JAY_TOK_DIV_ASSIGN, "/="),
+    TOK(JAY_TOK_MOD_ASSIGN, "%="),
+    TOK(JAY_TOK_PLUS_ASSIGN, "+="),
+
+    /* 0x50 */
+    TOK(JAY_TOK_MINUS_ASSIGN, "-="),
+    TOK(JAY_TOK_LSHIFT_ASSIGN, "<<="),
+    TOK(JAY_TOK_RSHIFT_ASSIGN, ">>="),
+    TOK(JAY_TOK_AND_ASSIGN, "&="),
+    TOK(JAY_TOK_XOR_ASSIGN, "^="),
+    TOK(JAY_TOK_OR_ASSIGN, "|="),
+    TOK(JAY_TOK_TOKEN_PASTE, "##"),
+    EMPTY,
+
+    /* 0x58 */
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    TOK(JAY_TOK_OPEN_BRACKET, "["),
+    EMPTY,
+    TOK(JAY_TOK_CLOSE_BRACKET, "]"),
+    TOK(JAY_TOK_XOR, "^"),
+    EMPTY,
+
+    /* 0x60 */
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+
+    /* 0x68 */
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+
+    /* 0x70 */
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    {JAY_TOK_NUMBER},
+    {JAY_TOK_IDENTIFIER, 1, 1},
+    {JAY_TOK_STRING},
+    {JAY_TOK_PARAM},
+
+    /* 0x78 */
+    {JAY_TOK_EMPTY_ARG},
+    {JAY_TOK_PREP_NUMBER},
+    EMPTY,
+    TOK(JAY_TOK_OPEN_CURLY, "{"),
+    TOK(JAY_TOK_OR, "|"),
+    TOK(JAY_TOK_CLOSE_CURLY, "}"),
+    TOK(JAY_TOK_NEG, "~"),
+    EMPTY
+  };
   const char *ptr;
   char s[256];
   jl_token_t token;

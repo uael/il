@@ -131,168 +131,6 @@ enum {
 #define TOK(t, s) {(t), {0}, s, sizeof(s)-1}
 #define IDN(t, s) {(t), {0}, s, sizeof(s)-1}
 
-const jl_token_t tokens[] = {
-  /* 0x00 */
-  TOK(C_TOK_END, "$"),
-  IDN(C_TOK_AUTO, "auto"),
-  IDN(C_TOK_BREAK, "break"),
-  IDN(C_TOK_CASE, "case"),
-  IDN(C_TOK_CHAR, "char"),
-  IDN(C_TOK_CONST, "const"),
-  IDN(C_TOK_CONTINUE, "continue"),
-  IDN(C_TOK_DEFAULT, "default"),
-
-  /* 0x08 */
-  IDN(C_TOK_DO, "do"),
-  IDN(C_TOK_DOUBLE, "double"),
-  TOK(C_TOK_EOL, "\n"),
-  IDN(C_TOK_ELSE, "else"),
-  IDN(C_TOK_ENUM, "enum"),
-  IDN(C_TOK_EXTERN, "extern"),
-  IDN(C_TOK_FLOAT, "float"),
-  IDN(C_TOK_FOR, "for"),
-
-  /* 0x10 */
-  IDN(C_TOK_GOTO, "goto"),
-  IDN(C_TOK_IF, "if"),
-  IDN(C_TOK_INT, "int"),
-  IDN(C_TOK_LONG, "long"),
-  IDN(C_TOK_REGISTER, "register"),
-  IDN(C_TOK_RETURN, "return"),
-  IDN(C_TOK_SHORT, "short"),
-  IDN(C_TOK_SIGNED, "signed"),
-
-  /* 0x18 */
-  IDN(C_TOK_SIZEOF, "sizeof"),
-  IDN(C_TOK_STATIC, "static"),
-  IDN(C_TOK_STRUCT, "struct"),
-  IDN(C_TOK_SWITCH, "switch"),
-  IDN(C_TOK_TYPEDEF, "typedef"),
-  IDN(C_TOK_UNION, "union"),
-  IDN(C_TOK_UNSIGNED, "unsigned"),
-  IDN(C_TOK_VOID, "void"),
-
-  /* 0x20 */
-  IDN(C_TOK_INLINE, "inline"),
-  TOK(C_TOK_NOT, "!"),
-  IDN(C_TOK_VOLATILE, "volatile"),
-  TOK(C_TOK_HASH, "#"),
-  IDN(C_TOK_WHILE, "while"),
-  TOK(C_TOK_MODULO, "%"),
-  TOK(C_TOK_AND, "&"),
-  TOK(C_TOK_ALIGNOF, "_Alignof"),
-
-  /* 0x28 */
-  TOK(C_TOK_OPEN_PAREN, "("),
-  TOK(C_TOK_CLOSE_PAREN, ")"),
-  TOK(C_TOK_STAR, "*"),
-  TOK(C_TOK_PLUS, "+"),
-  TOK(C_TOK_COMMA, ","),
-  TOK(C_TOK_MINUS, "-"),
-  TOK(C_TOK_DOT, "."),
-  TOK(C_TOK_SLASH, "/"),
-
-  /* 0x30 */
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-
-  /* 0x38 */
-  EMPTY,
-  EMPTY,
-  TOK(C_TOK_COLON, ":"),
-  TOK(C_TOK_SEMICOLON, ";"),
-  TOK(C_TOK_LT, "<"),
-  TOK(C_TOK_ASSIGN, "="),
-  TOK(C_TOK_GT, ">"),
-  TOK(C_TOK_QUESTION, "?"),
-
-  /* 0x40 */
-  TOK(C_TOK_DOTS, "..."),
-  TOK(C_TOK_LOGICAL_OR, "||"),
-  TOK(C_TOK_LOGICAL_AND, "&&"),
-  TOK(C_TOK_LEQ, "<="),
-  TOK(C_TOK_GEQ, ">="),
-  TOK(C_TOK_EQ, "=="),
-  TOK(C_TOK_NEQ, "!="),
-  TOK(C_TOK_ARROW, "->"),
-
-  /* 0x48 */
-  TOK(C_TOK_INCREMENT, "++"),
-  TOK(C_TOK_DECREMENT, "--"),
-  TOK(C_TOK_LSHIFT, "<<"),
-  TOK(C_TOK_RSHIFT, ">>"),
-  TOK(C_TOK_MUL_ASSIGN, "*="),
-  TOK(C_TOK_DIV_ASSIGN, "/="),
-  TOK(C_TOK_MOD_ASSIGN, "%="),
-  TOK(C_TOK_PLUS_ASSIGN, "+="),
-
-  /* 0x50 */
-  TOK(C_TOK_MINUS_ASSIGN, "-="),
-  TOK(C_TOK_LSHIFT_ASSIGN, "<<="),
-  TOK(C_TOK_RSHIFT_ASSIGN, ">>="),
-  TOK(C_TOK_AND_ASSIGN, "&="),
-  TOK(C_TOK_XOR_ASSIGN, "^="),
-  TOK(C_TOK_OR_ASSIGN, "|="),
-  TOK(C_TOK_TOKEN_PASTE, "##"),
-  EMPTY,
-
-  /* 0x58 */
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  TOK(C_TOK_OPEN_BRACKET, "["),
-  EMPTY,
-  TOK(C_TOK_CLOSE_BRACKET, "]"),
-  TOK(C_TOK_XOR, "^"),
-  EMPTY,
-
-  /* 0x60 */
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-
-  /* 0x68 */
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-
-  /* 0x70 */
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  EMPTY,
-  {C_TOK_NUMBER},
-  {C_TOK_IDENTIFIER},
-  {C_TOK_STRING},
-  {C_TOK_PARAM},
-
-  /* 0x78 */
-  {C_TOK_EMPTY_ARG},
-  {C_TOK_PREP_NUMBER},
-  EMPTY,
-  TOK(C_TOK_OPEN_CURLY, "{"),
-  TOK(C_TOK_OR, "|"),
-  TOK(C_TOK_CLOSE_CURLY, "}"),
-  TOK(C_TOK_NEG, "~"),
-  EMPTY
-};
-
 #define peek *ptr
 #define peekn(n) ptr[n]
 #define next (self->loc.colno++, self->loc.position++, *++ptr)
@@ -319,6 +157,167 @@ const jl_token_t tokens[] = {
 
 
 void c_lexer_stack(jl_lexer_t *self, unsigned n) {
+  static const jl_token_t tokens[] = {
+    /* 0x00 */
+    TOK(C_TOK_END, "$"),
+    IDN(C_TOK_AUTO, "auto"),
+    IDN(C_TOK_BREAK, "break"),
+    IDN(C_TOK_CASE, "case"),
+    IDN(C_TOK_CHAR, "char"),
+    IDN(C_TOK_CONST, "const"),
+    IDN(C_TOK_CONTINUE, "continue"),
+    IDN(C_TOK_DEFAULT, "default"),
+
+    /* 0x08 */
+    IDN(C_TOK_DO, "do"),
+    IDN(C_TOK_DOUBLE, "double"),
+    TOK(C_TOK_EOL, "\n"),
+    IDN(C_TOK_ELSE, "else"),
+    IDN(C_TOK_ENUM, "enum"),
+    IDN(C_TOK_EXTERN, "extern"),
+    IDN(C_TOK_FLOAT, "float"),
+    IDN(C_TOK_FOR, "for"),
+
+    /* 0x10 */
+    IDN(C_TOK_GOTO, "goto"),
+    IDN(C_TOK_IF, "if"),
+    IDN(C_TOK_INT, "int"),
+    IDN(C_TOK_LONG, "long"),
+    IDN(C_TOK_REGISTER, "register"),
+    IDN(C_TOK_RETURN, "return"),
+    IDN(C_TOK_SHORT, "short"),
+    IDN(C_TOK_SIGNED, "signed"),
+
+    /* 0x18 */
+    IDN(C_TOK_SIZEOF, "sizeof"),
+    IDN(C_TOK_STATIC, "static"),
+    IDN(C_TOK_STRUCT, "struct"),
+    IDN(C_TOK_SWITCH, "switch"),
+    IDN(C_TOK_TYPEDEF, "typedef"),
+    IDN(C_TOK_UNION, "union"),
+    IDN(C_TOK_UNSIGNED, "unsigned"),
+    IDN(C_TOK_VOID, "void"),
+
+    /* 0x20 */
+    IDN(C_TOK_INLINE, "inline"),
+    TOK(C_TOK_NOT, "!"),
+    IDN(C_TOK_VOLATILE, "volatile"),
+    TOK(C_TOK_HASH, "#"),
+    IDN(C_TOK_WHILE, "while"),
+    TOK(C_TOK_MODULO, "%"),
+    TOK(C_TOK_AND, "&"),
+    TOK(C_TOK_ALIGNOF, "_Alignof"),
+
+    /* 0x28 */
+    TOK(C_TOK_OPEN_PAREN, "("),
+    TOK(C_TOK_CLOSE_PAREN, ")"),
+    TOK(C_TOK_STAR, "*"),
+    TOK(C_TOK_PLUS, "+"),
+    TOK(C_TOK_COMMA, ","),
+    TOK(C_TOK_MINUS, "-"),
+    TOK(C_TOK_DOT, "."),
+    TOK(C_TOK_SLASH, "/"),
+
+    /* 0x30 */
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+
+    /* 0x38 */
+    EMPTY,
+    EMPTY,
+    TOK(C_TOK_COLON, ":"),
+    TOK(C_TOK_SEMICOLON, ";"),
+    TOK(C_TOK_LT, "<"),
+    TOK(C_TOK_ASSIGN, "="),
+    TOK(C_TOK_GT, ">"),
+    TOK(C_TOK_QUESTION, "?"),
+
+    /* 0x40 */
+    TOK(C_TOK_DOTS, "..."),
+    TOK(C_TOK_LOGICAL_OR, "||"),
+    TOK(C_TOK_LOGICAL_AND, "&&"),
+    TOK(C_TOK_LEQ, "<="),
+    TOK(C_TOK_GEQ, ">="),
+    TOK(C_TOK_EQ, "=="),
+    TOK(C_TOK_NEQ, "!="),
+    TOK(C_TOK_ARROW, "->"),
+
+    /* 0x48 */
+    TOK(C_TOK_INCREMENT, "++"),
+    TOK(C_TOK_DECREMENT, "--"),
+    TOK(C_TOK_LSHIFT, "<<"),
+    TOK(C_TOK_RSHIFT, ">>"),
+    TOK(C_TOK_MUL_ASSIGN, "*="),
+    TOK(C_TOK_DIV_ASSIGN, "/="),
+    TOK(C_TOK_MOD_ASSIGN, "%="),
+    TOK(C_TOK_PLUS_ASSIGN, "+="),
+
+    /* 0x50 */
+    TOK(C_TOK_MINUS_ASSIGN, "-="),
+    TOK(C_TOK_LSHIFT_ASSIGN, "<<="),
+    TOK(C_TOK_RSHIFT_ASSIGN, ">>="),
+    TOK(C_TOK_AND_ASSIGN, "&="),
+    TOK(C_TOK_XOR_ASSIGN, "^="),
+    TOK(C_TOK_OR_ASSIGN, "|="),
+    TOK(C_TOK_TOKEN_PASTE, "##"),
+    EMPTY,
+
+    /* 0x58 */
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    TOK(C_TOK_OPEN_BRACKET, "["),
+    EMPTY,
+    TOK(C_TOK_CLOSE_BRACKET, "]"),
+    TOK(C_TOK_XOR, "^"),
+    EMPTY,
+
+    /* 0x60 */
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+
+    /* 0x68 */
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+
+    /* 0x70 */
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    EMPTY,
+    {C_TOK_NUMBER},
+    {C_TOK_IDENTIFIER},
+    {C_TOK_STRING},
+    {C_TOK_PARAM},
+
+    /* 0x78 */
+    {C_TOK_EMPTY_ARG},
+    {C_TOK_PREP_NUMBER},
+    EMPTY,
+    TOK(C_TOK_OPEN_CURLY, "{"),
+    TOK(C_TOK_OR, "|"),
+    TOK(C_TOK_CLOSE_CURLY, "}"),
+    TOK(C_TOK_NEG, "~"),
+    EMPTY
+  };
   const char *ptr;
   char s[256];
   jl_token_t token;

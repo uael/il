@@ -30,7 +30,15 @@
 #include <malloc.h>
 
 #if !defined(__GNUC__)
-  char * strndup (const char *s, size_t n) {
+  char *strdup(const char *s) {
+    size_t len = strlen (s) + 1;
+    char *result = (char*) malloc (len);
+    if (result == (char*) 0)
+      return (char*) 0;
+    return (char*) memcpy (result, s, len);
+  }
+
+  char *strndup (const char *s, size_t n) {
     char *result;
     size_t len = strnlen (s, n);
 

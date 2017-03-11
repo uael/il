@@ -308,7 +308,7 @@ jl_token_t jay_lexer_peek(jl_lexer_t *self) {
 
 jl_token_t jay_lexer_peekn(jl_lexer_t *self, unsigned n) {
   if (jl_vector_size(self->token_stack) < n) {
-    jay_lexer_stack(self, (unsigned) (n-jl_vector_size(self->token_stack)));
+    jay_lexer_stack(self, (unsigned) (n - jl_vector_size(self->token_stack)));
   }
   return jl_vector_at(
     self->token_stack,
@@ -438,6 +438,24 @@ void jay_lexer_stack(jl_lexer_t *self, unsigned n) {
   if (n) {
     token = tokens[JAY_TOK_END];
     token.loc = self->loc;
-    jl_vector_push(self->token_stack, token);
+    do {
+      do {
+        size_t __s = (size_t) ((self->token_stack).size + 1);
+        if ((self->token_stack).capacity <= __s) {
+          (self->token_stack).capacity = __s + 1;
+          (--((self->token_stack).capacity), ((self->token_stack).capacity) |= ((self->token_stack).capacity)
+            >> 1, ((self->token_stack).capacity) |= ((self->token_stack).capacity)
+            >> 2, ((self->token_stack).capacity) |= ((self->token_stack).capacity)
+            >> 4, ((self->token_stack).capacity) |= ((self->token_stack).capacity)
+            >> 8, ((self->token_stack).capacity) |= ((self->token_stack).capacity)
+            >> 16, ++((self->token_stack).capacity));
+          (self->token_stack).data = (__typeof__((self->token_stack).data)) realloc((self->token_stack).data,
+            sizeof(*(self->token_stack).data) * (self->token_stack).capacity);
+        }
+      }
+      while (0);
+      (self->token_stack).data[(self->token_stack).size++] = (token);
+    }
+    while (0);
   }
 }

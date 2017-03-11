@@ -134,8 +134,8 @@ enum {
 };
 
 #define EMPTY {0}
-#define TOK(t, s) {(t), (jl_loc_t){0}, s, sizeof(s)-1}
-#define IDN(t, s) {(t), (jl_loc_t){0}, s, sizeof(s)-1}
+#define TOK(t, s) {(t), {0}, s, sizeof(s)-1}
+#define IDN(t, s) {(t), {0}, s, sizeof(s)-1}
 
 const jl_token_t tokens[] = {
   /* 0x00 */

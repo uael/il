@@ -28,6 +28,7 @@
 
 #include "opts.h"
 #include "fe.h"
+#include "lexer.h"
 #include "be.h"
 
 typedef struct jl_compiler_t {

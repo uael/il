@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
   jl_token_t token;
 
   jl_context_init(&compiler, argc, argv);
-  jl_lexer_init(&lexer, JL_FRONTEND_JAY, 0,
+  jl_lexer_init(&lexer, &compiler.fe, 0,
     STR_N_SIZE(
       "auto main() { case; char; break; continue; const; return 1; }"
     )

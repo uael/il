@@ -23,14 +23,13 @@
  * SOFTWARE.
  */
 
-#include <string.h>
-
 #include "lexer.h"
 #include "jay/jay_lexer.h"
+#include "util/string.h"
 
-void jl_lexer_init(jl_lexer_t *self, jl_frontend_n kind, uint32_t file_id, char *buffer, size_t length) {
+void jl_lexer_init(jl_lexer_t *self, jl_frontend_t *fe, uint32_t file_id, char *buffer, size_t length) {
   *self = (jl_lexer_t) {
-    .kind = kind,
+    .fe = fe,
     .loc = (jl_loc_t) {
       .colno = 0,
       .lineno = 0,
@@ -42,7 +41,7 @@ void jl_lexer_init(jl_lexer_t *self, jl_frontend_n kind, uint32_t file_id, char 
   };
 
   self->buffer[length] = '\0';
-  switch (kind) {
+  switch (fe->kind) {
     case JL_FRONTEND_C:
       break;
     case JL_FRONTEND_JAY:

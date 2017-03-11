@@ -26,32 +26,27 @@
 #ifndef   JL_LEXER_H__
 # define  JL_LEXER_H__
 
+#include "fe.h"
 #include "token.h"
 #include "entity.h"
 
-typedef enum jl_frontend_n jl_frontend_n;
-
 typedef struct jl_lexer_t jl_lexer_t;
 
-enum jl_frontend_n {
-  JL_FRONTEND_C = 0,
-  JL_FRONTEND_JAY
-};
-
 struct jl_lexer_t {
-  jl_frontend_n kind;
+  jl_frontend_t *fe;
   char *buffer;
   size_t length;
   jl_loc_t loc;
   jl_token_r token_stack;
 
+  void (*stack)(jl_lexer_t *self, unsigned n);
   jl_token_t (*peek)(jl_lexer_t *self);
   jl_token_t (*peekn)(jl_lexer_t *self, unsigned n);
   jl_token_t (*next)(jl_lexer_t *self);
   jl_token_t (*consume)(jl_lexer_t *self, unsigned char type);
 };
 
-void jl_lexer_init(jl_lexer_t *self, jl_frontend_n kind, uint32_t file_id, char *buffer, size_t length);
+void jl_lexer_init(jl_lexer_t *self, jl_frontend_t *fe, uint32_t file_id, char *buffer, size_t length);
 void jl_lexer_dtor(jl_lexer_t *self);
 
 #endif /* JL_LEXER_H__ */

@@ -24,7 +24,6 @@
  */
 
 #include <ctype.h>
-#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -32,6 +31,7 @@
 #include "opts.h"
 #include "adt/vector.h"
 #include "util/io.h"
+#include "util/string.h"
 
 void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
   jl_vector_of(char *) errs = {0};

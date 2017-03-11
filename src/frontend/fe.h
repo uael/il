@@ -26,20 +26,26 @@
 #ifndef   JL_FE_H__
 # define  JL_FE_H__
 
-#include <stddef.h>
-
-#include "adt/vector.h"
-#include "lexer.h"
+#include "entity.h"
 
 struct jl_compiler_t;
+struct jl_lexer_t;
 
-typedef struct jl_frontend_t {
+typedef enum jl_frontend_n jl_frontend_n;
+typedef struct jl_frontend_t jl_frontend_t;
+
+enum jl_frontend_n {
+  JL_FRONTEND_C = 0,
+  JL_FRONTEND_JAY
+};
+
+struct jl_frontend_t {
   struct jl_compiler_t *compiler;
   jl_frontend_n kind;
   jl_vector_of(const char *) sources;
 
-  void (*parse)(struct jl_frontend_t *self, jl_lexer_t *lexer, jl_entity_r *out);
-} jl_frontend_t;
+  void (*parse)(struct jl_frontend_t *self, struct jl_lexer_t *lexer, jl_entity_r *out);
+};
 
 void jl_frontend_init(jl_frontend_t *self, jl_frontend_n kind, struct jl_compiler_t *compiler);
 void jl_frontend_push_src(jl_frontend_t *self, const char *src);

@@ -24,9 +24,11 @@
  */
 
 #include <adt/xmalloc.h>
+#include <stdlib.h>
 
 #include "lexer.h"
 #include "jay/jay_lexer.h"
+#include "c/c_lexer.h"
 
 void jl_lexer_init(jl_lexer_t *self, jl_frontend_t *fe, uint32_t file_id, char *buffer, size_t length) {
   *self = (jl_lexer_t) {
@@ -44,14 +46,56 @@ void jl_lexer_init(jl_lexer_t *self, jl_frontend_t *fe, uint32_t file_id, char *
   self->buffer[length] = '\0';
   switch (fe->kind) {
     case JL_FRONTEND_C:
+      self->stack = c_lexer_stack;
+      self->peek = jl_lexer_peek;
+      self->peekn = jl_lexer_peekn;
+      self->next = jl_lexer_next;
+      self->consume = jl_lexer_consume;
       break;
     case JL_FRONTEND_JAY:
-      self->peek = jay_lexer_peek;
-      self->peekn = jay_lexer_peekn;
-      self->next = jay_lexer_next;
-      self->consume = jay_lexer_consume;
+      self->stack = jay_lexer_stack;
+      self->peek = jl_lexer_peek;
+      self->peekn = jl_lexer_peekn;
+      self->next = jl_lexer_next;
+      self->consume = jl_lexer_consume;
       break;
   }
+}
+
+jl_token_t jl_lexer_peek(jl_lexer_t *self) {
+  if (jl_vector_size(self->token_stack) < 1) {
+    self->stack(self, 1);
+  }
+  return jl_vector_front(self->token_stack);
+}
+
+jl_token_t jl_lexer_peekn(jl_lexer_t *self, unsigned n) {
+  if (jl_vector_size(self->token_stack) < n) {
+    self->stack(self, (unsigned) (n - jl_vector_size(self->token_stack)));
+  }
+  return jl_vector_at(
+    self->token_stack,
+    jl_vector_size(self->token_stack) < n ? jl_vector_size(self->token_stack) : n
+  );
+}
+
+jl_token_t jl_lexer_next(jl_lexer_t *self) {
+  if (jl_vector_size(self->token_stack)) {
+    jl_token_dtor(&jl_vector_front(self->token_stack));
+    jl_vector_shift(self->token_stack);
+  }
+  if (jl_vector_size(self->token_stack) < 1) {
+    self->stack(self, 1);
+  }
+  return jl_vector_front(self->token_stack);
+}
+
+jl_token_t jl_lexer_consume(jl_lexer_t *self, unsigned char type) {
+  if (self->peek(self).type != type) {
+    puts("unexpected token");
+    exit(1);
+  }
+  return self->next(self);
 }
 
 void jl_lexer_dtor(jl_lexer_t *self) {

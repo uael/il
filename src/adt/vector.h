@@ -80,7 +80,6 @@
     } \
   } while (false)
 
-#define __jl_vector_push(v, x, i) jl_vector_data(v)[jl_vector_size(v)++] = (x)
 #define jl_vector_push(v, x) do { \
     jl_vector_grow(v, jl_vector_size(v) + 1); \
     jl_vector_data(v)[jl_vector_size(v)++] = (x); \

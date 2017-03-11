@@ -29,9 +29,5 @@
 #include "lexer.h"
 
 void jay_lexer_stack(jl_lexer_t *self, unsigned n);
-jl_token_t jay_lexer_peek(jl_lexer_t *self);
-jl_token_t jay_lexer_peekn(jl_lexer_t *self, unsigned n);
-jl_token_t jay_lexer_next(jl_lexer_t *self);
-jl_token_t jay_lexer_consume(jl_lexer_t *self, unsigned char type);
 
 #endif /* JL_JAY_LEXER_H__ */

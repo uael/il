@@ -26,7 +26,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <adt/xmalloc.h>
-#include <stdio.h>
 
 #include "jay_lexer.h"
 
@@ -300,42 +299,6 @@ const jl_token_t tokens[] = {
   EMPTY
 };
 
-jl_token_t jay_lexer_peek(jl_lexer_t *self) {
-  if (jl_vector_size(self->token_stack) < 1) {
-    jay_lexer_stack(self, 1);
-  }
-  return jl_vector_front(self->token_stack);
-}
-
-jl_token_t jay_lexer_peekn(jl_lexer_t *self, unsigned n) {
-  if (jl_vector_size(self->token_stack) < n) {
-    jay_lexer_stack(self, (unsigned) (n - jl_vector_size(self->token_stack)));
-  }
-  return jl_vector_at(
-    self->token_stack,
-    jl_vector_size(self->token_stack) < n ? jl_vector_size(self->token_stack) : n
-  );
-}
-
-jl_token_t jay_lexer_next(jl_lexer_t *self) {
-  if (jl_vector_size(self->token_stack)) {
-    jl_token_dtor(&jl_vector_front(self->token_stack));
-    jl_vector_shift(self->token_stack);
-  }
-  if (jl_vector_size(self->token_stack) < 1) {
-    jay_lexer_stack(self, 1);
-  }
-  return jl_vector_front(self->token_stack);
-}
-
-jl_token_t jay_lexer_consume(jl_lexer_t *self, unsigned char type) {
-  if (self->peek(self).type != type) {
-    puts("unexpected token");
-    exit(1);
-  }
-  return self->next(self);
-}
-
 #define peek *ptr
 #define peekn(n) ptr[n]
 #define next (self->loc.colno++, self->loc.position++, *++ptr)
@@ -439,24 +402,6 @@ void jay_lexer_stack(jl_lexer_t *self, unsigned n) {
   if (n) {
     token = tokens[JAY_TOK_END];
     token.loc = self->loc;
-    do {
-      do {
-        size_t __s = (size_t) ((self->token_stack).size + 1);
-        if ((self->token_stack).capacity <= __s) {
-          (self->token_stack).capacity = __s + 1;
-          (--((self->token_stack).capacity), ((self->token_stack).capacity) |= ((self->token_stack).capacity)
-            >> 1, ((self->token_stack).capacity) |= ((self->token_stack).capacity)
-            >> 2, ((self->token_stack).capacity) |= ((self->token_stack).capacity)
-            >> 4, ((self->token_stack).capacity) |= ((self->token_stack).capacity)
-            >> 8, ((self->token_stack).capacity) |= ((self->token_stack).capacity)
-            >> 16, ++((self->token_stack).capacity));
-          (self->token_stack).data = (__typeof__((self->token_stack).data)) realloc((self->token_stack).data,
-            sizeof(*(self->token_stack).data) * (self->token_stack).capacity);
-        }
-      }
-      while (0);
-      (self->token_stack).data[(self->token_stack).size++] = (token);
-    }
-    while (0);
+    jl_vector_push(self->token_stack, token);
   }
 }

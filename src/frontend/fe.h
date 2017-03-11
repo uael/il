@@ -23,35 +23,25 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_LEXER_H__
-# define  JL_LEXER_H__
+#ifndef   JL_FE_H__
+# define  JL_FE_H__
 
-#include "token.h"
-#include "entity.h"
+#include <stddef.h>
 
-typedef enum jl_frontend_n jl_frontend_n;
+#include "adt/vector.h"
+#include "lexer.h"
 
-typedef struct jl_lexer_t jl_lexer_t;
+struct jl_compiler_t;
 
-enum jl_frontend_n {
-  JL_FRONTEND_C = 0,
-  JL_FRONTEND_JAY
-};
-
-struct jl_lexer_t {
+typedef struct jl_frontend_t {
+  struct jl_compiler_t *compiler;
   jl_frontend_n kind;
-  char *buffer;
-  size_t length;
-  jl_loc_t loc;
-  jl_token_r token_stack;
+  jl_vector_of(const char *) sources;
 
-  jl_token_t (*peek)(jl_lexer_t *self);
-  jl_token_t (*peekn)(jl_lexer_t *self, unsigned n);
-  jl_token_t (*next)(jl_lexer_t *self);
-  jl_token_t (*consume)(jl_lexer_t *self, unsigned char type);
-};
+  void (*parse)(struct jl_frontend_t *self, jl_lexer_t *lexer, jl_entity_r *out);
+} jl_frontend_t;
 
-void jl_lexer_init(jl_lexer_t *self, jl_frontend_n kind, uint32_t file_id, char *buffer, size_t length);
-void jl_lexer_dtor(jl_lexer_t *self);
+void jl_frontend_init(jl_frontend_t *self, jl_frontend_n kind, struct jl_compiler_t *compiler);
+void jl_frontend_push_src(jl_frontend_t *self, const char *src);
 
-#endif /* JL_LEXER_H__ */
+#endif /* JL_FE_H__ */

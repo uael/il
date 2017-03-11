@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2016-2017 uael <www.github.com/uael>
+ * Copyright (c) 2016-2017 Abel Lucas <www.github.com/uael>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,35 +23,22 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_LEXER_H__
-# define  JL_LEXER_H__
+#include "exprs.h"
 
-#include "token.h"
-#include "entity.h"
+void jl_expr_id_init(jl_expr_id_t *self, const char *id, bool is_keyword) {
+  *self = (jl_expr_id_t) {
+    .id = id,
+    .is_keyword = is_keyword
+  };
+}
 
-typedef enum jl_frontend_n jl_frontend_n;
+void jl_expr_id_dtor(jl_expr_id_t *self) {}
 
-typedef struct jl_lexer_t jl_lexer_t;
 
-enum jl_frontend_n {
-  JL_FRONTEND_C = 0,
-  JL_FRONTEND_JAY
-};
+void jl_expr_const_init(jl_expr_const_t *self, jl_literal_t type) {
+  *self = (jl_expr_const_t) {
+    .type = type
+  };
+}
 
-struct jl_lexer_t {
-  jl_frontend_n kind;
-  char *buffer;
-  size_t length;
-  jl_loc_t loc;
-  jl_token_r token_stack;
-
-  jl_token_t (*peek)(jl_lexer_t *self);
-  jl_token_t (*peekn)(jl_lexer_t *self, unsigned n);
-  jl_token_t (*next)(jl_lexer_t *self);
-  jl_token_t (*consume)(jl_lexer_t *self, unsigned char type);
-};
-
-void jl_lexer_init(jl_lexer_t *self, jl_frontend_n kind, uint32_t file_id, char *buffer, size_t length);
-void jl_lexer_dtor(jl_lexer_t *self);
-
-#endif /* JL_LEXER_H__ */
+void jl_expr_const_dtor(jl_expr_const_t *self) {}

@@ -1,494 +1,422 @@
+#include <assert.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 #include "jay_lexer.h"
 
-#include "util/strtab.h"
+typedef enum jay_token_n jay_token_n;
 
-static char *buffer;
-static size_t size;
+enum jay_token_n {
+  JAY_TOK_END = 0,
+  JAY_TOK_AUTO = JAY_TOK_END + 1,
+  JAY_TOK_BREAK,
+  JAY_TOK_CASE,
+  JAY_TOK_CHAR,
+  JAY_TOK_CONST,
+  JAY_TOK_CONTINUE,
+  JAY_TOK_DEFAULT,
+  JAY_TOK_DO,
+  JAY_TOK_DOUBLE,
+  JAY_TOK_EOL = '\n',
+  JAY_TOK_ELSE = JAY_TOK_EOL + 1,
+  JAY_TOK_ENUM,
+  JAY_TOK_EXTERN,
+  JAY_TOK_FLOAT,
+  JAY_TOK_FOR,
+  JAY_TOK_GOTO,
+  JAY_TOK_IF,
+  JAY_TOK_INT,
+  JAY_TOK_LONG,
+  JAY_TOK_REGISTER,
+  JAY_TOK_RETURN,
+  JAY_TOK_SHORT,
+  JAY_TOK_SIGNED,
+  JAY_TOK_SIZEOF,
+  JAY_TOK_STATIC,
+  JAY_TOK_STRUCT,
+  JAY_TOK_SWITCH,
+  JAY_TOK_TYPEDEF,
+  JAY_TOK_UNION,
+  JAY_TOK_UNSIGNED,
+  JAY_TOK_VOID,
+  JAY_TOK_INLINE,
 
-void cleanup() {
-  free(buffer);
+  JAY_TOK_NOT = '!',
+  JAY_TOK_VOLATILE = JAY_TOK_NOT + 1,
+  JAY_TOK_HASH = '#',
+  JAY_TOK_WHILE = JAY_TOK_HASH + 1,
+  JAY_TOK_MODULO = '%',
+  JAY_TOK_AND = '&',
+  JAY_TOK_INCLUDE = JAY_TOK_AND + 1,
+
+  JAY_TOK_OPEN_PAREN = '(',
+  JAY_TOK_CLOSE_PAREN = ')',
+  JAY_TOK_STAR = '*',
+  JAY_TOK_PLUS = '+',
+  JAY_TOK_COMMA = ',',
+  JAY_TOK_MINUS = '-',
+  JAY_TOK_DOT = '.',
+  JAY_TOK_SLASH = '/',
+  JAY_TOK_USE = JAY_TOK_SLASH + 1,
+  JAY_TOK_DCOLON, /* :: */
+  JAY_TOK_DARROW, /* => */
+  JAY_TOK_DQUESTION, /* ?? */
+  JAY_TOK_NAMESPACE,
+
+  JAY_TOK_COLON = ':',
+  JAY_TOK_SEMICOLON = ';',
+  JAY_TOK_LT = '<',
+  JAY_TOK_ASSIGN = '=',
+  JAY_TOK_GT = '>',
+  JAY_TOK_QUESTION = '?',
+  JAY_TOK_DOTS = JAY_TOK_QUESTION + 1,  /* ... */
+  JAY_TOK_LOGICAL_OR,           /* || */
+  JAY_TOK_LOGICAL_AND,          /* && */
+  JAY_TOK_LEQ,                  /* <= */
+  JAY_TOK_GEQ,                  /* >= */
+  JAY_TOK_EQ,                   /* == */
+  JAY_TOK_NEQ,                  /* != */
+  JAY_TOK_ARROW,                /* -> */
+  JAY_TOK_INCREMENT,            /* ++ */
+  JAY_TOK_DECREMENT,            /* -- */
+  JAY_TOK_LSHIFT,               /* << */
+  JAY_TOK_RSHIFT,               /* >> */
+  JAY_TOK_MUL_ASSIGN,           /* *= */
+  JAY_TOK_DIV_ASSIGN,           /* /= */
+  JAY_TOK_MOD_ASSIGN,           /* %= */
+  JAY_TOK_PLUS_ASSIGN,          /* += */
+  JAY_TOK_MINUS_ASSIGN,         /* -= */
+  JAY_TOK_LSHIFT_ASSIGN,        /* <<= */
+  JAY_TOK_RSHIFT_ASSIGN,        /* >>= */
+  JAY_TOK_AND_ASSIGN,           /* &= */
+  JAY_TOK_XOR_ASSIGN,           /* ^= */
+  JAY_TOK_OR_ASSIGN,            /* |= */
+  JAY_TOK_TOKEN_PASTE,          /* ## */
+
+  JAY_TOK_OPEN_BRACKET = '[',
+  JAY_TOK_CLOSE_BRACKET = ']',
+  JAY_TOK_XOR = '^',
+  JAY_TOK_OPEN_CURLY = '{',
+  JAY_TOK_OR = '|',
+  JAY_TOK_CLOSE_CURLY = '}',
+  JAY_TOK_NEG = '~',
+
+  JAY_TOK_NUMBER = 116,
+  JAY_TOK_IDENTIFIER,
+  JAY_TOK_STRING,
+
+  JAY_TOK_PARAM,
+  JAY_TOK_EMPTY_ARG,
+  JAY_TOK_PREP_NUMBER
+};
+
+#define EMPTY {0}
+#define TOK(t, s) {(t), (jl_loc_t){0}, s, sizeof(s)-1}
+#define IDN(t, s) {(t), (jl_loc_t){0}, s, sizeof(s)-1}
+
+const jl_token_t tokens[] = {
+  /* 0x00 */
+  TOK(JAY_TOK_END, "$"),
+  IDN(JAY_TOK_AUTO, "auto"),
+  IDN(JAY_TOK_BREAK, "break"),
+  IDN(JAY_TOK_CASE, "case"),
+  IDN(JAY_TOK_CHAR, "char"),
+  IDN(JAY_TOK_CONST, "const"),
+  IDN(JAY_TOK_CONTINUE, "continue"),
+  IDN(JAY_TOK_DEFAULT, "default"),
+
+  /* 0x08 */
+  IDN(JAY_TOK_DO, "do"),
+  IDN(JAY_TOK_DOUBLE, "double"),
+  TOK(JAY_TOK_EOL, "\n"),
+  IDN(JAY_TOK_ELSE, "else"),
+  IDN(JAY_TOK_ENUM, "enum"),
+  IDN(JAY_TOK_EXTERN, "extern"),
+  IDN(JAY_TOK_FLOAT, "float"),
+  IDN(JAY_TOK_FOR, "for"),
+
+  /* 0x10 */
+  IDN(JAY_TOK_GOTO, "goto"),
+  IDN(JAY_TOK_IF, "if"),
+  IDN(JAY_TOK_INT, "int"),
+  IDN(JAY_TOK_LONG, "long"),
+  IDN(JAY_TOK_REGISTER, "register"),
+  IDN(JAY_TOK_RETURN, "return"),
+  IDN(JAY_TOK_SHORT, "short"),
+  IDN(JAY_TOK_SIGNED, "signed"),
+
+  /* 0x18 */
+  IDN(JAY_TOK_SIZEOF, "sizeof"),
+  IDN(JAY_TOK_STATIC, "static"),
+  IDN(JAY_TOK_STRUCT, "struct"),
+  IDN(JAY_TOK_SWITCH, "switch"),
+  IDN(JAY_TOK_TYPEDEF, "typedef"),
+  IDN(JAY_TOK_UNION, "union"),
+  IDN(JAY_TOK_UNSIGNED, "unsigned"),
+  IDN(JAY_TOK_VOID, "void"),
+
+  /* 0x20 */
+  IDN(JAY_TOK_INLINE, "inline"),
+  TOK(JAY_TOK_NOT, "!"),
+  IDN(JAY_TOK_VOLATILE, "volatile"),
+  TOK(JAY_TOK_HASH, "#"),
+  IDN(JAY_TOK_WHILE, "while"),
+  TOK(JAY_TOK_MODULO, "%"),
+  TOK(JAY_TOK_AND, "&"),
+  IDN(JAY_TOK_INCLUDE, "include"),
+
+  /* 0x28 */
+  TOK(JAY_TOK_OPEN_PAREN, "("),
+  TOK(JAY_TOK_CLOSE_PAREN, ")"),
+  TOK(JAY_TOK_STAR, "*"),
+  TOK(JAY_TOK_PLUS, "+"),
+  TOK(JAY_TOK_COMMA, ","),
+  TOK(JAY_TOK_MINUS, "-"),
+  TOK(JAY_TOK_DOT, "."),
+  TOK(JAY_TOK_SLASH, "/"),
+
+  /* 0x30 */
+  IDN(JAY_TOK_USE, "use"),
+  TOK(JAY_TOK_DCOLON, "::"),
+  TOK(JAY_TOK_DARROW, "=>"),
+  TOK(JAY_TOK_DQUESTION, "??"),
+  IDN(JAY_TOK_NAMESPACE, "namespace"),
+  EMPTY,
+  EMPTY,
+  EMPTY,
+
+  /* 0x38 */
+  EMPTY,
+  EMPTY,
+  TOK(JAY_TOK_COLON, ":"),
+  TOK(JAY_TOK_SEMICOLON, ";"),
+  TOK(JAY_TOK_LT, "<"),
+  TOK(JAY_TOK_ASSIGN, "="),
+  TOK(JAY_TOK_GT, ">"),
+  TOK(JAY_TOK_QUESTION, "?"),
+
+  /* 0x40 */
+  TOK(JAY_TOK_DOTS, "..."),
+  TOK(JAY_TOK_LOGICAL_OR, "||"),
+  TOK(JAY_TOK_LOGICAL_AND, "&&"),
+  TOK(JAY_TOK_LEQ, "<="),
+  TOK(JAY_TOK_GEQ, ">="),
+  TOK(JAY_TOK_EQ, "=="),
+  TOK(JAY_TOK_NEQ, "!="),
+  TOK(JAY_TOK_ARROW, "->"),
+
+  /* 0x48 */
+  TOK(JAY_TOK_INCREMENT, "++"),
+  TOK(JAY_TOK_DECREMENT, "--"),
+  TOK(JAY_TOK_LSHIFT, "<<"),
+  TOK(JAY_TOK_RSHIFT, ">>"),
+  TOK(JAY_TOK_MUL_ASSIGN, "*="),
+  TOK(JAY_TOK_DIV_ASSIGN, "/="),
+  TOK(JAY_TOK_MOD_ASSIGN, "%="),
+  TOK(JAY_TOK_PLUS_ASSIGN, "+="),
+
+  /* 0x50 */
+  TOK(JAY_TOK_MINUS_ASSIGN, "-="),
+  TOK(JAY_TOK_LSHIFT_ASSIGN, "<<="),
+  TOK(JAY_TOK_RSHIFT_ASSIGN, ">>="),
+  TOK(JAY_TOK_AND_ASSIGN, "&="),
+  TOK(JAY_TOK_XOR_ASSIGN, "^="),
+  TOK(JAY_TOK_OR_ASSIGN, "|="),
+  TOK(JAY_TOK_TOKEN_PASTE, "##"),
+  EMPTY,
+
+  /* 0x58 */
+  EMPTY,
+  EMPTY,
+  EMPTY,
+  TOK(JAY_TOK_OPEN_BRACKET, "["),
+  EMPTY,
+  TOK(JAY_TOK_CLOSE_BRACKET, "]"),
+  TOK(JAY_TOK_XOR, "^"),
+  EMPTY,
+
+  /* 0x60 */
+  EMPTY,
+  EMPTY,
+  EMPTY,
+  EMPTY,
+  EMPTY,
+  EMPTY,
+  EMPTY,
+  EMPTY,
+
+  /* 0x68 */
+  EMPTY,
+  EMPTY,
+  EMPTY,
+  EMPTY,
+  EMPTY,
+  EMPTY,
+  EMPTY,
+  EMPTY,
+
+  /* 0x70 */
+  EMPTY,
+  EMPTY,
+  EMPTY,
+  EMPTY,
+  {JAY_TOK_NUMBER},
+  {JAY_TOK_IDENTIFIER, 1, 1},
+  {JAY_TOK_STRING},
+  {JAY_TOK_PARAM},
+
+  /* 0x78 */
+  {JAY_TOK_EMPTY_ARG},
+  {JAY_TOK_PREP_NUMBER},
+  EMPTY,
+  TOK(JAY_TOK_OPEN_CURLY, "{"),
+  TOK(JAY_TOK_OR, "|"),
+  TOK(JAY_TOK_CLOSE_CURLY, "}"),
+  TOK(JAY_TOK_NEG, "~"),
+  EMPTY
+};
+
+void jay_lexer_stack(jl_lexer_t *self, unsigned n);
+
+jl_token_t jay_lexer_peek(jl_lexer_t *self) {
+  if (jl_vector_size(self->token_stack) < 1) {
+    jay_lexer_stack(self, 1);
+  }
+  return jl_vector_front(self->token_stack);
 }
 
-void jay_lex(lexer_t *this, fir_toks_t *token_stream) {
-  char *ptr;
-  FILE *stream;
-  size_t tail;
-
-  assert(this->filename);
-  stream = fopen(this->filename, "r");
-  assert(stream);
-
-  fseek(stream, 0L, SEEK_END);
-  tail = (size_t) ftell(stream);
-  rewind(stream);
-  if (!tail) {
-    return;
+jl_token_t jay_lexer_peekn(jl_lexer_t *self, unsigned n) {
+  if (jl_vector_size(self->token_stack) < n) {
+    jay_lexer_stack(self, (unsigned) (n-jl_vector_size(self->token_stack)));
   }
-
-  if (!buffer) {
-    buffer = malloc(tail + 1);
-    size = tail;
-    atexit(cleanup);
-  } else if (tail > size) {
-    buffer = realloc(buffer, tail + 1);
-    size = tail;
-  }
-
-  fread(buffer, size, 1, stream);
-  fclose(stream);
-  buffer[tail] = FIR_TOK_END;
-  ptr = strdup(buffer);
-  this->lex_str(this, ptr, token_stream);
-  free(ptr);
+  return jl_vector_at(
+    self->token_stack,
+    jl_vector_size(self->token_stack) < n ? jl_vector_size(self->token_stack) : n
+  );
 }
 
-#define peek() *ptr
+jl_token_t jay_lexer_next(jl_lexer_t *self) {
+  if (jl_vector_size(self->token_stack)) {
+    jl_token_dtor(&jl_vector_front(self->token_stack));
+    jl_vector_shift(self->token_stack);
+  }
+  if (jl_vector_size(self->token_stack) < 1) {
+    jay_lexer_stack(self, 1);
+  }
+  return jl_vector_front(self->token_stack);
+}
+
+jl_token_t jay_lexer_consume(jl_lexer_t *self, unsigned char type) {
+  if (self->peek(self).type != type) {
+    puts("unexpected token");
+    exit(1);
+  }
+  return self->next(self);
+}
+
+#define peek *ptr
 #define peekn(n) ptr[n]
-#define next() ({ loc.col++; *++ptr; })
-#define nextn(n) ({ loc.col += n; ptr += n; *ptr; })
-#define push(id) do { \
-    tok = tokens[id]; \
-    tok.loc = loc; \
-    P99_VECTOR_PUSH(token_stream, tok); \
-  } while (0)
-#define push_string(...) do { \
-    P99_IF_EMPTY(__VA_ARGS__)()({ \
-      tok = tokens[__VA_ARGS__]; \
-      tok.d.string = str_register(string, i); \
-    }) \
-    tok.loc = loc; \
-    tok.loc.col -= i; \
-    P99_VECTOR_PUSH(token_stream, tok); \
-  } while (0)
+#define next (self->loc.colno++, self->loc.position++, *++ptr)
+#define push_string do { \
+    token.loc = self->loc; \
+    token.length = i; \
+    token.loc.colno -= i; \
+    token.loc.position -= i; \
+    token.s = strndup(s, i); \
+    jl_vector_push(self->token_stack, token); \
+    n--; \
+  } while (false)
 
-#define M(n, i, c) string[i + n] == (c)
-#define M1(n, a) M(n, 0, a)
-#define M2(n, a, b) M1(n, a) && M(n, 1, b)
-#define M3(n, a, b, c) M2(n, a, b) && M(n, 2, c)
-#define M4(n, a, b, c, d) M3(n, a, b, c) && M(n, 3, d)
-#define M5(n, a, b, c, d, e) M4(n, a, b, c, d) && M(n, 4, e)
-#define M6(n, a, b, c, d, e, f) M5(n, a, b, c, d, e) && M(n, 5, f)
-#define M7(n, a, b, c, d, e, f, g) M6(n, a, b, c, d, e, f) && M(n, 6, g)
-#define M8(n, a, b, c, d, e, f, g, h) M7(n, a, b, c, d, e, f, g) && M(n, 7, h)
+#define M(l, n, ...) i == (l+n) && M_ ## l(n, __VA_ARGS__)
+#define M_(n, i, c) s[i + n] == (c)
+#define M_1(n, a) M_(n, 0, a)
+#define M_2(n, a, b) M_1(n, a) && M_(n, 1, b)
+#define M_3(n, a, b, c) M_2(n, a, b) && M_(n, 2, c)
+#define M_4(n, a, b, c, d) M_3(n, a, b, c) && M_(n, 3, d)
+#define M_5(n, a, b, c, d, e) M_4(n, a, b, c, d) && M_(n, 4, e)
+#define M_6(n, a, b, c, d, e, f) M_5(n, a, b, c, d, e) && M_(n, 5, f)
+#define M_7(n, a, b, c, d, e, f, g) M_6(n, a, b, c, d, e, f) && M_(n, 6, g)
+#define M_8(n, a, b, c, d, e, f, g, h) M_7(n, a, b, c, d, e, f, g) && M_(n, 7, h)
 
-#define MATCH_(n, op, ...) \
-  (P99_NARG(__VA_ARGS__) + n op i && (P99_PASTE2(M, P99_NARG(__VA_ARGS__)(n, __VA_ARGS__))))
 
-#define MATCH(n, ...) \
-  MATCH_(n, <=, __VA_ARGS__)
-
-#define TRY_MATCH(id, n, ...) \
-  if (MATCH_(n, ==, __VA_ARGS__)) { \
-    tok = tokens[id]; \
-    goto token; \
-  }
-
-void jay_lex_str(lexer_t *this, const char *buffer, fir_toks_t *token_stream) {
+void jay_lexer_stack(jl_lexer_t *self, unsigned n) {
   const char *ptr;
-  char string[255];
-  fir_tok_t tok;
-  fir_loc_t loc = {this->filename, 0, 0};
+  char s[256];
+  jl_token_t token;
   unsigned i;
 
-  if (!buffer && this->filename) {
-    this->lex(this, token_stream);
-    return;
-  }
-
-  assert(buffer);
-  ptr = buffer;
-
-  while (peek() != FIR_TOK_END) {
-    if (peek() == '_' || isalpha(peek())) {
-      string[i = 0] = peek();
-      while (next() == '_' || isalnum(peek())) {
-        string[++i] = peek();
+  ptr = self->buffer + self->loc.position;
+  while (n && peek != JAY_TOK_END) {
+    if (peek == '_' || isalpha(peek)) {
+      s[i = 0] = *ptr;
+      while (next == '_' || isalnum(peek)) {
+        s[++i] = peek;
       }
-      string[++i] = '\0';
-
-      switch (string[0]) {
+      s[++i] = '\0';
+      switch (s[0]) {
         case 'a':
-          TRY_MATCH(FIR_TOK_AUTO, 1, 'u', 't', 'o');
-        case 'b':
-          TRY_MATCH(FIR_TOK_BREAK, 1, 'r', 'e', 'a', 'k');
-        case 'c':
-          TRY_MATCH(FIR_TOK_CASE, 1, 'a', 's', 'e');
-          TRY_MATCH(FIR_TOK_CHAR, 1, 'h', 'a', 'r');
-          if (MATCH(1, 'o', 'n')) {
-            TRY_MATCH(FIR_TOK_CONST, 3, 's', 't');
-            TRY_MATCH(FIR_TOK_CONTINUE, 3, 't', 'i', 'n', 'u', 'e');
+          if (M(3, 1, 'u', 't', 'o')) {
+            token = tokens[JAY_TOK_AUTO];
+            goto push_token;
           }
-        case 'd':
-          TRY_MATCH(FIR_TOK_DEFAULT, 1, 'e', 'f', 'a', 'u', 'l', 't');
-          if (MATCH(1, 'o')) {
-            TRY_MATCH(FIR_TOK_DOUBLE, 2, 'u', 'b', 'l', 'e');
-            TRY_MATCH(FIR_TOK_DO, 2, 'o');
-          }
-        case 'e':
-          TRY_MATCH(FIR_TOK_ELSE, 1, 'l', 's', 'e');
-          TRY_MATCH(FIR_TOK_ENUM, 1, 'n', 'u', 'm');
-          TRY_MATCH(FIR_TOK_EXTERN, 1, 'x', 't', 'e', 'r', 'n');
-        case 'f':
-          TRY_MATCH(FIR_TOK_FLOAT, 1, 'l', 'o', 'a', 't');
-          TRY_MATCH(FIR_TOK_FOR, 1, 'o', 'r');
-        case 'g':
-          TRY_MATCH(FIR_TOK_GOTO, 1, 'o', 't', 'o');
-        case 'i':
-          TRY_MATCH(FIR_TOK_IF, 1, 'f');
-          if (MATCH(1, 'n')) {
-            TRY_MATCH(FIR_TOK_INT, 2, 't');
-            TRY_MATCH(FIR_TOK_INLINE, 2, 'l', 'i', 'n', 'e');
-            TRY_MATCH(FIR_TOK_INCLUDE, 2, 'c', 'l', 'u', 'd', 'e');
-          }
-        case 'l':
-          TRY_MATCH(FIR_TOK_LONG, 1, 'o', 'n', 'g');
-        case 'n':
-          TRY_MATCH(FIR_TOK_NAMESPACE, 1, 'a', 'm', 'e', 's', 'p', 'a', 'c', 'e');
-        case 'r':
-          if (MATCH(1, 'e')) {
-            TRY_MATCH(FIR_TOK_REGISTER, 2, 'g', 'i', 's', 't', 'e', 'r');
-            TRY_MATCH(FIR_TOK_RETURN, 2, 't', 'u', 'r', 'n');
-          }
-        case 's':
-          TRY_MATCH(FIR_TOK_SHORT, 1, 'h', 'o', 'r', 't');
-          TRY_MATCH(FIR_TOK_SWITCH, 1, 'w', 'i', 't', 'c', 'h');
-          if (MATCH(1, 'i')) {
-            TRY_MATCH(FIR_TOK_SIGNED, 2, 'g', 'n', 'e', 'd');
-            TRY_MATCH(FIR_TOK_SIZEOF, 2, 'z', 'e', 'o', 'f');
-          } else if (MATCH(1, 't')) {
-            TRY_MATCH(FIR_TOK_STATIC, 2, 'a', 't', 'i', 'c');
-            TRY_MATCH(FIR_TOK_STRUCT, 2, 'r', 'u', 'c', 't');
-          }
-        case 't':
-          TRY_MATCH(FIR_TOK_TYPEDEF, 1, 'y', 'p', 'e', 'd', 'e', 'f');
-        case 'u':
-          if (MATCH(1, 'n')) {
-            TRY_MATCH(FIR_TOK_UNION, 2, 'i', 'o', 'n');
-            TRY_MATCH(FIR_TOK_UNSIGNED, 2, 's', 'i', 'g', 'n', 'e', 'd');
-          } else {
-            TRY_MATCH(FIR_TOK_USE, 1, 's', 'e');
-          }
-        case 'v':
-          if (MATCH(1, 'o')) {
-            TRY_MATCH(FIR_TOK_VOID, 2, 'i', 'd');
-            TRY_MATCH(FIR_TOK_VOLATILE, 2, 'l', 'a', 't', 'i', 'l', 'e');
-          }
-        case 'w':
-          TRY_MATCH(FIR_TOK_WHILE, 1, 'h', 'i', 'l', 'e');
-        default:
-          push_string(FIR_TOK_IDENTIFIER);
           break;
-        token:
-          push_string();
+        case 'b':
+          if (M(4, 1, 'r', 'e', 'a', 'k')) {
+            token = tokens[JAY_TOK_BREAK];
+            goto push_token;
+          }
+          break;
+        case 'c':
+          if (M(3, 1, 'a', 's', 'e')) {
+            token = tokens[JAY_TOK_CASE];
+            goto push_token;
+          }
+          if (M(3, 1, 'h', 'a', 'r')) {
+            token = tokens[JAY_TOK_CHAR];
+            goto push_token;
+          }
+          if (s[1] == 'o' && s[2] == 'n') {
+            if (M(2, 3, 's', 't')) {
+              token = tokens[JAY_TOK_CONST];
+              goto push_token;
+            }
+            if (M(5, 3, 't', 'i', 'n', 'u', 'e')) {
+              token = tokens[JAY_TOK_CONTINUE];
+              goto push_token;
+            }
+          }
+        default:
+          token = tokens[JAY_TOK_IDENTIFIER];
+        push_token:
+          push_string;
           break;
       }
-    } else if (isdigit(peek()) || (peek() == '.' && isdigit(peekn(1)))) {
-      string[i = 0] = peek();
-      while (1) {
-        if (isdigit(next()) || peek() == '.' || peek() == '_') {
-          string[++i] = peek();
-        } else if (isalpha(peek())) {
-          if ((tolower(peek()) == 'e' || (tolower(peek()) == 'p'))
+    } else if (isdigit(peek) || (peek == '.' && isdigit(peekn(1)))) {
+      s[i = 0] = peek;
+      while (true) {
+        if (isdigit(next) || peek == '.' || peek == '_') {
+          s[++i] = peek;
+        } else if (isalpha(peek)) {
+          if ((tolower(peek) == 'e' || (tolower(peek) == 'p'))
             && (peekn(1) == '+' || peekn(1) == '-')) {
-            string[++i] = peek();
-            next();
+            s[++i] = peek;
+            next;
           }
-          string[++i] = peek();
+          s[++i] = peek;
         } else {
-          string[++i] = '\0';
+          s[++i] = '\0';
           break;
         }
       }
-      push_string(FIR_TOK_PREP_NUMBER);
+      token = tokens[JAY_TOK_PREP_NUMBER];
+      push_string;
     } else {
-      switch (peek()) {
-        case FIR_TOK_NOT:
-          if (peekn(1) == FIR_TOK_ASSIGN) {
-            push(FIR_TOK_NEQ);
-            nextn(2);
-            break;
-          }
-          push(FIR_TOK_NOT);
-          next();
-          break;
-        case FIR_TOK_HASH:
-          if (peekn(1) == FIR_TOK_HASH) {
-            push(FIR_TOK_TOKEN_PASTE);
-            nextn(2);
-            break;
-          }
-          push(FIR_TOK_HASH);
-          next();
-          break;
-        case FIR_TOK_MODULO:
-          if (peekn(1) == FIR_TOK_ASSIGN) {
-            push(FIR_TOK_MOD_ASSIGN);
-            nextn(2);
-            break;
-          }
-          push(FIR_TOK_MODULO);
-          next();
-          break;
-        case FIR_TOK_AND:
-          if (peekn(1) == FIR_TOK_AND) {
-            push(FIR_TOK_LOGICAL_AND);
-            nextn(2);
-            break;
-          }
-          if (peekn(1) == FIR_TOK_ASSIGN) {
-            push(FIR_TOK_AND_ASSIGN);
-            nextn(2);
-            break;
-          }
-          push(FIR_TOK_AND);
-          next();
-          break;
-        case FIR_TOK_OPEN_PAREN:
-          push(FIR_TOK_OPEN_PAREN);
-          next();
-          break;
-        case FIR_TOK_CLOSE_PAREN:
-          push(FIR_TOK_CLOSE_PAREN);
-          next();
-          break;
-        case FIR_TOK_STAR:
-          if (peekn(1) == FIR_TOK_ASSIGN) {
-            push(FIR_TOK_MUL_ASSIGN);
-            nextn(2);
-            break;
-          }
-          push(FIR_TOK_STAR);
-          next();
-          break;
-        case FIR_TOK_PLUS:
-          if (peekn(1) == FIR_TOK_ASSIGN) {
-            push(FIR_TOK_PLUS_ASSIGN);
-            nextn(2);
-            break;
-          }
-          if (peekn(1) == FIR_TOK_PLUS) {
-            push(FIR_TOK_INCREMENT);
-            nextn(2);
-            break;
-          }
-          push(FIR_TOK_PLUS);
-          next();
-          break;
-        case FIR_TOK_COMMA:
-          push(FIR_TOK_COMMA);
-          next();
-          break;
-        case FIR_TOK_MINUS:
-          if (peekn(1) == FIR_TOK_MINUS) {
-            push(FIR_TOK_MINUS_ASSIGN);
-            nextn(2);
-            break;
-          }
-          if (peekn(1) == FIR_TOK_MINUS) {
-            push(FIR_TOK_DECREMENT);
-            nextn(2);
-            break;
-          }
-          push(FIR_TOK_MINUS);
-          next();
-          break;
-        case FIR_TOK_DOT:
-          if (peekn(1) == FIR_TOK_DOT && peekn(2) == FIR_TOK_DOT) {
-            push(FIR_TOK_DOTS);
-            nextn(3);
-            break;
-          }
-          push(FIR_TOK_DOT);
-          next();
-          break;
-        case FIR_TOK_SLASH:
-          if (peekn(1) == FIR_TOK_STAR) {
-            while (next() != FIR_TOK_END) {
-              if (peek() == FIR_TOK_STAR) {
-                while (next() == FIR_TOK_STAR);
-                if (peek() == FIR_TOK_SLASH) {
-                  next();
-                  break;
-                }
-              } else if (peekn(1) == FIR_TOK_END) {
-                exit(1);
-              } else {
-                switch (peek()) {
-                  case '\r':
-                    next();
-                    if (peek() == FIR_TOK_EOL) {
-                      next();
-                    }
-                    push(FIR_TOK_EOL);
-                    ++loc.line;
-                    loc.col = 0;
-                    break;
-                  case '\v':
-                  case '\f':
-                  case FIR_TOK_EOL:
-                    next();
-                    push(FIR_TOK_EOL);
-                    ++loc.line;
-                    loc.col = 0;
-                    break;
-                  default:
-                    break;
-                }
-              }
-            }
-            break;
-          }
-          if (peekn(1) == FIR_TOK_ASSIGN) {
-            push(FIR_TOK_DIV_ASSIGN);
-            nextn(2);
-            break;
-          }
-          push(FIR_TOK_SLASH);
-          next();
-          break;
-        case FIR_TOK_COLON:
-          if (peekn(1) == FIR_TOK_COLON) {
-            push(FIR_TOK_DCOLON);
-            nextn(2);
-            break;
-          }
-          push(FIR_TOK_COLON);
-          next();
-          break;
-        case FIR_TOK_SEMICOLON:
-          push(FIR_TOK_SEMICOLON);
-          next();
-          break;
-        case FIR_TOK_LT:
-          if (peekn(1) == FIR_TOK_LT) {
-            if (peekn(2) == FIR_TOK_ASSIGN) {
-              push(FIR_TOK_LSHIFT_ASSIGN);
-              nextn(3);
-              break;
-            }
-            push(FIR_TOK_LSHIFT);
-            nextn(2);
-            break;
-          }
-          if (peekn(1) == FIR_TOK_ASSIGN) {
-            push(FIR_TOK_LEQ);
-            nextn(2);
-            break;
-          }
-          push(FIR_TOK_LT);
-          next();
-          break;
-        case FIR_TOK_ASSIGN:
-          if (peekn(1) == FIR_TOK_ASSIGN) {
-            push(FIR_TOK_EQ);
-            nextn(2);
-            break;
-          }
-          if (peekn(1) == FIR_TOK_GT) {
-            push(FIR_TOK_DARROW);
-            nextn(2);
-            break;
-          }
-          push(FIR_TOK_ASSIGN);
-          next();
-          break;
-        case FIR_TOK_GT:
-          if (peekn(1) == FIR_TOK_GT) {
-            if (peekn(2) == FIR_TOK_ASSIGN) {
-              push(FIR_TOK_RSHIFT_ASSIGN);
-              nextn(3);
-              break;
-            }
-            push(FIR_TOK_RSHIFT);
-            nextn(2);
-            break;
-          }
-          if (peekn(1) == FIR_TOK_ASSIGN) {
-            push(FIR_TOK_GEQ);
-            nextn(2);
-            break;
-          }
-          push(FIR_TOK_GT);
-          next();
-          break;
-        case FIR_TOK_QUESTION:
-          if (peekn(1) == FIR_TOK_QUESTION) {
-            push(FIR_TOK_DQUESTION);
-            nextn(2);
-            break;
-          }
-          push(FIR_TOK_QUESTION);
-          next();
-          break;
-        case FIR_TOK_OPEN_BRACKET:
-          push(FIR_TOK_OPEN_BRACKET);
-          next();
-          break;
-        case FIR_TOK_CLOSE_BRACKET:
-          push(FIR_TOK_CLOSE_BRACKET);
-          next();
-          break;
-        case FIR_TOK_XOR:
-          if (peekn(1) == FIR_TOK_ASSIGN) {
-            push(FIR_TOK_XOR_ASSIGN);
-            nextn(2);
-            break;
-          }
-          push(FIR_TOK_XOR);
-          next();
-          break;
-        case FIR_TOK_OPEN_CURLY:
-          push(FIR_TOK_OPEN_CURLY);
-          next();
-          break;
-        case FIR_TOK_OR:
-          if (peekn(1) == FIR_TOK_OR) {
-            push(FIR_TOK_LOGICAL_OR);
-            nextn(2);
-            break;
-          }
-          if (peekn(1) == FIR_TOK_ASSIGN) {
-            push(FIR_TOK_OR_ASSIGN);
-            nextn(2);
-            break;
-          }
-          push(FIR_TOK_OR);
-          next();
-          break;
-        case FIR_TOK_CLOSE_CURLY:
-          push(FIR_TOK_CLOSE_CURLY);
-          next();
-          break;
-        case FIR_TOK_NEG:
-          push(FIR_TOK_NEG);
-          next();
-          break;
-        case '\r':
-          if (peek() == FIR_TOK_EOL) {
-            next();
-          }
-          push(FIR_TOK_EOL);
-          next();
-          ++loc.line;
-          loc.col = 0;
-          break;
-        case '\v':
-        case '\f':
-        case FIR_TOK_EOL:
-          push(FIR_TOK_EOL);
-          next();
-          ++loc.line;
-          loc.col = 0;
-          break;
-        case ' ':
-        case '\t':
-          next();
-          break;
-        default:
-          next();
-          break;
-      }
+      next;
     }
   }
-  push(FIR_TOK_END);
+  if (n) {
+    token = tokens[JAY_TOK_END];
+    token.loc = self->loc;
+    jl_vector_push(self->token_stack, token);
+  }
 }

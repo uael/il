@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2016-2017 uael <www.github.com/uael>
+ * Copyright (c) 2016-2017 Abel Lucas <www.github.com/uael>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,35 +23,36 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_LEXER_H__
-# define  JL_LEXER_H__
+#ifndef   JL_OPTS_H__
+# define  JL_OPTS_H__
 
-#include "token.h"
-#include "entity.h"
+#include <stdbool.h>
 
-typedef enum jl_frontend_n jl_frontend_n;
+#define JL_SRC_DIR_MSIZE 256
 
-typedef struct jl_lexer_t jl_lexer_t;
+typedef enum jl_backend_n jl_backend_n;
+typedef struct jl_opts_t jl_opts_t;
 
-enum jl_frontend_n {
-  JL_FRONTEND_C = 0,
-  JL_FRONTEND_JAY
+enum jl_backend_n {
+  JL_BACKEND_NONE = 0,
+  JL_BACKEND_DOT,
+  JL_BACKEND_PPRINT,
+  JL_BACKEND_FIRM_ASM,
+  JL_BACKEND_FIRM_AMD64,
+  JL_BACKEND_FIRM_ARM,
+  JL_BACKEND_FIRM_IA32,
+  JL_BACKEND_FIRM_MIPS,
+  JL_BACKEND_FIRM_SPARC
 };
 
-struct jl_lexer_t {
-  jl_frontend_n kind;
-  char *buffer;
-  size_t length;
-  jl_loc_t loc;
-  jl_token_r token_stack;
-
-  jl_token_t (*peek)(jl_lexer_t *self);
-  jl_token_t (*peekn)(jl_lexer_t *self, unsigned n);
-  jl_token_t (*next)(jl_lexer_t *self);
-  jl_token_t (*consume)(jl_lexer_t *self, unsigned char type);
+struct jl_opts_t {
+  const char *in, *out;
+  char src_dir[JL_SRC_DIR_MSIZE];
+  bool echo, firm_graph, verbose, output_asm;
+  int optimize_lvl;
+  jl_backend_n target;
 };
 
-void jl_lexer_init(jl_lexer_t *self, jl_frontend_n kind, uint32_t file_id, char *buffer, size_t length);
-void jl_lexer_dtor(jl_lexer_t *self);
+void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]);
 
-#endif /* JL_LEXER_H__ */
+#endif /* JL_OPTS_H__ */

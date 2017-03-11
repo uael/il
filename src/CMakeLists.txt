@@ -11,14 +11,14 @@ add_subdirectory(adt)
 add_subdirectory(backend)
 add_subdirectory(frontend)
 
+
+set(jayl_INCLUDES ${jayl_INCLUDES} backend frontend)
+
 set(jayl_HEADERS ${jayl_HEADERS})
 set(jayl_SOURCES ${jayl_SOURCES})
-set(jayl_INCLUDES ${jayl_INCLUDES})
 set(jayl_DEPS ${jayl_DEPS})
 set(jayl_LDADD ${jayl_LDADD})
 set(jayl_DEFS ${jayl_DEFS})
-
-list(REMOVE_ITEM jayl_SOURCES ./main.c)
 
 set(jayl_INCLUDES ${jayl_INCLUDES} .)
 
@@ -30,5 +30,5 @@ add_library(${PROJECT_NAME}so ${jayl_SOURCES} ${jayl_HEADERS})
 add_dependencies(${PROJECT_NAME}so ${jayl_DEPS})
 target_link_libraries(${PROJECT_NAME}so ${jayl_LDADD})
 
-add_executable(${PROJECT_NAME} ./main.c)
+add_executable(${PROJECT_NAME} cli/jay.c)
 target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}so)

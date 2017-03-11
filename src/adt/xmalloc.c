@@ -51,12 +51,15 @@ void *xrealloc(void *ptr, size_t size) {
 
 char *xstrndup(const char *s, size_t n) {
   char *result;
-  size_t len = strnlen (s, n);
+  size_t len = strlen(s);
+  if (len > n) {
+    len = n;
+  }
 
-  result = (char *) malloc (len + 1);
+  result = (char *) xmalloc(len + 1);
   if (!result)
     return 0;
 
   result[len] = '\0';
-  return (char *) memcpy (result, s, len);
+  return (char *) memcpy(result, s, len);
 }

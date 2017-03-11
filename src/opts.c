@@ -27,11 +27,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <string.h>
+#include <adt/xmalloc.h>
 
 #include "opts.h"
 #include "adt/vector.h"
 #include "util/io.h"
-#include "util/string.h"
 
 void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
   jl_vector_of(char *) errs = {0};
@@ -64,7 +65,7 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
             case 'S':
               if (strlen(arg) > 2) {
                 sprintf(err, "unrecognized option: %s", arg);
-                jl_vector_push(errs, strdup(err));
+                jl_vector_push(errs, xstrdup(err));
               } else {
                 self->output_asm = true;
               }
@@ -74,12 +75,12 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
                 strncpy(arg, arg+2, strlen(arg));
                 if (strlen(arg) > 1 || !isalnum(arg[0])) {
                   sprintf(err, "invalid argument provided to -O: %s", arg);
-                  jl_vector_push(errs, strdup(err));
+                  jl_vector_push(errs, xstrdup(err));
                 } else {
                   value = atoi(arg);
                   if (value < 0 || value > 5) {
                     sprintf(err, "invalid optimize level provided to -O[0-5]: %s", arg);
-                    jl_vector_push(errs, strdup(err));
+                    jl_vector_push(errs, xstrdup(err));
                   } else {
                     self->optimize_lvl = value;
                   }
@@ -88,12 +89,12 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
                 arg = argv[++i];
                 if (strlen(arg) > 1 || !isalnum(arg[0])) {
                   sprintf(err, "invalid argument provided to -O: %s", arg);
-                  jl_vector_push(errs, strdup(err));
+                  jl_vector_push(errs, xstrdup(err));
                 } else {
                   value = atoi(arg);
                   if (value < 0 || value > 5) {
                     sprintf(err, "invalid optimize level provided to -O[0-5]: %s", arg);
-                    jl_vector_push(errs, strdup(err));
+                    jl_vector_push(errs, xstrdup(err));
                   } else {
                     self->optimize_lvl = value;
                   }
@@ -101,7 +102,7 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
               } else {
                 if (strlen(arg) > 2) {
                   sprintf(err, "unrecognized option: %s", arg);
-                  jl_vector_push(errs, strdup(err));
+                  jl_vector_push(errs, xstrdup(err));
                 } else {
                   jl_vector_push(errs, "-O argument missing");
                 }
@@ -110,13 +111,13 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
             case 'o':
               if (strlen(arg) > 2) {
                 strncpy(arg, arg+2, strlen(arg));
-                self->out = strdup(arg);
+                self->out = xstrdup(arg);
               } else if (i + 1 < argc) {
                 self->out = argv[++i];
               } else {
                 if (strlen(arg) > 2) {
                   sprintf(err, "unrecognized option: %s", arg);
-                  jl_vector_push(errs, strdup(err));
+                  jl_vector_push(errs, xstrdup(err));
                 } else {
                   jl_vector_push(errs, "-o argument missing");
                 }
@@ -125,7 +126,7 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
             case 'v':
               if (strlen(arg) > 2) {
                 sprintf(err, "unrecognized option: %s", arg);
-                jl_vector_push(errs, strdup(err));
+                jl_vector_push(errs, xstrdup(err));
               } else {
                 self->verbose = true;
               }
@@ -133,7 +134,7 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
             case 'h':
               if (strlen(arg) > 2) {
                 sprintf(err, "unrecognized option: %s", arg);
-                jl_vector_push(errs, strdup(err));
+                jl_vector_push(errs, xstrdup(err));
               } else {
                 printf(usage, argv[0]);
                 goto exit_success;
@@ -141,7 +142,7 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
               break;
             default:
               sprintf(err, "unrecognized option: %s", arg);
-              jl_vector_push(errs, strdup(err));
+              jl_vector_push(errs, xstrdup(err));
           }
         } else if (arg[1] == '-') {
           strncpy(arg, arg+2, strlen(arg));
@@ -165,14 +166,14 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
                 } else {
                   optimize_err:
                   sprintf(err, "invalid argument provided to --optimize: %s", arg);
-                  jl_vector_push(errs, strdup(err));
+                  jl_vector_push(errs, xstrdup(err));
                 }
               } else {
                 optimize_match:
                 value = atoi(arg);
                 if (value < 0 || value > 5) {
                   sprintf(err, "invalid optimize level provided to --optimize[0-5]: %s", arg);
-                  jl_vector_push(errs, strdup(err));
+                  jl_vector_push(errs, xstrdup(err));
                 } else {
                   self->optimize_lvl = value;
                 }
@@ -181,12 +182,12 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
               arg = argv[++i];
               if (strlen(arg) > 1 || !isalnum(arg[0])) {
                 sprintf(err, "invalid argument provided to -O: %s", arg);
-                jl_vector_push(errs, strdup(err));
+                jl_vector_push(errs, xstrdup(err));
               } else {
                 value = atoi(arg);
                 if (value < 0 || value > 5) {
                   sprintf(err, "invalid optimize level provided to --optimize[0-5]: %s", arg);
-                  jl_vector_push(errs, strdup(err));
+                  jl_vector_push(errs, xstrdup(err));
                 } else {
                   self->optimize_lvl = value;
                 }
@@ -194,7 +195,7 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
             } else {
               if (strlen(arg) > 2) {
                 sprintf(err, "unrecognized option: %s", arg);
-                jl_vector_push(errs, strdup(err));
+                jl_vector_push(errs, xstrdup(err));
               } else {
                 jl_vector_push(errs, "--optimize argument missing");
               }
@@ -213,7 +214,7 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
                 } else {
                   output_err:
                   sprintf(err, "invalid argument provided to --output: %s", arg);
-                  jl_vector_push(errs, strdup(err));
+                  jl_vector_push(errs, xstrdup(err));
                 }
               } else {
                 output_match:
@@ -223,14 +224,14 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
               arg = argv[++i];
               if (!isalnum(arg[0])) {
                 sprintf(err, "invalid argument provided to --output: %s", arg);
-                jl_vector_push(errs, strdup(err));
+                jl_vector_push(errs, xstrdup(err));
               } else {
                 self->out = arg;
               }
             } else {
               if (strlen(arg) > 2) {
                 sprintf(err, "unrecognized option: %s", arg);
-                jl_vector_push(errs, strdup(err));
+                jl_vector_push(errs, xstrdup(err));
               } else {
                 jl_vector_push(errs, "--output argument missing");
               }
@@ -242,11 +243,11 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
             goto exit_success;
           } else {
             sprintf(err, "unrecognized option: --%s", arg);
-            jl_vector_push(errs, strdup(err));
+            jl_vector_push(errs, xstrdup(err));
           }
         } else {
           sprintf(err, "unrecognized option: %s", arg);
-          jl_vector_push(errs, strdup(err));
+          jl_vector_push(errs, xstrdup(err));
         }
         break;
       default:
@@ -254,7 +255,7 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
           self->in = arg;
         } else {
           sprintf(err, "unrecognized option: %s", arg);
-          jl_vector_push(errs, strdup(err));
+          jl_vector_push(errs, xstrdup(err));
         }
         break;
     }

@@ -29,6 +29,7 @@
 #include "entity.h"
 #include "types.h"
 #include "stmt.h"
+#include "expr.h"
 
 typedef struct jl_var_t jl_var_t;
 typedef struct jl_param_t jl_param_t;
@@ -42,10 +43,10 @@ struct jl_var_t {
   unsigned refs, flags;
   const char *name;
   jl_type_t type;
-  struct jl_expr_t *initializer;
+  jl_expr_t initializer;
 };
 
-void jl_var_init(jl_var_t *self, const char *name, jl_type_t type, struct jl_expr_t *initializer, unsigned flags);
+void jl_var_init(jl_var_t *self, const char *name, jl_type_t type, jl_expr_t initializer, unsigned flags);
 void jl_var_dtor(jl_var_t *self);
 
 struct jl_param_t {
@@ -53,10 +54,10 @@ struct jl_param_t {
   const char *name;
   unsigned position;
   jl_type_t type;
-  struct jl_expr_t *initializer;
+  jl_expr_t initializer;
 };
 
-void jl_param_init(jl_param_t *self, unsigned position, const char *name, jl_type_t type, struct jl_expr_t *initializer,
+void jl_param_init(jl_param_t *self, unsigned position, const char *name, jl_type_t type, jl_expr_t initializer,
   unsigned flags);
 void jl_param_dtor(jl_param_t *self);
 
@@ -65,10 +66,10 @@ struct jl_func_t {
   const char *name;
   jl_type_t return_type;
   jl_param_r params;
-  struct jl_stmt_t *body;
+  jl_stmt_t body;
 };
 
-void jl_func_init(jl_func_t *self, const char *name, jl_type_t return_type, jl_param_r params, struct jl_stmt_t *body,
+void jl_func_init(jl_func_t *self, const char *name, jl_type_t return_type, jl_param_r params, jl_stmt_t body,
   unsigned flags);
 void jl_func_dtor(jl_func_t *self);
 

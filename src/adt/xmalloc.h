@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2016-2017 uael <www.github.com/uael>
+ * Copyright (c) 2016-2017 Abel Lucas <www.github.com/uael>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,37 +23,38 @@
  * SOFTWARE.
  */
 
-#include <adt/xmalloc.h>
+#ifndef   JAYL_XMALLOC_H__
+# define  JAYL_XMALLOC_H__
 
-#include "lexer.h"
-#include "jay/jay_lexer.h"
+#include <stdint.h>
+#include <malloc.h>
 
-void jl_lexer_init(jl_lexer_t *self, jl_frontend_t *fe, uint32_t file_id, char *buffer, size_t length) {
-  *self = (jl_lexer_t) {
-    .fe = fe,
-    .loc = (jl_loc_t) {
-      .colno = 0,
-      .lineno = 0,
-      .file_id = file_id,
-      .position = 0
-    },
-    .buffer = xstrndup(buffer, length),
-    .length = length
-  };
+/**
+ * Allocate @p size bytes on the heap.
+ * This is a wrapper for malloc which calls panic() in case of errors, so no
+ * error handling is required for code using it.
+ */
+void *xmalloc(size_t size);
 
-  self->buffer[length] = '\0';
-  switch (fe->kind) {
-    case JL_FRONTEND_C:
-      break;
-    case JL_FRONTEND_JAY:
-      self->peek = jay_lexer_peek;
-      self->peekn = jay_lexer_peekn;
-      self->next = jay_lexer_next;
-      self->consume = jay_lexer_consume;
-      break;
-  }
-}
+/**
+ * Chane size of a previously allocated memory block to @p size bytes.
+ * This is a wrapper for realloc which calls panic() in case of errors, so no
+ * error handling is required for code using it.
+ */
+void *xrealloc(void *ptr, size_t size);
 
-void jl_lexer_dtor(jl_lexer_t *self) {
-  free(self->buffer);
-}
+/**
+ * Allocates memory and copies string @p str into it.
+ * This is a wrapper for strdup which calls panic() in case of errors, so no
+ * error handling is required for code using it.
+ */
+char *xstrdup(const char *str);
+
+/**
+ * Allocates memory and copies string @p str into it.
+ * This is a wrapper for strndup which calls panic() in case of errors, so no
+ * error handling is required for code using it.
+ */
+char *xstrndup(const char *str, size_t n);
+
+#endif /* JAYL_XMALLOC_H__ */

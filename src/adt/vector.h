@@ -29,7 +29,8 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
-#include <malloc.h>
+#include <string.h>
+#include <adt/xmalloc.h>
 
 #define jl_roundup32(x) (--(x), (x)|=(x)>>1, (x)|=(x)>>2, (x)|=(x)>>4, (x)|=(x)>>8, (x)|=(x)>>16, ++(x))
 
@@ -59,13 +60,13 @@
 
 #define jl_vector_resize(v, s) ( \
     jl_vector_capacity(v) = (s), \
-    jl_vector_data(v) = (__typeof__(jl_vector_data(v))) realloc(jl_vector_data(v), sizeof(*jl_vector_data(v)) * jl_vector_capacity(v)) \
+    jl_vector_data(v) = (__typeof__(jl_vector_data(v))) xrealloc(jl_vector_data(v), sizeof(*jl_vector_data(v)) * jl_vector_capacity(v)) \
   )
 
 #define jl_vector_growth(v) ( \
     jl_vector_size(v) == jl_vector_capacity(v) \
       ? ((jl_vector_capacity(v) = jl_vector_capacity(v) ? jl_vector_capacity(v) << 1 : 2), (v)) \
-      : ((jl_vector_data(v) = (__typeof__(jl_vector_data(v))) realloc(jl_vector_data(v), sizeof(*jl_vector_data(v)) * jl_vector_capacity(v))), (v)) \
+      : ((jl_vector_data(v) = (__typeof__(jl_vector_data(v))) xrealloc(jl_vector_data(v), sizeof(*jl_vector_data(v)) * jl_vector_capacity(v))), (v)) \
   )
 
 #define jl_vector_grow(v, i) do { \
@@ -73,7 +74,7 @@
     if (jl_vector_capacity(v) <= __s) { \
       jl_vector_capacity(v) = __s + 1; \
       jl_roundup32(jl_vector_capacity(v)); \
-      jl_vector_data(v) = (__typeof__(jl_vector_data(v))) realloc( \
+      jl_vector_data(v) = (__typeof__(jl_vector_data(v))) xrealloc( \
         jl_vector_data(v), sizeof(*jl_vector_data(v)) * jl_vector_capacity(v) \
       ); \
     } \

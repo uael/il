@@ -25,9 +25,10 @@
 
 #include <stdlib.h>
 #include <ctype.h>
+#include <adt/xmalloc.h>
+#include <stdio.h>
 
 #include "jay_lexer.h"
-#include "util/string.h"
 
 enum {
   JAY_TOK_END = 0,
@@ -343,7 +344,7 @@ jl_token_t jay_lexer_consume(jl_lexer_t *self, unsigned char type) {
     token.length = i; \
     token.loc.colno -= i; \
     token.loc.position -= i; \
-    token.s = strndup(s, i); \
+    token.s = xstrndup(s, i); \
     jl_vector_push(self->token_stack, token); \
     n--; \
   } while (false)

@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-#include <malloc.h>
+#include <adt/xmalloc.h>
 
 #include "entity.h"
 #include "entities.h"
@@ -34,25 +34,25 @@ void jl_entity_init(jl_entity_t *self, jl_entity_n kind) {
   };
   switch (kind) {
     case JL_ENTITY_VAR:
-      self->_var = malloc(sizeof(struct jl_var_t));
+      self->_var = xmalloc(sizeof(struct jl_var_t));
       break;
     case JL_ENTITY_PARAM:
-      self->_param = malloc(sizeof(struct jl_param_t));
+      self->_param = xmalloc(sizeof(struct jl_param_t));
       break;
     case JL_ENTITY_FUNC:
-      self->_func = malloc(sizeof(struct jl_func_t));
+      self->_func = xmalloc(sizeof(struct jl_func_t));
       break;
     case JL_ENTITY_ENUM:
-      self->_enum = malloc(sizeof(struct jl_enum_t));
+      self->_enum = xmalloc(sizeof(struct jl_enum_t));
       break;
     case JL_ENTITY_STRUCT:
-      self->_struct = malloc(sizeof(struct jl_struct_t));
+      self->_struct = xmalloc(sizeof(struct jl_struct_t));
       break;
     case JL_ENTITY_UNION:
-      self->_union = malloc(sizeof(struct jl_union_t));
+      self->_union = xmalloc(sizeof(struct jl_union_t));
       break;
     case JL_ENTITY_LABEL:
-      self->_label = malloc(sizeof(struct jl_label_t));
+      self->_label = xmalloc(sizeof(struct jl_label_t));
       break;
   }
 }

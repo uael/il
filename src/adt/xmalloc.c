@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2016-2017 uael <www.github.com/uael>
+ * Copyright (c) 2016-2017 Abel Lucas <www.github.com/uael>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,32 +23,40 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_STRING_H__
-# define  JL_STRING_H__
-
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <malloc.h>
 
-#if !defined(__GNUC__)
-  char *strdup(const char *s) {
-    size_t len = strlen (s) + 1;
-    char *result = (char*) malloc (len);
-    if (result == (char*) 0)
-      return (char*) 0;
-    return (char*) memcpy (result, s, len);
-  }
+#include "xmalloc.h"
+#include "attr.h"
 
-  char *strndup (const char *s, size_t n) {
-    char *result;
-    size_t len = strnlen (s, n);
+static JL_NORETURN xnomem(void) {
+  fputs("out of memory", stderr);
+  abort();
+}
 
-    result = (char *) malloc (len + 1);
-    if (!result)
-      return 0;
+void *xmalloc(size_t size) {
+  void *res = malloc(size);
 
-    result[len] = '\0';
-    return (char *) memcpy (result, s, len);
-  }
-#endif
+  if (!res) xnomem();
+  return res;
+}
 
-#endif /* JL_STRING_H__ */
+void *xrealloc(void *ptr, size_t size) {
+  void *res = ptr ? realloc(ptr, size) : malloc(size);
+
+  if (!res) xnomem();
+  return res;
+}
+
+char *xstrndup(const char *s, size_t n) {
+  char *result;
+  size_t len = strnlen (s, n);
+
+  result = (char *) malloc (len + 1);
+  if (!result)
+    return 0;
+
+  result[len] = '\0';
+  return (char *) memcpy (result, s, len);
+}

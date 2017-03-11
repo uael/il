@@ -25,65 +25,45 @@
 
 #include "entities.h"
 
-void jl_var_init(jl_var_t *self, const char *name, jl_type_t type, struct jl_expr_t *initializer, unsigned flags) {
+void jl_var_init(jl_var_t *self, const char *name, jl_type_t type, jl_expr_t initializer, unsigned flags) {
   *self = (jl_var_t) {
     .name = name,
     .type = type,
-    .initializer = malloc(sizeof(struct jl_expr_t)),
+    .initializer = initializer,
     .flags = flags
   };
-  if (initializer) {
-    *self->initializer = *initializer;
-  }
 }
 
-void jl_var_dtor(jl_var_t *self) {
-  jl_expr_dtor(self->initializer);
-  free(self->initializer);
-  self->initializer = NULL;
-}
+void jl_var_dtor(jl_var_t *self) {}
 
 
-void jl_param_init(jl_param_t *self, unsigned position, const char *name, jl_type_t type, struct jl_expr_t *initializer,
+void jl_param_init(jl_param_t *self, unsigned position, const char *name, jl_type_t type, jl_expr_t initializer,
   unsigned flags) {
   *self = (jl_param_t) {
     .position = position,
     .name = name,
     .type = type,
-    .initializer = malloc(sizeof(struct jl_expr_t)),
+    .initializer = initializer,
     .flags = flags
   };
-  if (initializer) {
-    *self->initializer = *initializer;
-  }
 }
 
-void jl_param_dtor(jl_param_t *self) {
-  jl_expr_dtor(self->initializer);
-  free(self->initializer);
-  self->initializer = NULL;
-}
+void jl_param_dtor(jl_param_t *self) {}
 
 
-void jl_func_init(jl_func_t *self, const char *name, jl_type_t return_type, jl_param_r params, struct jl_stmt_t *body,
+void jl_func_init(jl_func_t *self, const char *name, jl_type_t return_type, jl_param_r params, jl_stmt_t body,
   unsigned flags) {
   *self = (jl_func_t) {
     .name = name,
     .return_type = return_type,
     .params = params,
-    .body = malloc(sizeof(struct jl_stmt_t)),
+    .body = body,
     .flags = flags
   };
-  if (body) {
-    *self->body = *body;
-  }
 }
 
 void jl_func_dtor(jl_func_t *self) {
   jl_vector_dtor(self->params);
-  jl_stmt_dtor(self->body);
-  free(self->body);
-  self->body = NULL;
 }
 
 

@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-#include <malloc.h>
+#include <adt/xmalloc.h>
 
 #include "expr.h"
 #include "exprs.h"
@@ -36,34 +36,34 @@ void jl_expr_init(jl_expr_t *self, jl_expr_n kind, jl_loc_t loc, void *ptr) {
 
   switch (kind) {
     case JL_EXPR_ID:
-      self->_id = ptr ? ptr : malloc(sizeof(jl_expr_id_t));
+      self->_id = ptr ? ptr : xmalloc(sizeof(jl_expr_id_t));
       break;
     case JL_EXPR_CONST:
-      self->_const = ptr ? ptr : malloc(sizeof(jl_expr_const_t));
+      self->_const = ptr ? ptr : xmalloc(sizeof(jl_expr_const_t));
       break;
     case JL_EXPR_UNARY:
-      self->_unary = ptr ? ptr : malloc(sizeof(jl_expr_unary_t));
+      self->_unary = ptr ? ptr : xmalloc(sizeof(jl_expr_unary_t));
       break;
     case JL_EXPR_BINARY:
-      self->_binary = ptr ? ptr : malloc(sizeof(jl_expr_binary_t));
+      self->_binary = ptr ? ptr : xmalloc(sizeof(jl_expr_binary_t));
       break;
     case JL_EXPR_TERNARY:
-      self->_ternary = ptr ? ptr : malloc(sizeof(jl_expr_ternary_t));
+      self->_ternary = ptr ? ptr : xmalloc(sizeof(jl_expr_ternary_t));
       break;
     case JL_EXPR_ARRAY_READ:
-      self->_array_read = ptr ? ptr : malloc(sizeof(jl_expr_array_read_t));
+      self->_array_read = ptr ? ptr : xmalloc(sizeof(jl_expr_array_read_t));
       break;
     case JL_EXPR_ARRAY_WRITE:
-      self->_array_write = ptr ? ptr : malloc(sizeof(jl_expr_array_write_t));
+      self->_array_write = ptr ? ptr : xmalloc(sizeof(jl_expr_array_write_t));
       break;
     case JL_EXPR_FIELD_READ:
-      self->_field_read = ptr ? ptr : malloc(sizeof(jl_expr_field_read_t));
+      self->_field_read = ptr ? ptr : xmalloc(sizeof(jl_expr_field_read_t));
       break;
     case JL_EXPR_FIELD_WRITE:
-      self->_field_write = ptr ? ptr : malloc(sizeof(jl_expr_field_write_t));
+      self->_field_write = ptr ? ptr : xmalloc(sizeof(jl_expr_field_write_t));
       break;
     case JL_EXPR_CALL:
-      self->_call = ptr ? ptr : malloc(sizeof(jl_expr_call_t));
+      self->_call = ptr ? ptr : xmalloc(sizeof(jl_expr_call_t));
       break;
   }
 }

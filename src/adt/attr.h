@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2016-2017 uael <www.github.com/uael>
+ * Copyright (c) 2016-2017 Abel Lucas <www.github.com/uael>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,37 +23,21 @@
  * SOFTWARE.
  */
 
-#include <adt/xmalloc.h>
+#ifndef   JAYL_ATTR_H__
+# define  JAYL_ATTR_H__
 
-#include "lexer.h"
-#include "jay/jay_lexer.h"
+/**
+ * @def JL_NORETURN
+ * Attribute to mark a function which never returns.
+ */
+#if defined(__GNUC__) && __GNUC__ >= 3 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 70)
+# define JL_NORETURN __attribute__((__noreturn__)) void
+#elif defined(__STDC__) && (__STDC_VERSION__ >= 201112L)
+# define JL_NORETURN _Noreturn void
+#elif defined(_MSC_VER)
+# define JL_NORETURN void __declspec(noreturn)
+#else
+# define JL_NORETURN void
+#endif
 
-void jl_lexer_init(jl_lexer_t *self, jl_frontend_t *fe, uint32_t file_id, char *buffer, size_t length) {
-  *self = (jl_lexer_t) {
-    .fe = fe,
-    .loc = (jl_loc_t) {
-      .colno = 0,
-      .lineno = 0,
-      .file_id = file_id,
-      .position = 0
-    },
-    .buffer = xstrndup(buffer, length),
-    .length = length
-  };
-
-  self->buffer[length] = '\0';
-  switch (fe->kind) {
-    case JL_FRONTEND_C:
-      break;
-    case JL_FRONTEND_JAY:
-      self->peek = jay_lexer_peek;
-      self->peekn = jay_lexer_peekn;
-      self->next = jay_lexer_next;
-      self->consume = jay_lexer_consume;
-      break;
-  }
-}
-
-void jl_lexer_dtor(jl_lexer_t *self) {
-  free(self->buffer);
-}
+#endif /* JAYL_ATTR_H__ */

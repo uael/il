@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-#include <malloc.h>
+#include <adt/xmalloc.h>
 
 #include "types.h"
 #include "entity.h"
@@ -35,16 +35,16 @@ void jl_type_init(jl_type_t *self, jl_type_n kind, unsigned char qualifiers) {
   };
   switch (kind) {
     case JL_TYPE_LITERAL:
-      self->_literal = malloc(sizeof(jl_literal_t));
+      self->_literal = xmalloc(sizeof(jl_literal_t));
       break;
     case JL_TYPE_POINTER:
-      self->_pointer = malloc(sizeof(jl_pointer_t));
+      self->_pointer = xmalloc(sizeof(jl_pointer_t));
       break;
     case JL_TYPE_ARRAY:
-      self->_array = malloc(sizeof(jl_array_t));
+      self->_array = xmalloc(sizeof(jl_array_t));
       break;
     case JL_TYPE_COMPOUND:
-      self->_compound = malloc(sizeof(jl_compound_t));
+      self->_compound = xmalloc(sizeof(jl_compound_t));
       break;
     default:
       break;

@@ -100,4 +100,9 @@ jl_token_t jl_lexer_consume(jl_lexer_t *self, unsigned char type) {
 
 void jl_lexer_dtor(jl_lexer_t *self) {
   free(self->buffer);
+  jl_token_t token;
+  jl_vector_foreach(self->token_stack, token) {
+    jl_token_dtor(&token);
+  }
+  jl_vector_dtor(self->token_stack);
 }

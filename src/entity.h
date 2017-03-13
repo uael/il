@@ -93,14 +93,6 @@ struct jl_entity_t {
   };
 };
 
-void jl_entity_init(jl_entity_t *self, jl_entity_n kind);
-void jl_entity_init_var(jl_entity_t *self, struct jl_var_t *entity);
-void jl_entity_init_param(jl_entity_t *self, struct jl_param_t *entity);
-void jl_entity_init_func(jl_entity_t *self, struct jl_func_t* entity);
-void jl_entity_init_enum(jl_entity_t *self, struct jl_enum_t* entity);
-void jl_entity_init_struct(jl_entity_t *self, struct jl_struct_t* entity);
-void jl_entity_init_union(jl_entity_t *self, struct jl_union_t* entity);
-void jl_entity_init_label(jl_entity_t *self, struct jl_label_t* entity);
 #define jl_entity_is_var(e) ((e).kind == JL_ENTITY_VAR)
 #define jl_entity_is_param(e) ((e).kind == JL_ENTITY_PARAM)
 #define jl_entity_is_func(e) ((e).kind == JL_ENTITY_FUNC)

@@ -61,10 +61,10 @@ enum jl_expr_const_n {
 
 struct jl_expr_const_t {
   unsigned refs;
-  jl_literal_t type;
+  jl_type_t type;
 };
 
-void jl_expr_const_init(jl_expr_const_t *self, jl_literal_t type);
+void jl_expr_const_init(jl_expr_const_t *self, jl_type_t type);
 void jl_expr_const_dtor(jl_expr_const_t *self);
 
 struct jl_expr_unary_t {

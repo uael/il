@@ -83,11 +83,6 @@ struct jl_type_t {
   };
 };
 
-void jl_type_init(jl_type_t *self, jl_type_n kind, unsigned char qualifiers);
-void jl_type_init_literal(jl_type_t *self, jl_literal_t *literal, unsigned char qualifiers);
-void jl_type_init_pointer(jl_type_t *self, jl_pointer_t *pointer, unsigned char qualifiers);
-void jl_type_init_array(jl_type_t *self, jl_array_t *array, unsigned char qualifiers);
-void jl_type_init_compound(jl_type_t *self, jl_compound_t *compound, unsigned char qualifiers);
 #define jl_type_is_defined(t) ((t).kind != JL_TYPE_UNDEFINED)
 #define jl_type_is_literal(t) ((t).kind == JL_TYPE_LITERAL)
 #define jl_type_is_pointer(t) ((t).kind == JL_TYPE_POINTER)
@@ -109,20 +104,18 @@ struct jl_literal_t {
   };
 };
 
-void jl_literal_init_s(jl_literal_t *self, char *value);
-void jl_literal_init_i(jl_literal_t *self, int value);
-void jl_literal_init_in(jl_literal_t *self, jl_literal_n kind, int value);
-void jl_literal_init_f(jl_literal_t *self, float value);
-void jl_literal_init_fn(jl_literal_t *self, jl_literal_n kind, float value);
-void jl_literal_dtor(jl_literal_t *self);
+void jl_literal_init_s(jl_type_t *self, char *value, unsigned char qualifiers);
+void jl_literal_init_i(jl_type_t *self, int value, unsigned char qualifiers);
+void jl_literal_init_in(jl_type_t *self, jl_literal_n kind, int value, unsigned char qualifiers);
+void jl_literal_init_f(jl_type_t *self, float value, unsigned char qualifiers);
+void jl_literal_init_fn(jl_type_t *self, jl_literal_n kind, float value, unsigned char qualifiers);
 
 struct jl_pointer_t {
   unsigned refs;
   jl_type_t of;
 };
 
-void jl_pointer_init(jl_pointer_t *self, jl_type_t of);
-void jl_pointer_dtor(jl_pointer_t *self);
+void jl_pointer_init(jl_type_t *self, jl_type_t of, unsigned char qualifiers);
 
 struct jl_array_t {
   unsigned refs;
@@ -130,15 +123,13 @@ struct jl_array_t {
   jl_expr_t size;
 };
 
-void jl_array_init(jl_array_t *self, jl_type_t of, jl_expr_t size);
-void jl_array_dtor(jl_array_t *self);
+void jl_array_init(jl_type_t *self, jl_type_t of, jl_expr_t size, unsigned char qualifiers);
 
 struct jl_compound_t {
   unsigned refs;
   jl_entity_t entity;
 };
 
-void jl_compound_init(jl_compound_t *self, jl_entity_t entity);
-void jl_compound_dtor(jl_compound_t *self);
+void jl_compound_init(jl_type_t *self, jl_entity_t entity, unsigned char qualifiers);
 
 #endif /* JL_TYPES_H__ */

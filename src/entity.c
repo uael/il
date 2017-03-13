@@ -28,82 +28,34 @@
 #include "entity.h"
 #include "entities.h"
 
-void jl_entity_init(jl_entity_t *self, jl_entity_n kind) {
+void jl_entity_init(jl_entity_t *self, jl_entity_n kind, void *ptr) {
   *self = (jl_entity_t) {
     .kind = kind
   };
+
   switch (kind) {
     case JL_ENTITY_VAR:
-      self->_var = xmalloc(sizeof(struct jl_var_t));
+      self->_var = ptr ? ptr : xmalloc(sizeof(struct jl_var_t));
       break;
     case JL_ENTITY_PARAM:
-      self->_param = xmalloc(sizeof(struct jl_param_t));
+      self->_param = ptr ? ptr : xmalloc(sizeof(struct jl_param_t));
       break;
     case JL_ENTITY_FUNC:
-      self->_func = xmalloc(sizeof(struct jl_func_t));
+      self->_func = ptr ? ptr : xmalloc(sizeof(struct jl_func_t));
       break;
     case JL_ENTITY_ENUM:
-      self->_enum = xmalloc(sizeof(struct jl_enum_t));
+      self->_enum = ptr ? ptr : xmalloc(sizeof(struct jl_enum_t));
       break;
     case JL_ENTITY_STRUCT:
-      self->_struct = xmalloc(sizeof(struct jl_struct_t));
+      self->_struct = ptr ? ptr : xmalloc(sizeof(struct jl_struct_t));
       break;
     case JL_ENTITY_UNION:
-      self->_union = xmalloc(sizeof(struct jl_union_t));
+      self->_union = ptr ? ptr : xmalloc(sizeof(struct jl_union_t));
       break;
     case JL_ENTITY_LABEL:
-      self->_label = xmalloc(sizeof(struct jl_label_t));
+      self->_label = ptr ? ptr : xmalloc(sizeof(struct jl_label_t));
       break;
   }
-}
-
-void jl_entity_init_var(jl_entity_t *self, struct jl_var_t *entity) {
-  *self = (jl_entity_t) {
-    .kind = JL_ENTITY_VAR,
-    ._var = entity
-  };
-}
-
-void jl_entity_init_param(jl_entity_t *self, struct jl_param_t *entity) {
-  *self = (jl_entity_t) {
-    .kind = JL_ENTITY_PARAM,
-    ._param = entity
-  };
-}
-
-void jl_entity_init_func(jl_entity_t *self, struct jl_func_t *entity) {
-  *self = (jl_entity_t) {
-    .kind = JL_ENTITY_FUNC,
-    ._func = entity
-  };
-}
-
-void jl_entity_init_enum(jl_entity_t *self, struct jl_enum_t *entity) {
-  *self = (jl_entity_t) {
-    .kind = JL_ENTITY_ENUM,
-    ._enum = entity
-  };
-}
-
-void jl_entity_init_struct(jl_entity_t *self, struct jl_struct_t *entity) {
-  *self = (jl_entity_t) {
-    .kind = JL_ENTITY_STRUCT,
-    ._struct = entity
-  };
-}
-
-void jl_entity_init_union(jl_entity_t *self, struct jl_union_t *entity) {
-  *self = (jl_entity_t) {
-    .kind = JL_ENTITY_UNION,
-    ._union = entity
-  };
-}
-
-void jl_entity_init_label(jl_entity_t *self, struct jl_label_t *entity) {
-  *self = (jl_entity_t) {
-    .kind = JL_ENTITY_LABEL,
-    ._label = entity
-  };
 }
 
 void jl_entity_dtor(jl_entity_t *self) {

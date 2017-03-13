@@ -26,11 +26,15 @@
 
 #include "compiler.h"
 
-void jl_context_init(jl_compiler_t *self, int argc, char *argv[]) {
+void jl_compiler_init(jl_compiler_t *self, int argc, char **argv) {
   *self = (jl_compiler_t) {
     .program = argv[0]
   };
 
   jl_opts_parse(&self->opts, argc, argv);
   jl_frontend_init(&self->fe, JL_FRONTEND_JAY, self);
+}
+
+void jl_compiler_dtor(jl_compiler_t *self) {
+  jl_frontend_dtor(&self->fe);
 }

@@ -38,6 +38,7 @@ typedef struct jl_compiler_t {
   jl_backend_t be;
 } jl_compiler_t;
 
-void jl_context_init(jl_compiler_t *self, int argc, char *argv[]);
+void jl_compiler_init(jl_compiler_t *self, int argc, char **argv);
+void jl_compiler_dtor(jl_compiler_t *self);
 
 #endif /* JL_COMPILER_H__ */

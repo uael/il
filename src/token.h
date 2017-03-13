@@ -28,10 +28,22 @@
 
 #include "adt/vector.h"
 
+typedef enum jl_token_n jl_token_n;
+
 typedef struct jl_token_t jl_token_t;
 typedef struct jl_loc_t jl_loc_t;
 
 typedef jl_vector_of(jl_token_t) jl_token_r;
+
+enum jl_token_n {
+  Jl_TOKEN_KEYWORD = 0,
+  Jl_TOKEN_SYNTAX,
+  JL_TOKEN_NUMBER,
+  Jl_TOKEN_IDENTIFIER,
+  Jl_TOKEN_STRING,
+  JL_TOKEN_FLOAT,
+  JL_TOKEN_INT
+};
 
 struct jl_loc_t {
   uint32_t lineno;
@@ -45,6 +57,7 @@ struct jl_token_t {
   jl_loc_t loc;
   const char *name;
   uint32_t length;
+  jl_token_n kind : 8;
   union {
     const char *s;
     float f;

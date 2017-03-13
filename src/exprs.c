@@ -35,7 +35,7 @@ void jl_expr_id_init(jl_expr_id_t *self, const char *id, bool is_keyword) {
 void jl_expr_id_dtor(jl_expr_id_t *self) {}
 
 
-void jl_expr_const_init(jl_expr_const_t *self, jl_literal_t type) {
+void jl_expr_const_init(jl_expr_const_t *self, jl_type_t type) {
   *self = (jl_expr_const_t) {
     .type = type
   };

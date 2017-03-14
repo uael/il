@@ -75,11 +75,18 @@ void jl_lexer_dup(jl_lexer_t *self, jl_lexer_t *begin) {
 void jl_lexer_dtor(jl_lexer_t *self) {
   free(self->buffer);
   jl_token_t token;
+  jl_lexer_event_t event;
   self->queue.cursor = 0;
   jl_deque_foreach(self->queue, token) {
     jl_token_dtor(&token);
   }
   jl_deque_dtor(self->queue);
+  jl_vector_foreach(self->events, event) {
+    if (event.dtor) {
+      event.dtor(&event);
+    }
+  }
+  jl_vector_dtor(self->events);
 }
 
 size_t jl_lexer_length(jl_lexer_t *self) {

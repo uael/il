@@ -26,6 +26,8 @@
 #ifndef   JL_EXPR_H__
 # define  JL_EXPR_H__
 
+#include <adt/vector.h>
+
 #include "token.h"
 
 struct jl_expr_id_t;

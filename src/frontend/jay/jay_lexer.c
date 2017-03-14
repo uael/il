@@ -142,7 +142,7 @@ enum {
     token.s = xstrndup(s, i); \
   } while (false)
 #define push_token do { \
-    jl_vector_push(self->token_stack, token); \
+    jl_vector_push(self->queue, token); \
     n--; \
   } while (false)
 
@@ -554,6 +554,6 @@ void jay_lexer_stack(jl_lexer_t *self, unsigned n) {
   if (n) {
     token = tokens[JAY_TOK_END];
     token.loc = self->loc;
-    jl_vector_push(self->token_stack, token);
+    jl_vector_push(self->queue, token);
   }
 }

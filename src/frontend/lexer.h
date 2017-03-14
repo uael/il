@@ -26,31 +26,53 @@
 #ifndef   JL_LEXER_H__
 # define  JL_LEXER_H__
 
+#include <adt/deque.h>
+
 #include "fe.h"
 #include "token.h"
 #include "entity.h"
 
+typedef enum jl_lexer_event_n jl_lexer_event_n;
+
 typedef struct jl_lexer_t jl_lexer_t;
+typedef struct jl_lexer_event_t jl_lexer_event_t;
+
+typedef jl_vector_of(jl_lexer_event_t) jl_lexer_event_r;
+
+enum jl_lexer_event_n {
+  JL_LEXER_EVENT_ON_PUSH = 0
+};
+
+struct jl_lexer_event_t {
+  jl_lexer_event_n kind;
+  void *data;
+
+  bool (*callback)(jl_lexer_event_t *self, jl_lexer_t *lexer, void *arg);
+  void (*dtor)(jl_lexer_event_t *self);
+};
 
 struct jl_lexer_t {
   jl_frontend_t *fe;
   char *buffer;
   size_t length;
   jl_loc_t loc;
-  jl_token_r token_stack;
+  jl_token_r queue;
+  jl_lexer_event_r events;
 
-  void (*stack)(jl_lexer_t *self, unsigned n);
-  jl_token_t (*peek)(jl_lexer_t *self);
-  jl_token_t (*peekn)(jl_lexer_t *self, unsigned n);
-  jl_token_t (*next)(jl_lexer_t *self);
-  jl_token_t (*consume)(jl_lexer_t *self, unsigned char type);
+  void (*queue_until)(jl_lexer_t *self, unsigned n);
 };
 
 void jl_lexer_init(jl_lexer_t *self, jl_frontend_t *fe, uint32_t file_id, char *buffer, size_t length);
+void jl_lexer_dup(jl_lexer_t *self, jl_lexer_t *begin);
+void jl_lexer_dtor(jl_lexer_t *self);
+
+size_t jl_lexer_length(jl_lexer_t *self);
+bool jl_lexer_push(jl_lexer_t *self, jl_token_t token);
+void jl_lexer_attach(jl_lexer_t *self, jl_lexer_event_t event);
+
 jl_token_t jl_lexer_peek(jl_lexer_t *self);
 jl_token_t jl_lexer_peekn(jl_lexer_t *self, unsigned n);
 jl_token_t jl_lexer_next(jl_lexer_t *self);
 jl_token_t jl_lexer_consume(jl_lexer_t *self, unsigned char type);
-void jl_lexer_dtor(jl_lexer_t *self);
 
 #endif /* JL_LEXER_H__ */

@@ -23,8 +23,8 @@
  * SOFTWARE.
  */
 
-#ifndef   JAYL_VECTOR_H__
-# define  JAYL_VECTOR_H__
+#ifndef   JL_VECTOR_H__
+# define  JL_VECTOR_H__
 
 #include <stdint.h>
 #include <stddef.h>
@@ -32,7 +32,8 @@
 #include <string.h>
 #include <adt/xmalloc.h>
 
-#define jl_roundup32(x) (--(x), (x)|=(x)>>1, (x)|=(x)>>2, (x)|=(x)>>4, (x)|=(x)>>8, (x)|=(x)>>16, ++(x))
+#define jl_roundup32(x) \
+  (--(x), (x)|=(x)>>1, (x)|=(x)>>2, (x)|=(x)>>4, (x)|=(x)>>8, (x)|=(x)>>16, ++(x))
 
 #define jl_vector_of(t) struct { \
     size_t size, capacity; t *data; \
@@ -108,4 +109,4 @@
     for (size_t __k = 1, __i = 0; __k && __i != jl_vector_length(v); __k = !__k, __i++) \
       for (var = *(jl_vector_data(v)+__i); __k; __k = !__k)
 
-#endif /* JAYL_VECTOR_H__ */
+#endif /* JL_VECTOR_H__ */

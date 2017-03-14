@@ -42,14 +42,14 @@ int main(int argc, char *argv[]) {
   jl_frontend_init(&c_fe, JL_FRONTEND_C, &compiler);
   jl_lexer_init(&lexer, &c_fe, 0,
     STR_N_SIZE(
-      "main autoo auto break case char const continue default do double \n "
+      "#define bla 0 \n main autoo auto break case char const continue default do double \n "
       "else enum extern float for goto if inline int long register return short signed \n "
       "sizeof static struct switch typedef union unsigned void ! volatile # while % _Alignof ( ) * + , - . / ; < = > \n "
       "? ... || && >= <= << >> >>= <<= -> -- ++ -= += *= /= %= |= &= == != /****** int */ 1.2 1"
     )
   );
 
-  while ((token = lexer.next(&lexer)).type != 0) {
+  while ((token = jl_lexer_next(&lexer)).type != 0) {
     printf("token[%d, %s]\n", token.kind, token.name ? token.name : token.s);
   }
 

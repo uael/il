@@ -43,18 +43,4 @@ void *xmalloc(size_t size);
  */
 void *xrealloc(void *ptr, size_t size);
 
-/**
- * Allocates memory and copies string @p str into it.
- * This is a wrapper for strdup which calls panic() in case of errors, so no
- * error handling is required for code using it.
- */
-char *xstrdup(const char *str);
-
-/**
- * Allocates memory and copies string @p str into it.
- * This is a wrapper for strndup which calls panic() in case of errors, so no
- * error handling is required for code using it.
- */
-char *xstrndup(const char *str, size_t n);
-
 #endif /* JAYL_XMALLOC_H__ */

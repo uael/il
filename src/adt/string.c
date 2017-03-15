@@ -23,6 +23,24 @@
  * SOFTWARE.
  */
 
-#include "token.h"
+#include "string.h"
 
-void jl_token_dtor(jl_token_t *self) {}
+char *xstrdup(const char *str) {
+  size_t len = strlen(str) + 1;
+  return (char *) memcpy(xmalloc(len), str, len);
+}
+
+char *xstrndup(const char *s, size_t n) {
+  char *result;
+  size_t len = strlen(s);
+  if (len > n) {
+    len = n;
+  }
+
+  result = (char *) xmalloc(len + 1);
+  if (!result)
+    return 0;
+
+  result[len] = '\0';
+  return (char *) memcpy(result, s, len);
+}

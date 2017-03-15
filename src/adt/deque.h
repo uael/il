@@ -56,7 +56,7 @@
 #define jl_deque_back(v) jl_deque_at(v, jl_deque_size(v)-1)
 
 #define jl_deque_dtor(v) do { \
-    jl_deque_size(v) = jl_deque_capacity(v) = 0; \
+    jl_deque_size(v) = jl_deque_capacity(v) = jl_deque_cursor(v) = 0; \
     if (jl_deque_data(v)) free(jl_deque_data(v)); \
     jl_deque_data(v) = NULL; \
   } while (false)
@@ -102,6 +102,11 @@
   } while (false)
 
 #define jl_deque_shift(v) jl_deque_data(v)[jl_deque_cursor(v)++]
+
+#define jl_deque_clear(v) do { \
+    memset(jl_deque_data(v), 0, jl_deque_capacity(v)); \
+    jl_deque_size(v) = jl_deque_capacity(v) = jl_deque_cursor(v) = 0; \
+  } while (false)
 
 #define jl_deque_foreach(v, var) \
     for (size_t __k = 1, __i = 0; __k && __i != jl_deque_length(v); __k = !__k, __i++) \

@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <adt/xmalloc.h>
+#include <adt/string.h>
 
 #include "jay_lexer.h"
 

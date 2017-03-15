@@ -105,6 +105,11 @@
     __r; \
   })
 
+#define jl_vector_clear(v) do { \
+    memset(jl_vector_data(v), 0, jl_vector_capacity(v)); \
+    jl_vector_size(v) = jl_vector_capacity(v) = 0; \
+  } while (false)
+
 #define jl_vector_foreach(v, var) \
     for (size_t __k = 1, __i = 0; __k && __i != jl_vector_length(v); __k = !__k, __i++) \
       for (var = *(jl_vector_data(v)+__i); __k; __k = !__k)

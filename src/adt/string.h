@@ -23,6 +23,28 @@
  * SOFTWARE.
  */
 
-#include "token.h"
+#ifndef   JL_STRING_H__
+# define  JL_STRING_H__
 
-void jl_token_dtor(jl_token_t *self) {}
+#include <string.h>
+
+#include "vector.h"
+#include "xmalloc.h"
+
+typedef jl_vector_of(const char *) string_r;
+
+/**
+ * Allocates memory and copies string @p str into it.
+ * This is a wrapper for strdup which calls panic() in case of errors, so no
+ * error handling is required for code using it.
+ */
+char *xstrdup(const char *str);
+
+/**
+ * Allocates memory and copies string @p str into it.
+ * This is a wrapper for strndup which calls panic() in case of errors, so no
+ * error handling is required for code using it.
+ */
+char *xstrndup(const char *str, size_t n);
+
+#endif /* JL_STRING_H__ */

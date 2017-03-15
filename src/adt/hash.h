@@ -216,8 +216,8 @@ static const double __ac_HASH_UPPER = 0.77;
 	extern void name##_del(name##_t *h, khint_t x);
 
 #define __KHASH_IMPL(name, SCOPE, khkey_t, khval_t, kh_is_map, __hash_func, __hash_equal) \
-	SCOPE name##_t *name##_new(void) {							\
-		return (name##_t *) kcalloc(1, sizeof(name##_t));		\
+	SCOPE name##_t *name##_new(void) { \
+		return (name##_t *) kcalloc(1, sizeof(name##_t)); \
 	} \
 	SCOPE void name##_dtor(name##_t *h) { \
 		if (h) { \
@@ -497,9 +497,9 @@ the bucket has been deleted [int*]
 @abstract     Remove a key from the hash table.
 @param  name  Name of the hash table [symbol]
 @param  h     Pointer to the hash table [khash_t(name)*]
-@param  k     Iterator to the element to be deleted [khint_t]
+@param  x     Iterator to the element to be deleted [khint_t]
 */
-#define kh_del(name, h, k) name##_del(h, k)
+#define kh_del(name, h, x) name##_del(h, x)
 
 /*! @function
 @abstract     Test whether a bucket contains data.

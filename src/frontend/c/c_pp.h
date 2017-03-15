@@ -34,6 +34,7 @@
 typedef enum c_macro_n c_macro_n;
 
 typedef struct c_macro_t c_macro_t;
+typedef struct c_pp_t c_pp_t;
 
 KHASH_DECLARE(c_macro_ht, const char *, c_macro_t);
 
@@ -54,7 +55,15 @@ struct c_macro_t {
   jl_token_r replacement;
 };
 
-bool c_pp_op_push_callback(jl_lexer_event_t *self, jl_lexer_t *lexer, void *arg);
+struct c_pp_t {
+  c_macro_ht_t macros;
+  jl_lexer_t pp_lexer;
+};
+
+void c_pp_init(c_pp_t *self, jl_lexer_t *lexer);
+void c_pp_dtor(c_pp_t *self);
+
+bool c_pp_op_push_callback(jl_lexer_event_t *self, void *arg);
 void c_pp_op_push_dtor(jl_lexer_event_t *self);
 
 #endif /* JL_C_PP_H__ */

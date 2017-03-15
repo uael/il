@@ -26,37 +26,44 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <adt/xmalloc.h>
+#include <adt/string.h>
 
 #include "c_lexer.h"
 #include "c_pp.h"
+#include "compiler.h"
 
 
-static void c_lexer_queue_until(jl_lexer_t *self, unsigned n);
+static void c_lexer_enqueue(jl_lexer_t *self, unsigned n);
 
 void c_lexer_init(jl_lexer_t *self) {
-  self->queue_until = c_lexer_queue_until;
-  jl_lexer_attach(self, (jl_lexer_event_t) {
+  jl_lexer_event_t event;
+
+  self->enqueue = c_lexer_enqueue;
+  event = (jl_lexer_event_t) {
     .kind = JL_LEXER_EVENT_ON_PUSH,
     .callback = c_pp_op_push_callback,
-    .dtor = c_pp_op_push_dtor
-  });
+    .dtor = c_pp_op_push_dtor,
+    .data = xmalloc(sizeof(c_pp_t))
+  };
+  c_pp_init(event.data, self);
+  jl_lexer_attach(self, event);
 }
 
 #define EMPTY {0}
 #define SYNTX(t, s) {(t), {0}, s, sizeof(s)-1, Jl_TOKEN_SYNTAX}
 #define KEYWD(t, s) {(t), {0}, s, sizeof(s)-1, Jl_TOKEN_KEYWORD}
 
-#define peek *ptr
-#define peekn(n) ptr[n]
-#define next (self->loc.colno++, self->loc.position++, *++ptr)
-#define nextn(n) (self->loc.colno+=n, self->loc.position+=n, ptr+=n, *ptr)
+#define peek *(self->buffer + self->loc.position)
+#define peekn(n) (self->buffer + self->loc.position)[n]
+#define next (self->loc.colno++, self->loc.position++, peek)
+#define nextn(n) (self->loc.colno+=n, self->loc.position+=n, peek)
 
 #define set_loc token.loc = self->loc
 #define set_s do { \
     token.length = i; \
     token.loc.colno -= i; \
     token.loc.position -= i; \
-    token.s = xstrndup(s, i); \
+    token.s = jl_strndup(self->fe->compiler, s, i); \
   } while (false)
 #define push_token do { \
     if (jl_lexer_push(self, token)) n--; \
@@ -80,7 +87,7 @@ void c_lexer_init(jl_lexer_t *self) {
 #define M_8(n, a, b, c, d, e, f, g, h) M_7(n, a, b, c, d, e, f, g) && M_(n, 7, h)
 
 
-static void c_lexer_queue_until(jl_lexer_t *self, unsigned n) {
+static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
   static const jl_token_t tokens[] = {
     /* 0x00 */
     SYNTX(C_TOK_END, "$"),
@@ -197,7 +204,7 @@ static void c_lexer_queue_until(jl_lexer_t *self, unsigned n) {
     EMPTY,
     EMPTY,
     SYNTX(C_TOK_OPEN_BRACKET, "["),
-    EMPTY,
+    SYNTX(C_TOK_ANTI_SLASH, "\\"),
     SYNTX(C_TOK_CLOSE_BRACKET, "]"),
     SYNTX(C_TOK_XOR, "^"),
     EMPTY,
@@ -242,15 +249,13 @@ static void c_lexer_queue_until(jl_lexer_t *self, unsigned n) {
     SYNTX(C_TOK_NEG, "~"),
     EMPTY
   };
-  const char *ptr;
   char s[256];
   jl_token_t token;
   unsigned i;
 
-  ptr = self->buffer + self->loc.position;
   while (n && peek != C_TOK_END) {
     if (peek == '_' || isalpha(peek)) {
-      s[i = 0] = *ptr;
+      s[i = 0] = peek;
       while (next == '_' || isalnum(peek)) {
         s[++i] = peek;
       }
@@ -261,11 +266,13 @@ static void c_lexer_queue_until(jl_lexer_t *self, unsigned n) {
             token = tokens[C_TOK_AUTO];
             goto lbl_push_token;
           }
+          goto lbl_push_ident;
         case 'b':
           if (ML(4, 1, 'r', 'e', 'a', 'k')) {
             token = tokens[C_TOK_BREAK];
             goto lbl_push_token;
           }
+          goto lbl_push_ident;
         case 'c':
           if (ML(3, 1, 'a', 's', 'e')) {
             token = tokens[C_TOK_CASE];
@@ -285,6 +292,7 @@ static void c_lexer_queue_until(jl_lexer_t *self, unsigned n) {
               goto lbl_push_token;
             }
           }
+          goto lbl_push_ident;
         case 'd':
           if (ML(6, 1, 'e', 'f', 'a', 'u', 'l', 't')) {
             token = tokens[C_TOK_DEFAULT];
@@ -300,6 +308,7 @@ static void c_lexer_queue_until(jl_lexer_t *self, unsigned n) {
               goto lbl_push_token;
             }
           }
+          goto lbl_push_ident;
         case 'e':
           if (ML(3, 1, 'l', 's', 'e')) {
             token = tokens[C_TOK_ELSE];
@@ -313,6 +322,7 @@ static void c_lexer_queue_until(jl_lexer_t *self, unsigned n) {
             token = tokens[C_TOK_EXTERN];
             goto lbl_push_token;
           }
+          goto lbl_push_ident;
         case 'f':
           if (ML(4, 1, 'l', 'o', 'a', 't')) {
             token = tokens[C_TOK_FLOAT];
@@ -322,11 +332,13 @@ static void c_lexer_queue_until(jl_lexer_t *self, unsigned n) {
             token = tokens[C_TOK_FOR];
             goto lbl_push_token;
           }
+          goto lbl_push_ident;
         case 'g':
           if (ML(3, 1, 'o', 't', 'o')) {
             token = tokens[C_TOK_GOTO];
             goto lbl_push_token;
           }
+          goto lbl_push_ident;
         case 'i':
           if (ML(1, 1, 'f')) {
             token = tokens[C_TOK_IF];
@@ -340,11 +352,13 @@ static void c_lexer_queue_until(jl_lexer_t *self, unsigned n) {
             token = tokens[C_TOK_INT];
             goto lbl_push_token;
           }
+          goto lbl_push_ident;
         case 'l':
           if (ML(3, 1, 'o', 'n', 'g')) {
             token = tokens[C_TOK_LONG];
             goto lbl_push_token;
           }
+          goto lbl_push_ident;
         case 'r':
           if (i > 4 && s[1] == 'e') {
             if (ML(6, 2, 'g', 'i', 's', 't', 'e', 'r')) {
@@ -356,6 +370,7 @@ static void c_lexer_queue_until(jl_lexer_t *self, unsigned n) {
               goto lbl_push_token;
             }
           }
+          goto lbl_push_ident;
         case 's':
           if (ML(4, 1, 'h', 'o', 'r', 't')) {
             token = tokens[C_TOK_SHORT];
@@ -393,11 +408,13 @@ static void c_lexer_queue_until(jl_lexer_t *self, unsigned n) {
                 break;
             }
           }
+          goto lbl_push_ident;
         case 't':
           if (ML(6, 1, 'y', 'p', 'e', 'd', 'e', 'f')) {
             token = tokens[C_TOK_TYPEDEF];
             goto lbl_push_token;
           }
+          goto lbl_push_ident;
         case 'u':
           if (i > 4 && s[1] == 'n') {
             if (ML(3, 2, 'i', 'o', 'n')) {
@@ -409,6 +426,7 @@ static void c_lexer_queue_until(jl_lexer_t *self, unsigned n) {
               goto lbl_push_token;
             }
           }
+          goto lbl_push_ident;
         case 'v':
           if (i > 3 && s[1] == 'o') {
             if (ML(2, 2, 'i', 'd')) {
@@ -420,17 +438,20 @@ static void c_lexer_queue_until(jl_lexer_t *self, unsigned n) {
               goto lbl_push_token;
             }
           }
+          goto lbl_push_ident;
         case 'w':
           if (ML(4, 1, 'h', 'i', 'l', 'e')) {
             token = tokens[C_TOK_WHILE];
             goto lbl_push_token;
           }
+          goto lbl_push_ident;
         case '_':
           if (ML(7, 1, 'A', 'l', 'i', 'g', 'n', 'o', 'f')) {
             token = tokens[C_TOK_ALIGNOF];
             goto lbl_push_token;
           }
         default:
+        lbl_push_ident:
           token = tokens[C_TOK_IDENTIFIER];
           set_loc;
           set_s;
@@ -674,6 +695,10 @@ static void c_lexer_queue_until(jl_lexer_t *self, unsigned n) {
           break;
         case '[':
           push('[');
+          next;
+          break;
+        case '\\':
+          push('\\');
           next;
           break;
         case ']':

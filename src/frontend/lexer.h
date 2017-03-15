@@ -45,9 +45,10 @@ enum jl_lexer_event_n {
 
 struct jl_lexer_event_t {
   jl_lexer_event_n kind;
+  jl_lexer_t *lexer;
   void *data;
 
-  bool (*callback)(jl_lexer_event_t *self, jl_lexer_t *lexer, void *arg);
+  bool (*callback)(jl_lexer_event_t *self, void *arg);
   void (*dtor)(jl_lexer_event_t *self);
 };
 
@@ -57,13 +58,16 @@ struct jl_lexer_t {
   size_t length;
   jl_loc_t loc;
   jl_token_r queue;
+  unsigned char cap;
   jl_lexer_event_r events;
 
-  void (*queue_until)(jl_lexer_t *self, unsigned n);
+  void (*enqueue)(jl_lexer_t *self, unsigned n);
 };
 
 void jl_lexer_init(jl_lexer_t *self, jl_frontend_t *fe, uint32_t file_id, char *buffer, size_t length);
-void jl_lexer_dup(jl_lexer_t *self, jl_lexer_t *begin);
+void jl_lexer_fork(jl_lexer_t *destination, jl_lexer_t *source);
+void jl_lexer_join(jl_lexer_t *origin, jl_lexer_t *fork);
+void jl_lexer_skip(jl_lexer_t *self, unsigned n);
 void jl_lexer_dtor(jl_lexer_t *self);
 
 size_t jl_lexer_length(jl_lexer_t *self);

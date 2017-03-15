@@ -110,6 +110,7 @@ enum {
   C_TOK_TOKEN_PASTE,          /* ## */
 
   C_TOK_OPEN_BRACKET = '[',
+  C_TOK_ANTI_SLASH = '\\',
   C_TOK_CLOSE_BRACKET = ']',
   C_TOK_XOR = '^',
   C_TOK_OPEN_CURLY = '{',

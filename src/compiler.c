@@ -26,7 +26,7 @@
 
 #include "compiler.h"
 
-void jl_compiler_init(jl_compiler_t *self, int argc, char **argv) {
+void jl_init(jl_compiler_t *self, int argc, char **argv) {
   *self = (jl_compiler_t) {
     .program = argv[0]
   };
@@ -35,6 +35,23 @@ void jl_compiler_init(jl_compiler_t *self, int argc, char **argv) {
   jl_frontend_init(&self->fe, JL_FRONTEND_JAY, self);
 }
 
-void jl_compiler_dtor(jl_compiler_t *self) {
+void jl_dtor(jl_compiler_t *self) {
+  const char *str;
+
   jl_frontend_dtor(&self->fe);
+  jl_vector_foreach(self->strtab, str) {
+    free((void *) str);
+  }
+  jl_vector_dtor(self->strtab);
+}
+
+const char *jl_strdup(jl_compiler_t *self, const char *str) {
+  return jl_strndup(self, str, strlen(str));
+}
+
+const char *jl_strndup(jl_compiler_t *self, const char *str, size_t n) {
+  jl_vector_push(self->strtab, "");
+  jl_vector_back(self->strtab) = xmalloc(n + 1);
+  strncpy((char *) jl_vector_back(self->strtab), str, n + 1);
+  return jl_vector_back(self->strtab);
 }

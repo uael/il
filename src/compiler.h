@@ -26,6 +26,8 @@
 #ifndef   JL_COMPILER_H__
 # define  JL_COMPILER_H__
 
+#include <adt/string.h>
+
 #include "opts.h"
 #include "fe.h"
 #include "lexer.h"
@@ -36,9 +38,13 @@ typedef struct jl_compiler_t {
   jl_opts_t opts;
   jl_frontend_t fe;
   jl_backend_t be;
+  string_r strtab;
 } jl_compiler_t;
 
-void jl_compiler_init(jl_compiler_t *self, int argc, char **argv);
-void jl_compiler_dtor(jl_compiler_t *self);
+void jl_init(jl_compiler_t *self, int argc, char **argv);
+void jl_dtor(jl_compiler_t *self);
+
+const char *jl_strdup(jl_compiler_t *self, const char *str);
+const char *jl_strndup(jl_compiler_t *self, const char *str, size_t n);
 
 #endif /* JL_COMPILER_H__ */

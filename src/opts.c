@@ -28,10 +28,11 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+
 #include <adt/xmalloc.h>
+#include <adt/string.h>
 
 #include "opts.h"
-#include "adt/vector.h"
 #include "util/io.h"
 
 void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
@@ -280,10 +281,16 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
   return;
 
   exit_success:
+  jl_vector_foreach(errs, sep) {
+    free(sep);
+  }
   jl_vector_dtor(errs);
   exit(EXIT_SUCCESS);
 
   exit_failure:
+  jl_vector_foreach(errs, sep) {
+    free(sep);
+  }
   jl_vector_dtor(errs);
   exit(EXIT_FAILURE);
 }

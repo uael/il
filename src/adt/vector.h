@@ -107,7 +107,7 @@
 
 #define jl_vector_clear(v) do { \
     memset(jl_vector_data(v), 0, jl_vector_capacity(v)); \
-    jl_vector_size(v) = jl_vector_capacity(v) = 0; \
+    jl_vector_size(v) = 0; \
   } while (false)
 
 #define jl_vector_foreach(v, var) \

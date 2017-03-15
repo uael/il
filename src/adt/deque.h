@@ -105,7 +105,7 @@
 
 #define jl_deque_clear(v) do { \
     memset(jl_deque_data(v), 0, jl_deque_capacity(v)); \
-    jl_deque_size(v) = jl_deque_capacity(v) = jl_deque_cursor(v) = 0; \
+    jl_deque_size(v) = jl_deque_cursor(v) = 0; \
   } while (false)
 
 #define jl_deque_foreach(v, var) \

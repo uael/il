@@ -45,7 +45,7 @@ void c_lexer_init(jl_lexer_t *self) {
     .dtor = c_pp_op_push_dtor,
     .data = xmalloc(sizeof(c_pp_t))
   };
-  c_pp_init(event.data, self);
+  c_pp_init(event.data);
   jl_lexer_attach(self, event);
 }
 

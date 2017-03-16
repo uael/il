@@ -60,7 +60,7 @@ struct c_pp_t {
   jl_lexer_t pp_lexer;
 };
 
-void c_pp_init(c_pp_t *self, jl_lexer_t *lexer);
+void c_pp_init(c_pp_t *self);
 void c_pp_dtor(c_pp_t *self);
 
 bool c_pp_op_push_callback(jl_lexer_event_t *self, void *arg);

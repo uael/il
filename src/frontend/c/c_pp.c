@@ -26,7 +26,9 @@
 #include "c_pp.h"
 #include "c_lexer.h"
 
-void c_pp_init(c_pp_t *self, jl_lexer_t *lexer) {}
+void c_pp_init(c_pp_t *self) {
+  *self = (c_pp_t) {0};
+}
 
 void c_pp_dtor(c_pp_t *self) {
   c_macro_ht_dtor(&self->macros);

@@ -65,7 +65,7 @@ static jl_entity_t parse_enum(jl_frontend_t *self, jl_lexer_t *lexer) {
   jl_type_t type;
   jl_expr_t expr;
 
-  jl_literal_init_i(&type, 0, JL_QUALIFIER_NONE);
+  jl_literal_init(&type, JL_LITERAL_INT, JL_QUALIFIER_NONE);
 
   jl_lexer_consume(lexer, C_TOK_ENUM);
   token = jl_lexer_consume(lexer, C_TOK_IDENTIFIER);

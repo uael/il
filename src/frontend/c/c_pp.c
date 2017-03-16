@@ -96,11 +96,14 @@ void c_pp_parse_define(c_pp_t *self, jl_lexer_t *lexer) {
     if (t.type == '\n') {
       if (pt.type != '\\') break;
       else {
+        jl_token_dtor(&pt);
         jl_token_dtor(&t);
         continue;
       }
+    } else
+    if (t.type != '\\') {
+      jl_vector_push(macro.replacement, t);
     }
-    jl_vector_push(macro.replacement, t);
     pt = t;
   }
   it = kh_put(c_macro_ht, &self->macros, macro.name, &out);

@@ -1,6 +1,8 @@
 #define EXIT_SUCCESS 0
+#define EXIT_FAILURE \
+  1
 
-enum an_enum_t {
-  AN_ENUM_VALUE_1 = 0,
-  AN_ENUM_VALUE_2 = 1
+enum estatus_t {
+  ESTATUS_SUCCESS = EXIT_SUCCESS,
+  ESTATUS_FAILURE = EXIT_FAILURE
 };

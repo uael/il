@@ -97,19 +97,9 @@ void jl_type_dtor(jl_type_t *self);
 struct jl_literal_t {
   unsigned refs;
   jl_literal_n kind;
-  union {
-    char *s;
-    int i;
-    float f;
-  };
 };
 
 void jl_literal_init(jl_type_t *self, jl_literal_n kind, unsigned char qualifiers);
-void jl_literal_init_s(jl_type_t *self, char *value, unsigned char qualifiers);
-void jl_literal_init_i(jl_type_t *self, int value, unsigned char qualifiers);
-void jl_literal_init_in(jl_type_t *self, jl_literal_n kind, int value, unsigned char qualifiers);
-void jl_literal_init_f(jl_type_t *self, float value, unsigned char qualifiers);
-void jl_literal_init_fn(jl_type_t *self, jl_literal_n kind, float value, unsigned char qualifiers);
 
 struct jl_pointer_t {
   unsigned refs;

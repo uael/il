@@ -100,46 +100,6 @@ void jl_literal_init(jl_type_t *self, jl_literal_n kind, unsigned char qualifier
   };
 }
 
-void jl_literal_init_s(jl_type_t *self, char *value, unsigned char qualifiers) {
-  jl_type_init(self, JL_TYPE_LITERAL, qualifiers, NULL);
-  *self->_literal = (jl_literal_t) {
-    .kind = JL_LITERAL_STRING,
-    .s = value
-  };
-}
-
-void jl_literal_init_i(jl_type_t *self, int value, unsigned char qualifiers) {
-  jl_type_init(self, JL_TYPE_LITERAL, qualifiers, NULL);
-  *self->_literal = (jl_literal_t) {
-    .kind = JL_LITERAL_INT,
-    .i = value
-  };
-}
-
-void jl_literal_init_in(jl_type_t *self, jl_literal_n kind, int value, unsigned char qualifiers) {
-  jl_type_init(self, JL_TYPE_LITERAL, qualifiers, NULL);
-  *self->_literal = (jl_literal_t) {
-    .kind = kind,
-    .i = value
-  };
-}
-
-void jl_literal_init_f(jl_type_t *self, float value, unsigned char qualifiers) {
-  jl_type_init(self, JL_TYPE_LITERAL, qualifiers, NULL);
-  *self->_literal = (jl_literal_t) {
-    .kind = JL_LITERAL_FLOAT,
-    .f = value
-  };
-}
-
-void jl_literal_init_fn(jl_type_t *self, jl_literal_n kind, float value, unsigned char qualifiers) {
-  jl_type_init(self, JL_TYPE_LITERAL, qualifiers, NULL);
-  *self->_literal = (jl_literal_t) {
-    .kind = kind,
-    .f = value
-  };
-}
-
 void jl_literal_dtor(jl_type_t *self) {}
 
 

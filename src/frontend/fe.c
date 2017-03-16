@@ -42,9 +42,9 @@ void jl_frontend_init(jl_frontend_t *self, jl_frontend_n kind, jl_compiler_t *co
 }
 
 void jl_frontend_push_src(jl_frontend_t *self, const char *src) {
-  jl_vector_push(self->sources, src);
+  jl_deque_push(self->sources, src);
 }
 
 void jl_frontend_dtor(jl_frontend_t *self) {
-  jl_vector_dtor(self->sources);
+  jl_deque_dtor(self->sources);
 }

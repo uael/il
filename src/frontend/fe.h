@@ -26,6 +26,8 @@
 #ifndef   JL_FE_H__
 # define  JL_FE_H__
 
+#include <adt/deque.h>
+
 #include "entity.h"
 
 struct jl_compiler_t;
@@ -42,7 +44,7 @@ enum jl_frontend_n {
 struct jl_frontend_t {
   struct jl_compiler_t *compiler;
   jl_frontend_n kind;
-  jl_vector_of(const char *) sources;
+  jl_deque_of(const char *) sources;
 
   void (*parse)(struct jl_frontend_t *self, struct jl_lexer_t *lexer, jl_entity_r *out);
 };

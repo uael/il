@@ -9,6 +9,8 @@ else()
     set(CMAKE_C_STANDARD 99)
 endif()
 
+include_directories(lib)
+
 add_subdirectory(lib)
 add_subdirectory(src)
 add_subdirectory(test)

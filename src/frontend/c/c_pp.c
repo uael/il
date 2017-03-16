@@ -35,7 +35,7 @@ void c_macro_dtor(c_macro_t *self) {
   jl_vector_dtor(self->replacement);
 }
 
-void c_macro_expand(c_macro_t *self, c_pp_t *pp, jl_token_r *into) {
+void c_macro_expand(c_macro_t *self, c_pp_t *pp, jl_lexer_t *into) {
   jl_token_t t;
   unsigned it;
   c_macro_t macro;
@@ -51,7 +51,7 @@ void c_macro_expand(c_macro_t *self, c_pp_t *pp, jl_token_r *into) {
         }
       }
     }
-    jl_deque_push(*into, t);
+    jl_lexer_push(into, t);
   }
 }
 
@@ -139,11 +139,11 @@ bool c_pp_op_push_callback(jl_lexer_event_t *self, void *arg) {
     if ((t = jl_lexer_peek(&pp_lexer)).kind == JL_TOKEN_IDENTIFIER) {
       if (strcmp("define", t.s) == 0) {
         c_pp_parse_define(pp, &pp_lexer);
-        jl_lexer_join(self->lexer, &pp_lexer);
+        jl_lexer_join(&pp_lexer);
         return false;
       } else if (strcmp("undef", t.s) == 0) {
         c_pp_parse_undef(pp, &pp_lexer);
-        jl_lexer_join(self->lexer, &pp_lexer);
+        jl_lexer_join(&pp_lexer);
 
         return false;
       }
@@ -151,7 +151,7 @@ bool c_pp_op_push_callback(jl_lexer_event_t *self, void *arg) {
   } else if (token->kind == JL_TOKEN_IDENTIFIER) {
     it = kh_get(c_macro_ht, &pp->macros, token->s);
     if (it != kh_end(&pp->macros)) {
-      c_macro_expand(&kh_value(&pp->macros, it), pp, &self->lexer->queue);
+      c_macro_expand(&kh_value(&pp->macros, it), pp, self->lexer);
       return false;
     }
   }

@@ -1,5 +1,3 @@
-set(jayl_INCLUDES ${jayl_INCLUDES} ${CMAKE_CURRENT_LIST_DIR}/p99/include)
-
 include(ExternalProject)
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")

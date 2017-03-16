@@ -25,13 +25,13 @@
 
 #include <stdlib.h>
 #include <ctype.h>
+
 #include <adt/xmalloc.h>
 #include <adt/string.h>
 
 #include "c_lexer.h"
 #include "c_pp.h"
 #include "compiler.h"
-
 
 static void c_lexer_enqueue(jl_lexer_t *self, unsigned n);
 
@@ -91,7 +91,7 @@ void c_lexer_init(jl_lexer_t *self) {
 static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
   static const jl_token_t tokens[] = {
     /* 0x00 */
-    SYNTX(C_TOK_END, "$"),
+    SYNTX(C_TOK_END, "\0"),
     KEYWD(C_TOK_AUTO, "auto"),
     KEYWD(C_TOK_BREAK, "break"),
     KEYWD(C_TOK_CASE, "case"),

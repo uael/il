@@ -29,28 +29,16 @@
 
 #include "compiler.h"
 
-#define STR_N_SIZE(s) s, sizeof(s)-1
-
 int main(int argc, char *argv[]) {
   jl_compiler_t compiler;
   jl_lexer_t lexer;
   jl_token_t token;
 
   jl_init(&compiler, argc, argv);
-
-  jl_frontend_t c_fe;
-  jl_frontend_init(&c_fe, JL_FRONTEND_C, &compiler);
-  jl_lexer_init(&lexer, &c_fe, 0,
-    STR_N_SIZE(
-      "#define EXIT_SUCCESS 0 \n #define __main int main() { return EXIT_SUCCESS; } \n __main auto break case char const continue default do double \n "
-      "else enum extern float for goto if inline int long register return short signed \n "
-      "sizeof static struct switch typedef union unsigned void ! volatile # while % _Alignof ( ) * + , - . / ; < = > \n "
-      "? ... || && >= <= << >> >>= <<= -> -- ++ -= += *= /= %= |= &= == != /****** int */ 1.2 1"
-    )
-  );
+  jl_lexer_init_f(&lexer, &compiler.fe);
 
   while ((token = jl_lexer_next(&lexer)).type != 0) {
-    printf("token[%d, %s]\n", token.kind, token.name ? token.name : token.s);
+
   }
 
   jl_dtor(&compiler);

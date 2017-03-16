@@ -23,30 +23,32 @@
  * SOFTWARE.
  */
 
-#include <adt/xmalloc.h>
-#include <adt/string.h>
 #include <stdlib.h>
 #include <token.h>
+
+#include <adt/xmalloc.h>
+#include <adt/string.h>
+#include <util/io.h>
+#include <compiler.h>
 
 #include "lexer.h"
 #include "jay/jay_lexer.h"
 #include "c/c_lexer.h"
 
-void jl_lexer_init(jl_lexer_t *self, jl_frontend_t *fe, uint32_t file_id, char *buffer, size_t length) {
+void jl_lexer_init(jl_lexer_t *self, jl_frontend_t *fe, uint32_t file_id, const char *buffer, size_t length) {
   *self = (jl_lexer_t) {
     .fe = fe,
     .loc = (jl_loc_t) {
-      .colno = 0,
-      .lineno = 0,
       .file_id = file_id,
-      .position = 0
     },
-    .buffer = xstrndup(buffer, length),
+    .buffer = buffer ? xstrndup(buffer, length) : NULL,
     .length = length,
     .cap = 10
   };
 
-  self->buffer[length] = '\0';
+  if (self->buffer) {
+    self->buffer[length] = '\0';
+  }
   switch (fe->kind) {
     case JL_FRONTEND_C:
       c_lexer_init(self);
@@ -57,24 +59,29 @@ void jl_lexer_init(jl_lexer_t *self, jl_frontend_t *fe, uint32_t file_id, char *
   }
 }
 
-void jl_lexer_fork(jl_lexer_t *destination, jl_lexer_t *source) {
-  destination->fe = source->fe;
-  destination->loc = source->loc;
-  destination->buffer = source->buffer;
-  destination->length = source->length;
-  destination->enqueue = source->enqueue;
-  destination->cap = 1;
-}
+void jl_lexer_init_f(jl_lexer_t *self, jl_frontend_t *fe) {
+  size_t len;
+  uint32_t file_id;
+  const char *filename, *buffer;
 
-void jl_lexer_join(jl_lexer_t *origin, jl_lexer_t *fork) {
-  if (jl_deque_size(fork->queue)) {
-    origin->loc = fork->loc;
+  if (!jl_deque_length(fe->sources)) {
+    puts("no sources files to parse");
+    exit(1);
   }
-  jl_deque_clear(fork->queue);
-}
 
-void jl_lexer_skip(jl_lexer_t *self, unsigned n) {
-  self->loc.position += n;
+  file_id = (uint32_t) jl_deque_cursor(fe->sources);
+  filename = jl_deque_shift(fe->sources);
+  if (!jl_fexists(filename)) {
+    puts("file does not exists");
+    exit(1);
+  }
+  buffer = jl_fread(filename, &len);
+  if (!buffer) {
+    puts("unable to read source file");
+    exit(1);
+  }
+
+  jl_lexer_init(self,  fe, file_id, buffer, len);
 }
 
 void jl_lexer_dtor(jl_lexer_t *self) {
@@ -96,6 +103,27 @@ void jl_lexer_dtor(jl_lexer_t *self) {
   jl_vector_dtor(self->events);
 }
 
+void jl_lexer_fork(jl_lexer_t *destination, jl_lexer_t *source) {
+  destination->parent = source;
+  destination->fe = source->fe;
+  destination->loc = source->loc;
+  destination->buffer = source->buffer;
+  destination->length = source->length;
+  destination->enqueue = source->enqueue;
+  destination->cap = 1;
+}
+
+void jl_lexer_join(jl_lexer_t *fork) {
+  if (jl_deque_size(fork->queue)) {
+    fork->parent->loc = fork->loc;
+  }
+  jl_deque_clear(fork->queue);
+}
+
+void jl_lexer_skip(jl_lexer_t *self, unsigned n) {
+  self->loc.position += n;
+}
+
 size_t jl_lexer_length(jl_lexer_t *self) {
   return jl_deque_length(self->queue);
 }
@@ -111,12 +139,38 @@ bool jl_lexer_push(jl_lexer_t *self, jl_token_t token) {
     }
   }
   jl_deque_push(self->queue, token);
+  if (jl_lexer_is_root(self) && self->fe->compiler->opts.echo) {
+    switch (token.kind) {
+      case JL_TOKEN_IDENTIFIER:
+      case JL_TOKEN_NUMBER:
+        printf("%s ", token.s);
+        break;
+      case JL_TOKEN_FLOAT:
+        printf("%f ", token.f);
+        break;
+      case JL_TOKEN_INT:
+        printf("%d ", token.i);
+        break;
+      default:
+        if (token.length>1) {
+          printf("%s ", token.name);
+        }
+        else {
+          printf("%s", token.name);
+        }
+        break;
+    }
+  }
   return true;
 }
 
 void jl_lexer_attach(jl_lexer_t *self, jl_lexer_event_t event) {
   event.lexer = self;
   jl_vector_push(self->events, event);
+}
+
+bool jl_lexer_is_root(jl_lexer_t *self) {
+  return self->parent == NULL;
 }
 
 void jl_lexer_enqueue(jl_lexer_t *self, unsigned n) {

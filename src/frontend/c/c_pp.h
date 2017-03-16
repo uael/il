@@ -57,7 +57,7 @@ struct c_macro_t {
 
 void c_macro_init(c_macro_t *self);
 void c_macro_dtor(c_macro_t *self);
-void c_macro_expand(c_macro_t *self, c_pp_t *pp, jl_token_r *into);
+void c_macro_expand(c_macro_t *self, c_pp_t *pp, jl_lexer_t *into);
 
 struct c_pp_t {
   c_macro_ht_t macros;

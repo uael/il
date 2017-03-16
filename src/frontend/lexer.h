@@ -60,19 +60,22 @@ struct jl_lexer_t {
   jl_token_r queue;
   unsigned char cap;
   jl_lexer_event_r events;
+  jl_lexer_t *parent;
 
   void (*enqueue)(jl_lexer_t *self, unsigned n);
 };
 
-void jl_lexer_init(jl_lexer_t *self, jl_frontend_t *fe, uint32_t file_id, char *buffer, size_t length);
-void jl_lexer_fork(jl_lexer_t *destination, jl_lexer_t *source);
-void jl_lexer_join(jl_lexer_t *origin, jl_lexer_t *fork);
-void jl_lexer_skip(jl_lexer_t *self, unsigned n);
+void jl_lexer_init(jl_lexer_t *self, jl_frontend_t *fe, uint32_t file_id, const char *buffer, size_t length);
+void jl_lexer_init_f(jl_lexer_t *self, jl_frontend_t *fe);
 void jl_lexer_dtor(jl_lexer_t *self);
+void jl_lexer_fork(jl_lexer_t *destination, jl_lexer_t *source);
+void jl_lexer_join(jl_lexer_t *fork);
+void jl_lexer_skip(jl_lexer_t *self, unsigned n);
 
 size_t jl_lexer_length(jl_lexer_t *self);
 bool jl_lexer_push(jl_lexer_t *self, jl_token_t token);
 void jl_lexer_attach(jl_lexer_t *self, jl_lexer_event_t event);
+bool jl_lexer_is_root(jl_lexer_t *self);
 
 jl_token_t jl_lexer_peek(jl_lexer_t *self);
 jl_token_t jl_lexer_peekn(jl_lexer_t *self, unsigned n);

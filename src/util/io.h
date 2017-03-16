@@ -26,6 +26,8 @@
 #ifndef   JL_IO_H__
 # define  JL_IO_H__
 
+#include "tinydir/tinydir.h"
+
 #define RESET   "\033[0m"
 #define BLACK   "\033[30m"
 #define RED     "\033[31m"
@@ -36,5 +38,26 @@
 #define CYAN    "\033[36m"
 #define WHITE   "\033[37m"
 #define BOLD    "\033[1m"
+
+#include <stdint.h>
+#include <stdbool.h>
+
+uint64_t jl_fsize(const char *path);
+const char *jl_fread(const char *path, size_t *len);
+bool jl_fexists(const char *path);
+const char *jl_fbuildpath(const char *filename, const char *dirpath);
+bool jl_fwrite(const char *path, const char *buffer, size_t len);
+
+#if defined(_WIN32)
+# include <windows.h>
+# define DIRREF HANDLE
+#else
+# include <dirent.h>
+# define DIRREF DIR*
+#endif
+
+bool jl_is_dir(const char *path);
+DIRREF jl_dir_init(const char *path);
+const char *jl_dread(DIRREF ref);
 
 #endif /* JL_IO_H__ */

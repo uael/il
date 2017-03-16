@@ -32,7 +32,8 @@ void jl_init(jl_compiler_t *self, int argc, char **argv) {
   };
 
   jl_opts_parse(&self->opts, argc, argv);
-  jl_frontend_init(&self->fe, JL_FRONTEND_JAY, self);
+  jl_frontend_init(&self->fe, JL_FRONTEND_C, self);
+  jl_frontend_push_src(&self->fe, self->opts.in);
 }
 
 void jl_dtor(jl_compiler_t *self) {

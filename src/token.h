@@ -36,11 +36,11 @@ typedef struct jl_loc_t jl_loc_t;
 typedef jl_deque_of(jl_token_t) jl_token_r;
 
 enum jl_token_n {
-  Jl_TOKEN_KEYWORD = 0,
-  Jl_TOKEN_SYNTAX,
+  JL_TOKEN_KEYWORD = 0,
+  JL_TOKEN_SYNTAX,
   JL_TOKEN_NUMBER,
-  Jl_TOKEN_IDENTIFIER,
-  Jl_TOKEN_STRING,
+  JL_TOKEN_IDENTIFIER,
+  JL_TOKEN_STRING,
   JL_TOKEN_FLOAT,
   JL_TOKEN_INT
 };

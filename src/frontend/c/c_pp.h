@@ -55,13 +55,18 @@ struct c_macro_t {
   jl_token_r replacement;
 };
 
+void c_macro_init(c_macro_t *self);
+void c_macro_dtor(c_macro_t *self);
+void c_macro_expand(c_macro_t *self, c_pp_t *pp, jl_token_r *into);
+
 struct c_pp_t {
   c_macro_ht_t macros;
-  jl_lexer_t pp_lexer;
 };
 
 void c_pp_init(c_pp_t *self);
 void c_pp_dtor(c_pp_t *self);
+void c_pp_parse_define(c_pp_t *self, jl_lexer_t *lexer);
+void c_pp_parse_undef(c_pp_t *self, jl_lexer_t *lexer);
 
 bool c_pp_op_push_callback(jl_lexer_event_t *self, void *arg);
 void c_pp_op_push_dtor(jl_lexer_event_t *self);

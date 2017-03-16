@@ -50,8 +50,8 @@ void c_lexer_init(jl_lexer_t *self) {
 }
 
 #define EMPTY {0}
-#define SYNTX(t, s) {(t), {0}, s, sizeof(s)-1, Jl_TOKEN_SYNTAX}
-#define KEYWD(t, s) {(t), {0}, s, sizeof(s)-1, Jl_TOKEN_KEYWORD}
+#define SYNTX(t, s) {(t), {0}, s, sizeof(s)-1, JL_TOKEN_SYNTAX}
+#define KEYWD(t, s) {(t), {0}, s, sizeof(s)-1, JL_TOKEN_KEYWORD}
 
 #define peek *(self->buffer + self->loc.position)
 #define peekn(n) (self->buffer + self->loc.position)[n]
@@ -71,6 +71,7 @@ void c_lexer_init(jl_lexer_t *self) {
 #define push(t) do { \
     token = tokens[t]; \
     set_loc; \
+    nextn(token.length); \
     push_token; \
   } while (false)
 
@@ -235,8 +236,8 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
     EMPTY,
     EMPTY,
     {C_TOK_NUMBER, {0}, NULL, 0, JL_TOKEN_NUMBER},
-    {C_TOK_IDENTIFIER, {0}, NULL, 0, Jl_TOKEN_IDENTIFIER},
-    {C_TOK_STRING, {0}, NULL, 0, Jl_TOKEN_STRING},
+    {C_TOK_IDENTIFIER, {0}, NULL, 0, JL_TOKEN_IDENTIFIER},
+    {C_TOK_STRING, {0}, NULL, 0, JL_TOKEN_STRING},
     EMPTY,
 
     /* 0x78 */
@@ -488,106 +489,83 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
         case '!':
           if (peekn(1) == '=') {
             push(C_TOK_NEQ);
-            nextn(2);
             break;
           }
           push('!');
-          next;
           break;
         case '#':
           if (peekn(1) == '#') {
             push(C_TOK_TOKEN_PASTE);
-            nextn(2);
             break;
           }
           push('#');
-          next;
           break;
         case '%':
           if (peekn(1) == '=') {
             push(C_TOK_MOD_ASSIGN);
-            nextn(2);
             break;
           }
           push('%');
-          next;
           break;
         case '&':
           if (peekn(1) == '&') {
             push(C_TOK_LOGICAL_AND);
-            nextn(2);
             break;
           }
           if (peekn(1) == '=') {
             push(C_TOK_AND_ASSIGN);
-            nextn(2);
             break;
           }
           push('&');
-          next;
           break;
         case '(':
           push('(');
-          next;
           break;
         case ')':
           push(')');
-          next;
           break;
         case '*':
           if (peekn(1) == '=') {
             push(C_TOK_MUL_ASSIGN);
-            nextn(2);
             break;
           }
           push('*');
-          next;
           break;
         case '+':
           if (peekn(1) == '=') {
             push(C_TOK_PLUS_ASSIGN);
-            nextn(2);
             break;
           }
           if (peekn(1) == '+') {
             push(C_TOK_INCREMENT);
-            nextn(2);
             break;
           }
           push('+');
-          next;
           break;
         case ',':
           push(',');
-          next;
           break;
         case '-':
           if (peekn(1) == '=') {
             push(C_TOK_MINUS_ASSIGN);
-            nextn(2);
             break;
           }
           if (peekn(1) == '-') {
             push(C_TOK_DECREMENT);
-            nextn(2);
             break;
           }
           if (peekn(1) == '>') {
             push(C_TOK_ARROW);
-            nextn(2);
             break;
           }
           push('-');
-          next;
           break;
         case '.':
           if (peekn(1) == '.' && peekn(2) == '.') {
             push(C_TOK_DOTS);
-            nextn(3);
             break;
           }
           push('.');
-          next;
           break;
         case '/':
           if (peekn(1) == '*') {
@@ -603,8 +581,7 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
               } else {
                 switch (peek) {
                   case '\r':
-                    next;
-                    if (peek == '\n') {
+                    if (peekn(1) == '\n') {
                       next;
                     }
                     push('\n');
@@ -614,7 +591,6 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
                   case '\v':
                   case '\f':
                   case '\n':
-                    next;
                     push('\n');
                     ++self->loc.lineno;
                     self->loc.colno = 0;
@@ -628,124 +604,97 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
           }
           if (peekn(1) == '=') {
             push(C_TOK_DIV_ASSIGN);
-            nextn(2);
             break;
           }
           push('/');
-          next;
           break;
         case ':':
           push(':');
-          next;
           break;
         case ';':
           push(';');
-          next;
           break;
         case '<':
           if (peekn(1) == '<') {
             if (peekn(2) == '=') {
               push(C_TOK_LSHIFT_ASSIGN);
-              nextn(3);
               break;
             }
             push(C_TOK_LSHIFT);
-            nextn(2);
             break;
           }
           if (peekn(1) == '=') {
             push(C_TOK_LEQ);
-            nextn(2);
             break;
           }
           push('<');
-          next;
           break;
         case '=':
           if (peekn(1) == '=') {
             push(C_TOK_EQ);
-            nextn(2);
             break;
           }
           push('=');
-          next;
           break;
         case '>':
           if (peekn(1) == '>') {
             if (peekn(2) == '=') {
               push(C_TOK_RSHIFT_ASSIGN);
-              nextn(3);
               break;
             }
             push(C_TOK_RSHIFT);
-            nextn(2);
             break;
           }
           if (peekn(1) == '=') {
             push(C_TOK_GEQ);
-            nextn(2);
             break;
           }
           push('>');
-          next;
           break;
         case '?':
           push('?');
-          next;
           break;
         case '[':
           push('[');
-          next;
           break;
         case '\\':
           push('\\');
-          next;
           break;
         case ']':
           push(']');
-          next;
           break;
         case '^':
           if (peekn(1) == '=') {
             push(C_TOK_XOR_ASSIGN);
-            nextn(2);
             break;
           }
           push('^');
-          next;
           break;
         case '{':
           push('{');
-          next;
           break;
         case '|':
           if (peekn(1) == '|') {
             push(C_TOK_LOGICAL_OR);
-            nextn(2);
             break;
           }
           if (peekn(1) == '=') {
             push(C_TOK_OR_ASSIGN);
-            nextn(2);
             break;
           }
           push('|');
-          next;
           break;
         case '}':
           push('}');
-          next;
           break;
         case '~':
           push('~');
-          next;
           break;
         case '\r':
-          if (peek == '\n') {
+          if (peekn(1) == '\n') {
             next;
           }
           push('\n');
-          next;
           ++self->loc.lineno;
           self->loc.colno = 0;
           break;
@@ -753,14 +702,11 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
         case '\f':
         case '\n':
           push('\n');
-          next;
           ++self->loc.lineno;
           self->loc.colno = 0;
           break;
         case ' ':
         case '\t':
-          next;
-          break;
         default:
           next;
           break;

@@ -67,7 +67,7 @@ void jl_lexer_fork(jl_lexer_t *destination, jl_lexer_t *source) {
 }
 
 void jl_lexer_join(jl_lexer_t *origin, jl_lexer_t *fork) {
-  if (jl_deque_length(fork->queue)) {
+  if (jl_deque_size(fork->queue)) {
     origin->loc = fork->loc;
   }
   jl_deque_clear(fork->queue);
@@ -147,19 +147,40 @@ jl_token_t jl_lexer_peekn(jl_lexer_t *self, unsigned n) {
 }
 
 jl_token_t jl_lexer_next(jl_lexer_t *self) {
-  if (jl_lexer_length(self) && jl_deque_front(self->queue).type != 0) {
-    (void) jl_deque_shift(self->queue);
-  }
+  jl_token_t result;
+
   if (jl_lexer_length(self) < 1) {
     jl_lexer_enqueue(self, self->cap);
   }
-  return jl_deque_front(self->queue);
+  if (jl_lexer_length(self) && jl_deque_front(self->queue).type != 0) {
+    result = jl_deque_shift(self->queue);
+  } else {
+    result = jl_deque_front(self->queue);
+  }
+  return result;
 }
 
 jl_token_t jl_lexer_consume(jl_lexer_t *self, unsigned char type) {
-  if (jl_lexer_peek(self).type != type) {
+  jl_token_t result;
+
+  if ((result = jl_lexer_peek(self)).type != type) {
     puts("unexpected token");
     exit(1);
   }
-  return jl_lexer_next(self);
+  jl_lexer_next(self);
+  return result;
+}
+
+jl_token_t jl_lexer_consume_id(jl_lexer_t *self, const char *id) {
+  jl_token_t result;
+  if ((result = jl_lexer_peek(self)).kind != JL_TOKEN_IDENTIFIER) {
+    puts("unexpected token");
+    exit(1);
+  }
+  if (strcmp(id, result.s) != 0) {
+    puts("unexpected identifier");
+    exit(1);
+  }
+  jl_lexer_next(self);
+  return result;
 }

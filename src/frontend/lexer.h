@@ -78,5 +78,6 @@ jl_token_t jl_lexer_peek(jl_lexer_t *self);
 jl_token_t jl_lexer_peekn(jl_lexer_t *self, unsigned n);
 jl_token_t jl_lexer_next(jl_lexer_t *self);
 jl_token_t jl_lexer_consume(jl_lexer_t *self, unsigned char type);
+jl_token_t jl_lexer_consume_id(jl_lexer_t *self, const char *id);
 
 #endif /* JL_LEXER_H__ */

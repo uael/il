@@ -569,8 +569,8 @@ the bucket has been deleted [int*]
 #define kh_foreach(h, kvar, vvar, code) { khint_t __i; \
 	for (__i = kh_begin(h); __i != kh_end(h); ++__i) { \
 		if (!kh_exist(h,__i)) continue; \
-		(kvar) = kh_key(h,__i); \
-		(vvar) = kh_val(h,__i); \
+		kvar = kh_key(h,__i); \
+		vvar = kh_val(h,__i); \
 		code; \
 	} }
 
@@ -583,7 +583,7 @@ the bucket has been deleted [int*]
 #define kh_foreach_value(h, vvar, code) { khint_t __i; \
 	for (__i = kh_begin(h); __i != kh_end(h); ++__i) { \
 		if (!kh_exist(h,__i)) continue; \
-		(vvar) = kh_val(h,__i); \
+		vvar = kh_val(h,__i); \
 		code; \
 	} }
 

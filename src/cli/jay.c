@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
   jl_frontend_init(&c_fe, JL_FRONTEND_C, &compiler);
   jl_lexer_init(&lexer, &c_fe, 0,
     STR_N_SIZE(
-      "#define __main int main() { return 0; } \n __main auto break case char const continue default do double \n "
+      "#define EXIT_SUCCESS 0 \n #define __main int main() { return EXIT_SUCCESS; } \n __main auto break case char const continue default do double \n "
       "else enum extern float for goto if inline int long register return short signed \n "
       "sizeof static struct switch typedef union unsigned void ! volatile # while % _Alignof ( ) * + , - . / ; < = > \n "
       "? ... || && >= <= << >> >>= <<= -> -- ++ -= += *= /= %= |= &= == != /****** int */ 1.2 1"

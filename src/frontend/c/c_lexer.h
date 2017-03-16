@@ -29,7 +29,7 @@
 #include "lexer.h"
 
 enum {
-  C_TOK_END = 0,
+  C_TOK_END = '\0',
   C_TOK_AUTO = C_TOK_END + 1,
   C_TOK_BREAK,
   C_TOK_CASE,

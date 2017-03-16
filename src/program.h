@@ -23,29 +23,18 @@
  * SOFTWARE.
  */
 
-#include "fe.h"
-#include "compiler.h"
-#include "c/c_fe.h"
+#ifndef   JL_PROGRAM_H__
+# define  JL_PROGRAM_H__
 
-void jl_frontend_init(jl_frontend_t *self, jl_frontend_n kind, jl_compiler_t *compiler) {
-  *self = (jl_frontend_t) {
-    .compiler = compiler,
-    .kind = kind
-  };
+#include "entity.h"
 
-  switch (self->kind) {
-    case JL_FRONTEND_C:
-      self->parse = c_fe_parse;
-      break;
-    case JL_FRONTEND_JAY:
-      break;
-  }
-}
+typedef struct jl_program_t jl_program_t;
 
-void jl_frontend_push_src(jl_frontend_t *self, const char *src) {
-  jl_deque_push(self->sources, src);
-}
+struct jl_program_t {
+  jl_entity_r entities;
+};
 
-void jl_frontend_dtor(jl_frontend_t *self) {
-  jl_deque_dtor(self->sources);
-}
+void jl_program_init(jl_program_t *self);
+void jl_program_dtor(jl_program_t *self);
+
+#endif /* JL_PROGRAM_H__ */

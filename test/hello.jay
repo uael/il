@@ -1,7 +1,6 @@
 #define EXIT_SUCCESS 0
-#define __main int main() { return EXIT_SUCCESS; }
 
-__main auto break case char const continue default do double
-else enum extern float for goto if inline int long register return short signed
-sizeof static struct switch typedef union unsigned void ! volatile # while % _Alignof ( ) * + , - . / ; < = >
-? ... || && >= <= << >> >>= <<= -> -- ++ -= += *= /= %= |= &= == != /****** int */ 1.2 1
+enum an_enum_t {
+  AN_ENUM_VALUE_1 = 0,
+  AN_ENUM_VALUE_2 = 1
+};

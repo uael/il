@@ -32,15 +32,11 @@
 int main(int argc, char *argv[]) {
   jl_compiler_t compiler;
   jl_lexer_t lexer;
-  jl_token_t token;
+  jl_program_t program;
 
   jl_init(&compiler, argc, argv);
   jl_lexer_init_f(&lexer, &compiler.fe);
-
-  while ((token = jl_lexer_next(&lexer)).type != 0) {
-
-  }
-
+  compiler.fe.parse(&compiler.fe, &lexer, &program);
   jl_dtor(&compiler);
   jl_lexer_dtor(&lexer);
 

@@ -217,6 +217,12 @@ jl_token_t jl_lexer_next(jl_lexer_t *self) {
 jl_token_t jl_lexer_consume(jl_lexer_t *self, unsigned char type) {
   jl_token_t result;
 
+  if (type != '\n') {
+    while (jl_lexer_peek(self).type == '\n') {
+      jl_lexer_next(self);
+    }
+  }
+
   if ((result = jl_lexer_peek(self)).type != type) {
     puts("unexpected token");
     exit(1);

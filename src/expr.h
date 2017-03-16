@@ -49,7 +49,8 @@ typedef struct jl_expr_t jl_expr_t;
 typedef jl_vector_of(jl_expr_t) jl_expr_r;
 
 enum jl_expr_n {
-  JL_EXPR_ID = 0,
+  JL_EXPR_UNDEFINED = 0,
+  JL_EXPR_ID,
   JL_EXPR_CONST,
   JL_EXPR_UNARY,
   JL_EXPR_BINARY,
@@ -100,7 +101,7 @@ struct jl_expr_t {
   };
 };
 
-void jl_expr_init(jl_expr_t *self, jl_expr_n kind, jl_loc_t loc, void *ptr);
+void jl_expr_undefined(jl_expr_t *self);
 void jl_expr_dtor(jl_expr_t *self);
 
 #endif /* JL_EXPR_H__ */

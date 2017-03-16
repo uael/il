@@ -104,6 +104,7 @@ struct jl_literal_t {
   };
 };
 
+void jl_literal_init(jl_type_t *self, jl_literal_n kind, unsigned char qualifiers);
 void jl_literal_init_s(jl_type_t *self, char *value, unsigned char qualifiers);
 void jl_literal_init_i(jl_type_t *self, int value, unsigned char qualifiers);
 void jl_literal_init_in(jl_type_t *self, jl_literal_n kind, int value, unsigned char qualifiers);

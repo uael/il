@@ -46,8 +46,8 @@ struct jl_var_t {
   jl_expr_t initializer;
 };
 
-void jl_var_init(jl_var_t *self, const char *name, jl_type_t type, jl_expr_t initializer, unsigned flags);
-void jl_var_dtor(jl_var_t *self);
+void jl_var_init(jl_entity_t *self, const char *name, jl_type_t type, jl_expr_t initializer, unsigned flags);
+void jl_var_dtor(jl_entity_t *self);
 
 struct jl_param_t {
   unsigned refs, flags;
@@ -57,9 +57,9 @@ struct jl_param_t {
   jl_expr_t initializer;
 };
 
-void jl_param_init(jl_param_t *self, unsigned position, const char *name, jl_type_t type, jl_expr_t initializer,
+void jl_param_init(jl_entity_t *self, unsigned position, const char *name, jl_type_t type, jl_expr_t initializer,
   unsigned flags);
-void jl_param_dtor(jl_param_t *self);
+void jl_param_dtor(jl_entity_t *self);
 
 struct jl_func_t {
   unsigned refs, flags;
@@ -69,9 +69,9 @@ struct jl_func_t {
   jl_stmt_t body;
 };
 
-void jl_func_init(jl_func_t *self, const char *name, jl_type_t return_type, jl_param_r params, jl_stmt_t body,
+void jl_func_init(jl_entity_t *self, const char *name, jl_type_t return_type, jl_param_r params, jl_stmt_t body,
   unsigned flags);
-void jl_func_dtor(jl_func_t *self);
+void jl_func_dtor(jl_entity_t *self);
 
 struct jl_enum_t {
   unsigned refs, flags;
@@ -80,8 +80,8 @@ struct jl_enum_t {
   jl_var_r vars;
 };
 
-void jl_enum_init(jl_enum_t *self, const char *name, jl_type_t item_type, jl_var_r vars, unsigned flags);
-void jl_enum_dtor(jl_enum_t *self);
+void jl_enum_init(jl_entity_t *self, const char *name, jl_type_t item_type, jl_var_r vars, unsigned flags);
+void jl_enum_dtor(jl_entity_t *self);
 
 struct jl_struct_t {
   unsigned refs, flags;
@@ -89,8 +89,8 @@ struct jl_struct_t {
   jl_var_r vars;
 };
 
-void jl_struct_init(jl_struct_t *self, const char *name, jl_var_r vars, unsigned flags);
-void jl_struct_dtor(jl_struct_t *self);
+void jl_struct_init(jl_entity_t *self, const char *name, jl_var_r vars, unsigned flags);
+void jl_struct_dtor(jl_entity_t *self);
 
 struct jl_union_t {
   unsigned refs, flags;
@@ -98,8 +98,8 @@ struct jl_union_t {
   jl_var_r vars;
 };
 
-void jl_union_init(jl_union_t *self, const char *name, jl_var_r vars, unsigned flags);
-void jl_union_dtor(jl_union_t *self);
+void jl_union_init(jl_entity_t *self, const char *name, jl_var_r vars, unsigned flags);
+void jl_union_dtor(jl_entity_t *self);
 
 struct jl_label_t {
   unsigned refs, flags;
@@ -107,7 +107,7 @@ struct jl_label_t {
   jl_stmt_t next;
 };
 
-void jl_label_init(jl_label_t *self, const char *name, jl_stmt_t next, unsigned flags);
-void jl_label_dtor(jl_label_t *label);
+void jl_label_init(jl_entity_t *self, const char *name, jl_stmt_t next, unsigned flags);
+void jl_label_dtor(jl_entity_t *label);
 
 #endif /* JL_ENTITIES_H__ */

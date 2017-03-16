@@ -46,10 +46,11 @@ typedef struct jl_entity_t jl_entity_t;
 
 typedef jl_vector_of(jl_entity_t) jl_entity_r;
 typedef jl_vector_of(struct jl_param_t) jl_param_r;
-typedef jl_vector_of(struct jl_var_t) jl_var_r;
+typedef jl_vector_of(jl_entity_t) jl_var_r;
 
 enum jl_entity_n {
-  JL_ENTITY_VAR = 0,
+  JL_ENTITY_UNDEFINED = 0,
+  JL_ENTITY_VAR,
   JL_ENTITY_PARAM,
   JL_ENTITY_FUNC,
   JL_ENTITY_ENUM,
@@ -93,6 +94,7 @@ struct jl_entity_t {
   };
 };
 
+#define jl_entity_is_defined(e) ((e).kind != JL_ENTITY_UNDEFINED)
 #define jl_entity_is_var(e) ((e).kind == JL_ENTITY_VAR)
 #define jl_entity_is_param(e) ((e).kind == JL_ENTITY_PARAM)
 #define jl_entity_is_func(e) ((e).kind == JL_ENTITY_FUNC)

@@ -93,6 +93,13 @@ void jl_type_dtor(jl_type_t *self) {
 }
 
 
+void jl_literal_init(jl_type_t *self, jl_literal_n kind, unsigned char qualifiers) {
+  jl_type_init(self, JL_TYPE_LITERAL, qualifiers, NULL);
+  *self->_literal = (jl_literal_t) {
+    .kind = kind,
+  };
+}
+
 void jl_literal_init_s(jl_type_t *self, char *value, unsigned char qualifiers) {
   jl_type_init(self, JL_TYPE_LITERAL, qualifiers, NULL);
   *self->_literal = (jl_literal_t) {

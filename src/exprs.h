@@ -31,8 +31,6 @@
 #include "expr.h"
 #include "types.h"
 
-typedef enum jl_expr_const_n jl_expr_const_n;
-
 typedef struct jl_expr_id_t jl_expr_id_t;
 typedef struct jl_expr_const_t jl_expr_const_t;
 typedef struct jl_expr_unary_t jl_expr_unary_t;
@@ -50,22 +48,21 @@ struct jl_expr_id_t {
   bool is_keyword;
 };
 
-void jl_expr_id_init(jl_expr_id_t *self, const char *id, bool is_keyword);
-void jl_expr_id_dtor(jl_expr_id_t *self);
-
-enum jl_expr_const_n {
-  JL_EXPR_CONST_INT = 0,
-  JL_EXPR_CONST_FLOAT,
-  JL_EXPR_CONST_STRING
-};
+void jl_expr_id_init(jl_expr_t *self, const char *id, bool is_keyword);
+void jl_expr_id_dtor(jl_expr_t *self);
 
 struct jl_expr_const_t {
   unsigned refs;
   jl_type_t type;
+  union {
+    char *s;
+    int i;
+    float f;
+  };
 };
 
-void jl_expr_const_init(jl_expr_const_t *self, jl_type_t type);
-void jl_expr_const_dtor(jl_expr_const_t *self);
+void jl_expr_const_init(jl_expr_t *self, jl_type_t type);
+void jl_expr_const_dtor(jl_expr_t *self);
 
 struct jl_expr_unary_t {
   unsigned refs;
@@ -74,8 +71,8 @@ struct jl_expr_unary_t {
   jl_expr_t operand;
 };
 
-void jl_expr_unary_init(jl_expr_unary_t *self, jl_op_n op, jl_expr_t operand);
-void jl_expr_unary_dtor(jl_expr_unary_t *self);
+void jl_expr_unary_init(jl_expr_t *self, jl_op_n op, jl_expr_t operand);
+void jl_expr_unary_dtor(jl_expr_t *self);
 
 struct jl_expr_binary_t {
   unsigned refs;
@@ -84,8 +81,8 @@ struct jl_expr_binary_t {
   jl_expr_t lhs, rhs;
 };
 
-void jl_expr_binary_init(jl_expr_binary_t *self, jl_op_n op, jl_expr_t lhs, jl_expr_t rhs);
-void jl_expr_binary_dtor(jl_expr_binary_t *self);
+void jl_expr_binary_init(jl_expr_t *self, jl_op_n op, jl_expr_t lhs, jl_expr_t rhs);
+void jl_expr_binary_dtor(jl_expr_t *self);
 
 struct jl_expr_ternary_t {
   unsigned refs;
@@ -94,9 +91,9 @@ struct jl_expr_ternary_t {
   jl_expr_t lhs, mhs, rhs;
 };
 
-void jl_expr_ternary_init(jl_expr_ternary_t *self, jl_op_n op1, jl_op_n op2, jl_expr_t lhs, jl_expr_t mhs,
+void jl_expr_ternary_init(jl_expr_t *self, jl_op_n op1, jl_op_n op2, jl_expr_t lhs, jl_expr_t mhs,
   jl_expr_t rhs);
-void jl_expr_ternary_dtor(jl_expr_ternary_t *self);
+void jl_expr_ternary_dtor(jl_expr_t *self);
 
 struct jl_expr_array_read_t {
   unsigned refs;
@@ -104,7 +101,7 @@ struct jl_expr_array_read_t {
   jl_expr_t lhs, pos;
 };
 
-void jl_expr_array_read_dtor(jl_expr_array_read_t *self);
+void jl_expr_array_read_dtor(jl_expr_t *self);
 
 struct jl_expr_array_write_t {
   unsigned refs;
@@ -112,7 +109,7 @@ struct jl_expr_array_write_t {
   jl_expr_t lhs, pos, rhs;
 };
 
-void jl_expr_array_write_dtor(jl_expr_array_write_t *self);
+void jl_expr_array_write_dtor(jl_expr_t *self);
 
 struct jl_expr_field_read_t {
   unsigned refs;
@@ -122,7 +119,7 @@ struct jl_expr_field_read_t {
   jl_expr_id_t field;
 };
 
-void jl_expr_field_read_dtor(jl_expr_field_read_t *self);
+void jl_expr_field_read_dtor(jl_expr_t *self);
 
 struct jl_expr_field_write_t {
   unsigned refs;
@@ -132,7 +129,7 @@ struct jl_expr_field_write_t {
   jl_expr_id_t field;
 };
 
-void jl_expr_field_write_dtor(jl_expr_field_write_t *self);
+void jl_expr_field_write_dtor(jl_expr_t *self);
 
 struct jl_expr_call_t {
   unsigned refs;
@@ -141,6 +138,6 @@ struct jl_expr_call_t {
   jl_expr_r args;
 };
 
-void jl_expr_call_dtor(jl_expr_call_t *self);
+void jl_expr_call_dtor(jl_expr_t *self);
 
 #endif /* JL_EXPRS_H__ */

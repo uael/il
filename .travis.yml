@@ -10,7 +10,6 @@ install:
   - mkdir build
   - cd build
   - cmake ..
-  - cd .. && build/src/jay test/hello.jay -ohello --echo
 
 script:
   - make

@@ -30,7 +30,7 @@
 
 #include "fe.h"
 #include "token.h"
-#include "entity.h"
+#include "entity_t.h"
 
 typedef enum jl_lexer_event_n jl_lexer_event_n;
 

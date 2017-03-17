@@ -23,13 +23,11 @@
  * SOFTWARE.
  */
 
+#include "entity.h"
+#include "expr.h"
 #include "stmt.h"
-#include "stmts.h"
+#include "type.h"
 
-void jl_stmt_init(jl_stmt_t *self, jl_stmt_n kind, void *ptr) {
-  *self = (jl_stmt_t) {
-    .kind = kind
-  };
-
-
+jl_stmt_t jl_stmt_undefined() {
+  return (jl_stmt_t) {JL_STMT_UNDEFINED};
 }

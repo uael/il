@@ -26,75 +26,18 @@
 #ifndef   JL_ENTITY_H__
 # define  JL_ENTITY_H__
 
-#include "adt/vector.h"
-#include "stmt.h"
+#include "entity_t.h"
+#include "expr_t.h"
+#include "stmt_t.h"
+#include "type_t.h"
 
-struct jl_var_t;
-struct jl_param_t;
-struct jl_func_t;
-struct jl_enum_t;
-struct jl_struct_t;
-struct jl_union_t;
-struct jl_label_t;
+jl_entity_t jl_entity_undefined();
+void jl_entity_dtor(jl_entity_t *self);
+void jl_entity_switch(jl_entity_t *self, jl_entity_n kind);
+void jl_entity_acquire(jl_entity_t *self);
+void jl_entity_release(jl_entity_t *self);
+bool jl_entity_is_defined(jl_entity_t *self);
 
-typedef enum jl_entity_n jl_entity_n;
-typedef enum jl_linkage_n jl_linkage_n;
-typedef enum jl_storage_n jl_storage_n;
-typedef enum jl_visibility_n jl_visibility_n;
-
-typedef struct jl_entity_t jl_entity_t;
-
-typedef jl_vector_of(jl_entity_t) jl_entity_r;
-typedef jl_vector_of(struct jl_param_t) jl_param_r;
-typedef jl_vector_of(jl_entity_t) jl_var_r;
-
-enum jl_entity_n {
-  JL_ENTITY_UNDEFINED = 0,
-  JL_ENTITY_VAR,
-  JL_ENTITY_PARAM,
-  JL_ENTITY_FUNC,
-  JL_ENTITY_ENUM,
-  JL_ENTITY_STRUCT,
-  JL_ENTITY_UNION,
-  JL_ENTITY_LABEL
-};
-
-enum jl_linkage_n {
-  JL_LINKAGE_DEFAULT = 0,
-  JL_LINKAGE_EXTERN = 1 << 0,
-  JL_LINKAGE_CONST = 1 << 1,
-  JL_LINKAGE_WEAK = 1 << 2,
-  JL_LINKAGE_INLINE = 1 << 3
-};
-
-enum jl_storage_n {
-  JL_STORAGE_NONE = 1 << 4,
-  JL_STORAGE_STATIC = 1 << 5,
-  JL_STORAGE_ABSTRACT = 1 << 6,
-  JL_STORAGE_FINAL = 1 << 7
-};
-
-enum jl_visibility_n {
-  JL_VISIBILITY_PUBLIC = 1 << 8,
-  JL_VISIBILITY_PRIVATE = 1 << 9,
-  JL_VISIBILITY_PROTECTED = 1 << 10,
-  JL_VISIBILITY_LOCAL = 1 << 11
-};
-
-struct jl_entity_t {
-  jl_entity_n kind;
-  union {
-    struct jl_var_t *_var;
-    struct jl_param_t *_param;
-    struct jl_func_t *_func;
-    struct jl_enum_t *_enum;
-    struct jl_struct_t *_struct;
-    struct jl_union_t *_union;
-    struct jl_label_t *_label;
-  };
-};
-
-#define jl_entity_is_defined(e) ((e).kind != JL_ENTITY_UNDEFINED)
 #define jl_entity_is_var(e) ((e).kind == JL_ENTITY_VAR)
 #define jl_entity_is_param(e) ((e).kind == JL_ENTITY_PARAM)
 #define jl_entity_is_func(e) ((e).kind == JL_ENTITY_FUNC)
@@ -102,13 +45,85 @@ struct jl_entity_t {
 #define jl_entity_is_struct(e) ((e).kind == JL_ENTITY_STRUCT)
 #define jl_entity_is_union(e) ((e).kind == JL_ENTITY_UNION)
 #define jl_entity_is_label(e) ((e).kind == JL_ENTITY_LABEL)
-#define jl_entity_var(e) ((void) assert(jl_entity_is_var(e)), (e)._var)
-#define jl_entity_param(e) ((void) assert(jl_entity_is_param(e)), (e)._param)
-#define jl_entity_func(e) ((void) assert(jl_entity_is_func(e)), (e)._func)
-#define jl_entity_enum(e) ((void) assert(jl_entity_is_enum(e)), (e)._enum)
-#define jl_entity_struct(e) ((void) assert(jl_entity_is_struct(e)), (e)._struct)
-#define jl_entity_union(e) ((void) assert(jl_entity_is_union(e)), (e)._union)
-#define jl_entity_label(e) ((void) assert(jl_entity_is_label(e)), (e)._label)
-void jl_entity_dtor(jl_entity_t *self);
+
+
+jl_entity_t jl_var_undefined();
+jl_entity_t jl_var_int(const char *name, int d);
+jl_entity_t jl_var_float(const char *name, float f);
+jl_entity_t jl_var_string(const char *name, const char *s);
+jl_entity_t jl_var(const char *name, jl_type_t type, jl_expr_t initializer);
+void jl_var_init(jl_entity_t *self, const char *name, jl_type_t type, jl_expr_t initializer);
+const char *jl_var_get_name(jl_entity_t *self);
+void jl_var_set_name(jl_entity_t *self, const char *name);
+jl_type_t jl_var_get_type(jl_entity_t *self);
+void jl_var_set_type(jl_entity_t *self, jl_type_t type);
+jl_expr_t jl_var_get_initializer(jl_entity_t *self);
+void jl_var_set_initializer(jl_entity_t *self, jl_expr_t initializer);
+
+
+jl_entity_t jl_param_undefined();
+jl_entity_t jl_param_int(unsigned position, const char *name, int d);
+jl_entity_t jl_param_float(unsigned position, const char *name, float f);
+jl_entity_t jl_param_string(unsigned position, const char *name, const char *s);
+void jl_param_init(jl_entity_t *self, unsigned position, const char *name, jl_type_t type, jl_expr_t initializer);
+unsigned jl_param_get_position(jl_entity_t *self);
+void jl_param_set_position(jl_entity_t *self, unsigned position);
+const char *jl_param_get_name(jl_entity_t *self);
+void jl_param_set_name(jl_entity_t *self, const char *name);
+jl_type_t jl_param_get_type(jl_entity_t *self);
+void jl_param_set_type(jl_entity_t *self, jl_type_t type);
+jl_expr_t jl_param_get_initializer(jl_entity_t *self);
+void jl_param_set_initializer(jl_entity_t *self, jl_expr_t initializer);
+
+
+jl_entity_t jl_func_undefined();
+jl_entity_t jl_func_decl(jl_func_specifier_n specifiers, jl_type_t return_type, const char *name, jl_entity_r params);
+jl_entity_t jl_proc_decl(jl_func_specifier_n specifiers, const char *name, jl_entity_r params);
+jl_entity_t jl_func_def(jl_entity_t prototype, jl_stmt_t body);
+void jl_func_init(jl_entity_t *self, jl_func_specifier_n s, jl_type_t r, const char * n, jl_entity_r p, jl_stmt_t b);
+bool jl_func_is_inline(jl_entity_t *self);
+bool jl_func_is_noreturn(jl_entity_t *self);
+jl_func_specifier_n jl_func_get_specifiers(jl_entity_t *self);
+void jl_func_set_specifiers(jl_entity_t *self, jl_func_specifier_n specifiers);
+void jl_func_add_specifier(jl_entity_t *self, jl_func_specifier_n specifier);
+void jl_func_rem_specifier(jl_entity_t *self, jl_func_specifier_n specifier);
+const char *jl_func_get_name(jl_entity_t *self);
+void jl_func_set_name(jl_entity_t *self, const char *name);
+jl_type_t jl_func_get_return_type(jl_entity_t *self);
+void jl_func_set_return_type(jl_entity_t *self, jl_type_t return_type);
+jl_entity_r jl_func_get_params(jl_entity_t *self);
+void jl_func_set_params(jl_entity_t *self, jl_entity_r params);
+jl_stmt_t jl_func_get_body(jl_entity_t *self);
+void jl_func_set_body(jl_entity_t *self, jl_stmt_t body);
+
+
+jl_entity_t jl_enum_undefined();
+jl_entity_t jl_enum(const char *name, jl_entity_r fields);
+jl_entity_t jl_enum_anonymous(jl_entity_r fields);
+void jl_enum_init(jl_entity_t *self, const char *name, jl_entity_r fields);
+const char *jl_enum_get_name(jl_entity_t *self);
+void jl_enum_set_name(jl_entity_t *self, const char *name);
+jl_entity_r jl_enum_get_fields(jl_entity_t *self);
+void jl_enum_set_fields(jl_entity_t *self, jl_entity_r fields);
+
+
+jl_entity_t jl_struct_undefined();
+jl_entity_t jl_struct(const char *name, jl_entity_r fields);
+jl_entity_t jl_struct_anonymous(jl_entity_r fields);
+void jl_struct_init(jl_entity_t *self, const char *name, jl_entity_r fields);
+const char *jl_struct_get_name(jl_entity_t *self);
+void jl_struct_set_name(jl_entity_t *self, const char *name);
+jl_entity_r jl_struct_get_fields(jl_entity_t *self);
+void jl_struct_set_fields(jl_entity_t *self, jl_entity_r fields);
+
+
+jl_entity_t jl_union_undefined();
+jl_entity_t jl_union(const char *name, jl_entity_r fields);
+jl_entity_t jl_union_anonymous(jl_entity_r fields);
+void jl_union_init(jl_entity_t *self, const char *name, jl_entity_r fields);
+const char *jl_union_get_name(jl_entity_t *self);
+void jl_union_set_name(jl_entity_t *self, const char *name);
+jl_entity_r jl_union_get_fields(jl_entity_t *self);
+void jl_union_set_fields(jl_entity_t *self, jl_entity_r fields);
 
 #endif /* JL_ENTITY_H__ */

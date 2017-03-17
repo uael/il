@@ -26,82 +26,127 @@
 #ifndef   JL_EXPR_H__
 # define  JL_EXPR_H__
 
-#include <adt/vector.h>
+#include "entity_t.h"
+#include "expr_t.h"
+#include "stmt_t.h"
+#include "type_t.h"
 
-#include "token.h"
-
-struct jl_expr_id_t;
-struct jl_expr_const_t;
-struct jl_expr_unary_t;
-struct jl_expr_binary_t;
-struct jl_expr_ternary_t;
-struct jl_expr_array_read_t;
-struct jl_expr_array_write_t;
-struct jl_expr_field_read_t;
-struct jl_expr_field_write_t;
-struct jl_expr_call_t;
-
-typedef enum jl_expr_n jl_expr_n;
-typedef enum jl_op_n jl_op_n;
-
-typedef struct jl_expr_t jl_expr_t;
-
-typedef jl_vector_of(jl_expr_t) jl_expr_r;
-
-enum jl_expr_n {
-  JL_EXPR_UNDEFINED = 0,
-  JL_EXPR_ID,
-  JL_EXPR_CONST,
-  JL_EXPR_UNARY,
-  JL_EXPR_BINARY,
-  JL_EXPR_TERNARY,
-  JL_EXPR_ARRAY_READ,
-  JL_EXPR_ARRAY_WRITE,
-  JL_EXPR_FIELD_READ,
-  JL_EXPR_FIELD_WRITE,
-  JL_EXPR_CALL
-};
-
-enum jl_op_n {
-  JL_OP_CAST,   /* (T) l        */
-  JL_OP_CALL,   /* l()          */
-  JL_OP_VA_ARG, /* va_arg(l, T) */
-  JL_OP_NOT,    /* !l           */
-  JL_OP_ASSIGN, /* l = r        */
-  JL_OP_ADD,    /* l + r        */
-  JL_OP_SUB,    /* l - r        */
-  JL_OP_MUL,    /* l * r        */
-  JL_OP_DIV,    /* l / r        */
-  JL_OP_MOD,    /* l % r        */
-  JL_OP_AND,    /* l & r        */
-  JL_OP_OR,     /* l | r        */
-  JL_OP_XOR,    /* l ^ r        */
-  JL_OP_SHL,    /* l << r       */
-  JL_OP_SHR,    /* l >> r       */
-  JL_OP_EQ,     /* l == r       */
-  JL_OP_NE,     /* l != r       */
-  JL_OP_GE,     /* l >= r       */
-  JL_OP_GT      /* l > r        */
-};
-
-struct jl_expr_t {
-  jl_expr_n kind;
-  jl_loc_t loc;
-  union {
-    struct jl_expr_id_t *_id;
-    struct jl_expr_const_t *_const;
-    struct jl_expr_unary_t *_unary;
-    struct jl_expr_binary_t *_binary;
-    struct jl_expr_ternary_t *_ternary;
-    struct jl_expr_array_read_t *_array_read;
-    struct jl_expr_array_write_t *_array_write;
-    struct jl_expr_field_read_t *_field_read;
-    struct jl_expr_field_write_t *_field_write;
-    struct jl_expr_call_t *_call;
-  };
-};
-
-void jl_expr_undefined(jl_expr_t *self);
+jl_expr_t jl_expr_undefined();
 void jl_expr_dtor(jl_expr_t *self);
+void jl_expr_switch(jl_expr_t *self, jl_expr_n kind);
+void jl_expr_acquire(jl_expr_t *self);
+void jl_expr_release(jl_expr_t *self);
+bool jl_expr_is_defined(jl_expr_t *self);
+jl_type_t jl_expr_get_type(jl_expr_t *self);
+void jl_expr_set_type(jl_expr_t *self, jl_type_t type);
+jl_expr_t jl_expr_get_next(jl_expr_t *self);
+void jl_expr_set_next(jl_expr_t *self, jl_expr_t next);
+
+#define jl_expr_is_id(t) ((t).kind == JL_EXPR_ID)
+#define jl_expr_is_const(t) ((t).kind == JL_EXPR_CONST)
+#define jl_expr_is_unary(t) ((t).kind == JL_EXPR_UNARY)
+#define jl_expr_is_binary(t) ((t).kind == JL_EXPR_BINARY)
+#define jl_expr_is_ternary(t) ((t).kind == JL_EXPR_TERNARY)
+#define jl_expr_is_array_read(t) ((t).kind == JL_EXPR_ARRAY_READ)
+#define jl_expr_is_array_write(t) ((t).kind == JL_EXPR_ARRAY_WRITE)
+#define jl_expr_is_field_read(t) ((t).kind == JL_EXPR_FIELD_READ)
+#define jl_expr_is_field_write(t) ((t).kind == JL_EXPR_FIELD_WRITE)
+#define jl_expr_is_call(t) ((t).kind == JL_EXPR_CALL)
+
+
+jl_expr_t jl_id(const char *id, bool is_keyword);
+void jl_id_init(jl_expr_t *self, const char *id, bool is_keyword);
+const char *jl_id_get_id(jl_expr_t *self);
+void jl_id_set_id(jl_expr_t *self, const char *id);
+bool jl_id_is_keyword(jl_expr_t *self);
+void jl_id_set_is_keyword(jl_expr_t *self, bool is_keyword);
+
+
+jl_expr_t jl_const_int(int d);
+jl_expr_t jl_const_float(float f);
+jl_expr_t jl_const_string(const char *s);
+void jl_const_init(jl_expr_t *self, jl_type_t type);
+int jl_const_get_int(jl_expr_t *self);
+void jl_const_set_int(jl_expr_t *self, int d);
+float jl_const_get_float(jl_expr_t *self);
+void jl_const_set_float(jl_expr_t *self, float d);
+const char *jl_const_get_string(jl_expr_t *self);
+void jl_const_set_string(jl_expr_t *self, const char *s);
+
+
+jl_expr_t jl_unary(jl_op_n op, jl_expr_t operand);
+void jl_unary_init(jl_expr_t *self, jl_op_n op, jl_expr_t operand);
+jl_op_n jl_unary_get_op(jl_expr_t *self);
+void jl_unary_set_op(jl_expr_t *self, jl_op_n op);
+jl_expr_t jl_unary_get_operand(jl_expr_t *self);
+void jl_unary_set_operand(jl_expr_t *self, jl_expr_t operand);
+
+
+jl_expr_t jl_binary(jl_op_n op, jl_expr_t lhs, jl_expr_t rhs);
+void jl_binary_init(jl_expr_t *self, jl_op_n op, jl_expr_t lhs, jl_expr_t rhs);
+jl_op_n jl_binary_get_op(jl_expr_t *self);
+void jl_binary_set_op(jl_expr_t *self, jl_op_n op);
+jl_expr_t jl_binary_get_lhs(jl_expr_t *self);
+void jl_binary_set_lhs(jl_expr_t *self, jl_expr_t lhs);
+jl_expr_t jl_binary_get_rhs(jl_expr_t *self);
+void jl_binary_set_rhs(jl_expr_t *self, jl_expr_t rhs);
+
+
+jl_expr_t jl_ternary(jl_expr_t lhs, jl_expr_t mhs, jl_expr_t rhs);
+void jl_ternary_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t mhs, jl_expr_t rhs);
+jl_expr_t jl_ternary_get_lhs(jl_expr_t *self);
+void jl_ternary_set_lhs(jl_expr_t *self, jl_expr_t lhs);
+jl_expr_t jl_ternary_get_mhs(jl_expr_t *self);
+void jl_ternary_set_mhs(jl_expr_t *self, jl_expr_t mhs);
+jl_expr_t jl_ternary_get_rhs(jl_expr_t *self);
+void jl_ternary_set_rhs(jl_expr_t *self, jl_expr_t rhs);
+
+
+jl_expr_t jl_array_read(jl_expr_t lhs, jl_expr_t pos);
+void jl_array_read_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t pos);
+jl_expr_t jl_array_read_get_lhs(jl_expr_t *self);
+void jl_array_read_set_lhs(jl_expr_t *self, jl_expr_t lhs);
+jl_expr_t jl_array_read_get_pos(jl_expr_t *self);
+void jl_array_read_set_pos(jl_expr_t *self, jl_expr_t pos);
+
+
+jl_expr_t jl_array_write(jl_expr_t lhs, jl_expr_t pos, jl_expr_t rhs);
+void jl_array_write_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t pos, jl_expr_t rhs);
+jl_expr_t jl_array_write_get_lhs(jl_expr_t *self);
+void jl_array_write_set_lhs(jl_expr_t *self, jl_expr_t lhs);
+jl_expr_t jl_array_write_get_pos(jl_expr_t *self);
+void jl_array_write_set_pos(jl_expr_t *self, jl_expr_t pos);
+jl_expr_t jl_array_write_get_rhs(jl_expr_t *self);
+void jl_array_write_set_rhs(jl_expr_t *self, jl_expr_t rhs);
+
+
+jl_expr_t jl_field_read(jl_expr_t lhs, bool ptr, jl_expr_t field);
+void jl_field_read_init(jl_expr_t *self, jl_expr_t lhs, bool ptr, jl_expr_t field);
+jl_expr_t jl_field_read_get_lhs(jl_expr_t *self);
+void jl_field_read_set_lhs(jl_expr_t *self, jl_expr_t lhs);
+bool jl_field_read_get_ptr(jl_expr_t *self);
+void jl_field_read_set_ptr(jl_expr_t *self, bool ptr);
+jl_expr_t jl_field_read_get_field(jl_expr_t *self);
+void jl_field_read_set_field(jl_expr_t *self, jl_expr_t field);
+
+
+jl_expr_t jl_field_write(jl_expr_t lhs, bool ptr, jl_expr_t field, jl_expr_t rhs);
+void jl_field_write_init(jl_expr_t *self, jl_expr_t lhs, bool ptr, jl_expr_t field, jl_expr_t rhs);
+jl_expr_t jl_field_write_get_lhs(jl_expr_t *self);
+void jl_field_write_set_lhs(jl_expr_t *self, jl_expr_t lhs);
+bool jl_field_write_get_ptr(jl_expr_t *self);
+void jl_field_write_set_ptr(jl_expr_t *self, bool ptr);
+jl_expr_t jl_field_write_get_field(jl_expr_t *self);
+void jl_field_write_set_field(jl_expr_t *self, jl_expr_t field);
+jl_expr_t jl_field_write_get_rhs(jl_expr_t *self);
+void jl_field_write_set_rhs(jl_expr_t *self, jl_expr_t rhs);
+
+
+jl_expr_t jl_call(jl_expr_t lhs, jl_expr_t args);
+void jl_call_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t args);
+jl_expr_t jl_call_get_lhs(jl_expr_t *self);
+void jl_call_set_lhs(jl_expr_t *self, jl_expr_t lhs);
+jl_expr_t jl_call_get_args(jl_expr_t *self);
+void jl_call_set_args(jl_expr_t *self, jl_expr_t args);
 
 #endif /* JL_EXPR_H__ */

@@ -26,7 +26,7 @@
 #ifndef   JL_PROGRAM_H__
 # define  JL_PROGRAM_H__
 
-#include "entity.h"
+#include "entity_t.h"
 
 typedef struct jl_program_t jl_program_t;
 

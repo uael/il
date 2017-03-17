@@ -23,4 +23,45 @@
  * SOFTWARE.
  */
 
-#include "stmts.h"
+#ifndef   JL_ENTITY_T_H__
+# define  JL_ENTITY_T_H__
+
+#include <adt/vector.h>
+
+typedef enum jl_entity_n jl_entity_n;
+typedef enum jl_func_specifier_n jl_func_specifier_n;
+
+typedef struct jl_entity_t jl_entity_t;
+typedef jl_vector_of(jl_entity_t) jl_entity_r;
+
+enum jl_entity_n {
+  JL_ENTITY_UNDEFINED = 0,
+  JL_ENTITY_VAR,
+  JL_ENTITY_PARAM,
+  JL_ENTITY_FUNC,
+  JL_ENTITY_ENUM,
+  JL_ENTITY_STRUCT,
+  JL_ENTITY_UNION,
+  JL_ENTITY_LABEL
+};
+
+enum jl_func_specifier_n {
+  JL_FUNC_SPECIFIER_NONE = 0,
+  JL_FUNC_SPECIFIER_INLINE = 1 << 0,
+  JL_FUNC_SPECIFIER_NORETURN = 1 << 1
+};
+
+struct jl_entity_t {
+  jl_entity_n kind : 8;
+  union {
+    struct jl_var_t *_var;
+    struct jl_param_t *_param;
+    struct jl_func_t *_func;
+    struct jl_enum_t *_enum;
+    struct jl_struct_t *_struct;
+    struct jl_union_t *_union;
+    struct jl_label_t *_label;
+  };
+};
+
+#endif /* JL_ENTITY_T_H__ */

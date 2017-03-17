@@ -26,70 +26,105 @@
 #ifndef   JL_STMT_H__
 # define  JL_STMT_H__
 
-#include "adt/vector.h"
+#include "entity_t.h"
+#include "expr_t.h"
+#include "stmt_t.h"
+#include "type_t.h"
 
-struct jl_stmt_expr_t;
-struct jl_stmt_label_t;
-struct jl_stmt_case_t;
-struct jl_stmt_default_t;
-struct jl_stmt_compound_t;
-struct jl_stmt_if_t;
-struct jl_stmt_switch_t;
-struct jl_stmt_while_t;
-struct jl_stmt_do_t;
-struct jl_stmt_for_t;
-struct jl_stmt_goto_t;
-struct jl_stmt_break_t;
-struct jl_stmt_continue_t;
-struct jl_stmt_return_t;
-struct jl_stmt_decl_t;
+typedef struct jl_stmt_expr_t jl_stmt_expr_t;
+typedef struct jl_stmt_label_t jl_stmt_label_t;
+typedef struct jl_stmt_case_t jl_stmt_case_t;
+typedef struct jl_stmt_default_t jl_stmt_default_t;
+typedef struct jl_stmt_compound_t jl_stmt_compound_t;
+typedef struct jl_stmt_if_t jl_stmt_if_t;
+typedef struct jl_stmt_switch_t jl_stmt_switch_t;
+typedef struct jl_stmt_while_t jl_stmt_while_t;
+typedef struct jl_stmt_do_t jl_stmt_do_t;
+typedef struct jl_stmt_for_t jl_stmt_for_t;
+typedef struct jl_stmt_goto_t jl_stmt_goto_t;
+typedef struct jl_stmt_break_t jl_stmt_break_t;
+typedef struct jl_stmt_continue_t jl_stmt_continue_t;
+typedef struct jl_stmt_return_t jl_stmt_return_t;
+typedef struct jl_stmt_decl_t jl_stmt_decl_t;
 
-typedef enum jl_stmt_n jl_stmt_n;
-
-typedef struct jl_stmt_t jl_stmt_t;
-
-typedef jl_vector_of(jl_stmt_t) jl_stmt_r;
-
-enum jl_stmt_n {
-  JL_STMT_EXPR,
-  JL_STMT_LABEL,
-  JL_STMT_CASE,
-  JL_STMT_DEFAULT,
-  JL_STMT_COMPOUND,
-  JL_STMT_IF,
-  JL_STMT_SWITCH,
-  JL_STMT_WHILE,
-  JL_STMT_DO,
-  JL_STMT_FOR,
-  JL_STMT_GOTO,
-  JL_STMT_BREAK,
-  JL_STMT_CONTINUE,
-  JL_STMT_RETURN,
-  JL_STMT_DECL
+struct jl_stmt_expr_t {
+  unsigned refs;
+  jl_expr_t expr;
 };
 
-struct jl_stmt_t {
-  jl_stmt_n kind;
-  union {
-    struct jl_stmt_expr_t *_expr;
-    struct jl_stmt_label_t *_label;
-    struct jl_stmt_case_t *_case;
-    struct jl_stmt_default_t *_default;
-    struct jl_stmt_compound_t *_compound;
-    struct jl_stmt_if_t *_if;
-    struct jl_stmt_switch_t *_switch;
-    struct jl_stmt_while_t *_while;
-    struct jl_stmt_do_t *_do;
-    struct jl_stmt_for_t *_for;
-    struct jl_stmt_goto_t *_goto;
-    struct jl_stmt_break_t *_break;
-    struct jl_stmt_continue_t *_continue;
-    struct jl_stmt_return_t *_return;
-    struct jl_stmt_decl_t *_decl;
-  };
+struct jl_stmt_label_t {
+  unsigned refs;
+  const char *name;
 };
 
-void jl_stmt_init(jl_stmt_t *self, jl_stmt_n kind, void *ptr);
-void jl_stmt_dtor(jl_stmt_t *self);
+struct jl_stmt_case_t {
+  unsigned refs;
+  jl_expr_t cond;
+  jl_stmt_t body;
+};
+
+struct jl_stmt_default_t {
+  unsigned refs;
+  jl_stmt_t body;
+};
+
+struct jl_stmt_compound_t {
+  unsigned refs;
+  jl_stmt_r stmts;
+};
+
+struct jl_stmt_if_t {
+  unsigned refs;
+  jl_expr_t cond;
+  jl_stmt_t then_body, else_body;
+};
+
+struct jl_stmt_switch_t {
+  unsigned refs;
+  jl_expr_t cond;
+  jl_stmt_t body;
+};
+
+struct jl_stmt_while_t {
+  unsigned refs;
+  jl_expr_t cond;
+  jl_stmt_t body;
+};
+
+struct jl_stmt_do_t {
+  unsigned refs;
+  jl_expr_t cond;
+  jl_stmt_t body;
+};
+
+struct jl_stmt_for_t {
+  jl_stmt_expr_t lhs, mhs;
+  jl_expr_t rhs;
+  jl_stmt_t body;
+};
+
+struct jl_stmt_goto_t {
+  unsigned refs;
+  const char *label;
+};
+
+struct jl_stmt_break_t {
+  unsigned refs;
+};
+
+struct jl_stmt_continue_t {
+  unsigned refs;
+};
+
+struct jl_stmt_return_t {
+  unsigned refs;
+  jl_expr_t expr;
+};
+
+struct jl_stmt_decl_t {
+  jl_type_t decl;
+};
+
+jl_stmt_t jl_stmt_undefined();
 
 #endif /* JL_STMT_H__ */

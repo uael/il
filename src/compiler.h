@@ -30,16 +30,17 @@
 
 #include "opts.h"
 #include "fe.h"
-#include "lexer.h"
 #include "be.h"
 
-typedef struct jl_compiler_t {
+typedef struct jl_compiler_t jl_compiler_t;
+
+struct jl_compiler_t {
   const char *program;
   jl_opts_t opts;
   jl_frontend_t fe;
   jl_backend_t be;
   string_r strtab;
-} jl_compiler_t;
+};
 
 void jl_init(jl_compiler_t *self, int argc, char **argv);
 void jl_dtor(jl_compiler_t *self);

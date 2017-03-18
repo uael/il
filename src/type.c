@@ -30,42 +30,10 @@
 #include "stmt.h"
 #include "type.h"
 
-#define jl_literal(t) ((void) assert(jl_type_is_literal(*t)), (t)->_literal)
-#define jl_pointer(t) ((void) assert(jl_type_is_pointer(*t)), (t)->_pointer)
-#define jl_array(t) ((void) assert(jl_type_is_array(*t)), (t)->_array)
-#define jl_compound(t) ((void) assert(jl_type_is_compound(*t)), (t)->_compound)
-
-typedef struct jl_literal_t jl_literal_t;
-typedef struct jl_pointer_t jl_pointer_t;
-typedef struct jl_array_t jl_array_t;
-typedef struct jl_compound_t jl_compound_t;
-
 void jl_literal_dtor(jl_type_t *self);
 void jl_pointer_dtor(jl_type_t *self);
 void jl_array_dtor(jl_type_t *self);
 void jl_compound_dtor(jl_type_t *self);
-
-struct jl_literal_t {
-  unsigned refs;
-  jl_literal_n kind;
-};
-
-struct jl_pointer_t {
-  unsigned refs;
-  jl_type_t of;
-};
-
-struct jl_array_t {
-  unsigned refs;
-  jl_type_t of;
-  jl_expr_t size;
-};
-
-struct jl_compound_t {
-  unsigned refs;
-  jl_entity_t entity;
-};
-
 
 jl_type_t jl_type_undefined() {
   return (jl_type_t) {JL_TYPE_UNDEFINED};

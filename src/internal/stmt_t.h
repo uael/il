@@ -47,7 +47,6 @@ struct jl_stmt_decl_t;
 typedef enum jl_stmt_n jl_stmt_n;
 
 typedef struct jl_stmt_t jl_stmt_t;
-
 typedef jl_vector_of(jl_stmt_t) jl_stmt_r;
 
 enum jl_stmt_n {

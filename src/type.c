@@ -165,7 +165,7 @@ bool jl_type_is_defined(jl_type_t *self) {
 
 
 jl_type_t jl_literal_void() {
-  static jl_type_t type = (jl_type_t) {JL_TYPE_UNDEFINED};
+  static jl_type_t type;
   if (!jl_type_is_defined(&type)) {
     jl_literal_init(&type, JL_LITERAL_VOID);
   }
@@ -173,7 +173,7 @@ jl_type_t jl_literal_void() {
 }
 
 jl_type_t jl_literal_null() {
-  static jl_type_t type = (jl_type_t) {JL_TYPE_UNDEFINED};
+  static jl_type_t type;
   if (!jl_type_is_defined(&type)) {
     jl_literal_init(&type, JL_LITERAL_NULL);
   }
@@ -181,7 +181,7 @@ jl_type_t jl_literal_null() {
 }
 
 jl_type_t jl_literal_string() {
-  static jl_type_t type = (jl_type_t) {JL_TYPE_UNDEFINED};
+  static jl_type_t type;
   if (!jl_type_is_defined(&type)) {
     jl_literal_init(&type, JL_LITERAL_STRING);
   }
@@ -189,7 +189,7 @@ jl_type_t jl_literal_string() {
 }
 
 jl_type_t jl_literal_bool() {
-  static jl_type_t type = (jl_type_t) {JL_TYPE_UNDEFINED};
+  static jl_type_t type;
   if (!jl_type_is_defined(&type)) {
     jl_literal_init(&type, JL_LITERAL_BOOL);
   }
@@ -197,7 +197,7 @@ jl_type_t jl_literal_bool() {
 }
 
 jl_type_t jl_literal_char() {
-  static jl_type_t type = (jl_type_t) {JL_TYPE_UNDEFINED};
+  static jl_type_t type;
   if (!jl_type_is_defined(&type)) {
     jl_literal_init(&type, JL_LITERAL_CHAR);
   }
@@ -205,7 +205,7 @@ jl_type_t jl_literal_char() {
 }
 
 jl_type_t jl_literal_short() {
-  static jl_type_t type = (jl_type_t) {JL_TYPE_UNDEFINED};
+  static jl_type_t type;
   if (!jl_type_is_defined(&type)) {
     jl_literal_init(&type, JL_LITERAL_INT);
   }
@@ -213,7 +213,7 @@ jl_type_t jl_literal_short() {
 }
 
 jl_type_t jl_literal_int() {
-  static jl_type_t type = (jl_type_t) {JL_TYPE_UNDEFINED};
+  static jl_type_t type;
   if (!jl_type_is_defined(&type)) {
     jl_literal_init(&type, JL_LITERAL_INT);
   }
@@ -221,7 +221,7 @@ jl_type_t jl_literal_int() {
 }
 
 jl_type_t jl_literal_long() {
-  static jl_type_t type = (jl_type_t) {JL_TYPE_UNDEFINED};
+  static jl_type_t type;
   if (!jl_type_is_defined(&type)) {
     jl_literal_init(&type, JL_LITERAL_LONG);
   }
@@ -229,7 +229,7 @@ jl_type_t jl_literal_long() {
 }
 
 jl_type_t jl_literal_double() {
-  static jl_type_t type = (jl_type_t) {JL_TYPE_UNDEFINED};
+  static jl_type_t type;
   if (!jl_type_is_defined(&type)) {
     jl_literal_init(&type, JL_LITERAL_DOUBLE);
   }
@@ -237,7 +237,7 @@ jl_type_t jl_literal_double() {
 }
 
 jl_type_t jl_literal_float() {
-  static jl_type_t type = (jl_type_t) {JL_TYPE_UNDEFINED};
+  static jl_type_t type;
   if (!jl_type_is_defined(&type)) {
     jl_literal_init(&type, JL_LITERAL_FLOAT);
   }

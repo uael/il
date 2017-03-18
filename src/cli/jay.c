@@ -25,9 +25,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <type_t.h>
 
 #include "compiler.h"
+#include "lexer.h"
 
 int main(int argc, char *argv[]) {
   jl_compiler_t compiler;

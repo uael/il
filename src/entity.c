@@ -288,21 +288,21 @@ jl_entity_t jl_var_undefined() {
 jl_entity_t jl_var_int(const char *name, int d) {
   jl_entity_t entity;
 
-  jl_var_init(&entity, name, jl_literal_int(), jl_const_int(d));
+  jl_var_init(&entity, name, jl_int(), jl_const_int(d));
   return entity;
 }
 
 jl_entity_t jl_var_float(const char *name, float f) {
   jl_entity_t entity;
 
-  jl_var_init(&entity, name, jl_literal_float(), jl_const_float(f));
+  jl_var_init(&entity, name, jl_float(), jl_const_float(f));
   return entity;
 }
 
 jl_entity_t jl_var_string(const char *name, const char *s) {
   jl_entity_t entity;
 
-  jl_var_init(&entity, name, jl_literal_string(), jl_const_string(s));
+  jl_var_init(&entity, name, jl_string(), jl_const_string(s));
   return entity;
 }
 
@@ -354,21 +354,21 @@ jl_entity_t jl_param_undefined() {
 jl_entity_t jl_param_int(unsigned position, const char *name, int d) {
   jl_entity_t entity;
 
-  jl_param_init(&entity, position, name, jl_literal_int(), jl_const_int(d));
+  jl_param_init(&entity, position, name, jl_int(), jl_const_int(d));
   return entity;
 }
 
 jl_entity_t jl_param_float(unsigned position, const char *name, float f) {
   jl_entity_t entity;
 
-  jl_param_init(&entity, position, name, jl_literal_float(), jl_const_float(f));
+  jl_param_init(&entity, position, name, jl_float(), jl_const_float(f));
   return entity;
 }
 
 jl_entity_t jl_param_string(unsigned position, const char *name, const char *s) {
   jl_entity_t entity;
 
-  jl_param_init(&entity, position, name, jl_literal_string(), jl_const_string(s));
+  jl_param_init(&entity, position, name, jl_string(), jl_const_string(s));
   return entity;
 }
 
@@ -429,7 +429,7 @@ jl_entity_t jl_func_decl(jl_func_specifier_n specifiers, jl_type_t return_type, 
 jl_entity_t jl_proc_decl(jl_func_specifier_n specifiers, const char *name, jl_entity_r params) {
   jl_entity_t entity;
 
-  jl_func_init(&entity, specifiers, jl_literal_void(), name, params, jl_stmt_undefined());
+  jl_func_init(&entity, specifiers, jl_void(), name, params, jl_stmt_undefined());
   return entity;
 }
 

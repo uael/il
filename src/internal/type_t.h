@@ -34,6 +34,10 @@ typedef enum jl_type_specifier_n jl_type_specifier_n;
 typedef enum jl_type_qualifier_n jl_type_qualifier_n;
 
 typedef struct jl_type_t jl_type_t;
+typedef struct jl_literal_t jl_literal_t;
+typedef struct jl_pointer_t jl_pointer_t;
+typedef struct jl_array_t jl_array_t;
+typedef struct jl_compound_t jl_compound_t;
 
 enum jl_type_n {
   JL_TYPE_UNDEFINED = 0,
@@ -87,11 +91,65 @@ struct jl_type_t {
   jl_type_specifier_n specifiers;
   jl_type_qualifier_n qualifiers;
   union {
-    struct jl_literal_t *_literal;
-    struct jl_pointer_t *_pointer;
-    struct jl_array_t *_array;
-    struct jl_compound_t *_compound;
+    jl_literal_t *_literal;
+    jl_pointer_t *_pointer;
+    jl_array_t *_array;
+    jl_compound_t *_compound;
   };
 };
+
+jl_type_t jl_type_undefined();
+void jl_type_dtor(jl_type_t *self);
+void jl_type_switch(jl_type_t *self, jl_type_n kind);
+void jl_type_acquire(jl_type_t *self);
+void jl_type_release(jl_type_t *self);
+bool jl_type_is_defined(jl_type_t self);
+bool jl_ptype_is_defined(jl_type_t *self);
+
+#define jl_type_is_literal(t) ((t).kind == JL_TYPE_LITERAL)
+#define jl_type_is_pointer(t) ((t).kind == JL_TYPE_POINTER)
+#define jl_type_is_array(t) ((t).kind == JL_TYPE_ARRAY)
+#define jl_type_is_compound(t) ((t).kind == JL_TYPE_COMPOUND)
+#define jl_ptype_is_literal(t) ((t)->kind == JL_TYPE_LITERAL)
+#define jl_ptype_is_pointer(t) ((t)->kind == JL_TYPE_POINTER)
+#define jl_ptype_is_array(t) ((t)->kind == JL_TYPE_ARRAY)
+#define jl_ptype_is_compound(t) ((t)->kind == JL_TYPE_COMPOUND)
+
+#define jl_type_is_specified(t) ((t).specifiers != 0)
+#define jl_type_is_signed(t) ((t).specifiers & JL_TYPE_SPECIFIER_SIGNED)
+#define jl_type_is_unsigned(t) ((t).specifiers & JL_TYPE_SPECIFIER_UNSIGNED)
+#define jl_type_is_extern(t) ((t).specifiers & JL_TYPE_SPECIFIER_EXTERN)
+#define jl_type_is_static(t) ((t).specifiers & JL_TYPE_SPECIFIER_STATIC)
+#define jl_type_is_thread_local(t) ((t).specifiers & JL_TYPE_SPECIFIER_THREAD_LOCAL)
+#define jl_type_is_auto(t) ((t).specifiers & JL_TYPE_SPECIFIER_AUTO)
+#define jl_type_is_register(t) ((t).specifiers & JL_TYPE_SPECIFIER_REGISTER)
+#define jl_ptype_is_specified(t) ((t)->specifiers != 0)
+#define jl_ptype_is_signed(t) ((t)->specifiers & JL_TYPE_SPECIFIER_SIGNED)
+#define jl_ptype_is_unsigned(t) ((t)->specifiers & JL_TYPE_SPECIFIER_UNSIGNED)
+#define jl_ptype_is_extern(t) ((t)->specifiers & JL_TYPE_SPECIFIER_EXTERN)
+#define jl_ptype_is_static(t) ((t)->specifiers & JL_TYPE_SPECIFIER_STATIC)
+#define jl_ptype_is_thread_local(t) ((t)->specifiers & JL_TYPE_SPECIFIER_THREAD_LOCAL)
+#define jl_ptype_is_auto(t) ((t)->specifiers & JL_TYPE_SPECIFIER_AUTO)
+#define jl_ptype_is_register(t) ((t)->specifiers & JL_TYPE_SPECIFIER_REGISTER)
+
+#define jl_type_is_qualified(t) ((t).qualifiers != 0)
+#define jl_type_is_const(t) ((t).qualifiers & JL_TYPE_QUALIFIER_CONST)
+#define jl_type_is_volatile(t) ((t).qualifiers & JL_TYPE_QUALIFIER_VOLATILE)
+#define jl_type_is_restrict(t) ((t).qualifiers & JL_TYPE_QUALIFIER_RESTRICT)
+#define jl_type_is_atomic(t) ((t).qualifiers & JL_TYPE_QUALIFIER_ATOMIC)
+#define jl_ptype_is_qualified(t) ((t)->qualifiers != 0)
+#define jl_ptype_is_const(t) ((t)->qualifiers & JL_TYPE_QUALIFIER_CONST)
+#define jl_ptype_is_volatile(t) ((t)->qualifiers & JL_TYPE_QUALIFIER_VOLATILE)
+#define jl_ptype_is_restrict(t) ((t)->qualifiers & JL_TYPE_QUALIFIER_RESTRICT)
+#define jl_ptype_is_atomic(t) ((t)->qualifiers & JL_TYPE_QUALIFIER_ATOMIC)
+
+#define jl_type_literal(t) ((void) assert(jl_type_is_literal(t)), (t)._literal)
+#define jl_type_pointer(t) ((void) assert(jl_type_is_pointer(t)), (t)._pointer)
+#define jl_type_array(t) ((void) assert(jl_type_is_array(t)), (t)._array)
+#define jl_type_compound(t) ((void) assert(jl_type_is_compound(t)), (t)._compound)
+#define jl_ptype_literal(t) ((void) assert(jl_ptype_is_literal(t)), (t)->_literal)
+#define jl_ptype_pointer(t) ((void) assert(jl_ptype_is_pointer(t)), (t)->_pointer)
+#define jl_ptype_array(t) ((void) assert(jl_ptype_is_array(t)), (t)->_array)
+#define jl_ptype_compound(t) ((void) assert(jl_ptype_is_compound(t)), (t)->_compound)
 
 #endif /* JL_TYPE_T_H__ */

@@ -547,7 +547,7 @@ void jl_id_set_is_keyword(jl_expr_t *self, bool is_keyword) {
 jl_expr_t jl_const_int(int d) {
   jl_expr_t expr;
 
-  jl_const_init(&expr, jl_literal_int());
+  jl_const_init(&expr, jl_int());
   jl_const_set_int(&expr, d);
   return expr;
 }
@@ -555,7 +555,7 @@ jl_expr_t jl_const_int(int d) {
 jl_expr_t jl_const_float(float f) {
   jl_expr_t expr;
 
-  jl_const_init(&expr, jl_literal_float());
+  jl_const_init(&expr, jl_float());
   jl_const_set_float(&expr, f);
   return expr;
 }
@@ -563,7 +563,7 @@ jl_expr_t jl_const_float(float f) {
 jl_expr_t jl_const_string(const char *s) {
   jl_expr_t expr;
 
-  jl_const_init(&expr, jl_literal_string());
+  jl_const_init(&expr, jl_string());
   jl_const_set_string(&expr, s);
   return expr;
 }

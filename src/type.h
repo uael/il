@@ -72,4 +72,7 @@ struct jl_compound_t {
   jl_entity_t entity;
 };
 
+jl_type_t jl_compound(jl_entity_t entity);
+void jl_compound_init(jl_type_t *self, jl_entity_t entity);
+
 #endif /* JL_TYPE_H__ */

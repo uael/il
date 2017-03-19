@@ -301,4 +301,16 @@ void jl_array_init(jl_type_t *self, jl_type_t of, jl_expr_t size) {
 void jl_array_dtor(jl_type_t *self) {}
 
 
+jl_type_t jl_compound(jl_entity_t entity) {
+  jl_type_t type;
+
+  jl_compound_init(&type, entity);
+  return type;
+}
+
+void jl_compound_init(jl_type_t *self, jl_entity_t entity) {
+  jl_type_switch(self, JL_TYPE_COMPOUND);
+  jl_ptype_compound(self)->entity = entity;
+}
+
 void jl_compound_dtor(jl_type_t *self) {}

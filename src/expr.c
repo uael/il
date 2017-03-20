@@ -513,7 +513,7 @@ void jl_expr_set_next(jl_expr_t *self, jl_expr_t next) {
 
 
 jl_expr_t jl_id(const char *id, bool is_keyword) {
-  jl_expr_t expr;
+  jl_expr_t expr = {};
 
   jl_id_init(&expr, id, is_keyword);
   return expr;
@@ -545,7 +545,7 @@ void jl_id_set_is_keyword(jl_expr_t *self, bool is_keyword) {
 
 
 jl_expr_t jl_const_int(int d) {
-  jl_expr_t expr;
+  jl_expr_t expr = {};
 
   jl_const_init(&expr, jl_int());
   jl_const_set_int(&expr, d);
@@ -553,7 +553,7 @@ jl_expr_t jl_const_int(int d) {
 }
 
 jl_expr_t jl_const_float(float f) {
-  jl_expr_t expr;
+  jl_expr_t expr = {};
 
   jl_const_init(&expr, jl_float());
   jl_const_set_float(&expr, f);
@@ -561,7 +561,7 @@ jl_expr_t jl_const_float(float f) {
 }
 
 jl_expr_t jl_const_string(const char *s) {
-  jl_expr_t expr;
+  jl_expr_t expr = {};
 
   jl_const_init(&expr, jl_string());
   jl_const_set_string(&expr, s);
@@ -602,7 +602,7 @@ void jl_const_set_string(jl_expr_t *self, const char *s) {
 
 
 jl_expr_t jl_unary(jl_op_n op, jl_expr_t operand) {
-  jl_expr_t expr;
+  jl_expr_t expr = {};
 
   jl_unary_init(&expr, op, operand);
   return expr;

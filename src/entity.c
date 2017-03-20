@@ -247,28 +247,28 @@ jl_entity_t jl_var_undefined() {
 }
 
 jl_entity_t jl_var_int(const char *name, int d) {
-  jl_entity_t entity;
+  jl_entity_t entity = {};
 
   jl_var_init(&entity, name, jl_int(), jl_const_int(d));
   return entity;
 }
 
 jl_entity_t jl_var_float(const char *name, float f) {
-  jl_entity_t entity;
+  jl_entity_t entity = {};
 
   jl_var_init(&entity, name, jl_float(), jl_const_float(f));
   return entity;
 }
 
 jl_entity_t jl_var_string(const char *name, const char *s) {
-  jl_entity_t entity;
+  jl_entity_t entity = {};
 
   jl_var_init(&entity, name, jl_string(), jl_const_string(s));
   return entity;
 }
 
 jl_entity_t jl_var(const char *name, jl_type_t type, jl_expr_t initializer) {
-  jl_entity_t entity;
+  jl_entity_t entity = {};
 
   jl_var_init(&entity, name, type, initializer);
   return entity;
@@ -313,21 +313,21 @@ jl_entity_t jl_param_undefined() {
 }
 
 jl_entity_t jl_param_int(unsigned position, const char *name, int d) {
-  jl_entity_t entity;
+  jl_entity_t entity = {};
 
   jl_param_init(&entity, position, name, jl_int(), jl_const_int(d));
   return entity;
 }
 
 jl_entity_t jl_param_float(unsigned position, const char *name, float f) {
-  jl_entity_t entity;
+  jl_entity_t entity = {};
 
   jl_param_init(&entity, position, name, jl_float(), jl_const_float(f));
   return entity;
 }
 
 jl_entity_t jl_param_string(unsigned position, const char *name, const char *s) {
-  jl_entity_t entity;
+  jl_entity_t entity = {};
 
   jl_param_init(&entity, position, name, jl_string(), jl_const_string(s));
   return entity;
@@ -381,21 +381,21 @@ jl_entity_t jl_func_undefined() {
 }
 
 jl_entity_t jl_func_decl(jl_func_specifier_n specifiers, jl_type_t return_type, const char *name, jl_entity_r params) {
-  jl_entity_t entity;
+  jl_entity_t entity = {};
 
   jl_func_init(&entity, specifiers, return_type, name, params, jl_stmt_undefined());
   return entity;
 }
 
 jl_entity_t jl_proc_decl(jl_func_specifier_n specifiers, const char *name, jl_entity_r params) {
-  jl_entity_t entity;
+  jl_entity_t entity = {};
 
   jl_func_init(&entity, specifiers, jl_void(), name, params, jl_stmt_undefined());
   return entity;
 }
 
 jl_entity_t jl_func_def(jl_entity_t prototype, jl_stmt_t body) {
-  jl_entity_t entity;
+  jl_entity_t entity = {};
 
   jl_func_init(
     &entity,
@@ -483,14 +483,14 @@ jl_entity_t jl_enum_undefined() {
 }
 
 jl_entity_t jl_enum(const char *name, jl_entity_r fields) {
-  jl_entity_t entity;
+  jl_entity_t entity = {};
 
   jl_enum_init(&entity, name, fields);
   return entity;
 }
 
 jl_entity_t jl_enum_anonymous(jl_entity_r fields) {
-  jl_entity_t entity;
+  jl_entity_t entity = {};
 
   jl_enum_init(&entity, NULL, fields);
   return entity;
@@ -528,14 +528,14 @@ jl_entity_t jl_struct_undefined() {
 }
 
 jl_entity_t jl_struct(const char *name, jl_entity_r fields) {
-  jl_entity_t entity;
+  jl_entity_t entity = {};
 
   jl_struct_init(&entity, name, fields);
   return entity;
 }
 
 jl_entity_t jl_struct_anonymous(jl_entity_r fields) {
-  jl_entity_t entity;
+  jl_entity_t entity = {};
 
   jl_struct_init(&entity, NULL, fields);
   return entity;
@@ -573,14 +573,14 @@ jl_entity_t jl_union_undefined() {
 }
 
 jl_entity_t jl_union(const char *name, jl_entity_r fields) {
-  jl_entity_t entity;
+  jl_entity_t entity = {};
 
   jl_union_init(&entity, name, fields);
   return entity;
 }
 
 jl_entity_t jl_union_anonymous(jl_entity_r fields) {
-  jl_entity_t entity;
+  jl_entity_t entity = {};
 
   jl_union_init(&entity, NULL, fields);
   return entity;

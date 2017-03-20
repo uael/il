@@ -186,7 +186,7 @@ RULEDF(primary_expression) {
   if (TOKEN(C_TOK_IDENTIFIER)) {
     token = NEXT;
     if (!(sym = sym_get(self, out, token.s))) {
-      fprintf(stderr, "%s undefined symbol", token.s);
+      fprintf(stderr, "undefined symbol %s", token.s);
       exit(1);
     }
     self->entity = sym->entity;
@@ -217,7 +217,7 @@ RULEDF(constant) {
   if (TOKEN(C_TOK_IDENTIFIER)) {
     token = NEXT;
     if (!(sym = sym_get(self, out, token.s))) {
-      fprintf(stderr, "%s undefined symbol", token.s);
+      fprintf(stderr, "undefined symbol %s", token.s);
       exit(1);
     }
     if (!(sym->flags & C_TOKEN_FLAG_ENUMERATION_CONSTANT)) {
@@ -272,6 +272,7 @@ RULEDF(generic_selection) {
     if (!RULE(generic_assoc_list)) {
       return false;
     }
+    CONSUME(')');
     return true;
   }
   return false;
@@ -308,6 +309,23 @@ RULEDF(generic_association) {
 RULEDF(postfix_expression) {
   if (RULE(primary_expression)) {
     return true;
+  }
+  if (TOKEN('(')) {
+    NEXT;
+    if (!RULE(type_name)) {
+      return false;
+    }
+    CONSUME(')');
+    if (!RULE(initializer_list)) {
+      return false;
+    }
+    if (TOKEN(',')) {
+      NEXT;
+    }
+    return true;
+  }
+  if (RULE(postfix_expression)) {
+
   }
   return false;
 }

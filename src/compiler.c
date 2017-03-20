@@ -27,6 +27,11 @@
 #include "compiler.h"
 
 void jl_init(jl_compiler_t *self, int argc, char **argv) {
+  char *sep;
+
+  if ((sep = strrchr(argv[0], '/'))) {
+    argv[0] = ++sep;
+  }
   *self = (jl_compiler_t) {
     .program = argv[0]
   };

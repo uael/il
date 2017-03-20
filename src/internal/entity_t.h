@@ -78,6 +78,7 @@ void jl_entity_switch(jl_entity_t *self, jl_entity_n kind);
 void jl_entity_acquire(jl_entity_t *self);
 void jl_entity_release(jl_entity_t *self);
 bool jl_entity_is_defined(jl_entity_t *self);
+const char *jl_entity_name(jl_entity_t self);
 
 #define jl_entity_is_var(e) ((e).kind == JL_ENTITY_VAR)
 #define jl_entity_is_param(e) ((e).kind == JL_ENTITY_PARAM)

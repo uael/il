@@ -26,12 +26,25 @@
 #ifndef   JL_PROGRAM_H__
 # define  JL_PROGRAM_H__
 
+#include <adt/hash.h>
+
 #include "entity_t.h"
 
 typedef struct jl_program_t jl_program_t;
+typedef struct jl_sym_t jl_sym_t;
+KHASH_DECLARE(jl_symtab, const char *, jl_sym_t);
+
+struct jl_sym_t {
+  jl_sym_t *parent;
+  jl_symtab_t childs;
+  const char *id;
+  unsigned flags;
+  jl_entity_t entity;
+};
 
 struct jl_program_t {
   jl_entity_r entities;
+  jl_symtab_t symtab;
 };
 
 void jl_program_init(jl_program_t *self);

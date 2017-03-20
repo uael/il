@@ -50,8 +50,8 @@ struct jl_frontend_t {
   jl_frontend_n kind;
   jl_deque_of(const char *) sources;
 
+  jl_sym_t *scope;
   jl_entity_t entity;
-  jl_entity_r entities;
   jl_expr_t expr;
   jl_stmt_t stmt;
   jl_type_t type;

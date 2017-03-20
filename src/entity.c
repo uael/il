@@ -219,6 +219,28 @@ bool jl_entity_is_defined(jl_entity_t *self) {
   }
 }
 
+const char *jl_entity_name(jl_entity_t self) {
+  switch (self.kind) {
+    case JL_ENTITY_VAR:
+      return self._var->name;
+    case JL_ENTITY_PARAM:
+      return self._param->name;
+    case JL_ENTITY_FUNC:
+      return self._func->name;
+    case JL_ENTITY_ENUM:
+      return self._enum->name;
+    case JL_ENTITY_STRUCT:
+      return self._struct->name;
+    case JL_ENTITY_UNION:
+      return self._union->name;
+    case JL_ENTITY_LABEL:
+      return self._label->name;
+    default:
+      break;
+  }
+  return NULL;
+}
+
 
 jl_entity_t jl_var_undefined() {
   return (jl_entity_t) {JL_ENTITY_VAR};

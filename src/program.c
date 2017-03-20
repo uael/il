@@ -38,3 +38,5 @@ void jl_program_dtor(jl_program_t *self) {
   }
   jl_vector_dtor(self->entities);
 }
+
+KHASH_MAP_IMPL_STR(jl_symtab, jl_sym_t);

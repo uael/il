@@ -156,13 +156,13 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
     KEYWD(C_TOK_ATOMIC, "_Atomic"),
     KEYWD(C_TOK_BOOL, "_Bool"),
     KEYWD(C_TOK_COMPLEX, "_Complex"),
+    KEYWD(C_TOK_GENERIC, "_Generic"),
     KEYWD(C_TOK_IMAGINARY, "_Imaginary"),
     KEYWD(C_TOK_NORETURN, "_Noreturn"),
-    KEYWD(C_TOK_STATIC_ASSERT, "_Static_assert"),
 
     /* 0x38 */
+    KEYWD(C_TOK_STATIC_ASSERT, "_Static_assert"),
     KEYWD(C_TOK_THREAD_LOCAL, "_Thread_local"),
-    KEYWD(C_TOK_FUNC_NAME, "__func__"),
     SYNTX(C_TOK_COLON, ":"),
     SYNTX(C_TOK_SEMICOLON, ";"),
     SYNTX(C_TOK_LT, "<"),
@@ -198,7 +198,7 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
     SYNTX(C_TOK_XOR_ASSIGN, "^="),
     SYNTX(C_TOK_OR_ASSIGN, "|="),
     SYNTX(C_TOK_TOKEN_PASTE, "##"),
-    EMPTY,
+    KEYWD(C_TOK_FUNC_NAME, "__func__"),
 
     /* 0x58 */
     EMPTY,

@@ -2,7 +2,4 @@
 #define EXIT_FAILURE \
   1
 
-enum estatus_t {
-  ESTATUS_SUCCESS = EXIT_SUCCESS,
-  ESTATUS_FAILURE = EXIT_FAILURE
-};
+0.0

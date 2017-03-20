@@ -85,11 +85,11 @@ enum {
   C_TOK_ATOMIC,
   C_TOK_BOOL,
   C_TOK_COMPLEX,
+  C_TOK_GENERIC,
   C_TOK_IMAGINARY,
   C_TOK_NORETURN,
   C_TOK_STATIC_ASSERT,
   C_TOK_THREAD_LOCAL,
-  C_TOK_FUNC_NAME,
 
   C_TOK_COLON = ':',
   C_TOK_SEMICOLON = ';',
@@ -120,6 +120,8 @@ enum {
   C_TOK_XOR_ASSIGN,           /* ^= */
   C_TOK_OR_ASSIGN,            /* |= */
   C_TOK_TOKEN_PASTE,          /* ## */
+
+  C_TOK_FUNC_NAME,
 
   C_TOK_OPEN_BRACKET = '[',
   C_TOK_ANTI_SLASH = '\\',

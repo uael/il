@@ -49,6 +49,9 @@ jl_type_t jl_float();
 jl_type_t jl_literal(jl_literal_n kind);
 void jl_literal_init(jl_type_t *self, jl_literal_n kind);
 
+#define jl_literal_is(t, T) (jl_type_literal(t)->kind == JL_LITERAL_ ## T)
+#define jl_literal_is_number(t) (jl_type_literal(t)->kind >= JL_LITERAL_CHAR)
+
 struct jl_pointer_t {
   unsigned refs;
   jl_type_t of;

@@ -117,10 +117,11 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
     KEYWD(C_TOK_INT, "int"),
     KEYWD(C_TOK_LONG, "long"),
     KEYWD(C_TOK_REGISTER, "register"),
+    KEYWD(C_TOK_RESTRICT, "restrict"),
     KEYWD(C_TOK_RETURN, "return"),
-    KEYWD(C_TOK_SHORT, "short"),
 
     /* 0x18 */
+    KEYWD(C_TOK_SHORT, "short"),
     KEYWD(C_TOK_SIGNED, "signed"),
     KEYWD(C_TOK_SIZEOF, "sizeof"),
     KEYWD(C_TOK_STATIC, "static"),
@@ -128,17 +129,16 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
     KEYWD(C_TOK_SWITCH, "switch"),
     KEYWD(C_TOK_TYPEDEF, "typedef"),
     KEYWD(C_TOK_UNION, "union"),
-    KEYWD(C_TOK_UNSIGNED, "unsigned"),
 
     /* 0x20 */
-    KEYWD(C_TOK_VOID, "void"),
+    KEYWD(C_TOK_UNSIGNED, "unsigned"),
     SYNTX(C_TOK_NOT, "!"),
-    KEYWD(C_TOK_VOLATILE, "volatile"),
+    KEYWD(C_TOK_VOID, "void"),
     SYNTX(C_TOK_HASH, "#"),
-    KEYWD(C_TOK_WHILE, "while"),
+    KEYWD(C_TOK_VOLATILE, "volatile"),
     SYNTX(C_TOK_MODULO, "%"),
     SYNTX(C_TOK_AND, "&"),
-    SYNTX(C_TOK_ALIGNOF, "_Alignof"),
+    KEYWD(C_TOK_WHILE, "while"),
 
     /* 0x28 */
     SYNTX(C_TOK_OPEN_PAREN, "("),
@@ -151,18 +151,18 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
     SYNTX(C_TOK_SLASH, "/"),
 
     /* 0x30 */
-    EMPTY,
-    EMPTY,
-    EMPTY,
-    EMPTY,
-    EMPTY,
-    EMPTY,
-    EMPTY,
-    EMPTY,
+    SYNTX(C_TOK_ALIGNAS, "_Alignas"),
+    SYNTX(C_TOK_ALIGNOF, "_Alignof"),
+    KEYWD(C_TOK_ATOMIC, "_Atomic"),
+    KEYWD(C_TOK_BOOL, "_Bool"),
+    KEYWD(C_TOK_COMPLEX, "_Complex"),
+    KEYWD(C_TOK_IMAGINARY, "_Imaginary"),
+    KEYWD(C_TOK_NORETURN, "_Noreturn"),
+    KEYWD(C_TOK_STATIC_ASSERT, "_Static_assert"),
 
     /* 0x38 */
-    EMPTY,
-    EMPTY,
+    KEYWD(C_TOK_THREAD_LOCAL, "_Thread_local"),
+    KEYWD(C_TOK_FUNC_NAME, "__func__"),
     SYNTX(C_TOK_COLON, ":"),
     SYNTX(C_TOK_SEMICOLON, ";"),
     SYNTX(C_TOK_LT, "<"),

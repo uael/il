@@ -71,11 +71,14 @@ enum jl_type_specifier_n {
   JL_TYPE_SPECIFIER_LONG = 1 << 6,
   JL_TYPE_SPECIFIER_FLOAT = 1 << 7,
   JL_TYPE_SPECIFIER_DOUBLE = 1 << 8,
-  JL_TYPE_SPECIFIER_EXTERN = 1 << 9,
-  JL_TYPE_SPECIFIER_STATIC = 1 << 10,
-  JL_TYPE_SPECIFIER_THREAD_LOCAL = 1 << 11,
-  JL_TYPE_SPECIFIER_AUTO = 1 << 12,
-  JL_TYPE_SPECIFIER_REGISTER = 1 << 13
+  JL_TYPE_SPECIFIER_COMPLEX = 1 << 9,
+  JL_TYPE_SPECIFIER_IMAGINARY = 1 << 10,
+  JL_TYPE_SPECIFIER_TYPEDEF = 1 << 11,
+  JL_TYPE_SPECIFIER_EXTERN = 1 << 12,
+  JL_TYPE_SPECIFIER_STATIC = 1 << 13,
+  JL_TYPE_SPECIFIER_THREAD_LOCAL = 1 << 14,
+  JL_TYPE_SPECIFIER_AUTO = 1 << 15,
+  JL_TYPE_SPECIFIER_REGISTER = 1 << 16
 };
 
 enum jl_type_qualifier_n {
@@ -99,6 +102,7 @@ struct jl_type_t {
 };
 
 jl_type_t jl_type_undefined();
+void jl_type_undef(jl_type_t *self);
 void jl_type_dtor(jl_type_t *self);
 void jl_type_switch(jl_type_t *self, jl_type_n kind);
 void jl_type_acquire(jl_type_t *self);
@@ -118,6 +122,7 @@ bool jl_ptype_is_defined(jl_type_t *self);
 #define jl_type_is_specified(t) ((t).specifiers != 0)
 #define jl_type_is_signed(t) ((t).specifiers & JL_TYPE_SPECIFIER_SIGNED)
 #define jl_type_is_unsigned(t) ((t).specifiers & JL_TYPE_SPECIFIER_UNSIGNED)
+#define jl_type_is_typedef(t) ((t).specifiers & JL_TYPE_SPECIFIER_TYPEDEF)
 #define jl_type_is_extern(t) ((t).specifiers & JL_TYPE_SPECIFIER_EXTERN)
 #define jl_type_is_static(t) ((t).specifiers & JL_TYPE_SPECIFIER_STATIC)
 #define jl_type_is_thread_local(t) ((t).specifiers & JL_TYPE_SPECIFIER_THREAD_LOCAL)
@@ -126,6 +131,7 @@ bool jl_ptype_is_defined(jl_type_t *self);
 #define jl_ptype_is_specified(t) ((t)->specifiers != 0)
 #define jl_ptype_is_signed(t) ((t)->specifiers & JL_TYPE_SPECIFIER_SIGNED)
 #define jl_ptype_is_unsigned(t) ((t)->specifiers & JL_TYPE_SPECIFIER_UNSIGNED)
+#define jl_ptype_is_typedef(t) ((t)->specifiers & JL_TYPE_SPECIFIER_TYPEDEF)
 #define jl_ptype_is_extern(t) ((t)->specifiers & JL_TYPE_SPECIFIER_EXTERN)
 #define jl_ptype_is_static(t) ((t)->specifiers & JL_TYPE_SPECIFIER_STATIC)
 #define jl_ptype_is_thread_local(t) ((t)->specifiers & JL_TYPE_SPECIFIER_THREAD_LOCAL)

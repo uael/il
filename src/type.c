@@ -39,6 +39,10 @@ jl_type_t jl_type_undefined() {
   return (jl_type_t) {JL_TYPE_UNDEFINED};
 }
 
+void jl_type_undef(jl_type_t *self) {
+  *self = jl_type_undefined();
+}
+
 void jl_type_dtor(jl_type_t *self) {
   switch (self->kind) {
     case JL_TYPE_UNDEFINED:

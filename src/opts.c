@@ -40,7 +40,7 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
   char err[256], *sep, *arg;
   int value;
   static const char *usage =
-    BOLD "Usage:" RED " %s" RESET " [options] file\n"
+    BOLD "Usage:" BOLD RED " %s" RESET " [options] file\n"
     "%s compiler options:\n"
     "  -h [ --help ]              print this help message\n"
     "  --echo                     print the content of the input file\n"
@@ -263,12 +263,12 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
   }
 
   if (!self->in) {
-    printf(BOLD "%s: " RED "fatal error: " RESET "no input files\n", argv[0]);
+    printf(BOLD "%s: " BOLD RED "fatal error: " RESET "no input files\n", argv[0]);
     goto exit_failure;
   }
 
   if (jl_vector_size(errs)) {
-    printf(BOLD "%s: " RED "error: " RESET "%s\n", argv[0], jl_vector_at(errs, 0));
+    printf(BOLD "%s: " BOLD RED "error: " RESET "%s\n", argv[0], jl_vector_at(errs, 0));
     goto exit_failure;
   }
 

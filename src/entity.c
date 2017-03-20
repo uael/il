@@ -32,22 +32,6 @@
 #include "stmt.h"
 #include "type.h"
 
-#define jl_entity_var(e) ((void) assert(jl_entity_is_var(*e)), (e)->_var)
-#define jl_entity_param(e) ((void) assert(jl_entity_is_param(*e)), (e)->_param)
-#define jl_entity_func(e) ((void) assert(jl_entity_is_func(*e)), (e)->_func)
-#define jl_entity_enum(e) ((void) assert(jl_entity_is_enum(*e)), (e)->_enum)
-#define jl_entity_struct(e) ((void) assert(jl_entity_is_struct(*e)), (e)->_struct)
-#define jl_entity_union(e) ((void) assert(jl_entity_is_union(*e)), (e)->_union)
-#define jl_entity_label(e) ((void) assert(jl_entity_is_label(*e)), (e)->_label)
-
-typedef struct jl_var_t jl_var_t;
-typedef struct jl_param_t jl_param_t;
-typedef struct jl_func_t jl_func_t;
-typedef struct jl_enum_t jl_enum_t;
-typedef struct jl_struct_t jl_struct_t;
-typedef struct jl_union_t jl_union_t;
-typedef struct jl_label_t jl_label_t;
-
 void jl_var_dtor(jl_entity_t *self);
 void jl_param_dtor(jl_entity_t *self);
 void jl_func_dtor(jl_entity_t *self);
@@ -56,57 +40,12 @@ void jl_struct_dtor(jl_entity_t *self);
 void jl_union_dtor(jl_entity_t *self);
 void jl_label_dtor(jl_entity_t *self);
 
-struct jl_var_t {
-  unsigned refs;
-  const char *name;
-  jl_type_t type;
-  jl_expr_t initializer;
-};
-
-struct jl_param_t {
-  unsigned refs;
-  const char *name;
-  unsigned position;
-  jl_type_t type;
-  jl_expr_t initializer;
-};
-
-struct jl_func_t {
-  unsigned refs;
-  jl_func_specifier_n specifiers;
-  const char *name;
-  jl_type_t return_type;
-  jl_entity_r params;
-  jl_stmt_t body;
-};
-
-struct jl_enum_t {
-  unsigned refs;
-  const char *name;
-  jl_entity_r fields;
-};
-
-struct jl_struct_t {
-  unsigned refs;
-  const char *name;
-  jl_entity_r fields;
-};
-
-struct jl_union_t {
-  unsigned refs;
-  const char *name;
-  jl_entity_r fields;
-};
-
-struct jl_label_t {
-  unsigned refs;
-  const char *name;
-  jl_stmt_t next;
-};
-
-
 jl_entity_t jl_entity_undefined() {
   return (jl_entity_t) {JL_ENTITY_UNDEFINED};
+}
+
+void jl_entity_undef(jl_entity_t *self) {
+  *self = jl_entity_undefined();
 }
 
 void jl_entity_dtor(jl_entity_t *self) {
@@ -323,27 +262,27 @@ void jl_var_init(jl_entity_t *self, const char *name, jl_type_t type, jl_expr_t 
 void jl_var_dtor(jl_entity_t *self) {}
 
 const char *jl_var_get_name(jl_entity_t *self) {
-  return jl_entity_var(self)->name;
+  return jl_pentity_var(self)->name;
 }
 
 void jl_var_set_name(jl_entity_t *self, const char *name) {
-  jl_entity_var(self)->name = name;
+  jl_pentity_var(self)->name = name;
 }
 
 jl_type_t jl_var_get_type(jl_entity_t *self) {
-  return jl_entity_var(self)->type;
+  return jl_pentity_var(self)->type;
 }
 
 void jl_var_set_type(jl_entity_t *self, jl_type_t type) {
-  jl_entity_var(self)->type = type;
+  jl_pentity_var(self)->type = type;
 }
 
 jl_expr_t jl_var_get_initializer(jl_entity_t *self) {
-  return jl_entity_var(self)->initializer;
+  return jl_pentity_var(self)->initializer;
 }
 
 void jl_var_set_initializer(jl_entity_t *self, jl_expr_t initializer) {
-  jl_entity_var(self)->initializer = initializer;
+  jl_pentity_var(self)->initializer = initializer;
 }
 
 
@@ -383,35 +322,35 @@ void jl_param_init(jl_entity_t *self, unsigned position, const char *name, jl_ty
 void jl_param_dtor(jl_entity_t *self) {}
 
 unsigned jl_param_get_position(jl_entity_t *self) {
-  return jl_entity_param(self)->position;
+  return jl_pentity_param(self)->position;
 }
 
 void jl_param_set_position(jl_entity_t *self, unsigned position) {
-  jl_entity_param(self)->position = position;
+  jl_pentity_param(self)->position = position;
 }
 
 const char *jl_param_get_name(jl_entity_t *self) {
-  return jl_entity_param(self)->name;
+  return jl_pentity_param(self)->name;
 }
 
 void jl_param_set_name(jl_entity_t *self, const char *name) {
-  jl_entity_param(self)->name = name;
+  jl_pentity_param(self)->name = name;
 }
 
 jl_type_t jl_param_get_type(jl_entity_t *self) {
-  return jl_entity_param(self)->type;
+  return jl_pentity_param(self)->type;
 }
 
 void jl_param_set_type(jl_entity_t *self, jl_type_t type) {
-  jl_entity_param(self)->type = type;
+  jl_pentity_param(self)->type = type;
 }
 
 jl_expr_t jl_param_get_initializer(jl_entity_t *self) {
-  return jl_entity_param(self)->initializer;
+  return jl_pentity_param(self)->initializer;
 }
 
 void jl_param_set_initializer(jl_entity_t *self, jl_expr_t initializer) {
-  jl_entity_param(self)->initializer = initializer;
+  jl_pentity_param(self)->initializer = initializer;
 }
 
 
@@ -457,7 +396,7 @@ void jl_func_init(jl_entity_t *self, jl_func_specifier_n s, jl_type_t r, const c
 }
 
 void jl_func_dtor(jl_entity_t *self) {
-  jl_vector_dtor(jl_entity_func(self)->params);
+  jl_vector_dtor(jl_pentity_func(self)->params);
 }
 
 bool jl_func_is_inline(jl_entity_t *self) {
@@ -469,51 +408,51 @@ bool jl_func_is_noreturn(jl_entity_t *self) {
 }
 
 jl_func_specifier_n jl_func_get_specifiers(jl_entity_t *self) {
-  return jl_entity_func(self)->specifiers;
+  return jl_pentity_func(self)->specifiers;
 }
 
 void jl_func_set_specifiers(jl_entity_t *self, jl_func_specifier_n specifiers) {
-  jl_entity_func(self)->specifiers = specifiers;
+  jl_pentity_func(self)->specifiers = specifiers;
 }
 
 void jl_func_add_specifier(jl_entity_t *self, jl_func_specifier_n specifier) {
-  jl_entity_func(self)->specifiers |= specifier;
+  jl_pentity_func(self)->specifiers |= specifier;
 }
 
 void jl_func_rem_specifier(jl_entity_t *self, jl_func_specifier_n specifier) {
-  jl_entity_func(self)->specifiers &= ~specifier;
+  jl_pentity_func(self)->specifiers &= ~specifier;
 }
 
 const char *jl_func_get_name(jl_entity_t *self) {
-  return jl_entity_func(self)->name;
+  return jl_pentity_func(self)->name;
 }
 
 void jl_func_set_name(jl_entity_t *self, const char *name) {
-  jl_entity_func(self)->name = name;
+  jl_pentity_func(self)->name = name;
 }
 
 jl_type_t jl_func_get_return_type(jl_entity_t *self) {
-  return jl_entity_func(self)->return_type;
+  return jl_pentity_func(self)->return_type;
 }
 
 void jl_func_set_return_type(jl_entity_t *self, jl_type_t return_type) {
-  jl_entity_func(self)->return_type = return_type;
+  jl_pentity_func(self)->return_type = return_type;
 }
 
 jl_entity_r jl_func_get_params(jl_entity_t *self) {
-  return jl_entity_func(self)->params;
+  return jl_pentity_func(self)->params;
 }
 
 void jl_func_set_params(jl_entity_t *self, jl_entity_r params) {
-  jl_entity_func(self)->params = params;
+  jl_pentity_func(self)->params = params;
 }
 
 jl_stmt_t jl_func_get_body(jl_entity_t *self) {
-  return jl_entity_func(self)->body;
+  return jl_pentity_func(self)->body;
 }
 
 void jl_func_set_body(jl_entity_t *self, jl_stmt_t body) {
-  jl_entity_func(self)->body = body;
+  jl_pentity_func(self)->body = body;
 }
 
 
@@ -542,23 +481,23 @@ void jl_enum_init(jl_entity_t *self, const char *name, jl_entity_r fields) {
 }
 
 void jl_enum_dtor(jl_entity_t *self) {
-  jl_vector_dtor(jl_entity_enum(self)->fields);
+  jl_vector_dtor(jl_pentity_enum(self)->fields);
 }
 
 const char *jl_enum_get_name(jl_entity_t *self) {
-  return jl_entity_enum(self)->name;
+  return jl_pentity_enum(self)->name;
 }
 
 void jl_enum_set_name(jl_entity_t *self, const char *name) {
-  jl_entity_enum(self)->name = name;
+  jl_pentity_enum(self)->name = name;
 }
 
 jl_entity_r jl_enum_get_fields(jl_entity_t *self) {
-  return jl_entity_enum(self)->fields;
+  return jl_pentity_enum(self)->fields;
 }
 
 void jl_enum_set_fields(jl_entity_t *self, jl_entity_r fields) {
-  jl_entity_enum(self)->fields = fields;
+  jl_pentity_enum(self)->fields = fields;
 }
 
 
@@ -587,23 +526,23 @@ void jl_struct_init(jl_entity_t *self, const char *name, jl_entity_r fields) {
 }
 
 void jl_struct_dtor(jl_entity_t *self) {
-  jl_vector_dtor(jl_entity_struct(self)->fields);
+  jl_vector_dtor(jl_pentity_struct(self)->fields);
 }
 
 const char *jl_struct_get_name(jl_entity_t *self) {
-  return jl_entity_struct(self)->name;
+  return jl_pentity_struct(self)->name;
 }
 
 void jl_struct_set_name(jl_entity_t *self, const char *name) {
-  jl_entity_struct(self)->name = name;
+  jl_pentity_struct(self)->name = name;
 }
 
 jl_entity_r jl_struct_get_fields(jl_entity_t *self) {
-  return jl_entity_struct(self)->fields;
+  return jl_pentity_struct(self)->fields;
 }
 
 void jl_struct_set_fields(jl_entity_t *self, jl_entity_r fields) {
-  jl_entity_struct(self)->fields = fields;
+  jl_pentity_struct(self)->fields = fields;
 }
 
 
@@ -632,23 +571,23 @@ void jl_union_init(jl_entity_t *self, const char *name, jl_entity_r fields) {
 }
 
 void jl_union_dtor(jl_entity_t *self) {
-  jl_vector_dtor(jl_entity_union(self)->fields);
+  jl_vector_dtor(jl_pentity_union(self)->fields);
 }
 
 const char *jl_union_get_name(jl_entity_t *self) {
-  return jl_entity_union(self)->name;
+  return jl_pentity_union(self)->name;
 }
 
 void jl_union_set_name(jl_entity_t *self, const char *name) {
-  jl_entity_union(self)->name = name;
+  jl_pentity_union(self)->name = name;
 }
 
 jl_entity_r jl_union_get_fields(jl_entity_t *self) {
-  return jl_entity_union(self)->fields;
+  return jl_pentity_union(self)->fields;
 }
 
 void jl_union_set_fields(jl_entity_t *self, jl_entity_r fields) {
-  jl_entity_union(self)->fields = fields;
+  jl_pentity_union(self)->fields = fields;
 }
 
 

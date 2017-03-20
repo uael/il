@@ -29,6 +29,10 @@
 #include <adt/deque.h>
 
 #include "program.h"
+#include "entity_t.h"
+#include "expr_t.h"
+#include "stmt_t.h"
+#include "type_t.h"
 
 struct jl_compiler_t;
 struct jl_lexer_t;
@@ -45,6 +49,12 @@ struct jl_frontend_t {
   struct jl_compiler_t *compiler;
   jl_frontend_n kind;
   jl_deque_of(const char *) sources;
+
+  jl_entity_t entity;
+  jl_entity_r entities;
+  jl_expr_t expr;
+  jl_stmt_t stmt;
+  jl_type_t type;
 
   void (*parse)(struct jl_frontend_t *self, struct jl_lexer_t *lexer, jl_program_t *out);
 };

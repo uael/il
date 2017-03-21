@@ -125,6 +125,7 @@ JL_RULEDF(constant) {
   JL_MATCHT(1, C_TOK_NUMBER) {
     $$ = jl_fval_string($1.token.s);
   }
+  else
   JL_MATCHT(1, C_TOK_IDENTIFIER) {
     if (SYM_GET($1.token.s) && jl_sym_has_flag(sym, C_TOKEN_FLAG_ENUMERATION_CONSTANT)) {
       $$ = jl_fval_string($1.token.s);
@@ -139,6 +140,7 @@ JL_RULEDF(primary_expression) {
   JL_MATCHT(1, C_TOK_IDENTIFIER) {
     $$ = jl_fval_string($1.token.s);
   }
+  else
   JL_MATCHR(1, constant, JL_FVAL_STRING | JL_FVAL_INT | JL_FVAL_FLOAT) {
     switch ($1.kind) {
       case JL_FVAL_STRING:
@@ -151,6 +153,7 @@ JL_RULEDF(primary_expression) {
         break;
     }
   }
+  else
   JL_MATCHT(1, '(') JL_MATCHR(2, expression, JL_FVAL_EXPR) JL_MATCHT(3, ')') {
     $$ = jl_fval_expr(jl_unary(JL_OP_EN, $2.expr));
   }

@@ -71,6 +71,7 @@ void jl_lexer_dtor(jl_lexer_t *self);
 void jl_lexer_fork(jl_lexer_t *destination, jl_lexer_t *source);
 void jl_lexer_join(jl_lexer_t *fork);
 void jl_lexer_skip(jl_lexer_t *self, unsigned n);
+void jl_lexer_undo(jl_lexer_t *lexer, jl_token_t until);
 
 size_t jl_lexer_length(jl_lexer_t *self);
 bool jl_lexer_push(jl_lexer_t *self, jl_token_t token);

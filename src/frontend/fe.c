@@ -42,10 +42,28 @@ void jl_frontend_init(jl_frontend_t *self, jl_frontend_n kind, jl_compiler_t *co
   }
 }
 
+void jl_frontend_dtor(jl_frontend_t *self) {
+  jl_deque_dtor(self->sources);
+}
+
 void jl_frontend_push_src(jl_frontend_t *self, const char *src) {
   jl_deque_push(self->sources, src);
 }
 
-void jl_frontend_dtor(jl_frontend_t *self) {
-  jl_deque_dtor(self->sources);
+void jl_frontend_scope(jl_frontend_t *self, jl_program_t *out, const char *id) {
+  jl_symtab_t *symtab;
+  int it;
+
+  symtab = self->scope ? &self->scope->childs : &out->symtab;
+  it = kh_get(jl_symtab, symtab, id);
+  if (it == kh_end(symtab)) {
+    puts("cannot scope on unrecognized entity");
+    exit(1);
+  }
+  kh_value(symtab, it).parent = self->scope;
+  self->scope = &kh_value(symtab, it);
+}
+
+void jl_frontend_unscope(jl_frontend_t *self) {
+  self->scope = self->scope->parent;
 }

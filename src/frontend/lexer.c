@@ -124,6 +124,10 @@ void jl_lexer_skip(jl_lexer_t *self, unsigned n) {
   self->loc.position += n;
 }
 
+void jl_lexer_undo(jl_lexer_t *lexer, jl_token_t until) {
+  while (jl_deque_cursor(lexer->queue) > until.cursor) jl_deque_cursor(lexer->queue)--;
+}
+
 size_t jl_lexer_length(jl_lexer_t *self) {
   return jl_deque_length(self->queue);
 }
@@ -138,6 +142,7 @@ bool jl_lexer_push(jl_lexer_t *self, jl_token_t token) {
       }
     }
   }
+  token.cursor = jl_deque_size(self->queue);
   jl_deque_push(self->queue, token);
   if (jl_lexer_is_root(self) && self->fe->compiler->opts.echo) {
     switch (token.kind) {

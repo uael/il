@@ -23,49 +23,33 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_TOKEN_H__
-# define  JL_TOKEN_H__
+#include "symbol.h"
 
-#include <adt/deque.h>
+bool jl_sym_has_flag(jl_sym_t *self, unsigned flag) {
+  return (bool) (self->flags & flag);
+}
 
-typedef enum jl_token_n jl_token_n;
+jl_sym_t *jl_sym_put(jl_symtab_t *symtab, const char *id) {
+  jl_sym_t *sym;
+  int it, r;
 
-typedef struct jl_token_t jl_token_t;
-typedef struct jl_loc_t jl_loc_t;
+  it = kh_put(jl_symtab, symtab, id, &r);
+  if (r == 0) {
+    return NULL;
+  }
+  sym = &kh_value(symtab, it);
+  sym->id = id;
+  return sym;
+}
 
-typedef jl_deque_of(jl_token_t) jl_token_r;
+jl_sym_t *jl_sym_get(jl_symtab_t *symtab, const char *id) {
+  int it;
 
-enum jl_token_n {
-  JL_TOKEN_KEYWORD = 0,
-  JL_TOKEN_SYNTAX,
-  JL_TOKEN_NUMBER,
-  JL_TOKEN_IDENTIFIER,
-  JL_TOKEN_STRING,
-  JL_TOKEN_FLOAT,
-  JL_TOKEN_INT
-};
+  it = kh_get(jl_symtab, symtab, id);
+  if (it == kh_end(symtab)) {
+    return NULL;
+  }
+  return &kh_value(symtab, it);
+}
 
-struct jl_loc_t {
-  uint32_t lineno;
-  uint32_t colno;
-  uint32_t position;
-  uint32_t file_id;
-};
-
-struct jl_token_t {
-  char type;
-  jl_loc_t loc;
-  const char *name;
-  uint32_t length;
-  jl_token_n kind : 8;
-  size_t cursor;
-  union {
-    const char *s;
-    float f;
-    int i;
-  };
-};
-
-void jl_token_dtor(jl_token_t *self);
-
-#endif /* JL_TOKEN_H__ */
+KHASH_MAP_IMPL_STR(jl_symtab, jl_sym_t);

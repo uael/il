@@ -23,49 +23,43 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_TOKEN_H__
-# define  JL_TOKEN_H__
+#include "fval.h"
 
-#include <adt/deque.h>
+jl_fval_t jl_fval_undefined() {
+  return (jl_fval_t) {JL_FVAL_UNDEFINED};
+}
 
-typedef enum jl_token_n jl_token_n;
-
-typedef struct jl_token_t jl_token_t;
-typedef struct jl_loc_t jl_loc_t;
-
-typedef jl_deque_of(jl_token_t) jl_token_r;
-
-enum jl_token_n {
-  JL_TOKEN_KEYWORD = 0,
-  JL_TOKEN_SYNTAX,
-  JL_TOKEN_NUMBER,
-  JL_TOKEN_IDENTIFIER,
-  JL_TOKEN_STRING,
-  JL_TOKEN_FLOAT,
-  JL_TOKEN_INT
-};
-
-struct jl_loc_t {
-  uint32_t lineno;
-  uint32_t colno;
-  uint32_t position;
-  uint32_t file_id;
-};
-
-struct jl_token_t {
-  char type;
-  jl_loc_t loc;
-  const char *name;
-  uint32_t length;
-  jl_token_n kind : 8;
-  size_t cursor;
-  union {
-    const char *s;
-    float f;
-    int i;
+jl_fval_t jl_fval_string(const char *s) {
+  return  (jl_fval_t) {
+    JL_FVAL_STRING,
+    .s = s
   };
-};
+}
 
-void jl_token_dtor(jl_token_t *self);
+jl_fval_t jl_fval_token(jl_token_t token) {
+  return  (jl_fval_t) {
+    JL_FVAL_TOKEN,
+    .begin = token,
+    .end = token,
+    .token = token
+  };
+}
 
-#endif /* JL_TOKEN_H__ */
+jl_fval_t jl_fval_expr(jl_expr_t expr) {
+  return  (jl_fval_t) {
+    JL_FVAL_EXPR,
+    .expr = expr
+  };
+}
+
+void jl_fval_undef(jl_fval_t *self) {
+  *self = jl_fval_undefined();
+}
+
+void jl_fval_begin(jl_fval_t *self, jl_token_t token) {
+  self->begin = token;
+}
+
+void jl_fval_end(jl_fval_t *self, jl_token_t token) {
+  self->end = token;
+}

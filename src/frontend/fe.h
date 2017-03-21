@@ -60,7 +60,9 @@ struct jl_frontend_t {
 };
 
 void jl_frontend_init(jl_frontend_t *self, jl_frontend_n kind, struct jl_compiler_t *compiler);
-void jl_frontend_push_src(jl_frontend_t *self, const char *src);
 void jl_frontend_dtor(jl_frontend_t *self);
+void jl_frontend_push_src(jl_frontend_t *self, const char *src);
+void jl_frontend_scope(jl_frontend_t *self, jl_program_t *out, const char *id);
+void jl_frontend_unscope(jl_frontend_t *self);
 
 #endif /* JL_FE_H__ */

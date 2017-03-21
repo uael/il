@@ -23,49 +23,20 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_TOKEN_H__
-# define  JL_TOKEN_H__
+#include "frule.h"
 
-#include <adt/deque.h>
+bool jl_frule_validate(jl_frule_t self, jl_fval_t *fval, jl_frontend_t *fe, jl_lexer_t *lexer, jl_program_t *out) {
+  jl_token_t begin;
+  bool validate;
 
-typedef enum jl_token_n jl_token_n;
+  begin = jl_lexer_peek(lexer);
+  validate = self.callback(fval, fe, lexer, out);
+  jl_fval_begin(fval, begin);
+  if (!validate || !(fval->kind & self.expected)) {
+    jl_lexer_undo(lexer, fval->begin);
+    return false;
+  }
+  jl_fval_end(fval, jl_lexer_peek(lexer));
 
-typedef struct jl_token_t jl_token_t;
-typedef struct jl_loc_t jl_loc_t;
-
-typedef jl_deque_of(jl_token_t) jl_token_r;
-
-enum jl_token_n {
-  JL_TOKEN_KEYWORD = 0,
-  JL_TOKEN_SYNTAX,
-  JL_TOKEN_NUMBER,
-  JL_TOKEN_IDENTIFIER,
-  JL_TOKEN_STRING,
-  JL_TOKEN_FLOAT,
-  JL_TOKEN_INT
-};
-
-struct jl_loc_t {
-  uint32_t lineno;
-  uint32_t colno;
-  uint32_t position;
-  uint32_t file_id;
-};
-
-struct jl_token_t {
-  char type;
-  jl_loc_t loc;
-  const char *name;
-  uint32_t length;
-  jl_token_n kind : 8;
-  size_t cursor;
-  union {
-    const char *s;
-    float f;
-    int i;
-  };
-};
-
-void jl_token_dtor(jl_token_t *self);
-
-#endif /* JL_TOKEN_H__ */
+  return true;
+}

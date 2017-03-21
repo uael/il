@@ -23,49 +23,41 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_TOKEN_H__
-# define  JL_TOKEN_H__
+#ifndef   JL_FRULE_H__
+# define  JL_FRULE_H__
 
-#include <adt/deque.h>
+#include "fval.h"
 
-typedef enum jl_token_n jl_token_n;
+typedef struct jl_frule_t jl_frule_t;
 
-typedef struct jl_token_t jl_token_t;
-typedef struct jl_loc_t jl_loc_t;
-
-typedef jl_deque_of(jl_token_t) jl_token_r;
-
-enum jl_token_n {
-  JL_TOKEN_KEYWORD = 0,
-  JL_TOKEN_SYNTAX,
-  JL_TOKEN_NUMBER,
-  JL_TOKEN_IDENTIFIER,
-  JL_TOKEN_STRING,
-  JL_TOKEN_FLOAT,
-  JL_TOKEN_INT
+struct jl_frule_t {
+  jl_fval_n expected;
+  bool (*callback)(jl_fval_t *, jl_frontend_t *, jl_lexer_t *, jl_program_t *);
 };
 
-struct jl_loc_t {
-  uint32_t lineno;
-  uint32_t colno;
-  uint32_t position;
-  uint32_t file_id;
-};
+bool jl_frule_validate(jl_frule_t self, jl_fval_t *fval, jl_frontend_t *fe, jl_lexer_t *lexer, jl_program_t *out);
 
-struct jl_token_t {
-  char type;
-  jl_loc_t loc;
-  const char *name;
-  uint32_t length;
-  jl_token_n kind : 8;
-  size_t cursor;
-  union {
-    const char *s;
-    float f;
-    int i;
-  };
-};
+#define $$ *fval
+#define JL_RULEFN(name) name
 
-void jl_token_dtor(jl_token_t *self);
+#define JL_RULEDC(name) \
+  static bool JL_RULEFN(name)(jl_fval_t *fval, jl_frontend_t *fe, jl_lexer_t *lexer, jl_program_t *out)
 
-#endif /* JL_TOKEN_H__ */
+#define Jl_RULEBG \
+  jl_fval_t $1, $2, $3, $4, $5, $6, $7, $8, $9; jl_sym_t *sym; *fval = jl_fval_undefined()
+
+#define Jl_RULEED \
+  return fval->kind != JL_FVAL_UNDEFINED
+
+#define JL_RULEDF(name) \
+  JL_RULEDC(name)
+
+#define JL_MATCHR(n, name, expected) \
+  if (jl_frule_validate((jl_frule_t) {expected, JL_RULEFN(name)}, &$ ## n, fe, lexer, out))
+
+#define JL_MATCHT(n, name) \
+  if (jl_lexer_peek(lexer).type == name \
+    ? ($ ## n = jl_fval_token(jl_lexer_peek(lexer)), jl_lexer_next(lexer), true) \
+    : ((n==1?(void)0:jl_lexer_undo(lexer, $1.begin)), false))
+
+#endif /* JL_FRULE_H__ */

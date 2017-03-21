@@ -119,21 +119,6 @@ void c_fe_parse(jl_frontend_t *self, jl_lexer_t *lexer, jl_program_t *out) {
 
 #define SYM_GET(id) (sym = jl_sym_get(fe->scope ? &fe->scope->childs : &out->symtab, id))
 
-JL_RULEDF(constant) {
-  Jl_RULEBG;
-
-  JL_MATCHT(1, C_TOK_NUMBER) {
-    $$ = jl_fval_string($1.token.s);
-  }
-  else
-  JL_MATCHT(1, C_TOK_IDENTIFIER) {
-    if (SYM_GET($1.token.s) && jl_sym_has_flag(sym, C_TOKEN_FLAG_ENUMERATION_CONSTANT)) {
-      $$ = jl_fval_string($1.token.s);
-    }
-  }
-  Jl_RULEED;
-}
-
 JL_RULEDF(primary_expression) {
   Jl_RULEBG;
 
@@ -154,8 +139,31 @@ JL_RULEDF(primary_expression) {
     }
   }
   else
+  JL_MATCHR(1, expression, JL_FVAL_STRING) {
+    $$ = jl_fval_string($1.s);
+  }
+  else
   JL_MATCHT(1, '(') JL_MATCHR(2, expression, JL_FVAL_EXPR) JL_MATCHT(3, ')') {
     $$ = jl_fval_expr(jl_unary(JL_OP_EN, $2.expr));
+  }
+  /*else todo
+  JL_MATCHR(1, generic_selection, JL_FVAL_EXPR) {
+    $$ = jl_fval_string($1.s);
+  }*/
+  Jl_RULEED;
+}
+
+JL_RULEDF(constant) {
+  Jl_RULEBG;
+
+  JL_MATCHT(1, C_TOK_NUMBER) {
+    $$ = jl_fval_string($1.token.s);
+  }
+  else
+  JL_MATCHT(1, C_TOK_IDENTIFIER) {
+    if (SYM_GET($1.token.s) && jl_sym_has_flag(sym, C_TOKEN_FLAG_ENUMERATION_CONSTANT)) {
+      $$ = jl_fval_string($1.token.s);
+    }
   }
   Jl_RULEED;
 }

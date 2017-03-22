@@ -128,33 +128,32 @@ JL_RULEDF(primary_expression) {
   Jl_RULEBG;
 
   JL_MATCHT(1, C_TOK_IDENTIFIER) {
-    $$ = jl_fval_string($1.u.token.u.s);
+    _0 = jl_fval_string(_1.u.token.u.s);
   }
   else
   JL_MATCHR(1, constant, JL_FVAL_STRING | JL_FVAL_INT | JL_FVAL_FLOAT) {
-    switch ($1.kind) {
+    switch (_1.kind) {
       case JL_FVAL_STRING:
-        $$ = jl_fval_expr(jl_const_string($1.u.s));
+        _0 = jl_fval_expr(jl_const_string(_1.u.s));
       case JL_FVAL_INT:
-        $$ = jl_fval_expr(jl_const_int($1.u.d));
+        _0 = jl_fval_expr(jl_const_int(_1.u.d));
       case JL_FVAL_FLOAT:
-        $$ = jl_fval_expr(jl_const_float($1.u.f));
+        _0 = jl_fval_expr(jl_const_float(_1.u.f));
       default:
         break;
     }
   }
   else
   JL_MATCHR(1, expression, JL_FVAL_STRING) {
-    $$ = jl_fval_string($1.u.s);
+    _0 = jl_fval_string(_1.u.s);
   }
   else
   JL_MATCHT(1, '(') JL_MATCHR(2, expression, JL_FVAL_EXPR) {
-
-    $$ = jl_fval_expr(jl_unary(JL_OP_EN, $2.u.expr));
+    _0 = jl_fval_expr(jl_unary(JL_OP_EN, _2.u.expr));
   }
   /*else todo
   JL_MATCHR(1, generic_selection, JL_FVAL_EXPR) {
-    $$ = jl_fval_string($1.s);
+    __ = jl_fval_string(_1.s);
   }*/
   Jl_RULEED;
 }
@@ -163,12 +162,12 @@ JL_RULEDF(constant) {
   Jl_RULEBG;
 
   JL_MATCHT(1, C_TOK_NUMBER) {
-    $$ = jl_fval_string($1.u.token.u.s);
+    _0 = jl_fval_string(_1.u.token.u.s);
   }
   else
   JL_MATCHT(1, C_TOK_IDENTIFIER) {
-    if (SYM_GET($1.u.token.u.s) && jl_sym_has_flag(sym, C_TOKEN_FLAG_ENUMERATION_CONSTANT)) {
-      $$ = jl_fval_string($1.u.token.u.s);
+    if (SYM_GET(_1.u.token.u.s) && jl_sym_has_flag(sym, C_TOKEN_FLAG_ENUMERATION_CONSTANT)) {
+      _0 = jl_fval_string(_1.u.token.u.s);
     }
   }
   Jl_RULEED;

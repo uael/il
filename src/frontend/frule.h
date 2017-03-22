@@ -48,14 +48,14 @@ struct jl_frule_t {
 
 bool jl_frule_validate(jl_frule_t self, jl_fval_t *fval, struct jl_fe_t *fe, struct jl_lexer_t *lexer, struct jl_program_t *out);
 
-#define $$ *fval
+#define _0 *fval
 #define JL_RULEFN(name) name
 
 #define JL_RULEDC(name) \
   static bool JL_RULEFN(name)(jl_fval_t *fval, jl_fe_t *fe, jl_lexer_t *lexer, jl_program_t *out)
 
 #define Jl_RULEBG \
-  jl_fval_t $1, $2, $3, $4, $5, $6, $7, $8, $9; jl_sym_t *sym; *fval = jl_fval_undefined()
+  jl_fval_t _1, _2, _3, _4, _5, _6, _7, _8, _9; jl_sym_t *sym; *fval = jl_fval_undefined()
 
 #define Jl_RULEED \
   return fval->kind != JL_FVAL_UNDEFINED
@@ -64,11 +64,11 @@ bool jl_frule_validate(jl_frule_t self, jl_fval_t *fval, struct jl_fe_t *fe, str
   JL_RULEDC(name)
 
 #define JL_MATCHR(n, name, expected) \
-  if (jl_frule_validate((jl_frule_t) {expected, JL_RULEFN(name)}, &$ ## n, fe, lexer, out))
+  if (jl_frule_validate((jl_frule_t) {expected, JL_RULEFN(name)}, &_ ## n, fe, lexer, out))
 
 #define JL_MATCHT(n, name) \
   if (jl_lexer_peek(lexer).type == name \
-    ? ($ ## n = jl_fval_token(jl_lexer_peek(lexer)), jl_lexer_next(lexer), true) \
-    : ((n==1?(void)0:jl_lexer_undo(lexer, $1.begin)), false))
+    ? (_ ## n = jl_fval_token(jl_lexer_peek(lexer)), jl_lexer_next(lexer), true) \
+    : ((n==1?(void)0:jl_lexer_undo(lexer, _1.begin)), false))
 
 #endif /* JL_FRULE_H__ */

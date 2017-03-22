@@ -26,16 +26,16 @@
 #include <stdlib.h>
 #include <token.h>
 
-#include <adt/xmalloc.h>
 #include <adt/string.h>
 #include <util/io.h>
 #include <compiler.h>
 
 #include "lexer.h"
+
 #include "jay/jay_lexer.h"
 #include "c/c_lexer.h"
 
-void jl_lexer_init(jl_lexer_t *self, jl_frontend_t *fe, uint32_t file_id, const char *buffer, size_t length) {
+void jl_lexer_init(jl_lexer_t *self, jl_fe_t *fe, uint32_t file_id, const char *buffer, size_t length) {
   *self = (jl_lexer_t) {
     .fe = fe,
     .loc = (jl_loc_t) {
@@ -59,7 +59,7 @@ void jl_lexer_init(jl_lexer_t *self, jl_frontend_t *fe, uint32_t file_id, const 
   }
 }
 
-void jl_lexer_init_f(jl_lexer_t *self, jl_frontend_t *fe) {
+void jl_lexer_init_f(jl_lexer_t *self, jl_fe_t *fe) {
   size_t len;
   uint32_t file_id;
   const char *filename, *buffer;
@@ -122,10 +122,6 @@ void jl_lexer_join(jl_lexer_t *fork) {
 
 void jl_lexer_skip(jl_lexer_t *self, unsigned n) {
   self->loc.position += n;
-}
-
-void jl_lexer_undo(jl_lexer_t *lexer, jl_token_t until) {
-  while (jl_deque_cursor(lexer->queue) > until.cursor) jl_deque_cursor(lexer->queue)--;
 }
 
 size_t jl_lexer_length(jl_lexer_t *self) {
@@ -248,4 +244,8 @@ jl_token_t jl_lexer_consume_id(jl_lexer_t *self, const char *id) {
   }
   jl_lexer_next(self);
   return result;
+}
+
+void jl_lexer_undo(jl_lexer_t *lexer, jl_token_t until) {
+  while (jl_deque_cursor(lexer->queue) > until.cursor) jl_deque_cursor(lexer->queue)--;
 }

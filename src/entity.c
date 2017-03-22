@@ -28,6 +28,7 @@
 #include <adt/xmalloc.h>
 
 #include "entity.h"
+
 #include "expr.h"
 #include "stmt.h"
 #include "type.h"

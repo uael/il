@@ -24,7 +24,6 @@
  */
 
 #include "c_pp.h"
-#include "c_lexer.h"
 
 void c_macro_init(c_macro_t *self) {
   *self = (c_macro_t) {C_MACRO_UNDEFINED};

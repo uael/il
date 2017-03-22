@@ -26,13 +26,10 @@
 #ifndef   JL_FVAL_H__
 # define  JL_FVAL_H__
 
-#include "entity.h"
-#include "expr.h"
-#include "stmt.h"
-#include "type.h"
-#include "token.h"
-#include "fe.h"
-#include "lexer.h"
+#include "entity_t.h"
+#include "expr_t.h"
+#include "stmt_t.h"
+#include "type_t.h"
 
 typedef enum jl_fval_n jl_fval_n;
 

@@ -33,6 +33,7 @@
 #include <adt/string.h>
 
 #include "opts.h"
+
 #include "util/io.h"
 
 void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {

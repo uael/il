@@ -37,7 +37,7 @@ typedef struct jl_compiler_t jl_compiler_t;
 struct jl_compiler_t {
   const char *program;
   jl_opts_t opts;
-  jl_frontend_t fe;
+  jl_fe_t fe;
   jl_backend_t be;
   string_r strtab;
 };

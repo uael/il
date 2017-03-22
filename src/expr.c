@@ -25,8 +25,9 @@
 
 #include <stdlib.h>
 
-#include "entity.h"
 #include "expr.h"
+
+#include "entity.h"
 #include "stmt.h"
 #include "type.h"
 

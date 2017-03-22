@@ -25,10 +25,11 @@
 
 #include <stdlib.h>
 
+#include "type.h"
+
 #include "entity.h"
 #include "expr.h"
 #include "stmt.h"
-#include "type.h"
 
 void jl_literal_dtor(jl_type_t *self);
 void jl_pointer_dtor(jl_type_t *self);

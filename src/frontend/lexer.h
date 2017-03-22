@@ -53,7 +53,7 @@ struct jl_lexer_event_t {
 };
 
 struct jl_lexer_t {
-  jl_frontend_t *fe;
+  jl_fe_t *fe;
   char *buffer;
   size_t length;
   jl_loc_t loc;
@@ -65,13 +65,12 @@ struct jl_lexer_t {
   void (*enqueue)(jl_lexer_t *self, unsigned n);
 };
 
-void jl_lexer_init(jl_lexer_t *self, jl_frontend_t *fe, uint32_t file_id, const char *buffer, size_t length);
-void jl_lexer_init_f(jl_lexer_t *self, jl_frontend_t *fe);
+void jl_lexer_init(jl_lexer_t *self, jl_fe_t *fe, uint32_t file_id, const char *buffer, size_t length);
+void jl_lexer_init_f(jl_lexer_t *self, jl_fe_t *fe);
 void jl_lexer_dtor(jl_lexer_t *self);
 void jl_lexer_fork(jl_lexer_t *destination, jl_lexer_t *source);
 void jl_lexer_join(jl_lexer_t *fork);
 void jl_lexer_skip(jl_lexer_t *self, unsigned n);
-void jl_lexer_undo(jl_lexer_t *lexer, jl_token_t until);
 
 size_t jl_lexer_length(jl_lexer_t *self);
 bool jl_lexer_push(jl_lexer_t *self, jl_token_t token);
@@ -83,5 +82,6 @@ jl_token_t jl_lexer_peekn(jl_lexer_t *self, unsigned n);
 jl_token_t jl_lexer_next(jl_lexer_t *self);
 jl_token_t jl_lexer_consume(jl_lexer_t *self, unsigned char type);
 jl_token_t jl_lexer_consume_id(jl_lexer_t *self, const char *id);
+void jl_lexer_undo(jl_lexer_t *lexer, jl_token_t until);
 
 #endif /* JL_LEXER_H__ */

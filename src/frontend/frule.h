@@ -28,20 +28,31 @@
 
 #include "fval.h"
 
+struct jl_lexer_t;
+struct jl_fe_t;
+struct jl_program_t;
+
+jl_token_t jl_lexer_peek(struct jl_lexer_t *self);
+jl_token_t jl_lexer_peekn(struct jl_lexer_t *self, unsigned n);
+jl_token_t jl_lexer_next(struct jl_lexer_t *self);
+jl_token_t jl_lexer_consume(struct jl_lexer_t *self, unsigned char type);
+jl_token_t jl_lexer_consume_id(struct jl_lexer_t *self, const char *id);
+void jl_lexer_undo(struct jl_lexer_t *lexer, jl_token_t until);
+
 typedef struct jl_frule_t jl_frule_t;
 
 struct jl_frule_t {
   jl_fval_n expected;
-  bool (*callback)(jl_fval_t *, jl_frontend_t *, jl_lexer_t *, jl_program_t *);
+  bool (*callback)(jl_fval_t *, struct jl_fe_t *, struct jl_lexer_t *, struct jl_program_t *);
 };
 
-bool jl_frule_validate(jl_frule_t self, jl_fval_t *fval, jl_frontend_t *fe, jl_lexer_t *lexer, jl_program_t *out);
+bool jl_frule_validate(jl_frule_t self, jl_fval_t *fval, struct jl_fe_t *fe, struct jl_lexer_t *lexer, struct jl_program_t *out);
 
 #define $$ *fval
 #define JL_RULEFN(name) name
 
 #define JL_RULEDC(name) \
-  static bool JL_RULEFN(name)(jl_fval_t *fval, jl_frontend_t *fe, jl_lexer_t *lexer, jl_program_t *out)
+  static bool JL_RULEFN(name)(jl_fval_t *fval, jl_fe_t *fe, jl_lexer_t *lexer, jl_program_t *out)
 
 #define Jl_RULEBG \
   jl_fval_t $1, $2, $3, $4, $5, $6, $7, $8, $9; jl_sym_t *sym; *fval = jl_fval_undefined()

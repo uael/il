@@ -24,8 +24,13 @@
  */
 
 #include "c_fe.h"
+
 #include "c_lexer.h"
-#include "frule.h"
+#include "program.h"
+#include "entity.h"
+#include "expr.h"
+#include "stmt.h"
+#include "type.h"
 
 JL_RULEDC(primary_expression);
 JL_RULEDC(constant);
@@ -110,7 +115,7 @@ enum {
   C_TOKEN_FLAG_ENUMERATION_CONSTANT = 1 << 0,
 };
 
-void c_fe_parse(jl_frontend_t *self, jl_lexer_t *lexer, jl_program_t *out) {
+void c_fe_parse(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
   jl_program_init(out);
 
   jl_fval_t fval;
@@ -143,7 +148,8 @@ JL_RULEDF(primary_expression) {
     $$ = jl_fval_string($1.s);
   }
   else
-  JL_MATCHT(1, '(') JL_MATCHR(2, expression, JL_FVAL_EXPR) JL_MATCHT(3, ')') {
+  JL_MATCHT(1, '(') JL_MATCHR(2, expression, JL_FVAL_EXPR) {
+
     $$ = jl_fval_expr(jl_unary(JL_OP_EN, $2.expr));
   }
   /*else todo

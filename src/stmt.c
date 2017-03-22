@@ -23,9 +23,10 @@
  * SOFTWARE.
  */
 
+#include "stmt.h"
+
 #include "entity.h"
 #include "expr.h"
-#include "stmt.h"
 #include "type.h"
 
 jl_stmt_t jl_stmt_undefined() {

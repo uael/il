@@ -23,11 +23,11 @@
  * SOFTWARE.
  */
 
-#include <stdio.h>
 #include <stdlib.h>
 
 #include "compiler.h"
 #include "lexer.h"
+#include "program.h"
 
 int main(int argc, char *argv[]) {
   jl_compiler_t compiler;

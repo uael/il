@@ -36,14 +36,14 @@ void jl_init(jl_compiler_t *self, int argc, char **argv) {
     .program = argv[0]
   };
   jl_opts_parse(&self->opts, argc, argv);
-  jl_frontend_init(&self->fe, JL_FRONTEND_C, self);
-  jl_frontend_push_src(&self->fe, self->opts.in);
+  jl_fe_init(&self->fe, JL_FRONTEND_C, self);
+  jl_fe_push_src(&self->fe, self->opts.in);
 }
 
 void jl_dtor(jl_compiler_t *self) {
   const char *str;
 
-  jl_frontend_dtor(&self->fe);
+  jl_fe_dtor(&self->fe);
   jl_vector_foreach(self->strtab, str) {
     free((void *) str);
   }

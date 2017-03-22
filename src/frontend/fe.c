@@ -24,11 +24,16 @@
  */
 
 #include "fe.h"
+
 #include "compiler.h"
+#include "lexer.h"
+#include "symbol.h"
+#include "program.h"
+
 #include "c/c_fe.h"
 
-void jl_frontend_init(jl_frontend_t *self, jl_frontend_n kind, jl_compiler_t *compiler) {
-  *self = (jl_frontend_t) {
+void jl_fe_init(jl_fe_t *self, jl_fe_n kind, jl_compiler_t *compiler) {
+  *self = (jl_fe_t) {
     .compiler = compiler,
     .kind = kind
   };
@@ -42,15 +47,15 @@ void jl_frontend_init(jl_frontend_t *self, jl_frontend_n kind, jl_compiler_t *co
   }
 }
 
-void jl_frontend_dtor(jl_frontend_t *self) {
+void jl_fe_dtor(jl_fe_t *self) {
   jl_deque_dtor(self->sources);
 }
 
-void jl_frontend_push_src(jl_frontend_t *self, const char *src) {
+void jl_fe_push_src(jl_fe_t *self, const char *src) {
   jl_deque_push(self->sources, src);
 }
 
-void jl_frontend_scope(jl_frontend_t *self, jl_program_t *out, const char *id) {
+void jl_fe_scope(jl_fe_t *self, jl_program_t *out, const char *id) {
   jl_symtab_t *symtab;
   int it;
 
@@ -64,6 +69,6 @@ void jl_frontend_scope(jl_frontend_t *self, jl_program_t *out, const char *id) {
   self->scope = &kh_value(symtab, it);
 }
 
-void jl_frontend_unscope(jl_frontend_t *self) {
+void jl_fe_unscope(jl_fe_t *self) {
   self->scope = self->scope->parent;
 }

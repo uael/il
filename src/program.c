@@ -24,6 +24,7 @@
  */
 
 #include "program.h"
+
 #include "entity.h"
 
 void jl_program_init(jl_program_t *self) {

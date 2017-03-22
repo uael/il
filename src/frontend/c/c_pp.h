@@ -29,7 +29,7 @@
 #include <stdbool.h>
 #include <adt/hash.h>
 
-#include "lexer.h"
+#include "c_lexer.h"
 
 typedef enum c_macro_n c_macro_n;
 

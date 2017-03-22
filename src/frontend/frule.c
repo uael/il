@@ -30,17 +30,11 @@
 #include "program.h"
 
 bool jl_frule_validate(jl_frule_t self, jl_fval_t *fval, jl_fe_t *fe, jl_lexer_t *lexer, jl_program_t *out) {
-  jl_token_t begin;
-  bool validate;
-
-  begin = jl_lexer_peek(lexer);
-  validate = self.callback(fval, fe, lexer, out);
-  jl_fval_begin(fval, begin);
-  if (!validate || !(fval->kind & self.expected)) {
+  jl_fval_begin(fval, jl_lexer_peek(lexer));
+  if (!self.callback(fval, fe, lexer, out)) {
     jl_lexer_undo(lexer, fval->begin);
     return false;
   }
   jl_fval_end(fval, jl_lexer_peek(lexer));
-
   return true;
 }

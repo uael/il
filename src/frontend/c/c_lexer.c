@@ -64,7 +64,7 @@ void c_lexer_init(jl_lexer_t *self) {
     token.length = i; \
     token.loc.colno -= i; \
     token.loc.position -= i; \
-    token.s = jl_strndup(self->fe->compiler, s, i); \
+    token.u.s = jl_strndup(self->fe->compiler, s, i); \
   } while (false)
 #define push_token do { \
     if (jl_lexer_push(self, token)) n--; \

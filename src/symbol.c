@@ -31,7 +31,8 @@ bool jl_sym_has_flag(jl_sym_t *self, unsigned flag) {
 
 jl_sym_t *jl_sym_put(jl_symtab_t *symtab, const char *id) {
   jl_sym_t *sym;
-  int it, r;
+  unsigned it;
+  int r;
 
   it = kh_put(jl_symtab, symtab, id, &r);
   if (r == 0) {
@@ -43,7 +44,7 @@ jl_sym_t *jl_sym_put(jl_symtab_t *symtab, const char *id) {
 }
 
 jl_sym_t *jl_sym_get(jl_symtab_t *symtab, const char *id) {
-  int it;
+  unsigned it;
 
   it = kh_get(jl_symtab, symtab, id);
   if (it == kh_end(symtab)) {
@@ -52,4 +53,4 @@ jl_sym_t *jl_sym_get(jl_symtab_t *symtab, const char *id) {
   return &kh_value(symtab, it);
 }
 
-KHASH_MAP_IMPL_STR(jl_symtab, jl_sym_t);
+KHASH_MAP_IMPL_STR(jl_symtab, jl_sym_t)

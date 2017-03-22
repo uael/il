@@ -42,7 +42,7 @@ void jl_lexer_undo(struct jl_lexer_t *lexer, jl_token_t until);
 typedef struct jl_frule_t jl_frule_t;
 
 struct jl_frule_t {
-  jl_fval_n expected;
+  enum jl_fval_n expected;
   bool (*callback)(jl_fval_t *, struct jl_fe_t *, struct jl_lexer_t *, struct jl_program_t *);
 };
 

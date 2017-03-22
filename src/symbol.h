@@ -32,7 +32,7 @@
 
 typedef struct jl_sym_t jl_sym_t;
 
-KHASH_DECLARE(jl_symtab, const char *, jl_sym_t);
+KHASH_DECLARE(jl_symtab, const char *, jl_sym_t)
 
 struct jl_sym_t {
   const char *id;

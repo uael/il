@@ -28,8 +28,6 @@
 
 #include <adt/deque.h>
 
-typedef enum jl_token_n jl_token_n;
-
 typedef struct jl_token_t jl_token_t;
 typedef struct jl_loc_t jl_loc_t;
 
@@ -57,13 +55,13 @@ struct jl_token_t {
   jl_loc_t loc;
   const char *name;
   uint32_t length;
-  jl_token_n kind : 8;
+  enum jl_token_n kind : 8;
   size_t cursor;
   union {
     const char *s;
     float f;
     int i;
-  };
+  } u;
 };
 
 void jl_token_dtor(jl_token_t *self);

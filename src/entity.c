@@ -54,59 +54,59 @@ void jl_entity_dtor(jl_entity_t *self) {
     case JL_ENTITY_UNDEFINED:
       return;
     case JL_ENTITY_VAR:
-      if (self->_var->refs <= 0) {
+      if (self->u._var->refs <= 0) {
         jl_var_dtor(self);
-        free(self->_var);
-        self->_var = NULL;
+        free(self->u._var);
+        self->u._var = NULL;
       }
       break;
     case JL_ENTITY_PARAM:
-      if (self->_param->refs <= 0) {
+      if (self->u._param->refs <= 0) {
         jl_param_dtor(self);
-        free(self->_param);
-        self->_param = NULL;
+        free(self->u._param);
+        self->u._param = NULL;
       }
       break;
     case JL_ENTITY_FUNC:
-      if (self->_func->refs <= 0) {
+      if (self->u._func->refs <= 0) {
         jl_func_dtor(self);
-        free(self->_func);
-        self->_func = NULL;
+        free(self->u._func);
+        self->u._func = NULL;
       }
       break;
     case JL_ENTITY_ENUM:
-      if (self->_enum->refs <= 0) {
+      if (self->u._enum->refs <= 0) {
         jl_enum_dtor(self);
-        free(self->_enum);
-        self->_enum = NULL;
+        free(self->u._enum);
+        self->u._enum = NULL;
       }
       break;
     case JL_ENTITY_STRUCT:
-      if (self->_struct->refs <= 0) {
+      if (self->u._struct->refs <= 0) {
         jl_struct_dtor(self);
-        free(self->_struct);
-        self->_struct = NULL;
+        free(self->u._struct);
+        self->u._struct = NULL;
       }
       break;
     case JL_ENTITY_UNION:
-      if (self->_union->refs <= 0) {
+      if (self->u._union->refs <= 0) {
         jl_union_dtor(self);
-        free(self->_union);
-        self->_union = NULL;
+        free(self->u._union);
+        self->u._union = NULL;
       }
       break;
     case JL_ENTITY_LABEL:
-      if (self->_label->refs <= 0) {
+      if (self->u._label->refs <= 0) {
         jl_label_dtor(self);
-        free(self->_label);
-        self->_label = NULL;
+        free(self->u._label);
+        self->u._label = NULL;
       }
       break;
   }
   *self = jl_entity_undefined();
 }
 
-void jl_entity_switch(jl_entity_t *self, jl_entity_n kind) {
+void jl_entity_switch(jl_entity_t *self, enum jl_entity_n kind) {
   if (self->kind != kind || !jl_entity_is_defined(self)) {
     jl_entity_dtor(self);
     *self = (jl_entity_t) {
@@ -116,25 +116,25 @@ void jl_entity_switch(jl_entity_t *self, jl_entity_n kind) {
       case JL_ENTITY_UNDEFINED:
         break;
       case JL_ENTITY_VAR:
-        self->_var = xmalloc(sizeof(jl_var_t));
+        self->u._var = xmalloc(sizeof(jl_var_t));
         break;
       case JL_ENTITY_PARAM:
-        self->_param = xmalloc(sizeof(jl_param_t));
+        self->u._param = xmalloc(sizeof(jl_param_t));
         break;
       case JL_ENTITY_FUNC:
-        self->_func = xmalloc(sizeof(jl_func_t));
+        self->u._func = xmalloc(sizeof(jl_func_t));
         break;
       case JL_ENTITY_ENUM:
-        self->_enum = xmalloc(sizeof(jl_enum_t));
+        self->u._enum = xmalloc(sizeof(jl_enum_t));
         break;
       case JL_ENTITY_STRUCT:
-        self->_struct = xmalloc(sizeof(jl_struct_t));
+        self->u._struct = xmalloc(sizeof(jl_struct_t));
         break;
       case JL_ENTITY_UNION:
-        self->_union = xmalloc(sizeof(jl_union_t));
+        self->u._union = xmalloc(sizeof(jl_union_t));
         break;
       case JL_ENTITY_LABEL:
-        self->_label = xmalloc(sizeof(jl_label_t));
+        self->u._label = xmalloc(sizeof(jl_label_t));
         break;
     }
   }
@@ -146,25 +146,25 @@ void jl_entity_acquire(jl_entity_t *self) {
       puts("cannot acquire undefined type");
       exit(1);
     case JL_ENTITY_VAR:
-      ++self->_var->refs;
+      ++self->u._var->refs;
       break;
     case JL_ENTITY_PARAM:
-      ++self->_param->refs;
+      ++self->u._param->refs;
       break;
     case JL_ENTITY_FUNC:
-      ++self->_func->refs;
+      ++self->u._func->refs;
       break;
     case JL_ENTITY_ENUM:
-      ++self->_enum->refs;
+      ++self->u._enum->refs;
       break;
     case JL_ENTITY_STRUCT:
-      ++self->_struct->refs;
+      ++self->u._struct->refs;
       break;
     case JL_ENTITY_UNION:
-      ++self->_union->refs;
+      ++self->u._union->refs;
       break;
     case JL_ENTITY_LABEL:
-      ++self->_label->refs;
+      ++self->u._label->refs;
       break;
   }
 }
@@ -175,25 +175,25 @@ void jl_entity_release(jl_entity_t *self) {
       puts("cannot release undefined type");
       exit(1);
     case JL_ENTITY_VAR:
-      --self->_var->refs;
+      --self->u._var->refs;
       break;
     case JL_ENTITY_PARAM:
-      --self->_param->refs;
+      --self->u._param->refs;
       break;
     case JL_ENTITY_FUNC:
-      --self->_func->refs;
+      --self->u._func->refs;
       break;
     case JL_ENTITY_ENUM:
-      --self->_enum->refs;
+      --self->u._enum->refs;
       break;
     case JL_ENTITY_STRUCT:
-      --self->_struct->refs;
+      --self->u._struct->refs;
       break;
     case JL_ENTITY_UNION:
-      --self->_union->refs;
+      --self->u._union->refs;
       break;
     case JL_ENTITY_LABEL:
-      --self->_label->refs;
+      --self->u._label->refs;
       break;
   }
 }
@@ -201,19 +201,19 @@ void jl_entity_release(jl_entity_t *self) {
 bool jl_entity_is_defined(jl_entity_t *self) {
   switch (self->kind) {
     case JL_ENTITY_VAR:
-      return self->_var != NULL;
+      return self->u._var != NULL;
     case JL_ENTITY_PARAM:
-      return self->_param != NULL;
+      return self->u._param != NULL;
     case JL_ENTITY_FUNC:
-      return self->_func != NULL;
+      return self->u._func != NULL;
     case JL_ENTITY_ENUM:
-      return self->_enum != NULL;
+      return self->u._enum != NULL;
     case JL_ENTITY_STRUCT:
-      return self->_struct != NULL;
+      return self->u._struct != NULL;
     case JL_ENTITY_UNION:
-      return self->_union != NULL;
+      return self->u._union != NULL;
     case JL_ENTITY_LABEL:
-      return self->_label != NULL;
+      return self->u._label != NULL;
     case JL_ENTITY_UNDEFINED:
     default:
       return false;
@@ -223,19 +223,19 @@ bool jl_entity_is_defined(jl_entity_t *self) {
 const char *jl_entity_name(jl_entity_t self) {
   switch (self.kind) {
     case JL_ENTITY_VAR:
-      return self._var->name;
+      return self.u._var->name;
     case JL_ENTITY_PARAM:
-      return self._param->name;
+      return self.u._param->name;
     case JL_ENTITY_FUNC:
-      return self._func->name;
+      return self.u._func->name;
     case JL_ENTITY_ENUM:
-      return self._enum->name;
+      return self.u._enum->name;
     case JL_ENTITY_STRUCT:
-      return self._struct->name;
+      return self.u._struct->name;
     case JL_ENTITY_UNION:
-      return self._union->name;
+      return self.u._union->name;
     case JL_ENTITY_LABEL:
-      return self._label->name;
+      return self.u._label->name;
     default:
       break;
   }
@@ -248,28 +248,28 @@ jl_entity_t jl_var_undefined() {
 }
 
 jl_entity_t jl_var_int(const char *name, int d) {
-  jl_entity_t entity = {};
+  jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
   jl_var_init(&entity, name, jl_int(), jl_const_int(d));
   return entity;
 }
 
 jl_entity_t jl_var_float(const char *name, float f) {
-  jl_entity_t entity = {};
+  jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
   jl_var_init(&entity, name, jl_float(), jl_const_float(f));
   return entity;
 }
 
 jl_entity_t jl_var_string(const char *name, const char *s) {
-  jl_entity_t entity = {};
+  jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
   jl_var_init(&entity, name, jl_string(), jl_const_string(s));
   return entity;
 }
 
 jl_entity_t jl_var(const char *name, jl_type_t type, jl_expr_t initializer) {
-  jl_entity_t entity = {};
+  jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
   jl_var_init(&entity, name, type, initializer);
   return entity;
@@ -282,7 +282,7 @@ void jl_var_init(jl_entity_t *self, const char *name, jl_type_t type, jl_expr_t 
   jl_var_set_initializer(self, initializer);
 }
 
-void jl_var_dtor(jl_entity_t *self) {}
+void jl_var_dtor(jl_entity_t *slf) {}
 
 const char *jl_var_get_name(jl_entity_t *self) {
   return jl_pentity_var(self)->name;
@@ -314,21 +314,21 @@ jl_entity_t jl_param_undefined() {
 }
 
 jl_entity_t jl_param_int(unsigned position, const char *name, int d) {
-  jl_entity_t entity = {};
+  jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
   jl_param_init(&entity, position, name, jl_int(), jl_const_int(d));
   return entity;
 }
 
 jl_entity_t jl_param_float(unsigned position, const char *name, float f) {
-  jl_entity_t entity = {};
+  jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
   jl_param_init(&entity, position, name, jl_float(), jl_const_float(f));
   return entity;
 }
 
 jl_entity_t jl_param_string(unsigned position, const char *name, const char *s) {
-  jl_entity_t entity = {};
+  jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
   jl_param_init(&entity, position, name, jl_string(), jl_const_string(s));
   return entity;
@@ -381,22 +381,22 @@ jl_entity_t jl_func_undefined() {
   return (jl_entity_t) {JL_ENTITY_FUNC};
 }
 
-jl_entity_t jl_func_decl(jl_func_specifier_n specifiers, jl_type_t return_type, const char *name, jl_entity_r params) {
-  jl_entity_t entity = {};
+jl_entity_t jl_func_decl(enum jl_func_specifier_n specifiers, jl_type_t return_type, const char *name, jl_entity_r params) {
+  jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
   jl_func_init(&entity, specifiers, return_type, name, params, jl_stmt_undefined());
   return entity;
 }
 
-jl_entity_t jl_proc_decl(jl_func_specifier_n specifiers, const char *name, jl_entity_r params) {
-  jl_entity_t entity = {};
+jl_entity_t jl_proc_decl(enum jl_func_specifier_n specifiers, const char *name, jl_entity_r params) {
+  jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
   jl_func_init(&entity, specifiers, jl_void(), name, params, jl_stmt_undefined());
   return entity;
 }
 
 jl_entity_t jl_func_def(jl_entity_t prototype, jl_stmt_t body) {
-  jl_entity_t entity = {};
+  jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
   jl_func_init(
     &entity,
@@ -409,7 +409,7 @@ jl_entity_t jl_func_def(jl_entity_t prototype, jl_stmt_t body) {
   return entity;
 }
 
-void jl_func_init(jl_entity_t *self, jl_func_specifier_n s, jl_type_t r, const char * n, jl_entity_r p, jl_stmt_t b) {
+void jl_func_init(jl_entity_t *self, enum jl_func_specifier_n s, jl_type_t r, const char * n, jl_entity_r p, jl_stmt_t b) {
   jl_entity_switch(self, JL_ENTITY_FUNC);
   jl_func_set_specifiers(self, s);
   jl_func_set_return_type(self, r);
@@ -430,19 +430,19 @@ bool jl_func_is_noreturn(jl_entity_t *self) {
   return jl_func_get_specifiers(self) & JL_FUNC_SPECIFIER_NORETURN;
 }
 
-jl_func_specifier_n jl_func_get_specifiers(jl_entity_t *self) {
+enum jl_func_specifier_n jl_func_get_specifiers(jl_entity_t *self) {
   return jl_pentity_func(self)->specifiers;
 }
 
-void jl_func_set_specifiers(jl_entity_t *self, jl_func_specifier_n specifiers) {
+void jl_func_set_specifiers(jl_entity_t *self, enum jl_func_specifier_n specifiers) {
   jl_pentity_func(self)->specifiers = specifiers;
 }
 
-void jl_func_add_specifier(jl_entity_t *self, jl_func_specifier_n specifier) {
+void jl_func_add_specifier(jl_entity_t *self, enum jl_func_specifier_n specifier) {
   jl_pentity_func(self)->specifiers |= specifier;
 }
 
-void jl_func_rem_specifier(jl_entity_t *self, jl_func_specifier_n specifier) {
+void jl_func_rem_specifier(jl_entity_t *self, enum jl_func_specifier_n specifier) {
   jl_pentity_func(self)->specifiers &= ~specifier;
 }
 
@@ -484,14 +484,14 @@ jl_entity_t jl_enum_undefined() {
 }
 
 jl_entity_t jl_enum(const char *name, jl_entity_r fields) {
-  jl_entity_t entity = {};
+  jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
   jl_enum_init(&entity, name, fields);
   return entity;
 }
 
 jl_entity_t jl_enum_anonymous(jl_entity_r fields) {
-  jl_entity_t entity = {};
+  jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
   jl_enum_init(&entity, NULL, fields);
   return entity;
@@ -529,14 +529,14 @@ jl_entity_t jl_struct_undefined() {
 }
 
 jl_entity_t jl_struct(const char *name, jl_entity_r fields) {
-  jl_entity_t entity = {};
+  jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
   jl_struct_init(&entity, name, fields);
   return entity;
 }
 
 jl_entity_t jl_struct_anonymous(jl_entity_r fields) {
-  jl_entity_t entity = {};
+  jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
   jl_struct_init(&entity, NULL, fields);
   return entity;
@@ -574,14 +574,14 @@ jl_entity_t jl_union_undefined() {
 }
 
 jl_entity_t jl_union(const char *name, jl_entity_r fields) {
-  jl_entity_t entity = {};
+  jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
   jl_union_init(&entity, name, fields);
   return entity;
 }
 
 jl_entity_t jl_union_anonymous(jl_entity_r fields) {
-  jl_entity_t entity = {};
+  jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
   jl_union_init(&entity, NULL, fields);
   return entity;

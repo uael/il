@@ -29,11 +29,20 @@
 #include <adt/vector.h>
 
 #include "token.h"
-
-typedef enum jl_expr_n jl_expr_n;
-typedef enum jl_op_n jl_op_n;
+#include "type_t.h"
 
 typedef struct jl_expr_t jl_expr_t;
+typedef struct jl_expr_id_t jl_expr_id_t;
+typedef struct jl_expr_const_t jl_expr_const_t;
+typedef struct jl_expr_unary_t jl_expr_unary_t;
+typedef struct jl_expr_binary_t jl_expr_binary_t;
+typedef struct jl_expr_ternary_t jl_expr_ternary_t;
+typedef struct jl_expr_array_read_t jl_expr_array_read_t;
+typedef struct jl_expr_array_write_t jl_expr_array_write_t;
+typedef struct jl_expr_field_read_t jl_expr_field_read_t;
+typedef struct jl_expr_field_write_t jl_expr_field_write_t;
+typedef struct jl_expr_call_t jl_expr_call_t;
+
 typedef jl_vector_of(jl_expr_t) jl_expr_r;
 
 enum jl_expr_n {
@@ -75,7 +84,7 @@ enum jl_op_n {
 };
 
 struct jl_expr_t {
-  jl_expr_n kind : 8;
+  enum jl_expr_n kind : 8;
   jl_loc_t loc;
   union {
     struct jl_expr_id_t *_id;
@@ -88,7 +97,60 @@ struct jl_expr_t {
     struct jl_expr_field_read_t *_field_read;
     struct jl_expr_field_write_t *_field_write;
     struct jl_expr_call_t *_call;
-  };
+  } u;
 };
+
+jl_expr_t jl_expr_undefined();
+void jl_expr_dtor(jl_expr_t *self);
+void jl_expr_switch(jl_expr_t *self, enum jl_expr_n kind);
+void jl_expr_acquire(jl_expr_t *self);
+void jl_expr_release(jl_expr_t *self);
+bool jl_expr_is_defined(jl_expr_t *self);
+jl_type_t jl_expr_get_type(jl_expr_t *self);
+void jl_expr_set_type(jl_expr_t *self, jl_type_t type);
+jl_expr_t jl_expr_get_next(jl_expr_t *self);
+void jl_expr_set_next(jl_expr_t *self, jl_expr_t next);
+
+#define jl_expr_is_id(t) ((t).kind == JL_EXPR_ID)
+#define jl_expr_is_const(t) ((t).kind == JL_EXPR_CONST)
+#define jl_expr_is_unary(t) ((t).kind == JL_EXPR_UNARY)
+#define jl_expr_is_binary(t) ((t).kind == JL_EXPR_BINARY)
+#define jl_expr_is_ternary(t) ((t).kind == JL_EXPR_TERNARY)
+#define jl_expr_is_array_read(t) ((t).kind == JL_EXPR_ARRAY_READ)
+#define jl_expr_is_array_write(t) ((t).kind == JL_EXPR_ARRAY_WRITE)
+#define jl_expr_is_field_read(t) ((t).kind == JL_EXPR_FIELD_READ)
+#define jl_expr_is_field_write(t) ((t).kind == JL_EXPR_FIELD_WRITE)
+#define jl_expr_is_call(t) ((t).kind == JL_EXPR_CALL)
+#define jl_pexpr_is_id(t) ((t)->kind == JL_EXPR_ID)
+#define jl_pexpr_is_const(t) ((t)->kind == JL_EXPR_CONST)
+#define jl_pexpr_is_unary(t) ((t)->kind == JL_EXPR_UNARY)
+#define jl_pexpr_is_binary(t) ((t)->kind == JL_EXPR_BINARY)
+#define jl_pexpr_is_ternary(t) ((t)->kind == JL_EXPR_TERNARY)
+#define jl_pexpr_is_array_read(t) ((t)->kind == JL_EXPR_ARRAY_READ)
+#define jl_pexpr_is_array_write(t) ((t)->kind == JL_EXPR_ARRAY_WRITE)
+#define jl_pexpr_is_field_read(t) ((t)->kind == JL_EXPR_FIELD_READ)
+#define jl_pexpr_is_field_write(t) ((t)->kind == JL_EXPR_FIELD_WRITE)
+#define jl_pexpr_is_call(t) ((t)->kind == JL_EXPR_CALL)
+
+#define jl_expr_id(t) ((void) assert(jl_expr_is_id(t)), (t).u._id)
+#define jl_expr_const(t) ((void) assert(jl_expr_is_const(t)), t.u._const)
+#define jl_expr_unary(t) ((void) assert(jl_expr_is_unary(t)), (t).u._unary)
+#define jl_expr_binary(t) ((void) assert(jl_expr_is_binary(t)), (t).u._binary)
+#define jl_expr_ternary(t) ((void) assert(jl_expr_is_ternary(t)), (t).u._ternary)
+#define jl_expr_array_read(t) ((void) assert(jl_expr_is_array_read(t)), (t).u._array_read)
+#define jl_expr_array_write(t) ((void) assert(jl_expr_is_array_write(t)), (t).u._array_write)
+#define jl_expr_field_read(t) ((void) assert(jl_expr_is_field_read(t)), (t).u._field_read)
+#define jl_expr_field_write(t) ((void) assert(jl_expr_is_field_write(t)), (t).u._field_write)
+#define jl_expr_call(t) ((void) assert(jl_expr_is_call(t)), (t).u._call)
+#define jl_pexpr_id(t) ((void) assert(jl_pexpr_is_id(t)), (t)->u._id)
+#define jl_pexpr_const(t) ((void) assert(jl_pexpr_is_const(t)), (t)->u._const)
+#define jl_pexpr_unary(t) ((void) assert(jl_pexpr_is_unary(t)), (t)->u._unary)
+#define jl_pexpr_binary(t) ((void) assert(jl_pexpr_is_binary(t)), (t)->u._binary)
+#define jl_pexpr_ternary(t) ((void) assert(jl_pexpr_is_ternary(t)), (t)->u._ternary)
+#define jl_pexpr_array_read(t) ((void) assert(jl_pexpr_is_array_read(t)), (t)->u._array_read)
+#define jl_pexpr_array_write(t) ((void) assert(jl_pexpr_is_array_write(t)), (t)->u._array_write)
+#define jl_pexpr_field_read(t) ((void) assert(jl_pexpr_is_field_read(t)), (t)->u._field_read)
+#define jl_pexpr_field_write(t) ((void) assert(jl_pexpr_is_field_write(t)), (t)->u._field_write)
+#define jl_pexpr_call(t) ((void) assert(jl_pexpr_is_call(t)), (t)->u._call)
 
 #endif /* JL_EXPR_T_H__ */

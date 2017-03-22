@@ -30,7 +30,6 @@
 
 #define JL_SRC_DIR_MSIZE 256
 
-typedef enum jl_backend_n jl_backend_n;
 typedef struct jl_opts_t jl_opts_t;
 
 enum jl_backend_n {
@@ -50,7 +49,7 @@ struct jl_opts_t {
   char src_dir[JL_SRC_DIR_MSIZE];
   bool echo, firm_graph, verbose, output_asm;
   int optimize_lvl;
-  jl_backend_n target;
+  enum jl_backend_n target;
 };
 
 void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]);

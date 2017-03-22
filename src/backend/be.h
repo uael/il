@@ -27,7 +27,7 @@
 # define  JL_BE_H__
 
 typedef struct jl_backend_t {
-
+  int tmp;
 } jl_backend_t;
 
 #endif /* JL_BE_H__ */

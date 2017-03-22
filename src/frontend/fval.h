@@ -31,8 +31,6 @@
 #include "stmt_t.h"
 #include "type_t.h"
 
-typedef enum jl_fval_n jl_fval_n;
-
 typedef struct jl_fval_t jl_fval_t;
 
 enum jl_fval_n {
@@ -53,23 +51,23 @@ enum jl_fval_n {
 };
 
 struct jl_fval_t {
-  jl_fval_n kind : 8;
+  enum jl_fval_n kind : 8;
   jl_token_t begin, end;
   union {
     int d;
     float f;
     const char *s;
+    enum jl_func_specifier_n func_specifier;
+    enum jl_op_n op;
+    enum jl_literal_n literal;
+    enum jl_type_specifier_n type_specifier;
+    enum jl_type_qualifier_n type_qualifier;
     jl_token_t token;
     jl_entity_t entity;
-    jl_func_specifier_n func_specifier;
     jl_expr_t expr;
-    jl_op_n op;
     jl_stmt_t stmt;
     jl_type_t type;
-    jl_literal_n literal;
-    jl_type_specifier_n type_specifier;
-    jl_type_qualifier_n type_qualifier;
-  };
+  } u;
 };
 
 jl_fval_t jl_fval_undefined();

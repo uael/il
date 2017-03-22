@@ -49,40 +49,40 @@ void jl_type_dtor(jl_type_t *self) {
     case JL_TYPE_UNDEFINED:
       return;
     case JL_TYPE_LITERAL:
-      if (self->_literal->refs <= 0) {
+      if (self->u._literal->refs <= 0) {
         jl_literal_dtor(self);
-        free(self->_literal);
-        self->_literal = NULL;
+        free(self->u._literal);
+        self->u._literal = NULL;
       }
       break;
     case JL_TYPE_POINTER:
-      if (self->_pointer->refs <= 0) {
+      if (self->u._pointer->refs <= 0) {
         jl_pointer_dtor(self);
-        free(self->_pointer);
-        self->_pointer = NULL;
+        free(self->u._pointer);
+        self->u._pointer = NULL;
       }
       break;
     case JL_TYPE_ARRAY:
-      if (self->_array->refs <= 0) {
+      if (self->u._array->refs <= 0) {
         jl_array_dtor(self);
-        free(self->_array);
-        self->_array = NULL;
+        free(self->u._array);
+        self->u._array = NULL;
       }
       break;
     case JL_TYPE_COMPOUND:
-      if (self->_compound->refs <= 0) {
+      if (self->u._compound->refs <= 0) {
         jl_compound_dtor(self);
-        free(self->_compound);
-        self->_compound = NULL;
+        free(self->u._compound);
+        self->u._compound = NULL;
       }
       break;
   }
   *self = jl_type_undefined();
 }
 
-void jl_type_switch(jl_type_t *self, jl_type_n kind) {
-  jl_type_specifier_n specifiers;
-  jl_type_qualifier_n qualifiers;
+void jl_type_switch(jl_type_t *self, enum jl_type_n kind) {
+  enum jl_type_specifier_n specifiers;
+  enum jl_type_qualifier_n qualifiers;
 
   if (self->kind != kind || !jl_ptype_is_defined(self)) {
     specifiers = self->specifiers;
@@ -97,16 +97,16 @@ void jl_type_switch(jl_type_t *self, jl_type_n kind) {
       case JL_TYPE_UNDEFINED:
         break;
       case JL_TYPE_LITERAL:
-        self->_literal = xmalloc(sizeof(jl_literal_t));
+        self->u._literal = xmalloc(sizeof(jl_literal_t));
         break;
       case JL_TYPE_POINTER:
-        self->_pointer = xmalloc(sizeof(jl_pointer_t));
+        self->u._pointer = xmalloc(sizeof(jl_pointer_t));
         break;
       case JL_TYPE_ARRAY:
-        self->_array = xmalloc(sizeof(jl_array_t));
+        self->u._array = xmalloc(sizeof(jl_array_t));
         break;
       case JL_TYPE_COMPOUND:
-        self->_compound = xmalloc(sizeof(jl_compound_t));
+        self->u._compound = xmalloc(sizeof(jl_compound_t));
         break;
     }
   }
@@ -118,16 +118,16 @@ void jl_type_acquire(jl_type_t *self) {
       puts("cannot acquire undefined type");
       exit(1);
     case JL_TYPE_LITERAL:
-      ++self->_literal->refs;
+      ++self->u._literal->refs;
       break;
     case JL_TYPE_POINTER:
-      ++self->_pointer->refs;
+      ++self->u._pointer->refs;
       break;
     case JL_TYPE_ARRAY:
-      ++self->_array->refs;
+      ++self->u._array->refs;
       break;
     case JL_TYPE_COMPOUND:
-      ++self->_compound->refs;
+      ++self->u._compound->refs;
       break;
   }
 }
@@ -138,16 +138,16 @@ void jl_type_release(jl_type_t *self) {
       puts("cannot release undefined type");
       exit(1);
     case JL_TYPE_LITERAL:
-      --self->_literal->refs;
+      --self->u._literal->refs;
       break;
     case JL_TYPE_POINTER:
-      --self->_pointer->refs;
+      --self->u._pointer->refs;
       break;
     case JL_TYPE_ARRAY:
-      --self->_array->refs;
+      --self->u._array->refs;
       break;
     case JL_TYPE_COMPOUND:
-      --self->_compound->refs;
+      --self->u._compound->refs;
       break;
   }
 }
@@ -155,13 +155,13 @@ void jl_type_release(jl_type_t *self) {
 bool jl_type_is_defined(jl_type_t self) {
   switch (self.kind) {
     case JL_TYPE_LITERAL:
-      return self._literal != NULL;
+      return self.u._literal != NULL;
     case JL_TYPE_POINTER:
-      return self._pointer != NULL;
+      return self.u._pointer != NULL;
     case JL_TYPE_ARRAY:
-      return self._array != NULL;
+      return self.u._array != NULL;
     case JL_TYPE_COMPOUND:
-      return self._compound != NULL;
+      return self.u._compound != NULL;
     case JL_TYPE_UNDEFINED:
     default:
       return false;
@@ -174,7 +174,7 @@ bool jl_ptype_is_defined(jl_type_t *self) {
 
 
   jl_type_t jl_void() {
-  static jl_type_t type = {};
+  static jl_type_t type = {JL_TYPE_UNDEFINED};
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_VOID);
   }
@@ -182,7 +182,7 @@ bool jl_ptype_is_defined(jl_type_t *self) {
 }
 
 jl_type_t jl_null() {
-  static jl_type_t type = {};
+  static jl_type_t type = {JL_TYPE_UNDEFINED};
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_NULL);
   }
@@ -190,7 +190,7 @@ jl_type_t jl_null() {
 }
 
 jl_type_t jl_string() {
-  static jl_type_t type = {};
+  static jl_type_t type = {JL_TYPE_UNDEFINED};
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_STRING);
   }
@@ -198,7 +198,7 @@ jl_type_t jl_string() {
 }
 
 jl_type_t jl_bool() {
-  static jl_type_t type = {};
+  static jl_type_t type = {JL_TYPE_UNDEFINED};
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_BOOL);
   }
@@ -206,7 +206,7 @@ jl_type_t jl_bool() {
 }
 
 jl_type_t jl_char() {
-  static jl_type_t type = {};
+  static jl_type_t type = {JL_TYPE_UNDEFINED};
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_CHAR);
   }
@@ -214,7 +214,7 @@ jl_type_t jl_char() {
 }
 
 jl_type_t jl_short() {
-  static jl_type_t type = {};
+  static jl_type_t type = {JL_TYPE_UNDEFINED};
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_INT);
   }
@@ -222,7 +222,7 @@ jl_type_t jl_short() {
 }
 
 jl_type_t jl_int() {
-  static jl_type_t type = {};
+  static jl_type_t type = {JL_TYPE_UNDEFINED};
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_INT);
   }
@@ -230,7 +230,7 @@ jl_type_t jl_int() {
 }
 
 jl_type_t jl_long() {
-  static jl_type_t type = {};
+  static jl_type_t type = {JL_TYPE_UNDEFINED};
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_LONG);
   }
@@ -238,7 +238,7 @@ jl_type_t jl_long() {
 }
 
 jl_type_t jl_double() {
-  static jl_type_t type = {};
+  static jl_type_t type = {JL_TYPE_UNDEFINED};
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_DOUBLE);
   }
@@ -246,21 +246,21 @@ jl_type_t jl_double() {
 }
 
 jl_type_t jl_float() {
-  static jl_type_t type = {};
+  static jl_type_t type = {JL_TYPE_UNDEFINED};
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_FLOAT);
   }
   return type;
 }
 
-jl_type_t jl_literal(jl_literal_n kind) {
-  jl_type_t type = {};
+jl_type_t jl_literal(enum jl_literal_n kind) {
+  jl_type_t type = {JL_TYPE_UNDEFINED};
 
   jl_literal_init(&type, kind);
   return type;
 }
 
-void jl_literal_init(jl_type_t *self, jl_literal_n kind) {
+void jl_literal_init(jl_type_t *self, enum jl_literal_n kind) {
   jl_type_switch(self, JL_TYPE_LITERAL);
   jl_ptype_literal(self)->kind = kind;
 }
@@ -269,7 +269,7 @@ void jl_literal_dtor(jl_type_t *self) {}
 
 
 jl_type_t jl_pointer(jl_type_t of) {
-  jl_type_t type = {};
+  jl_type_t type = {JL_TYPE_UNDEFINED};
 
   jl_pointer_init(&type, of);
   return type;
@@ -284,14 +284,14 @@ void jl_pointer_dtor(jl_type_t *self) {}
 
 
 jl_type_t jl_array(jl_type_t of) {
-  jl_type_t type = {};
+  jl_type_t type = {JL_TYPE_UNDEFINED};
 
   jl_array_init(&type, of, jl_expr_undefined());
   return type;
 }
 
 jl_type_t jl_narray(jl_type_t of, jl_expr_t size) {
-  jl_type_t type = {};
+  jl_type_t type = {JL_TYPE_UNDEFINED};
 
   jl_array_init(&type, of, size);
   return type;
@@ -307,7 +307,7 @@ void jl_array_dtor(jl_type_t *self) {}
 
 
 jl_type_t jl_compound(jl_entity_t entity) {
-  jl_type_t type = {};
+  jl_type_t type = {JL_TYPE_UNDEFINED};
 
   jl_compound_init(&type, entity);
   return type;

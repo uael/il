@@ -31,12 +31,10 @@
 
 #include "c_lexer.h"
 
-typedef enum c_macro_n c_macro_n;
-
 typedef struct c_macro_t c_macro_t;
 typedef struct c_pp_t c_pp_t;
 
-KHASH_DECLARE(c_macro_ht, const char *, c_macro_t);
+KHASH_DECLARE(c_macro_ht, const char *, c_macro_t)
 
 enum c_macro_n {
   C_MACRO_UNDEFINED = 0,
@@ -45,7 +43,7 @@ enum c_macro_n {
 };
 
 struct c_macro_t {
-  c_macro_n kind;
+  enum c_macro_n kind;
   const char *name;
   bool stringify;
   bool is__line__;

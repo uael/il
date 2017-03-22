@@ -164,8 +164,8 @@ typedef unsigned long long khint64_t;
 typedef khint32_t khint_t;
 typedef khint_t khiter_t;
 
-#define empty_bit 0b10
-#define deleted_bit 0b01
+#define empty_bit 2
+#define deleted_bit 1
 #define both_bits (empty_bit|deleted_bit)
 
 #define __ac_isempty(flag, i) ((flag[i]&empty_bit)==empty_bit)

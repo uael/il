@@ -129,8 +129,8 @@ enum {
 };
 
 #define EMPTY {0}
-#define SYNTX(t, s) {(t), {0}, s, sizeof(s)-1, false}
-#define KEYWD(t, s) {(t), {0}, s, sizeof(s)-1, true}
+#define SYNTX(t, s) {(t), {0}, s, sizeof(s)-1, JL_TOKEN_SYNTAX}
+#define KEYWD(t, s) {(t), {0}, s, sizeof(s)-1, JL_TOKEN_KEYWORD}
 
 #define peek *ptr
 #define peekn(n) ptr[n]
@@ -140,7 +140,7 @@ enum {
     token.length = i; \
     token.loc.colno -= i; \
     token.loc.position -= i; \
-    token.s = xstrndup(s, i); \
+    token.u.s = xstrndup(s, i); \
   } while (false)
 #define push_token do { \
     jl_vector_push(self->queue, token); \
@@ -476,6 +476,8 @@ void jay_lexer_stack(jl_lexer_t *self, unsigned n) {
                   token = tokens[JAY_TOK_SWITCH];
                   goto lbl_push_token;
                 }
+                break;
+              default:
                 break;
             }
           }

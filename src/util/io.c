@@ -50,7 +50,7 @@
 # include <tchar.h>
 #endif
 
-uint64_t jl_fsize(const char *path) {
+int64_t jl_fsize(const char *path) {
 #ifdef WIN32
   WIN32_FILE_ATTRIBUTE_DATA   fileInfo;
   if (GetFileAttributesExA(path, GetFileExInfoStandard, (void*)&fileInfo) == 0) return -1;
@@ -58,7 +58,7 @@ uint64_t jl_fsize(const char *path) {
 #else
   struct stat sb;
   if (stat(path, &sb) > 0) return -1;
-  return (uint64_t) sb.st_size;
+  return (int64_t) sb.st_size;
 #endif
 }
 
@@ -149,7 +149,7 @@ bool jl_fwrite(const char *path, const char *buffer, size_t len) {
   ssize_t nwrite = write(fd, buffer, len);
   close(fd);
 
-  return (nwrite == len);
+  return ((size_t) nwrite == len);
 }
 
 

@@ -28,11 +28,6 @@
 
 #include <assert.h>
 
-typedef enum jl_type_n jl_type_n;
-typedef enum jl_literal_n jl_literal_n;
-typedef enum jl_type_specifier_n jl_type_specifier_n;
-typedef enum jl_type_qualifier_n jl_type_qualifier_n;
-
 typedef struct jl_type_t jl_type_t;
 typedef struct jl_literal_t jl_literal_t;
 typedef struct jl_pointer_t jl_pointer_t;
@@ -90,21 +85,21 @@ enum jl_type_qualifier_n {
 };
 
 struct jl_type_t {
-  jl_type_n kind : 8;
-  jl_type_specifier_n specifiers;
-  jl_type_qualifier_n qualifiers;
+  enum jl_type_n kind : 8;
+  enum jl_type_specifier_n specifiers;
+  enum jl_type_qualifier_n qualifiers;
   union {
     jl_literal_t *_literal;
     jl_pointer_t *_pointer;
     jl_array_t *_array;
     jl_compound_t *_compound;
-  };
+  } u;
 };
 
 jl_type_t jl_type_undefined();
 void jl_type_undef(jl_type_t *self);
 void jl_type_dtor(jl_type_t *self);
-void jl_type_switch(jl_type_t *self, jl_type_n kind);
+void jl_type_switch(jl_type_t *self, enum jl_type_n kind);
 void jl_type_acquire(jl_type_t *self);
 void jl_type_release(jl_type_t *self);
 bool jl_type_is_defined(jl_type_t self);
@@ -149,13 +144,13 @@ bool jl_ptype_is_defined(jl_type_t *self);
 #define jl_ptype_is_restrict(t) ((t)->qualifiers & JL_TYPE_QUALIFIER_RESTRICT)
 #define jl_ptype_is_atomic(t) ((t)->qualifiers & JL_TYPE_QUALIFIER_ATOMIC)
 
-#define jl_type_literal(t) ((void) assert(jl_type_is_literal(t)), (t)._literal)
-#define jl_type_pointer(t) ((void) assert(jl_type_is_pointer(t)), (t)._pointer)
-#define jl_type_array(t) ((void) assert(jl_type_is_array(t)), (t)._array)
-#define jl_type_compound(t) ((void) assert(jl_type_is_compound(t)), (t)._compound)
-#define jl_ptype_literal(t) ((void) assert(jl_ptype_is_literal(t)), (t)->_literal)
-#define jl_ptype_pointer(t) ((void) assert(jl_ptype_is_pointer(t)), (t)->_pointer)
-#define jl_ptype_array(t) ((void) assert(jl_ptype_is_array(t)), (t)->_array)
-#define jl_ptype_compound(t) ((void) assert(jl_ptype_is_compound(t)), (t)->_compound)
+#define jl_type_literal(t) ((void) assert(jl_type_is_literal(t)), (t).u._literal)
+#define jl_type_pointer(t) ((void) assert(jl_type_is_pointer(t)), (t).u._pointer)
+#define jl_type_array(t) ((void) assert(jl_type_is_array(t)), (t).u._array)
+#define jl_type_compound(t) ((void) assert(jl_type_is_compound(t)), (t).u._compound)
+#define jl_ptype_literal(t) ((void) assert(jl_ptype_is_literal(t)), (t)->u._literal)
+#define jl_ptype_pointer(t) ((void) assert(jl_ptype_is_pointer(t)), (t)->u._pointer)
+#define jl_ptype_array(t) ((void) assert(jl_ptype_is_array(t)), (t)->u._array)
+#define jl_ptype_compound(t) ((void) assert(jl_ptype_is_compound(t)), (t)->u._compound)
 
 #endif /* JL_TYPE_T_H__ */

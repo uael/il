@@ -75,7 +75,7 @@ void jl_param_set_initializer(jl_entity_t *self, jl_expr_t initializer);
 
 struct jl_func_t {
   unsigned refs;
-  jl_func_specifier_n specifiers;
+  enum jl_func_specifier_n specifiers;
   const char *name;
   jl_type_t return_type;
   jl_entity_r params;
@@ -83,16 +83,16 @@ struct jl_func_t {
 };
 
 jl_entity_t jl_func_undefined();
-jl_entity_t jl_func_decl(jl_func_specifier_n specifiers, jl_type_t return_type, const char *name, jl_entity_r params);
-jl_entity_t jl_proc_decl(jl_func_specifier_n specifiers, const char *name, jl_entity_r params);
+jl_entity_t jl_func_decl(enum jl_func_specifier_n specifiers, jl_type_t return_type, const char *name, jl_entity_r params);
+jl_entity_t jl_proc_decl(enum jl_func_specifier_n specifiers, const char *name, jl_entity_r params);
 jl_entity_t jl_func_def(jl_entity_t prototype, jl_stmt_t body);
-void jl_func_init(jl_entity_t *self, jl_func_specifier_n s, jl_type_t r, const char * n, jl_entity_r p, jl_stmt_t b);
+void jl_func_init(jl_entity_t *self, enum jl_func_specifier_n s, jl_type_t r, const char * n, jl_entity_r p, jl_stmt_t b);
 bool jl_func_is_inline(jl_entity_t *self);
 bool jl_func_is_noreturn(jl_entity_t *self);
-jl_func_specifier_n jl_func_get_specifiers(jl_entity_t *self);
-void jl_func_set_specifiers(jl_entity_t *self, jl_func_specifier_n specifiers);
-void jl_func_add_specifier(jl_entity_t *self, jl_func_specifier_n specifier);
-void jl_func_rem_specifier(jl_entity_t *self, jl_func_specifier_n specifier);
+enum jl_func_specifier_n jl_func_get_specifiers(jl_entity_t *self);
+void jl_func_set_specifiers(jl_entity_t *self, enum jl_func_specifier_n specifiers);
+void jl_func_add_specifier(jl_entity_t *self, enum jl_func_specifier_n specifier);
+void jl_func_rem_specifier(jl_entity_t *self, enum jl_func_specifier_n specifier);
 const char *jl_func_get_name(jl_entity_t *self);
 void jl_func_set_name(jl_entity_t *self, const char *name);
 jl_type_t jl_func_get_return_type(jl_entity_t *self);

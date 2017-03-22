@@ -44,8 +44,6 @@ struct jl_stmt_continue_t;
 struct jl_stmt_return_t;
 struct jl_stmt_decl_t;
 
-typedef enum jl_stmt_n jl_stmt_n;
-
 typedef struct jl_stmt_t jl_stmt_t;
 typedef jl_vector_of(jl_stmt_t) jl_stmt_r;
 
@@ -69,7 +67,7 @@ enum jl_stmt_n {
 };
 
 struct jl_stmt_t {
-  jl_stmt_n kind : 8;
+  enum jl_stmt_n kind : 8;
   union {
     struct jl_stmt_expr_t *_expr;
     struct jl_stmt_label_t *_label;
@@ -86,10 +84,10 @@ struct jl_stmt_t {
     struct jl_stmt_continue_t *_continue;
     struct jl_stmt_return_t *_return;
     struct jl_stmt_decl_t *_decl;
-  };
+  } u;
 };
 
-void jl_stmt_init(jl_stmt_t *self, jl_stmt_n kind, void *ptr);
+void jl_stmt_init(jl_stmt_t *self, enum jl_stmt_n kind, void *ptr);
 void jl_stmt_dtor(jl_stmt_t *self);
 
 #endif /* JL_STMT_T_H__ */

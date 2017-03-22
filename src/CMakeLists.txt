@@ -1,3 +1,11 @@
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -Wall -Wextra -pedantic -pedantic-errors")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-missing-field-initializers")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-parameter")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-function")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-variable")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-value")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-result")
+
 set(jayl_SOURCE_DIRS . internal util)
 
 foreach(dir ${jayl_SOURCE_DIRS})

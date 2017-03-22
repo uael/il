@@ -32,8 +32,6 @@
 #include "token.h"
 #include "entity_t.h"
 
-typedef enum jl_lexer_event_n jl_lexer_event_n;
-
 typedef struct jl_lexer_t jl_lexer_t;
 typedef struct jl_lexer_event_t jl_lexer_event_t;
 
@@ -44,7 +42,7 @@ enum jl_lexer_event_n {
 };
 
 struct jl_lexer_event_t {
-  jl_lexer_event_n kind;
+  enum jl_lexer_event_n kind;
   jl_lexer_t *lexer;
   void *data;
 

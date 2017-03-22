@@ -32,7 +32,7 @@
 
 #include "c/c_fe.h"
 
-void jl_fe_init(jl_fe_t *self, jl_fe_n kind, jl_compiler_t *compiler) {
+void jl_fe_init(jl_fe_t *self, enum jl_fe_n kind, jl_compiler_t *compiler) {
   *self = (jl_fe_t) {
     .compiler = compiler,
     .kind = kind
@@ -57,7 +57,7 @@ void jl_fe_push_src(jl_fe_t *self, const char *src) {
 
 void jl_fe_scope(jl_fe_t *self, jl_program_t *out, const char *id) {
   jl_symtab_t *symtab;
-  int it;
+  unsigned it;
 
   symtab = self->scope ? &self->scope->childs : &out->symtab;
   it = kh_get(jl_symtab, symtab, id);

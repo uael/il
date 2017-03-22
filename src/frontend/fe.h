@@ -35,7 +35,6 @@ struct jl_lexer_t;
 struct jl_sym_t;
 struct jl_program_t;
 
-typedef enum jl_fe_n jl_fe_n;
 typedef struct jl_fe_t jl_fe_t;
 
 enum jl_fe_n {
@@ -45,7 +44,7 @@ enum jl_fe_n {
 
 struct jl_fe_t {
   struct jl_compiler_t *compiler;
-  jl_fe_n kind;
+  enum jl_fe_n kind;
   jl_deque_of(const char *) sources;
 
   struct jl_sym_t *scope;
@@ -57,7 +56,7 @@ struct jl_fe_t {
   void (*parse)(struct jl_fe_t *self, struct jl_lexer_t *lexer, struct jl_program_t *out);
 };
 
-void jl_fe_init(jl_fe_t *self, jl_fe_n kind, struct jl_compiler_t *compiler);
+void jl_fe_init(jl_fe_t *self, enum jl_fe_n kind, struct jl_compiler_t *compiler);
 void jl_fe_dtor(jl_fe_t *self);
 void jl_fe_push_src(jl_fe_t *self, const char *src);
 void jl_fe_scope(jl_fe_t *self, struct jl_program_t *out, const char *id);

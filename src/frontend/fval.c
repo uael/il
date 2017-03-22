@@ -32,7 +32,7 @@ jl_fval_t jl_fval_undefined() {
 jl_fval_t jl_fval_string(const char *s) {
   return  (jl_fval_t) {
     JL_FVAL_STRING,
-    .s = s
+    .u.s = s
   };
 }
 
@@ -41,14 +41,14 @@ jl_fval_t jl_fval_token(jl_token_t token) {
     JL_FVAL_TOKEN,
     .begin = token,
     .end = token,
-    .token = token
+    .u.token = token
   };
 }
 
 jl_fval_t jl_fval_expr(jl_expr_t expr) {
   return  (jl_fval_t) {
     JL_FVAL_EXPR,
-    .expr = expr
+    .u.expr = expr
   };
 }
 

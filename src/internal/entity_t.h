@@ -28,9 +28,6 @@
 
 #include <adt/vector.h>
 
-typedef enum jl_entity_n jl_entity_n;
-typedef enum jl_func_specifier_n jl_func_specifier_n;
-
 typedef struct jl_entity_t jl_entity_t;
 typedef struct jl_var_t jl_var_t;
 typedef struct jl_param_t jl_param_t;
@@ -39,6 +36,7 @@ typedef struct jl_enum_t jl_enum_t;
 typedef struct jl_struct_t jl_struct_t;
 typedef struct jl_union_t jl_union_t;
 typedef struct jl_label_t jl_label_t;
+
 typedef jl_vector_of(jl_entity_t) jl_entity_r;
 
 enum jl_entity_n {
@@ -59,7 +57,7 @@ enum jl_func_specifier_n {
 };
 
 struct jl_entity_t {
-  jl_entity_n kind : 8;
+  enum jl_entity_n kind : 8;
   union {
     struct jl_var_t *_var;
     struct jl_param_t *_param;
@@ -68,13 +66,13 @@ struct jl_entity_t {
     struct jl_struct_t *_struct;
     struct jl_union_t *_union;
     struct jl_label_t *_label;
-  };
+  } u;
 };
 
 jl_entity_t jl_entity_undefined();
 void jl_entity_undef(jl_entity_t *self);
 void jl_entity_dtor(jl_entity_t *self);
-void jl_entity_switch(jl_entity_t *self, jl_entity_n kind);
+void jl_entity_switch(jl_entity_t *self, enum jl_entity_n kind);
 void jl_entity_acquire(jl_entity_t *self);
 void jl_entity_release(jl_entity_t *self);
 bool jl_entity_is_defined(jl_entity_t *self);
@@ -102,12 +100,12 @@ const char *jl_entity_name(jl_entity_t self);
 #define jl_entity_struct(e) ((void) assert(jl_entity_is_struct(e)), (e)._struct)
 #define jl_entity_union(e) ((void) assert(jl_entity_is_union(e)), (e)._union)
 #define jl_entity_label(e) ((void) assert(jl_entity_is_label(e)), (e)._label)
-#define jl_pentity_var(e) ((void) assert(jl_pentity_is_var(e)), (e)->_var)
-#define jl_pentity_param(e) ((void) assert(jl_pentity_is_param(e)), (e)->_param)
-#define jl_pentity_func(e) ((void) assert(jl_pentity_is_func(e)), (e)->_func)
-#define jl_pentity_enum(e) ((void) assert(jl_pentity_is_enum(e)), (e)->_enum)
-#define jl_pentity_struct(e) ((void) assert(jl_pentity_is_struct(e)), (e)->_struct)
-#define jl_pentity_union(e) ((void) assert(jl_pentity_is_union(e)), (e)->_union)
-#define jl_pentity_label(e) ((void) assert(jl_pentity_is_label(e)), (e)->_label)
+#define jl_pentity_var(e) ((void) assert(jl_pentity_is_var(e)), (e)->u._var)
+#define jl_pentity_param(e) ((void) assert(jl_pentity_is_param(e)), (e)->u._param)
+#define jl_pentity_func(e) ((void) assert(jl_pentity_is_func(e)), (e)->u._func)
+#define jl_pentity_enum(e) ((void) assert(jl_pentity_is_enum(e)), (e)->u._enum)
+#define jl_pentity_struct(e) ((void) assert(jl_pentity_is_struct(e)), (e)->u._struct)
+#define jl_pentity_union(e) ((void) assert(jl_pentity_is_union(e)), (e)->u._union)
+#define jl_pentity_label(e) ((void) assert(jl_pentity_is_label(e)), (e)->u._label)
 
 #endif /* JL_ENTITY_T_H__ */

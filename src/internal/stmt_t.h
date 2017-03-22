@@ -67,7 +67,7 @@ enum jl_stmt_n {
 };
 
 struct jl_stmt_t {
-  enum jl_stmt_n kind : 8;
+  unsigned kind : 8;
   union {
     struct jl_stmt_expr_t *_expr;
     struct jl_stmt_label_t *_label;

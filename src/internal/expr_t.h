@@ -84,7 +84,7 @@ enum jl_op_n {
 };
 
 struct jl_expr_t {
-  enum jl_expr_n kind : 8;
+  unsigned kind : 8;
   jl_loc_t loc;
   union {
     struct jl_expr_id_t *_id;

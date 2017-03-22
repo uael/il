@@ -85,7 +85,7 @@ enum jl_type_qualifier_n {
 };
 
 struct jl_type_t {
-  enum jl_type_n kind : 8;
+  unsigned kind : 8;
   enum jl_type_specifier_n specifiers;
   enum jl_type_qualifier_n qualifiers;
   union {

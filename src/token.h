@@ -55,7 +55,7 @@ struct jl_token_t {
   jl_loc_t loc;
   const char *name;
   uint32_t length;
-  enum jl_token_n kind : 8;
+  unsigned kind : 8;
   size_t cursor;
   union {
     const char *s;

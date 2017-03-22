@@ -57,7 +57,7 @@ enum jl_func_specifier_n {
 };
 
 struct jl_entity_t {
-  enum jl_entity_n kind : 8;
+  unsigned kind : 8;
   union {
     struct jl_var_t *_var;
     struct jl_param_t *_param;

@@ -51,7 +51,7 @@ enum jl_fval_n {
 };
 
 struct jl_fval_t {
-  enum jl_fval_n kind : 8;
+  unsigned kind : 8;
   jl_token_t begin, end;
   union {
     int d;

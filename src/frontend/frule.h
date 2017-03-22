@@ -41,11 +41,14 @@ struct jl_frule_t {
 
 bool jl_frule_validate(jl_frule_t self, jl_fval_t *fval, struct jl_fe_t *fe, struct jl_lexer_t *lexer, struct jl_program_t *out);
 
-#define _0 *fval
+#define _0 fval
 #define FRULE_FN(name) name
 
 #define FRULE_DECL(name) \
   static bool FRULE_FN(name)(jl_fval_t *fval, jl_fe_t *fe, jl_lexer_t *lexer, jl_program_t *out)
+
+#define FRULE_DEF(name) \
+  FRULE_DECL(name)
 
 #define FRULE_BODY_BEGIN \
   jl_fval_t _1, _2, _3, _4, _5, _6, _7, _8, _9; jl_sym_t *sym; *fval = jl_fval_undefined()
@@ -53,7 +56,6 @@ bool jl_frule_validate(jl_frule_t self, jl_fval_t *fval, struct jl_fe_t *fe, str
 #define FRULE_BODY_END \
   return fval->kind != JL_FVAL_UNDEFINED
 
-#define FRULE_DEF(name) \
-  FRULE_DECL(name)
+#define FRULE_OR else
 
 #endif /* JL_FRULE_H__ */

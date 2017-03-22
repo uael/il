@@ -128,34 +128,37 @@ FRULE_DEF(primary_expression) {
   FRULE_BODY_BEGIN;
 
   FE_MATCHT(1, C_TOK_IDENTIFIER) {
-    _0 = jl_fval_string(_1.u.token.u.s);
+    jl_fval_string(_0, _1.u.token.u.s);
   }
-  else
+  FRULE_OR
   FE_MATCHR(1, constant, JL_FVAL_STRING | JL_FVAL_INT | JL_FVAL_FLOAT) {
     switch (_1.kind) {
       case JL_FVAL_STRING:
-        _0 = jl_fval_expr(jl_const_string(_1.u.s));
+        jl_fval_expr(_0, jl_const_string(_1.u.s));
       case JL_FVAL_INT:
-        _0 = jl_fval_expr(jl_const_int(_1.u.d));
+        jl_fval_expr(_0, jl_const_int(_1.u.d));
       case JL_FVAL_FLOAT:
-        _0 = jl_fval_expr(jl_const_float(_1.u.f));
+        jl_fval_expr(_0, jl_const_float(_1.u.f));
       default:
         break;
     }
   }
-  else
-  FE_MATCHR(1, expression, JL_FVAL_STRING) {
-    _0 = jl_fval_string(_1.u.s);
+  FRULE_OR
+  FE_MATCHR(1, string, JL_FVAL_STRING) {
+    jl_fval_string(_0, _1.u.s);
   }
-  else
-  FE_MATCHT(1, '(') FE_MATCHR(2, expression, JL_FVAL_EXPR) {
-    FE_CONSUME(')');
-    _0 = jl_fval_expr(jl_unary(JL_OP_EN, _2.u.expr));
+  FRULE_OR
+  FE_MATCHT(1, '(') {
+    FE_MATCHR(2, expression, JL_FVAL_EXPR) {
+      FE_CONSUME(')');
+      jl_fval_expr(_0, jl_unary(JL_OP_EN, _2.u.expr));
+    }
   }
-  /*else todo
+  FRULE_OR
   FE_MATCHR(1, generic_selection, JL_FVAL_EXPR) {
-    __ = jl_fval_string(_1.s);
-  }*/
+    /* todo generic_selection */
+  }
+
   FRULE_BODY_END;
 }
 
@@ -163,14 +166,15 @@ FRULE_DEF(constant) {
   FRULE_BODY_BEGIN;
 
   FE_MATCHT(1, C_TOK_NUMBER) {
-    _0 = jl_fval_string(_1.u.token.u.s);
+    jl_fval_string(_0, _1.u.token.u.s);
   }
-  else
+  FRULE_OR
   FE_MATCHT(1, C_TOK_IDENTIFIER) {
     if (SYM_GET(_1.u.token.u.s) && jl_sym_has_flag(sym, C_TOKEN_FLAG_ENUMERATION_CONSTANT)) {
-      _0 = jl_fval_string(_1.u.token.u.s);
+      jl_fval_string(_0, _1.u.token.u.s);
     }
   }
+
   FRULE_BODY_END;
 }
 

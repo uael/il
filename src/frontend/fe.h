@@ -81,7 +81,7 @@ void jl_fe_unscope(jl_fe_t *self);
 
 #define FE_MATCHT(n, name) \
   if (FE_PEEK().type == name \
-    ? (_ ## n = jl_fval_token(FE_PEEK()), FE_NEXT(), true) \
+    ? (_ ## n = (jl_fval_t) {JL_FVAL_UNDEFINED}, jl_fval_token(&_ ## n, FE_PEEK()), FE_NEXT(), true) \
     : ((n==1?(void)0:FE_UNDO(_1.begin)), false))
 
 #endif /* JL_FE_H__ */

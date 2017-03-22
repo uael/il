@@ -32,83 +32,83 @@
 #include "stmt.h"
 #include "type.h"
 
-JL_RULEDC(primary_expression);
-JL_RULEDC(constant);
-JL_RULEDC(enumeration_constant);
-JL_RULEDC(string);
-JL_RULEDC(generic_selection);
-JL_RULEDC(generic_assoc_list);
-JL_RULEDC(generic_association);
-JL_RULEDC(postfix_expression);
-JL_RULEDC(argument_expression_list);
-JL_RULEDC(unary_expression);
-JL_RULEDC(unary_operator);
-JL_RULEDC(cast_expression);
-JL_RULEDC(multiplicative_expression);
-JL_RULEDC(additive_expression);
-JL_RULEDC(shift_expression);
-JL_RULEDC(relational_expression);
-JL_RULEDC(equality_expression);
-JL_RULEDC(and_expression);
-JL_RULEDC(exclusive_or_expression);
-JL_RULEDC(inclusive_or_expression);
-JL_RULEDC(logical_and_expression);
-JL_RULEDC(logical_or_expression);
-JL_RULEDC(conditional_expression);
-JL_RULEDC(assignment_expression);
-JL_RULEDC(assignment_operator);
-JL_RULEDC(expression);
-JL_RULEDC(constant_expression);
-JL_RULEDC(declaration);
-JL_RULEDC(declaration_specifiers);
-JL_RULEDC(init_declarator_list);
-JL_RULEDC(init_declarator);
-JL_RULEDC(storage_class_specifier);
-JL_RULEDC(type_specifier);
-JL_RULEDC(struct_or_union_specifier);
-JL_RULEDC(struct_or_union);
-JL_RULEDC(struct_declaration_list);
-JL_RULEDC(struct_declaration);
-JL_RULEDC(specifier_qualifier_list);
-JL_RULEDC(struct_declarator_list);
-JL_RULEDC(struct_declarator);
-JL_RULEDC(enum_specifier);
-JL_RULEDC(enumerator_list);
-JL_RULEDC(enumerator);
-JL_RULEDC(atomic_type_specifier);
-JL_RULEDC(type_qualifier);
-JL_RULEDC(function_specifier);
-JL_RULEDC(alignment_specifier);
-JL_RULEDC(declarator);
-JL_RULEDC(direct_declarator);
-JL_RULEDC(pointer);
-JL_RULEDC(type_qualifier_list);
-JL_RULEDC(parameter_type_list);
-JL_RULEDC(parameter_list);
-JL_RULEDC(parameter_declaration);
-JL_RULEDC(identifier_list);
-JL_RULEDC(type_name);
-JL_RULEDC(abstract_declarator);
-JL_RULEDC(direct_abstract_declarator);
-JL_RULEDC(initializer);
-JL_RULEDC(initializer_list);
-JL_RULEDC(designation);
-JL_RULEDC(designator_list);
-JL_RULEDC(designator);
-JL_RULEDC(static_assert_declaration);
-JL_RULEDC(statement);
-JL_RULEDC(labeled_statement);
-JL_RULEDC(compound_statement);
-JL_RULEDC(block_item_list);
-JL_RULEDC(block_item);
-JL_RULEDC(expression_statement);
-JL_RULEDC(selection_statement);
-JL_RULEDC(iteration_statement);
-JL_RULEDC(jump_statement);
-JL_RULEDC(translation_unit);
-JL_RULEDC(external_declaration);
-JL_RULEDC(function_definition);
-JL_RULEDC(declaration_list);
+FRULE_DECL(primary_expression);
+FRULE_DECL(constant);
+FRULE_DECL(enumeration_constant);
+FRULE_DECL(string);
+FRULE_DECL(generic_selection);
+FRULE_DECL(generic_assoc_list);
+FRULE_DECL(generic_association);
+FRULE_DECL(postfix_expression);
+FRULE_DECL(argument_expression_list);
+FRULE_DECL(unary_expression);
+FRULE_DECL(unary_operator);
+FRULE_DECL(cast_expression);
+FRULE_DECL(multiplicative_expression);
+FRULE_DECL(additive_expression);
+FRULE_DECL(shift_expression);
+FRULE_DECL(relational_expression);
+FRULE_DECL(equality_expression);
+FRULE_DECL(and_expression);
+FRULE_DECL(exclusive_or_expression);
+FRULE_DECL(inclusive_or_expression);
+FRULE_DECL(logical_and_expression);
+FRULE_DECL(logical_or_expression);
+FRULE_DECL(conditional_expression);
+FRULE_DECL(assignment_expression);
+FRULE_DECL(assignment_operator);
+FRULE_DECL(expression);
+FRULE_DECL(constant_expression);
+FRULE_DECL(declaration);
+FRULE_DECL(declaration_specifiers);
+FRULE_DECL(init_declarator_list);
+FRULE_DECL(init_declarator);
+FRULE_DECL(storage_class_specifier);
+FRULE_DECL(type_specifier);
+FRULE_DECL(struct_or_union_specifier);
+FRULE_DECL(struct_or_union);
+FRULE_DECL(struct_declaration_list);
+FRULE_DECL(struct_declaration);
+FRULE_DECL(specifier_qualifier_list);
+FRULE_DECL(struct_declarator_list);
+FRULE_DECL(struct_declarator);
+FRULE_DECL(enum_specifier);
+FRULE_DECL(enumerator_list);
+FRULE_DECL(enumerator);
+FRULE_DECL(atomic_type_specifier);
+FRULE_DECL(type_qualifier);
+FRULE_DECL(function_specifier);
+FRULE_DECL(alignment_specifier);
+FRULE_DECL(declarator);
+FRULE_DECL(direct_declarator);
+FRULE_DECL(pointer);
+FRULE_DECL(type_qualifier_list);
+FRULE_DECL(parameter_type_list);
+FRULE_DECL(parameter_list);
+FRULE_DECL(parameter_declaration);
+FRULE_DECL(identifier_list);
+FRULE_DECL(type_name);
+FRULE_DECL(abstract_declarator);
+FRULE_DECL(direct_abstract_declarator);
+FRULE_DECL(initializer);
+FRULE_DECL(initializer_list);
+FRULE_DECL(designation);
+FRULE_DECL(designator_list);
+FRULE_DECL(designator);
+FRULE_DECL(static_assert_declaration);
+FRULE_DECL(statement);
+FRULE_DECL(labeled_statement);
+FRULE_DECL(compound_statement);
+FRULE_DECL(block_item_list);
+FRULE_DECL(block_item);
+FRULE_DECL(expression_statement);
+FRULE_DECL(selection_statement);
+FRULE_DECL(iteration_statement);
+FRULE_DECL(jump_statement);
+FRULE_DECL(translation_unit);
+FRULE_DECL(external_declaration);
+FRULE_DECL(function_definition);
+FRULE_DECL(declaration_list);
 
 enum {
   C_TOKEN_FLAG_NONE = 0,
@@ -124,14 +124,14 @@ void c_fe_parse(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
 
 #define SYM_GET(id) (sym = jl_sym_get(fe->scope ? &fe->scope->childs : &out->symtab, id))
 
-JL_RULEDF(primary_expression) {
-  Jl_RULEBG;
+FRULE_DEF(primary_expression) {
+  FRULE_BODY_BEGIN;
 
-  JL_MATCHT(1, C_TOK_IDENTIFIER) {
+  FE_MATCHT(1, C_TOK_IDENTIFIER) {
     _0 = jl_fval_string(_1.u.token.u.s);
   }
   else
-  JL_MATCHR(1, constant, JL_FVAL_STRING | JL_FVAL_INT | JL_FVAL_FLOAT) {
+  FE_MATCHR(1, constant, JL_FVAL_STRING | JL_FVAL_INT | JL_FVAL_FLOAT) {
     switch (_1.kind) {
       case JL_FVAL_STRING:
         _0 = jl_fval_expr(jl_const_string(_1.u.s));
@@ -144,406 +144,407 @@ JL_RULEDF(primary_expression) {
     }
   }
   else
-  JL_MATCHR(1, expression, JL_FVAL_STRING) {
+  FE_MATCHR(1, expression, JL_FVAL_STRING) {
     _0 = jl_fval_string(_1.u.s);
   }
   else
-  JL_MATCHT(1, '(') JL_MATCHR(2, expression, JL_FVAL_EXPR) {
+  FE_MATCHT(1, '(') FE_MATCHR(2, expression, JL_FVAL_EXPR) {
+    FE_CONSUME(')');
     _0 = jl_fval_expr(jl_unary(JL_OP_EN, _2.u.expr));
   }
   /*else todo
-  JL_MATCHR(1, generic_selection, JL_FVAL_EXPR) {
+  FE_MATCHR(1, generic_selection, JL_FVAL_EXPR) {
     __ = jl_fval_string(_1.s);
   }*/
-  Jl_RULEED;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(constant) {
-  Jl_RULEBG;
+FRULE_DEF(constant) {
+  FRULE_BODY_BEGIN;
 
-  JL_MATCHT(1, C_TOK_NUMBER) {
+  FE_MATCHT(1, C_TOK_NUMBER) {
     _0 = jl_fval_string(_1.u.token.u.s);
   }
   else
-  JL_MATCHT(1, C_TOK_IDENTIFIER) {
+  FE_MATCHT(1, C_TOK_IDENTIFIER) {
     if (SYM_GET(_1.u.token.u.s) && jl_sym_has_flag(sym, C_TOKEN_FLAG_ENUMERATION_CONSTANT)) {
       _0 = jl_fval_string(_1.u.token.u.s);
     }
   }
-  Jl_RULEED;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(enumeration_constant) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(enumeration_constant) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(string) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(string) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(generic_selection) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(generic_selection) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(generic_assoc_list) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(generic_assoc_list) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(generic_association) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(generic_association) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(postfix_expression) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(postfix_expression) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(argument_expression_list) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(argument_expression_list) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(unary_expression) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(unary_expression) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(unary_operator) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(unary_operator) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(cast_expression) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(cast_expression) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(multiplicative_expression) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(multiplicative_expression) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(additive_expression) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(additive_expression) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(shift_expression) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(shift_expression) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(relational_expression) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(relational_expression) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(equality_expression) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(equality_expression) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(and_expression) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(and_expression) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(exclusive_or_expression) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(exclusive_or_expression) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(inclusive_or_expression) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(inclusive_or_expression) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(logical_and_expression) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(logical_and_expression) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(logical_or_expression) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(logical_or_expression) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(conditional_expression) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(conditional_expression) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(assignment_expression) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(assignment_expression) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(assignment_operator) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(assignment_operator) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(expression) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(expression) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(constant_expression) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(constant_expression) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(declaration) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(declaration) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(declaration_specifiers) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(declaration_specifiers) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(init_declarator_list) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(init_declarator_list) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(init_declarator) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(init_declarator) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(storage_class_specifier) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(storage_class_specifier) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(type_specifier) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(type_specifier) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(struct_or_union_specifier) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(struct_or_union_specifier) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(struct_or_union) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(struct_or_union) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(struct_declaration_list) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(struct_declaration_list) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(struct_declaration) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(struct_declaration) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(specifier_qualifier_list) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(specifier_qualifier_list) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(struct_declarator_list) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(struct_declarator_list) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(struct_declarator) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(struct_declarator) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(enum_specifier) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(enum_specifier) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(enumerator_list) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(enumerator_list) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(enumerator) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(enumerator) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(atomic_type_specifier) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(atomic_type_specifier) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(type_qualifier) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(type_qualifier) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(function_specifier) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(function_specifier) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(alignment_specifier) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(alignment_specifier) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(declarator) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(declarator) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(direct_declarator) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(direct_declarator) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(pointer) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(pointer) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(type_qualifier_list) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(type_qualifier_list) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(parameter_type_list) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(parameter_type_list) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(parameter_list) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(parameter_list) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(parameter_declaration) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(parameter_declaration) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(identifier_list) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(identifier_list) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(type_name) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(type_name) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(abstract_declarator) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(abstract_declarator) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(direct_abstract_declarator) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(direct_abstract_declarator) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(initializer) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(initializer) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(initializer_list) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(initializer_list) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(designation) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(designation) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(designator_list) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(designator_list) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(designator) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(designator) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(static_assert_declaration) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(static_assert_declaration) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(statement) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(statement) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(labeled_statement) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(labeled_statement) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(compound_statement) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(compound_statement) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(block_item_list) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(block_item_list) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(block_item) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(block_item) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(expression_statement) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(expression_statement) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(selection_statement) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(selection_statement) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(iteration_statement) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(iteration_statement) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(jump_statement) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(jump_statement) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(translation_unit) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(translation_unit) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(external_declaration) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(external_declaration) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(function_definition) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(function_definition) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }
 
-JL_RULEDF(declaration_list) {
-  Jl_RULEBG;
-  Jl_RULEED;
+FRULE_DEF(declaration_list) {
+  FRULE_BODY_BEGIN;
+  FRULE_BODY_END;
 }

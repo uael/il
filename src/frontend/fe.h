@@ -35,6 +35,13 @@ struct jl_lexer_t;
 struct jl_sym_t;
 struct jl_program_t;
 
+jl_token_t jl_lexer_peek(struct jl_lexer_t *self);
+jl_token_t jl_lexer_peekn(struct jl_lexer_t *self, unsigned n);
+jl_token_t jl_lexer_next(struct jl_lexer_t *self);
+jl_token_t jl_lexer_consume(struct jl_lexer_t *self, unsigned char type);
+jl_token_t jl_lexer_consume_id(struct jl_lexer_t *self, const char *id);
+void jl_lexer_undo(struct jl_lexer_t *lexer, jl_token_t until);
+
 typedef struct jl_fe_t jl_fe_t;
 
 enum jl_fe_n {
@@ -61,5 +68,20 @@ void jl_fe_dtor(jl_fe_t *self);
 void jl_fe_push_src(jl_fe_t *self, const char *src);
 void jl_fe_scope(jl_fe_t *self, struct jl_program_t *out, const char *id);
 void jl_fe_unscope(jl_fe_t *self);
+
+#define FE_PEEK() jl_lexer_peek(lexer)
+#define FE_PEEKN(n) jl_lexer_peekn(lexer, n)
+#define FE_NEXT() jl_lexer_next(lexer)
+#define FE_CONSUME(t) jl_lexer_consume(lexer, t)
+#define FE_CONSUME_ID(id) jl_lexer_consume_id(lexer, id)
+#define FE_UNDO(until) jl_lexer_undo(lexer, until)
+
+#define FE_MATCHR(n, name, expected) \
+  if (jl_frule_validate((jl_frule_t) {expected, FRULE_FN(name)}, &_ ## n, fe, lexer, out))
+
+#define FE_MATCHT(n, name) \
+  if (FE_PEEK().type == name \
+    ? (_ ## n = jl_fval_token(FE_PEEK()), FE_NEXT(), true) \
+    : ((n==1?(void)0:FE_UNDO(_1.begin)), false))
 
 #endif /* JL_FE_H__ */

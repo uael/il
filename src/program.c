@@ -28,7 +28,7 @@
 #include "entity.h"
 
 void jl_program_init(jl_program_t *self) {
-  *self = (jl_program_t) {0};
+  *self = (jl_program_t) {{0}};
 }
 
 void jl_program_dtor(jl_program_t *self) {

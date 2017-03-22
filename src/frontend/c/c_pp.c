@@ -56,7 +56,7 @@ void c_macro_expand(c_macro_t *self, c_pp_t *pp, jl_lexer_t *into) {
 
 
 void c_pp_init(c_pp_t *self) {
-  *self = (c_pp_t) {0};
+  *self = (c_pp_t) {{0}};
 }
 
 void c_pp_dtor(c_pp_t *self) {

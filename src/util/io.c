@@ -163,7 +163,7 @@ bool jl_is_dir(const char *path) {
 #else
   struct stat buf;
 
-  if (lstat(path, &buf) < 0) return false;
+  stat(path, &buf);
   if (S_ISDIR(buf.st_mode)) return true;
 #endif
 

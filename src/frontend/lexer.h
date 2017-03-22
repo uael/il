@@ -81,5 +81,6 @@ jl_token_t jl_lexer_next(jl_lexer_t *self);
 jl_token_t jl_lexer_consume(jl_lexer_t *self, unsigned char type);
 jl_token_t jl_lexer_consume_id(jl_lexer_t *self, const char *id);
 void jl_lexer_undo(jl_lexer_t *lexer, jl_token_t until);
+void jl_lexer_undon(jl_lexer_t *lexer, unsigned n);
 
 #endif /* JL_LEXER_H__ */

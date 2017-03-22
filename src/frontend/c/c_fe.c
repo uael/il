@@ -23,6 +23,7 @@
  * SOFTWARE.
  */
 
+#include <fval.h>
 #include "c_fe.h"
 
 #include "c_lexer.h"
@@ -119,10 +120,12 @@ void c_fe_parse(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
   jl_program_init(out);
 
   jl_fval_t fval;
-  primary_expression(&fval, self, lexer, out);
+  postfix_expression(&fval, self, lexer, out);
 }
 
-#define SYM_GET(id) (sym = jl_sym_get(fe->scope ? &fe->scope->childs : &out->symtab, id))
+#define SYM sym
+#define SYM_GET(id) (SYM = jl_sym_get(fe->scope ? &fe->scope->childs : &out->symtab, id))
+#define SYM_PUT(id) (SYM = jl_sym_put(fe->scope ? &fe->scope->childs : &out->symtab, id))
 
 FRULE_DEF(primary_expression) {
   FRULE_BODY_BEGIN;
@@ -135,10 +138,13 @@ FRULE_DEF(primary_expression) {
     switch (_1.kind) {
       case JL_FVAL_STRING:
         jl_fval_expr(_0, jl_const_string(_1.u.s));
+        break;
       case JL_FVAL_INT:
         jl_fval_expr(_0, jl_const_int(_1.u.d));
+        break;
       case JL_FVAL_FLOAT:
         jl_fval_expr(_0, jl_const_float(_1.u.f));
+        break;
       default:
         break;
     }
@@ -149,13 +155,13 @@ FRULE_DEF(primary_expression) {
   }
   FRULE_OR
   FE_MATCHT(1, '(') {
-    FE_MATCHR(2, expression, JL_FVAL_EXPR) {
+    FE_MATCHR(2, primary_expression, JL_FVAL_EXPR) {
       FE_CONSUME(')');
       jl_fval_expr(_0, jl_unary(JL_OP_EN, _2.u.expr));
     }
   }
   FRULE_OR
-  FE_MATCHR(1, generic_selection, JL_FVAL_EXPR) {
+  FE_MATCHR(1, generic_selection, JL_FVAL_UNDEFINED) {
     /* todo generic_selection */
   }
 
@@ -180,11 +186,39 @@ FRULE_DEF(constant) {
 
 FRULE_DEF(enumeration_constant) {
   FRULE_BODY_BEGIN;
+
+  FE_MATCHT(1, C_TOK_IDENTIFIER) {
+    if (SYM_GET(_1.u.token.u.s)) {
+      fprintf(stderr, "duplicate enumeration constant %s", _1.u.token.u.s);
+      exit(1);
+    }
+    SYM_PUT(_1.u.token.u.s)->flags |= C_TOKEN_FLAG_ENUMERATION_CONSTANT;
+    jl_fval_string(_0, _1.u.token.u.s);
+  }
+
   FRULE_BODY_END;
 }
 
 FRULE_DEF(string) {
   FRULE_BODY_BEGIN;
+
+  FE_MATCHT(1, C_TOK_STRING) {
+    if (SYM_GET(_1.u.token.u.s)) {
+      fprintf(stderr, "duplicate enumeration constant %s", _1.u.token.u.s);
+      exit(1);
+    }
+    SYM_PUT(_1.u.token.u.s)->flags |= C_TOKEN_FLAG_ENUMERATION_CONSTANT;
+    jl_fval_string(_0, _1.u.token.u.s);
+  }
+  FRULE_OR
+  FE_MATCHT(1, C_TOK_FUNC_NAME) {
+    if (!fe->scope || !jl_entity_is_func(fe->scope->entity)) {
+      fprintf(stderr, "access of __func__ outside of one");
+      exit(1);
+    }
+    jl_fval_string(_0, jl_entity_func(fe->scope->entity)->name);
+  }
+
   FRULE_BODY_END;
 }
 
@@ -203,8 +237,73 @@ FRULE_DEF(generic_association) {
   FRULE_BODY_END;
 }
 
-FRULE_DEF(postfix_expression) {
-  FRULE_BODY_BEGIN;
+static _Bool postfix_expression(jl_fval_t*fval,jl_fe_t*fe,jl_lexer_t*lexer,jl_program_t*out) {
+  jl_fval_t _1,_2,_3,_4,_5,_6,_7,_8,_9;jl_sym_t*sym;*fval=(jl_fval_t){JL_FVAL_UNDEFINED};
+
+  if(_1=(jl_fval_t){JL_FVAL_UNDEFINED},jl_frule_validate((jl_frule_t){JL_FVAL_EXPR,primary_expression},&_1,fe,lexer,out)) {
+    jl_fval_expr(_0, _1.u.expr);
+    goto lbl;
+  }
+  FRULE_OR
+  FE_MATCHR(1, postfix_expression, JL_FVAL_EXPR) {
+    lbl:;
+    jl_token_t t = FE_PEEK();
+    char tt = C_TOK_INCREMENT;
+    FE_MATCHT(2, '[') {
+      FE_MATCHR(3, expression , JL_FVAL_EXPR) {
+        jl_fval_expr(_0, jl_array_read(_1.u.expr, _3.u.expr));
+      }
+      FE_CONSUME(']');
+    }
+    FRULE_OR
+    FE_MATCHT(2, '(') {
+      FE_MATCHR(3, argument_expression_list , JL_FVAL_EXPR) {
+        jl_fval_expr(_0, jl_call(_1.u.expr, _3.u.expr));
+      }
+      FE_CONSUME(')');
+    }
+    FRULE_OR
+    FE_MATCHT(2, '.') {
+      FE_MATCHT(3, C_TOK_IDENTIFIER) {
+        jl_fval_expr(_0, jl_field_read(_1.u.expr, false, jl_id(_3.u.token.u.s, _3.u.token.kind == JL_TOKEN_KEYWORD)));
+      }
+    }
+    FRULE_OR
+    FE_MATCHT(2, C_TOK_ARROW) {
+      FE_MATCHT(3, C_TOK_IDENTIFIER) {
+        jl_fval_expr(_0, jl_field_read(_1.u.expr, true, jl_id(_3.u.token.u.s, _3.u.token.kind == JL_TOKEN_KEYWORD)));
+      }
+    }
+    FRULE_OR
+    FE_MATCHT(2, C_TOK_INCREMENT) {
+      fprintf(stderr, "unsupported post increment post operator");
+      exit(1);
+    }
+    FRULE_OR
+    FE_MATCHT(2, C_TOK_DECREMENT) {
+      fprintf(stderr, "unsupported post decrement post operator");
+      exit(1);
+    }
+    FRULE_OR {
+      FE_UNDO(_1.begin);
+    }
+  }
+  FRULE_OR
+  FE_MATCHT(1, '(') {
+    FE_MATCHR(2, type_name , JL_FVAL_TYPE) {
+      FE_CONSUME(')');
+      FE_MATCHT(3, '{') {
+        FE_MATCHR(4, initializer_list , JL_FVAL_TYPE) {
+          jl_fval_expr(_0, jl_expr_undefined());
+        }
+        if (FE_PEEK().type == ',') {
+          FE_NEXT();
+        }
+        FE_CONSUME('}');
+      }
+    }
+  }
+
   FRULE_BODY_END;
 }
 

@@ -75,13 +75,14 @@ void jl_fe_unscope(jl_fe_t *self);
 #define FE_CONSUME(t) jl_lexer_consume(lexer, t)
 #define FE_CONSUME_ID(id) jl_lexer_consume_id(lexer, id)
 #define FE_UNDO(until) jl_lexer_undo(lexer, until)
+#define FE_UNDON(n) jl_lexer_undon(lexer, n)
 
 #define FE_MATCHR(n, name, expected) \
-  if (jl_frule_validate((jl_frule_t) {expected, FRULE_FN(name)}, &_ ## n, fe, lexer, out))
+  if (_ ## n = (jl_fval_t) {JL_FVAL_UNDEFINED}, jl_frule_validate((jl_frule_t) {expected, FRULE_FN(name)}, &_ ## n, fe, lexer, out))
 
 #define FE_MATCHT(n, name) \
   if (FE_PEEK().type == name \
     ? (_ ## n = (jl_fval_t) {JL_FVAL_UNDEFINED}, jl_fval_token(&_ ## n, FE_PEEK()), FE_NEXT(), true) \
-    : ((n==1?(void)0:FE_UNDO(_1.begin)), false))
+    : (FE_UNDON(n-1), false))
 
 #endif /* JL_FE_H__ */

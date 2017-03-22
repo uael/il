@@ -247,5 +247,9 @@ jl_token_t jl_lexer_consume_id(jl_lexer_t *self, const char *id) {
 }
 
 void jl_lexer_undo(jl_lexer_t *lexer, jl_token_t until) {
-  while (jl_deque_cursor(lexer->queue) > until.cursor) jl_deque_cursor(lexer->queue)--;
+  while (jl_deque_cursor(lexer->queue) > until.cursor) --jl_deque_cursor(lexer->queue);
+}
+
+void jl_lexer_undon(jl_lexer_t *lexer, unsigned n) {
+  jl_deque_cursor(lexer->queue) -= n;
 }

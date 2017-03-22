@@ -473,76 +473,49 @@ void jl_unary_init(jl_expr_t *self, enum jl_op_n op, jl_expr_t operand) {
 void jl_expr_unary_dtor(jl_expr_t *self) {}
 
 
-jl_expr_t jl_binary(enum jl_op_n op, jl_expr_t lhs, jl_expr_t rhs);
-void jl_binary_init(jl_expr_t *self, enum jl_op_n op, jl_expr_t lhs, jl_expr_t rhs);
+jl_expr_t jl_binary(enum jl_op_n op, jl_expr_t lhs, jl_expr_t rhs) {
+  return jl_expr_undefined();
+}
+void jl_binary_init(jl_expr_t *self, enum jl_op_n op, jl_expr_t lhs, jl_expr_t rhs) {}
 void jl_expr_binary_dtor(jl_expr_t *self) {}
-enum jl_op_n jl_binary_get_op(jl_expr_t *self);
-void jl_binary_set_op(jl_expr_t *self, enum jl_op_n op);
-jl_expr_t jl_binary_get_lhs(jl_expr_t *self);
-void jl_binary_set_lhs(jl_expr_t *self, jl_expr_t lhs);
-jl_expr_t jl_binary_get_rhs(jl_expr_t *self);
-void jl_binary_set_rhs(jl_expr_t *self, jl_expr_t rhs);
 
-
-jl_expr_t jl_ternary(jl_expr_t lhs, jl_expr_t mhs, jl_expr_t rhs);
-void jl_ternary_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t mhs, jl_expr_t rhs);
+jl_expr_t jl_ternary(jl_expr_t lhs, jl_expr_t mhs, jl_expr_t rhs) {
+  return jl_expr_undefined();
+}
+void jl_ternary_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t mhs, jl_expr_t rhs) {}
 void jl_expr_ternary_dtor(jl_expr_t *self) {}
-jl_expr_t jl_ternary_get_lhs(jl_expr_t *self);
-void jl_ternary_set_lhs(jl_expr_t *self, jl_expr_t lhs);
-jl_expr_t jl_ternary_get_mhs(jl_expr_t *self);
-void jl_ternary_set_mhs(jl_expr_t *self, jl_expr_t mhs);
-jl_expr_t jl_ternary_get_rhs(jl_expr_t *self);
-void jl_ternary_set_rhs(jl_expr_t *self, jl_expr_t rhs);
 
 
-jl_expr_t jl_array_read(jl_expr_t lhs, jl_expr_t pos);
-void jl_array_read_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t pos);
+jl_expr_t jl_array_read(jl_expr_t lhs, jl_expr_t pos) {
+  return jl_expr_undefined();
+}
+void jl_array_read_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t pos) {}
 void jl_expr_array_read_dtor(jl_expr_t *self) {}
-jl_expr_t jl_array_read_get_lhs(jl_expr_t *self);
-void jl_array_read_set_lhs(jl_expr_t *self, jl_expr_t lhs);
-jl_expr_t jl_array_read_get_pos(jl_expr_t *self);
-void jl_array_read_set_pos(jl_expr_t *self, jl_expr_t pos);
 
 
-jl_expr_t jl_array_write(jl_expr_t lhs, jl_expr_t pos, jl_expr_t rhs);
-void jl_array_write_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t pos, jl_expr_t rhs);
+jl_expr_t jl_array_write(jl_expr_t lhs, jl_expr_t pos, jl_expr_t rhs) {
+  return jl_expr_undefined();
+}
+void jl_array_write_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t pos, jl_expr_t rhs) {}
 void jl_expr_array_write_dtor(jl_expr_t *self) {}
-jl_expr_t jl_array_write_get_lhs(jl_expr_t *self);
-void jl_array_write_set_lhs(jl_expr_t *self, jl_expr_t lhs);
-jl_expr_t jl_array_write_get_pos(jl_expr_t *self);
-void jl_array_write_set_pos(jl_expr_t *self, jl_expr_t pos);
-jl_expr_t jl_array_write_get_rhs(jl_expr_t *self);
-void jl_array_write_set_rhs(jl_expr_t *self, jl_expr_t rhs);
 
 
-jl_expr_t jl_field_read(jl_expr_t lhs, bool ptr, jl_expr_t field);
-void jl_field_read_init(jl_expr_t *self, jl_expr_t lhs, bool ptr, jl_expr_t field);
+jl_expr_t jl_field_read(jl_expr_t lhs, bool ptr, jl_expr_t field) {
+  return jl_expr_undefined();
+}
+void jl_field_read_init(jl_expr_t *self, jl_expr_t lhs, bool ptr, jl_expr_t field) {}
 void jl_expr_field_read_dtor(jl_expr_t *self) {}
-jl_expr_t jl_field_read_get_lhs(jl_expr_t *self);
-void jl_field_read_set_lhs(jl_expr_t *self, jl_expr_t lhs);
-bool jl_field_read_get_ptr(jl_expr_t *self);
-void jl_field_read_set_ptr(jl_expr_t *self, bool ptr);
-jl_expr_t jl_field_read_get_field(jl_expr_t *self);
-void jl_field_read_set_field(jl_expr_t *self, jl_expr_t field);
 
 
-jl_expr_t jl_field_write(jl_expr_t lhs, bool ptr, jl_expr_t field, jl_expr_t rhs);
-void jl_field_write_init(jl_expr_t *self, jl_expr_t lhs, bool ptr, jl_expr_t field, jl_expr_t rhs);
+jl_expr_t jl_field_write(jl_expr_t lhs, bool ptr, jl_expr_t field, jl_expr_t rhs) {
+  return jl_expr_undefined();
+}
+void jl_field_write_init(jl_expr_t *self, jl_expr_t lhs, bool ptr, jl_expr_t field, jl_expr_t rhs) {}
 void jl_expr_field_write_dtor(jl_expr_t *self) {}
-jl_expr_t jl_field_write_get_lhs(jl_expr_t *self);
-void jl_field_write_set_lhs(jl_expr_t *self, jl_expr_t lhs);
-bool jl_field_write_get_ptr(jl_expr_t *self);
-void jl_field_write_set_ptr(jl_expr_t *self, bool ptr);
-jl_expr_t jl_field_write_get_field(jl_expr_t *self);
-void jl_field_write_set_field(jl_expr_t *self, jl_expr_t field);
-jl_expr_t jl_field_write_get_rhs(jl_expr_t *self);
-void jl_field_write_set_rhs(jl_expr_t *self, jl_expr_t rhs);
 
 
-jl_expr_t jl_call(jl_expr_t lhs, jl_expr_t args);
-void jl_call_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t args);
+jl_expr_t jl_call(jl_expr_t lhs, jl_expr_t args) {
+  return jl_expr_undefined();
+}
+void jl_call_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t args) {}
 void jl_expr_call_dtor(jl_expr_t *self) {}
-jl_expr_t jl_call_get_lhs(jl_expr_t *self);
-void jl_call_set_lhs(jl_expr_t *self, jl_expr_t lhs);
-jl_expr_t jl_call_get_args(jl_expr_t *self);
-void jl_call_set_args(jl_expr_t *self, jl_expr_t args);

@@ -78,6 +78,7 @@ struct jl_expr_binary_t {
 };
 
 jl_expr_t jl_binary(enum jl_op_n op, jl_expr_t lhs, jl_expr_t rhs);
+jl_expr_t jl_cast(jl_type_t type, jl_expr_t rhs);
 void jl_binary_init(jl_expr_t *self, enum jl_op_n op, jl_expr_t lhs, jl_expr_t rhs);
 
 struct jl_expr_ternary_t {
@@ -142,7 +143,7 @@ struct jl_expr_call_t {
   jl_expr_r args;
 };
 
-jl_expr_t jl_call(jl_expr_t lhs, jl_expr_t args);
-void jl_call_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t args);
+jl_expr_t jl_call(jl_expr_t lhs, jl_expr_r args);
+void jl_call_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_r args);
 
 #endif /* JL_EXPR_H__ */

@@ -134,7 +134,7 @@ FRULE_DEF(primary_expression) {
     jl_fval_string(_0, _1.u.token.u.s);
   }
   FRULE_OR
-  FE_MATCHR(1, constant, JL_FVAL_STRING | JL_FVAL_INT | JL_FVAL_FLOAT) {
+  FE_MATCHR(1, constant) {
     switch (_1.kind) {
       case JL_FVAL_STRING:
         jl_fval_expr(_0, jl_const_string(_1.u.s));
@@ -150,18 +150,18 @@ FRULE_DEF(primary_expression) {
     }
   }
   FRULE_OR
-  FE_MATCHR(1, string, JL_FVAL_STRING) {
+  FE_MATCHR(1, string) {
     jl_fval_string(_0, _1.u.s);
   }
   FRULE_OR
   FE_MATCHT(1, '(') {
-    FE_MATCHR(2, primary_expression, JL_FVAL_EXPR) {
+    FE_MATCHR(2, primary_expression) {
       FE_CONSUME(')');
       jl_fval_expr(_0, jl_unary(JL_OP_EN, _2.u.expr));
     }
   }
   FRULE_OR
-  FE_MATCHR(1, generic_selection, JL_FVAL_UNDEFINED) {
+  FE_MATCHR(1, generic_selection) {
     /* todo generic_selection */
   }
 
@@ -237,69 +237,72 @@ FRULE_DEF(generic_association) {
   FRULE_BODY_END;
 }
 
-static _Bool postfix_expression(jl_fval_t*fval,jl_fe_t*fe,jl_lexer_t*lexer,jl_program_t*out) {
-  jl_fval_t _1,_2,_3,_4,_5,_6,_7,_8,_9;jl_sym_t*sym;*fval=(jl_fval_t){JL_FVAL_UNDEFINED};
+FRULE_DEF(postfix_expression) {
+  FRULE_BODY_BEGIN;
+  unsigned i;
+  jl_type_t type;
+  jl_entity_t param;
+  jl_entity_r params;
+  jl_expr_r args;
 
-  if(_1=(jl_fval_t){JL_FVAL_UNDEFINED},jl_frule_validate((jl_frule_t){JL_FVAL_EXPR,primary_expression},&_1,fe,lexer,out)) {
+  FE_MATCHR(1, primary_expression) {
+    puts("got pe");
     jl_fval_expr(_0, _1.u.expr);
-    goto lbl;
-  }
-  FRULE_OR
-  FE_MATCHR(1, postfix_expression, JL_FVAL_EXPR) {
-    lbl:;
-    jl_token_t t = FE_PEEK();
-    char tt = C_TOK_INCREMENT;
-    FE_MATCHT(2, '[') {
-      FE_MATCHR(3, expression , JL_FVAL_EXPR) {
-        jl_fval_expr(_0, jl_array_read(_1.u.expr, _3.u.expr));
-      }
-      FE_CONSUME(']');
-    }
-    FRULE_OR
-    FE_MATCHT(2, '(') {
-      FE_MATCHR(3, argument_expression_list , JL_FVAL_EXPR) {
-        jl_fval_expr(_0, jl_call(_1.u.expr, _3.u.expr));
-      }
-      FE_CONSUME(')');
-    }
-    FRULE_OR
-    FE_MATCHT(2, '.') {
-      FE_MATCHT(3, C_TOK_IDENTIFIER) {
-        jl_fval_expr(_0, jl_field_read(_1.u.expr, false, jl_id(_3.u.token.u.s, _3.u.token.kind == JL_TOKEN_KEYWORD)));
-      }
-    }
-    FRULE_OR
-    FE_MATCHT(2, C_TOK_ARROW) {
-      FE_MATCHT(3, C_TOK_IDENTIFIER) {
-        jl_fval_expr(_0, jl_field_read(_1.u.expr, true, jl_id(_3.u.token.u.s, _3.u.token.kind == JL_TOKEN_KEYWORD)));
-      }
-    }
-    FRULE_OR
-    FE_MATCHT(2, C_TOK_INCREMENT) {
-      fprintf(stderr, "unsupported post increment post operator");
-      exit(1);
-    }
-    FRULE_OR
-    FE_MATCHT(2, C_TOK_DECREMENT) {
-      fprintf(stderr, "unsupported post decrement post operator");
-      exit(1);
-    }
-    FRULE_OR {
-      FE_UNDO(_1.begin);
-    }
-  }
-  FRULE_OR
-  FE_MATCHT(1, '(') {
-    FE_MATCHR(2, type_name , JL_FVAL_TYPE) {
-      FE_CONSUME(')');
-      FE_MATCHT(3, '{') {
-        FE_MATCHR(4, initializer_list , JL_FVAL_TYPE) {
-          jl_fval_expr(_0, jl_expr_undefined());
-        }
-        if (FE_PEEK().type == ',') {
+    while (true) {
+      switch (FE_PEEK().type) {
+        case '[':
+          puts("array");
           FE_NEXT();
-        }
-        FE_CONSUME('}');
+          FE_MATCHR(1, primary_expression) {
+            puts("array pe");
+            jl_fval_expr(_0, jl_array_read(_0->u.expr, _1.u.expr));
+          }
+          FRULE_OR {
+            fprintf(stderr, "Expected expression");
+            exit(1);
+          }
+          FE_CONSUME(']');
+          break;
+        case '(':
+          type = jl_expr_get_type(_0->u.expr);
+          if (jl_type_is_pointer(type) && jl_type_is_func(jl_type_pointer(type)->of)) {
+            type = jl_type_pointer(type)->of;
+          } else if (!jl_type_is_func(type)) {
+            fprintf(stderr, "Expression must have type pointer to function");
+            exit(1);
+          }
+          FE_NEXT();
+          args = (jl_expr_r) {0};
+          params = jl_type_fields(type);
+          for (i = 0; i < jl_vector_size(params); ++i) {
+            if (FE_PEEK().type == ')') {
+              fprintf(stderr, "Too few arguments, expected %zu but got %d.", jl_vector_size(params), i);
+              exit(1);
+            }
+            param = jl_vector_at(params, i);
+            FE_MATCHR(1, assignment_expression) {
+              if (!jl_type_equals(jl_expr_get_type(_1.u.expr), jl_entity_type(param))) {
+                jl_fval_expr(&_1, jl_cast(jl_entity_type(param), _1.u.expr));
+              }
+              jl_vector_push(args, _1.u.expr);
+              if (i < jl_vector_size(params) - 1) {
+                FE_CONSUME(',');
+              }
+            }
+            FRULE_OR {
+              fprintf(stderr, "Expected assignment expression");
+              exit(1);
+            }
+          }
+          jl_fval_expr(_0, jl_call(_0->u.expr, args));
+          FE_CONSUME(')');
+          break;
+        case '.':
+          FE_NEXT();
+          FE_CONSUME(C_TOK_IDENTIFIER);
+          break;
+        default:
+          FRULE_BODY_END;
       }
     }
   }

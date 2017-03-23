@@ -77,8 +77,8 @@ void jl_fe_unscope(jl_fe_t *self);
 #define FE_UNDO(until) jl_lexer_undo(lexer, until)
 #define FE_UNDON(n) jl_lexer_undon(lexer, n)
 
-#define FE_MATCHR(n, name, expected) \
-  if (_ ## n = (jl_fval_t) {JL_FVAL_UNDEFINED}, jl_frule_validate((jl_frule_t) {expected, FRULE_FN(name)}, &_ ## n, fe, lexer, out))
+#define FE_MATCHR(n, name) \
+  if (_ ## n = (jl_fval_t) {JL_FVAL_UNDEFINED}, FRULE_FN(name)(&_ ## n, fe, lexer, out))
 
 #define FE_MATCHT(n, name) \
   if (FE_PEEK().type == name \

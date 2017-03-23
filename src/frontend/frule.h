@@ -51,7 +51,7 @@ bool jl_frule_validate(jl_frule_t self, jl_fval_t *fval, struct jl_fe_t *fe, str
   FRULE_DECL(name)
 
 #define FRULE_BODY_BEGIN \
-  jl_fval_t _1, _2, _3, _4, _5, _6, _7, _8, _9; jl_sym_t *sym; *fval = (jl_fval_t) {JL_FVAL_UNDEFINED}
+  jl_fval_t _1, _2, _3, _4, _5, _6, _7, _8, _9; jl_sym_t *sym; jl_token_t token; *fval = (jl_fval_t) {JL_FVAL_UNDEFINED}
 
 #define FRULE_BODY_END \
   return fval->kind != JL_FVAL_UNDEFINED

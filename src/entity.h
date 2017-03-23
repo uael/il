@@ -31,6 +31,8 @@
 #include "stmt_t.h"
 #include "type_t.h"
 
+jl_type_t jl_entity_type(jl_entity_t self);
+
 struct jl_var_t {
   unsigned refs;
   const char *name;

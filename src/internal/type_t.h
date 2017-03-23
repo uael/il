@@ -104,6 +104,10 @@ void jl_type_acquire(jl_type_t *self);
 void jl_type_release(jl_type_t *self);
 bool jl_type_is_defined(jl_type_t self);
 bool jl_ptype_is_defined(jl_type_t *self);
+bool jl_type_is_ref(jl_type_t type);
+bool jl_type_is_func(jl_type_t type);
+bool jl_type_equals(jl_type_t a, jl_type_t b);
+jl_type_t jl_type_deref(jl_type_t a);
 
 #define jl_type_is_literal(t) ((t).kind == JL_TYPE_LITERAL)
 #define jl_type_is_pointer(t) ((t).kind == JL_TYPE_POINTER)

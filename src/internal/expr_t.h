@@ -106,7 +106,7 @@ void jl_expr_switch(jl_expr_t *self, enum jl_expr_n kind);
 void jl_expr_acquire(jl_expr_t *self);
 void jl_expr_release(jl_expr_t *self);
 bool jl_expr_is_defined(jl_expr_t *self);
-jl_type_t jl_expr_get_type(jl_expr_t *self);
+jl_type_t jl_expr_get_type(jl_expr_t self);
 void jl_expr_set_type(jl_expr_t *self, jl_type_t type);
 jl_expr_t jl_expr_get_next(jl_expr_t *self);
 void jl_expr_set_next(jl_expr_t *self, jl_expr_t next);

@@ -220,6 +220,46 @@ bool jl_entity_is_defined(jl_entity_t *self) {
   }
 }
 
+bool jl_entity_equals(jl_entity_t a, jl_entity_t b) {
+  unsigned i;
+  jl_entity_r a_fields, b_fields;
+  jl_type_t a_type;
+
+  if (a.kind != b.kind) {
+    return false;
+  }
+  a_type = jl_entity_type(a);
+  if (!jl_type_is_unsigned(a_type)) {
+    return jl_type_equals(a_type, jl_entity_type(b));
+  }
+  a_fields = jl_entity_fields(a);
+  b_fields = jl_entity_fields(b);
+  if (jl_vector_size(a_fields) != jl_vector_size(b_fields)) {
+    return false;
+  }
+  for (i = 0; i < jl_vector_size(a_fields); ++i) {
+    if (!jl_entity_equals(jl_vector_at(a_fields, i), jl_vector_at(b_fields, i))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+jl_entity_r jl_entity_fields(jl_entity_t self) {
+  switch (self.kind) {
+    case JL_ENTITY_FUNC:
+      return self.u._func->params;
+    case JL_ENTITY_ENUM:
+      return self.u._enum->fields;
+    case JL_ENTITY_STRUCT:
+      return self.u._struct->fields;
+    case JL_ENTITY_UNION:
+      return self.u._union->fields;
+    default:
+      return (jl_entity_r) {0};
+  }
+}
+
 const char *jl_entity_name(jl_entity_t self) {
   switch (self.kind) {
     case JL_ENTITY_VAR:
@@ -240,6 +280,19 @@ const char *jl_entity_name(jl_entity_t self) {
       break;
   }
   return NULL;
+}
+
+jl_type_t jl_entity_type(jl_entity_t self) {
+  switch (self.kind) {
+    case JL_ENTITY_VAR:
+      return self.u._var->type;
+    case JL_ENTITY_PARAM:
+      return self.u._param->type;
+    case JL_ENTITY_FUNC:
+      return jl_pointer(jl_compound(self));
+    default:
+      return jl_type_undefined();
+  }
 }
 
 

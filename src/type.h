@@ -31,6 +31,8 @@
 #include "stmt_t.h"
 #include "type_t.h"
 
+jl_entity_r jl_type_fields(jl_type_t self);
+
 struct jl_literal_t {
   unsigned refs;
   enum jl_literal_n kind;

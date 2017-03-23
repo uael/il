@@ -76,6 +76,8 @@ void jl_type_dtor(jl_type_t *self) {
         self->u._compound = NULL;
       }
       break;
+    default:
+      break;
   }
   *self = jl_type_undefined();
 }
@@ -129,6 +131,8 @@ void jl_type_acquire(jl_type_t *self) {
     case JL_TYPE_COMPOUND:
       ++self->u._compound->refs;
       break;
+    default:
+      break;
   }
 }
 
@@ -148,6 +152,8 @@ void jl_type_release(jl_type_t *self) {
       break;
     case JL_TYPE_COMPOUND:
       --self->u._compound->refs;
+      break;
+    default:
       break;
   }
 }
@@ -172,8 +178,50 @@ bool jl_ptype_is_defined(jl_type_t *self) {
   return jl_type_is_defined(*self);
 }
 
+bool jl_type_is_ref(jl_type_t type) {
+  return jl_type_is_array(type) || jl_type_is_pointer(type);
+}
 
-  jl_type_t jl_void() {
+bool jl_type_is_func(jl_type_t type) {
+  return jl_type_is_compound(type) && jl_entity_is_func(type.u._compound->entity);
+}
+
+bool jl_type_equals(jl_type_t a, jl_type_t b) {
+  if (!memcmp(&a, &b, sizeof(a))) {
+    return true;
+  }
+  if (jl_type_is_ref(a)) {
+    return jl_type_is_ref(b) && jl_type_equals(jl_type_deref(a), jl_type_deref(b));
+  }
+  if (jl_type_is_ref(b)) {
+    return false;
+  }
+  if (a.kind != b.kind || jl_type_is_unsigned(a) != jl_type_is_unsigned(b)) {
+    return false;
+  }
+  if (jl_type_is_compound(a)) {
+    return jl_entity_equals(jl_type_compound(a)->entity, jl_type_compound(b)->entity);
+  }
+  return true;
+}
+
+jl_type_t jl_type_deref(jl_type_t a) {
+  switch (a.kind) {
+    case JL_TYPE_POINTER:
+      return a.u._pointer->of;
+    case JL_TYPE_ARRAY:
+      return a.u._array->of;
+    default:
+      exit(1);
+  }
+}
+
+jl_entity_r jl_type_fields(jl_type_t self) {
+  return jl_entity_fields(jl_type_compound(self)->entity);
+}
+
+
+jl_type_t jl_void() {
   static jl_type_t type = {JL_TYPE_UNDEFINED};
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_VOID);

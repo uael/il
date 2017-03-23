@@ -120,6 +120,8 @@ void jl_expr_dtor(jl_expr_t *self) {
         self->u._call = NULL;
       }
       break;
+    default:
+      break;
   }
   *self = jl_expr_undefined();
 }
@@ -202,6 +204,8 @@ void jl_expr_acquire(jl_expr_t *self) {
     case JL_EXPR_CALL:
       ++self->u._call->refs;
       break;
+    default:
+      break;
   }
 }
 
@@ -240,6 +244,8 @@ void jl_expr_release(jl_expr_t *self) {
     case JL_EXPR_CALL:
       --self->u._call->refs;
       break;
+    default:
+      break;
   }
 }
 
@@ -271,28 +277,28 @@ bool jl_expr_is_defined(jl_expr_t *self) {
   }
 }
 
-jl_type_t jl_expr_get_type(jl_expr_t *self) {
-  switch (self->kind) {
+jl_type_t jl_expr_get_type(jl_expr_t self) {
+  switch (self.kind) {
     case JL_EXPR_ID:
-      return self->u._id->type;
+      return self.u._id->type;
     case JL_EXPR_CONST:
-      return self->u._const->type;
+      return self.u._const->type;
     case JL_EXPR_UNARY:
-      return self->u._unary->type;
+      return self.u._unary->type;
     case JL_EXPR_BINARY:
-      return self->u._binary->type;
+      return self.u._binary->type;
     case JL_EXPR_TERNARY:
-      return self->u._ternary->type;
+      return self.u._ternary->type;
     case JL_EXPR_ARRAY_READ:
-      return self->u._array_read->type;
+      return self.u._array_read->type;
     case JL_EXPR_ARRAY_WRITE:
-      return self->u._array_write->type;
+      return self.u._array_write->type;
     case JL_EXPR_FIELD_READ:
-      return self->u._field_read->type;
+      return self.u._field_read->type;
     case JL_EXPR_FIELD_WRITE:
-      return self->u._field_write->type;
+      return self.u._field_write->type;
     case JL_EXPR_CALL:
-      return self->u._call->type;
+      return self.u._call->type;
     case JL_EXPR_UNDEFINED:
     default:
       puts("cannot access next on undefined expression");
@@ -476,6 +482,9 @@ void jl_expr_unary_dtor(jl_expr_t *self) {}
 jl_expr_t jl_binary(enum jl_op_n op, jl_expr_t lhs, jl_expr_t rhs) {
   return jl_expr_undefined();
 }
+jl_expr_t jl_cast(jl_type_t type, jl_expr_t rhs) {
+  return jl_expr_undefined();
+}
 void jl_binary_init(jl_expr_t *self, enum jl_op_n op, jl_expr_t lhs, jl_expr_t rhs) {}
 void jl_expr_binary_dtor(jl_expr_t *self) {}
 
@@ -514,8 +523,8 @@ void jl_field_write_init(jl_expr_t *self, jl_expr_t lhs, bool ptr, jl_expr_t fie
 void jl_expr_field_write_dtor(jl_expr_t *self) {}
 
 
-jl_expr_t jl_call(jl_expr_t lhs, jl_expr_t args) {
+jl_expr_t jl_call(jl_expr_t lhs, jl_expr_r args) {
   return jl_expr_undefined();
 }
-void jl_call_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t args) {}
+void jl_call_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_r args) {}
 void jl_expr_call_dtor(jl_expr_t *self) {}

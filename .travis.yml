@@ -4,7 +4,11 @@ language: c
 
 addons:
   apt:
+    sources:
+      - kubuntu-backports
     packages:
+      - cmake
+      - cmake-data
       - valgrind
 
 compiler:

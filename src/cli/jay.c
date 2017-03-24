@@ -29,6 +29,8 @@
 #include "lexer.h"
 #include "program.h"
 
+#include <libfirm/firm.h>
+
 int main(int argc, char *argv[]) {
   jl_compiler_t compiler;
   jl_lexer_t lexer;

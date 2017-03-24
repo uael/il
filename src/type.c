@@ -196,7 +196,7 @@ bool jl_type_equals(jl_type_t a, jl_type_t b) {
   if (jl_type_is_ref(b)) {
     return false;
   }
-  if (a.kind != b.kind || jl_type_is_unsigned(a) != jl_type_is_unsigned(b)) {
+  if (a.kind != b.kind || a.size != b.size || jl_type_is_unsigned(a) != jl_type_is_unsigned(b)) {
     return false;
   }
   if (jl_type_is_compound(a)) {

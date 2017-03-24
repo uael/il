@@ -32,7 +32,7 @@
 
 struct jl_compiler_t;
 struct jl_lexer_t;
-struct jl_sym_t;
+struct jl_scope_t;
 struct jl_program_t;
 
 jl_token_t jl_lexer_peek(struct jl_lexer_t *self);
@@ -54,7 +54,7 @@ struct jl_fe_t {
   enum jl_fe_n kind;
   jl_deque_of(const char *) sources;
 
-  struct jl_sym_t *scope;
+  struct jl_scope_t *scope;
   jl_entity_t entity;
   jl_expr_t expr;
   jl_stmt_t stmt;
@@ -66,7 +66,7 @@ struct jl_fe_t {
 void jl_fe_init(jl_fe_t *self, enum jl_fe_n kind, struct jl_compiler_t *compiler);
 void jl_fe_dtor(jl_fe_t *self);
 void jl_fe_push_src(jl_fe_t *self, const char *src);
-void jl_fe_scope(jl_fe_t *self, struct jl_program_t *out, const char *id);
+void jl_fe_scope(jl_fe_t *self, const char *id);
 void jl_fe_unscope(jl_fe_t *self);
 
 #define FE_PEEK() jl_lexer_peek(lexer)
@@ -82,7 +82,7 @@ void jl_fe_unscope(jl_fe_t *self);
 
 #define FE_MATCHT(n, name) \
   if (FE_PEEK().type == name \
-    ? (_ ## n = (jl_fval_t) {JL_FVAL_UNDEFINED}, jl_fval_token(&_ ## n, FE_PEEK()), FE_NEXT(), true) \
+    ? (_ ## n = (jl_fval_t) {JL_FVAL_UNDEFINED}, jl_fval_init_token(&_ ## n, FE_PEEK()), FE_NEXT(), true) \
     : (FE_UNDON(n-1), false))
 
 #endif /* JL_FE_H__ */

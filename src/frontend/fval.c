@@ -29,19 +29,19 @@ jl_fval_t jl_fval_undefined() {
   return (jl_fval_t) {JL_FVAL_UNDEFINED};
 }
 
-void jl_fval_string(jl_fval_t *self, const char *s) {
+void jl_fval_init_string(jl_fval_t *self, const char *s) {
   self->kind = JL_FVAL_STRING;
   self->u.s = s;
 }
 
-void jl_fval_token(jl_fval_t *self, jl_token_t token) {
+void jl_fval_init_token(jl_fval_t *self, jl_token_t token) {
   self->kind = JL_FVAL_TOKEN;
   self->begin = token;
   self->end = token;
   self->u.token = token;
 }
 
-void jl_fval_expr(jl_fval_t *self, jl_expr_t expr) {
+void jl_fval_init_expr(jl_fval_t *self, jl_expr_t expr) {
   self->kind = JL_FVAL_EXPR;
   self->u.expr = expr;
 }

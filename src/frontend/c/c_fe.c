@@ -124,26 +124,28 @@ void c_fe_parse(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
 }
 
 #define SYM sym
-#define SYM_GET(id) (SYM = jl_sym_get(fe->scope ? &fe->scope->childs : &out->symtab, id))
-#define SYM_PUT(id) (SYM = jl_sym_put(fe->scope ? &fe->scope->childs : &out->symtab, id))
+#define SYM_GET(id) (SYM = jl_sym_get(fe->scope, id))
+#define SYM_PUT(id) (SYM = jl_sym_put(fe->scope, id))
 
 FRULE_DEF(primary_expression) {
   FRULE_BODY_BEGIN;
 
   FE_MATCHT(1, C_TOK_IDENTIFIER) {
-    jl_fval_string(_0, _1.u.token.u.s);
+    SYM_GET(_1.u.token.u.s);
+    jl_fval_init_expr(_0, jl_id(sym->id, _1.u.token.kind == JL_TOKEN_KEYWORD));
+    jl_expr_set_type(&_0->u.expr, jl_entity_var(sym->entity)->type);
   }
   FRULE_OR
   FE_MATCHR(1, constant) {
     switch (_1.kind) {
       case JL_FVAL_STRING:
-        jl_fval_expr(_0, jl_const_string(_1.u.s));
+        jl_fval_init_expr(_0, jl_const_string(_1.u.s));
         break;
       case JL_FVAL_INT:
-        jl_fval_expr(_0, jl_const_int(_1.u.d));
+        jl_fval_init_expr(_0, jl_const_int(_1.u.d));
         break;
       case JL_FVAL_FLOAT:
-        jl_fval_expr(_0, jl_const_float(_1.u.f));
+        jl_fval_init_expr(_0, jl_const_float(_1.u.f));
         break;
       default:
         break;
@@ -151,13 +153,13 @@ FRULE_DEF(primary_expression) {
   }
   FRULE_OR
   FE_MATCHR(1, string) {
-    jl_fval_string(_0, _1.u.s);
+    jl_fval_init_string(_0, _1.u.s);
   }
   FRULE_OR
   FE_MATCHT(1, '(') {
     FE_MATCHR(2, primary_expression) {
       FE_CONSUME(')');
-      jl_fval_expr(_0, jl_unary(JL_OP_EN, _2.u.expr));
+      jl_fval_init_expr(_0, jl_unary(JL_OP_EN, _2.u.expr));
     }
   }
   FRULE_OR
@@ -172,12 +174,12 @@ FRULE_DEF(constant) {
   FRULE_BODY_BEGIN;
 
   FE_MATCHT(1, C_TOK_NUMBER) {
-    jl_fval_string(_0, _1.u.token.u.s);
+    jl_fval_init_string(_0, _1.u.token.u.s);
   }
   FRULE_OR
   FE_MATCHT(1, C_TOK_IDENTIFIER) {
     if (SYM_GET(_1.u.token.u.s) && jl_sym_has_flag(sym, C_TOKEN_FLAG_ENUMERATION_CONSTANT)) {
-      jl_fval_string(_0, _1.u.token.u.s);
+      jl_fval_init_string(_0, _1.u.token.u.s);
     }
   }
 
@@ -193,7 +195,7 @@ FRULE_DEF(enumeration_constant) {
       exit(1);
     }
     SYM_PUT(_1.u.token.u.s)->flags |= C_TOKEN_FLAG_ENUMERATION_CONSTANT;
-    jl_fval_string(_0, _1.u.token.u.s);
+    jl_fval_init_string(_0, _1.u.token.u.s);
   }
 
   FRULE_BODY_END;
@@ -208,15 +210,15 @@ FRULE_DEF(string) {
       exit(1);
     }
     SYM_PUT(_1.u.token.u.s)->flags |= C_TOKEN_FLAG_ENUMERATION_CONSTANT;
-    jl_fval_string(_0, _1.u.token.u.s);
+    jl_fval_init_string(_0, _1.u.token.u.s);
   }
   FRULE_OR
   FE_MATCHT(1, C_TOK_FUNC_NAME) {
-    if (!fe->scope || !jl_entity_is_func(fe->scope->entity)) {
+    if (!fe->scope || !jl_entity_is_func(fe->scope->sym->entity)) {
       fprintf(stderr, "access of __func__ outside of one");
       exit(1);
     }
-    jl_fval_string(_0, jl_entity_func(fe->scope->entity)->name);
+    jl_fval_init_string(_0, jl_entity_func(fe->scope->sym->entity)->name);
   }
 
   FRULE_BODY_END;
@@ -247,7 +249,7 @@ FRULE_DEF(postfix_expression) {
 
   FE_MATCHR(1, primary_expression) {
     puts("got pe");
-    jl_fval_expr(_0, _1.u.expr);
+    jl_fval_init_expr(_0, _1.u.expr);
     while (true) {
       switch (FE_PEEK().type) {
         case '[':
@@ -255,7 +257,7 @@ FRULE_DEF(postfix_expression) {
           FE_NEXT();
           FE_MATCHR(1, expression) {
             puts("array pe");
-            jl_fval_expr(_0, jl_array_read(_0->u.expr, _1.u.expr));
+            jl_fval_init_expr(_0, jl_array_read(_0->u.expr, _1.u.expr));
           }
           FRULE_OR {
             fprintf(stderr, "Expected expression");
@@ -282,7 +284,7 @@ FRULE_DEF(postfix_expression) {
             param = jl_vector_at(params, i);
             FE_MATCHR(1, assignment_expression) {
               if (!jl_type_equals(jl_expr_get_type(_1.u.expr), jl_entity_type(param))) {
-                jl_fval_expr(&_1, jl_cast(jl_entity_type(param), _1.u.expr));
+                jl_fval_init_expr(&_1, jl_cast(jl_entity_type(param), _1.u.expr));
               }
               jl_vector_push(args, _1.u.expr);
               if (i < jl_vector_size(params) - 1) {
@@ -294,7 +296,7 @@ FRULE_DEF(postfix_expression) {
               exit(1);
             }
           }
-          jl_fval_expr(_0, jl_call(_0->u.expr, args));
+          jl_fval_init_expr(_0, jl_call(_0->u.expr, args));
           FE_CONSUME(')');
           break;
         case '.':

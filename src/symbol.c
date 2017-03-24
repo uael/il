@@ -29,28 +29,32 @@ bool jl_sym_has_flag(jl_sym_t *self, unsigned flag) {
   return (bool) (self->flags & flag);
 }
 
-jl_sym_t *jl_sym_put(jl_symtab_t *symtab, const char *id) {
+jl_sym_t *jl_sym_put(jl_scope_t *scope, const char *id) {
   jl_sym_t *sym;
   unsigned it;
   int r;
 
-  it = kh_put(jl_symtab, symtab, id, &r);
+  it = kh_put(jl_symtab, &scope->symtab, id, &r);
   if (r == 0) {
     return NULL;
   }
-  sym = &kh_value(symtab, it);
+  sym = &kh_value(&scope->symtab, it);
   sym->id = id;
   return sym;
 }
 
-jl_sym_t *jl_sym_get(jl_symtab_t *symtab, const char *id) {
+jl_sym_t *jl_sym_get(jl_scope_t *scope, const char *id) {
   unsigned it;
 
-  it = kh_get(jl_symtab, symtab, id);
-  if (it == kh_end(symtab)) {
-    return NULL;
+  it = kh_get(jl_symtab, &scope->symtab, id);
+  if (it == kh_end(&scope->symtab)) {
+    if (scope->parent) {
+      return jl_sym_get(scope->parent, id);
+    }
+    fprintf(stderr, "Undefined symbol '%s'.", id);
+    exit(1);
   }
-  return &kh_value(symtab, it);
+  return &kh_value(&scope->symtab, it);
 }
 
 KHASH_MAP_IMPL_STR(jl_symtab, jl_sym_t)

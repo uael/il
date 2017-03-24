@@ -71,9 +71,9 @@ struct jl_fval_t {
 };
 
 jl_fval_t jl_fval_undefined();
-void jl_fval_string(jl_fval_t *self, const char *s);
-void jl_fval_token(jl_fval_t *self, jl_token_t token);
-void jl_fval_expr(jl_fval_t *self, jl_expr_t expr);
+void jl_fval_init_string(jl_fval_t *self, const char *s);
+void jl_fval_init_token(jl_fval_t *self, jl_token_t token);
+void jl_fval_init_expr(jl_fval_t *self, jl_expr_t expr);
 void jl_fval_undef(jl_fval_t *self);
 void jl_fval_begin(jl_fval_t *self, jl_token_t token);
 void jl_fval_end(jl_fval_t *self, jl_token_t token);

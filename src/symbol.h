@@ -31,19 +31,25 @@
 #include "entity_t.h"
 
 typedef struct jl_sym_t jl_sym_t;
+typedef struct jl_scope_t jl_scope_t;
 
 KHASH_DECLARE(jl_symtab, const char *, jl_sym_t)
 
 struct jl_sym_t {
   const char *id;
   unsigned flags;
+  jl_scope_t *scope;
   jl_entity_t entity;
-  jl_sym_t *parent;
-  jl_symtab_t childs;
+};
+
+struct jl_scope_t {
+  jl_scope_t *parent;
+  jl_sym_t *sym;
+  jl_symtab_t symtab;
 };
 
 bool jl_sym_has_flag(jl_sym_t *self, unsigned flag);
-jl_sym_t *jl_sym_put(jl_symtab_t *symtab, const char *id);
-jl_sym_t *jl_sym_get(jl_symtab_t *symtab, const char *id);
+jl_sym_t *jl_sym_put(jl_scope_t *scope, const char *id);
+jl_sym_t *jl_sym_get(jl_scope_t *scope, const char *id);
 
 #endif /* JL_SYMBOL_H__ */

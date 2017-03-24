@@ -63,13 +63,13 @@
 
 #define adt_deque_resize(v, s) ( \
     adt_deque_capacity(v) = (s), \
-    adt_deque_data(v) = (__typeof__(adt_deque_data(v))) xrealloc(adt_deque_data(v), sizeof(*adt_deque_data(v)) * adt_deque_capacity(v)) \
+    adt_deque_data(v) = xrealloc(adt_deque_data(v), sizeof(*adt_deque_data(v)) * adt_deque_capacity(v)) \
   )
 
 #define adt_deque_growth(v) ( \
     adt_deque_size(v) == adt_deque_capacity(v) \
       ? ((adt_deque_capacity(v) = adt_deque_capacity(v) ? adt_deque_capacity(v) << 1 : 2), (v)) \
-      : ((adt_deque_data(v) = (__typeof__(adt_deque_data(v))) xrealloc(adt_deque_data(v), sizeof(*adt_deque_data(v)) * adt_deque_capacity(v))), (v)) \
+      : ((adt_deque_data(v) = xrealloc(adt_deque_data(v), sizeof(*adt_deque_data(v)) * adt_deque_capacity(v))), (v)) \
   )
 
 #define adt_deque_grow(v, i) do { \
@@ -77,7 +77,7 @@
     if (adt_deque_capacity(v) <= __s) { \
       adt_deque_capacity(v) = __s + 1; \
       jl_roundup32(adt_deque_capacity(v)); \
-      adt_deque_data(v) = (__typeof__(adt_deque_data(v))) xrealloc( \
+      adt_deque_data(v) = xrealloc( \
         adt_deque_data(v), sizeof(*adt_deque_data(v)) * adt_deque_capacity(v) \
       ); \
     } \

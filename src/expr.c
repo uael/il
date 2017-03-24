@@ -523,7 +523,9 @@ void jl_exprs_unshift(jl_expr_t *self, jl_expr_t expr) {
 
 jl_expr_t jl_exprs_shift(jl_expr_t *self) {
   jl_expr_r exprs = jl_pexpr_list(self)->exprs;
-  return adt_vector_shift(exprs);
+  jl_expr_t expr = adt_vector_front(exprs);
+  adt_vector_shift(exprs);
+  return expr;
 }
 
 void jl_expr_list_dtor(jl_expr_t *self) {

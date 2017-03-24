@@ -61,13 +61,13 @@
 
 #define adt_vector_resize(v, s) ( \
     adt_vector_capacity(v) = (s), \
-    adt_vector_data(v) = (__typeof__(adt_vector_data(v))) xrealloc(adt_vector_data(v), sizeof(*adt_vector_data(v)) * adt_vector_capacity(v)) \
+    adt_vector_data(v) = xrealloc(adt_vector_data(v), sizeof(*adt_vector_data(v)) * adt_vector_capacity(v)) \
   )
 
 #define adt_vector_growth(v) ( \
     adt_vector_size(v) == adt_vector_capacity(v) \
       ? ((adt_vector_capacity(v) = adt_vector_capacity(v) ? adt_vector_capacity(v) << 1 : 2), (v)) \
-      : ((adt_vector_data(v) = (__typeof__(adt_vector_data(v))) xrealloc(adt_vector_data(v), sizeof(*adt_vector_data(v)) * adt_vector_capacity(v))), (v)) \
+      : ((adt_vector_data(v) = xrealloc(adt_vector_data(v), sizeof(*adt_vector_data(v)) * adt_vector_capacity(v))), (v)) \
   )
 
 #define adt_vector_grow(v, i) do { \
@@ -75,7 +75,7 @@
     if (adt_vector_capacity(v) <= __s) { \
       adt_vector_capacity(v) = __s + 1; \
       jl_roundup32(adt_vector_capacity(v)); \
-      adt_vector_data(v) = (__typeof__(adt_vector_data(v))) xrealloc( \
+      adt_vector_data(v) = xrealloc( \
         adt_vector_data(v), sizeof(*adt_vector_data(v)) * adt_vector_capacity(v) \
       ); \
     } \
@@ -99,11 +99,8 @@
     adt_vector_data(v)[0] = (x); \
   } while (false)
 
-#define adt_vector_shift(v) __extension__ ({ \
-    __typeof__(*adt_vector_data(v)) __r = adt_vector_front(v); \
-    memmove(adt_vector_data(v), adt_vector_data(v) + 1, --adt_vector_size(v) * sizeof(*adt_vector_data(v))); \
-    __r; \
-  })
+#define adt_vector_shift(v) \
+  memmove(adt_vector_data(v), adt_vector_data(v) + 1, --adt_vector_size(v) * sizeof(*adt_vector_data(v)))
 
 #define adt_vector_clear(v) do { \
     memset(adt_vector_data(v), 0, adt_vector_capacity(v)); \

@@ -33,8 +33,6 @@
 
 struct jl_expr_id_t {
   unsigned refs;
-  jl_type_t type;
-  jl_expr_t next;
   const char *id;
   bool is_keyword;
 };
@@ -44,8 +42,6 @@ void jl_id_init(jl_expr_t *self, const char *id, bool is_keyword);
 
 struct jl_expr_const_t {
   unsigned refs;
-  jl_type_t type;
-  jl_expr_t next;
   union {
     const char *s;
     int i;
@@ -60,31 +56,25 @@ void jl_const_init(jl_expr_t *self, jl_type_t type);
 
 struct jl_expr_unary_t {
   unsigned refs;
-  jl_type_t type;
-  jl_expr_t next;
   enum jl_op_n op;
   jl_expr_t operand;
 };
 
 jl_expr_t jl_unary(enum jl_op_n op, jl_expr_t operand);
+jl_expr_t jl_cast(jl_type_t type, jl_expr_t operand);
 void jl_unary_init(jl_expr_t *self, enum jl_op_n op, jl_expr_t operand);
 
 struct jl_expr_binary_t {
   unsigned refs;
-  jl_type_t type;
-  jl_expr_t next;
   enum jl_op_n op;
   jl_expr_t lhs, rhs;
 };
 
 jl_expr_t jl_binary(enum jl_op_n op, jl_expr_t lhs, jl_expr_t rhs);
-jl_expr_t jl_cast(jl_type_t type, jl_expr_t rhs);
 void jl_binary_init(jl_expr_t *self, enum jl_op_n op, jl_expr_t lhs, jl_expr_t rhs);
 
 struct jl_expr_ternary_t {
   unsigned refs;
-  jl_type_t type;
-  jl_expr_t next;
   jl_expr_t lhs, mhs, rhs;
 };
 
@@ -93,8 +83,6 @@ void jl_ternary_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t mhs, jl_expr_t rh
 
 struct jl_expr_array_read_t {
   unsigned refs;
-  jl_expr_t next;
-  jl_type_t type;
   jl_expr_t lhs, pos;
 };
 
@@ -103,8 +91,6 @@ void jl_array_read_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t pos);
 
 struct jl_expr_array_write_t {
   unsigned refs;
-  jl_type_t type;
-  jl_expr_t next;
   jl_expr_t lhs, pos, rhs;
 };
 
@@ -113,8 +99,6 @@ void jl_array_write_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t pos, jl_expr_
 
 struct jl_expr_field_read_t {
   unsigned refs;
-  jl_type_t type;
-  jl_expr_t next;
   bool ptr;
   jl_expr_t lhs;
   jl_expr_t field;
@@ -125,11 +109,9 @@ void jl_field_read_init(jl_expr_t *self, jl_expr_t lhs, bool ptr, jl_expr_t fiel
 
 struct jl_expr_field_write_t {
   unsigned refs;
-  jl_type_t type;
-  jl_expr_t next;
   bool ptr;
   jl_expr_t lhs, rhs;
-  jl_expr_id_t field;
+  jl_expr_t field;
 };
 
 jl_expr_t jl_field_write(jl_expr_t lhs, bool ptr, jl_expr_t field, jl_expr_t rhs);
@@ -137,13 +119,24 @@ void jl_field_write_init(jl_expr_t *self, jl_expr_t lhs, bool ptr, jl_expr_t fie
 
 struct jl_expr_call_t {
   unsigned refs;
-  jl_type_t type;
-  jl_expr_t next;
   jl_expr_t lhs;
   jl_expr_r args;
 };
 
 jl_expr_t jl_call(jl_expr_t lhs, jl_expr_r args);
 void jl_call_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_r args);
+
+struct jl_expr_list_t {
+  unsigned refs;
+  jl_expr_r exprs;
+};
+
+jl_expr_t jl_exprs(jl_expr_r exprs);
+void jl_exprs_init(jl_expr_t *self, jl_expr_r exprs);
+size_t jl_exprs_length(jl_expr_t *self);
+void jl_exprs_push(jl_expr_t *self, jl_expr_t expr);
+jl_expr_t jl_exprs_pop(jl_expr_t *self);
+void jl_exprs_unshift(jl_expr_t *self, jl_expr_t expr);
+jl_expr_t jl_exprs_shift(jl_expr_t *self);
 
 #endif /* JL_EXPR_H__ */

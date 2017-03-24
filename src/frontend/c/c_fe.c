@@ -253,7 +253,7 @@ FRULE_DEF(postfix_expression) {
         case '[':
           puts("array");
           FE_NEXT();
-          FE_MATCHR(1, primary_expression) {
+          FE_MATCHR(1, expression) {
             puts("array pe");
             jl_fval_expr(_0, jl_array_read(_0->u.expr, _1.u.expr));
           }

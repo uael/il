@@ -153,13 +153,14 @@ FRULE_DEF(primary_expression) {
   }
   FRULE_OR
   FE_MATCHR(1, string) {
-    jl_fval_init_string(_0, _1.u.s);
+    jl_fval_init_expr(_0, jl_const_string(_1.u.s));
   }
   FRULE_OR
   FE_MATCHT(1, '(') {
-    FE_MATCHR(2, primary_expression) {
+    FE_MATCHR(2, expression) {
       FE_CONSUME(')');
       jl_fval_init_expr(_0, jl_unary(JL_OP_EN, _2.u.expr));
+      jl_expr_set_type(&_0->u.expr, _2.u.expr.type);
     }
   }
   FRULE_OR
@@ -205,11 +206,6 @@ FRULE_DEF(string) {
   FRULE_BODY_BEGIN;
 
   FE_MATCHT(1, C_TOK_STRING) {
-    if (SYM_GET(_1.u.token.u.s)) {
-      fprintf(stderr, "duplicate enumeration constant %s", _1.u.token.u.s);
-      exit(1);
-    }
-    SYM_PUT(_1.u.token.u.s)->flags |= C_TOKEN_FLAG_ENUMERATION_CONSTANT;
     jl_fval_init_string(_0, _1.u.token.u.s);
   }
   FRULE_OR

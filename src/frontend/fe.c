@@ -49,9 +49,13 @@ void jl_fe_init(jl_fe_t *self, enum jl_fe_n kind, jl_compiler_t *compiler) {
 }
 
 void jl_fe_dtor(jl_fe_t *self) {
+  jl_scope_t *parent;
   jl_deque_dtor(self->sources);
-  free(self->scope);
-  self->scope = NULL;
+  while (self->scope) {
+    parent = self->scope->parent;
+    free(self->scope);
+    self->scope = parent;
+  }
 }
 
 void jl_fe_push_src(jl_fe_t *self, const char *src) {

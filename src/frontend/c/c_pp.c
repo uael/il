@@ -66,6 +66,7 @@ void c_pp_dtor(c_pp_t *self) {
     c_macro_dtor(&macro);
   });
   c_macro_ht_dtor(&self->macros);
+  jl_lexer_dtor(&self->lexer);
 }
 
 void c_pp_parse_define(c_pp_t *self, jl_lexer_t *lexer) {
@@ -130,22 +131,21 @@ void c_pp_parse_undef(c_pp_t *self, jl_lexer_t *lexer) {
 bool c_pp_op_push_callback(jl_lexer_event_t *self, void *arg) {
   jl_token_t *token, t;
   c_pp_t *pp;
-  jl_lexer_t pp_lexer = {0};
   unsigned it;
 
   token = (jl_token_t *) arg;
   pp = (c_pp_t *) self->data;
 
   if (token->type == '#') {
-    jl_lexer_fork(&pp_lexer, self->lexer);
-    if ((t = jl_lexer_peek(&pp_lexer)).kind == JL_TOKEN_IDENTIFIER) {
+    jl_lexer_fork(&pp->lexer, self->lexer);
+    if ((t = jl_lexer_peek(&pp->lexer)).kind == JL_TOKEN_IDENTIFIER) {
       if (strcmp("define", t.u.s) == 0) {
-        c_pp_parse_define(pp, &pp_lexer);
-        jl_lexer_join(&pp_lexer);
+        c_pp_parse_define(pp, &pp->lexer);
+        jl_lexer_join(&pp->lexer);
         return false;
       } else if (strcmp("undef", t.u.s) == 0) {
-        c_pp_parse_undef(pp, &pp_lexer);
-        jl_lexer_join(&pp_lexer);
+        c_pp_parse_undef(pp, &pp->lexer);
+        jl_lexer_join(&pp->lexer);
 
         return false;
       }

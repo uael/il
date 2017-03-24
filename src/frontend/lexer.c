@@ -82,6 +82,7 @@ void jl_lexer_init_f(jl_lexer_t *self, jl_fe_t *fe) {
   }
 
   jl_lexer_init(self,  fe, file_id, buffer, len);
+  free((char *) buffer);
 }
 
 void jl_lexer_dtor(jl_lexer_t *self) {
@@ -114,6 +115,7 @@ void jl_lexer_fork(jl_lexer_t *destination, jl_lexer_t *source) {
 }
 
 void jl_lexer_join(jl_lexer_t *fork) {
+  fork->buffer = NULL;
   if (jl_deque_size(fork->queue)) {
     fork->parent->loc = fork->loc;
   }

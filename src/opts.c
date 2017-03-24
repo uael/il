@@ -74,7 +74,7 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
               break;
             case 'O':
               if (strlen(arg) > 2) {
-                strncpy(arg, arg+2, strlen(arg));
+                arg += 2;
                 if (strlen(arg) > 1 || !isalnum(arg[0])) {
                   sprintf(err, "invalid argument provided to command line option -O"BOLD"‘%s’"RESET, arg);
                   jl_vector_push(errs, xstrdup(err));
@@ -112,8 +112,8 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
               break;
             case 'o':
               if (strlen(arg) > 2) {
-                strncpy(arg, arg+2, strlen(arg));
-                self->out = xstrdup(arg);
+                arg += 2;
+                self->out = arg;
               } else if (i + 1 < argc) {
                 self->out = argv[++i];
               } else {
@@ -147,7 +147,7 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
               jl_vector_push(errs, xstrdup(err));
           }
         } else if (arg[1] == '-') {
-          strncpy(arg, arg+2, strlen(arg));
+          arg += 2;
           if (strcmp(arg, "echo") == 0) {
             self->echo = true;
           } else if (strcmp(arg, "firm-graph") == 0) {
@@ -156,10 +156,10 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
             self->output_asm = true;
           } else if (strncmp(arg, "optimize", 8) == 0) {
             if (strlen(arg) > 8) {
-              strncpy(arg, arg+8, strlen(arg));
+              arg += 8;
               if (strlen(arg) > 1 || !isalnum(arg[0])) {
                 if (arg[0] == '=') {
-                  strncpy(arg, arg+1, strlen(arg));
+                  ++arg;
                   if (strlen(arg) > 1 || !isalnum(arg[0])) {
                     goto optimize_err;
                   } else {
@@ -204,10 +204,10 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
             }
           } else if (strncmp(arg, "output", 6) == 0) {
             if (strlen(arg) > 6) {
-              strncpy(arg, arg+6, strlen(arg));
+              arg += 6;;
               if (!isalnum(arg[0])) {
                 if (arg[0] == '=') {
-                  strncpy(arg, arg+1, strlen(arg));
+                  ++arg;
                   if (!isalnum(arg[0])) {
                     goto output_err;
                   } else {
@@ -274,9 +274,9 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
   }
 
   if ((sep = strrchr(self->in, '/'))) {
-    strncpy(self->src_dir, self->in, (size_t) (sep - self->in));
+    memcpy(self->src_dir, self->in, (size_t) (sep - self->in));
   } else {
-    getcwd(self->src_dir, JL_SRC_DIR_MSIZE);
+    (void) getcwd(self->src_dir, JL_SRC_DIR_MSIZE);
   }
 
   return;

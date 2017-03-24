@@ -116,16 +116,19 @@ enum {
   C_TOKEN_FLAG_ENUMERATION_CONSTANT = 1 << 0,
 };
 
-void c_fe_parse(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
-  jl_program_init(out);
-
-  jl_fval_t fval;
-  postfix_expression(&fval, self, lexer, out);
-}
-
 #define SYM sym
 #define SYM_GET(id) (SYM = jl_sym_get(fe->scope, id))
 #define SYM_PUT(id) (SYM = jl_sym_put(fe->scope, id))
+
+void c_fe_parse(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
+  jl_program_init(out);
+
+  jl_fe_scope(self);
+  self->scope->sym = jl_sym_put(self->scope, "foo");
+  jl_fe_unscope(self);
+
+  while (FE_NEXT().type != 0);
+}
 
 FRULE_DEF(primary_expression) {
   FRULE_BODY_BEGIN;

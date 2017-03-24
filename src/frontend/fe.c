@@ -38,6 +38,7 @@ void jl_fe_init(jl_fe_t *self, enum jl_fe_n kind, jl_compiler_t *compiler) {
     .kind = kind,
     .scope = xmalloc(sizeof(jl_scope_t))
   };
+  *self->scope = (jl_scope_t) {0};
 
   switch (self->kind) {
     case JL_FRONTEND_C:
@@ -49,29 +50,27 @@ void jl_fe_init(jl_fe_t *self, enum jl_fe_n kind, jl_compiler_t *compiler) {
 }
 
 void jl_fe_dtor(jl_fe_t *self) {
-  jl_scope_t *parent;
   jl_deque_dtor(self->sources);
-  while (self->scope) {
-    parent = self->scope->parent;
-    free(self->scope);
-    self->scope = parent;
+  while (self->scope->parent) {
+    self->scope = self->scope->parent;
   }
+  jl_scope_dtor(self->scope);
+  free(self->scope);
+  self->scope = NULL;
 }
 
 void jl_fe_push_src(jl_fe_t *self, const char *src) {
   jl_deque_push(self->sources, src);
 }
 
-void jl_fe_scope(jl_fe_t *self, const char *id) {
+void jl_fe_scope(jl_fe_t *self) {
   jl_scope_t *parent;
-  jl_sym_t *sym;
 
-  sym = id ? jl_sym_get(self->scope, id) : NULL;
   parent = self->scope;
   self->scope = xmalloc(sizeof(jl_scope_t));
-  self->scope->sym = sym;
-  self->scope->sym->scope = self->scope;
+  *self->scope = (jl_scope_t) {0};
   self->scope->parent = parent;
+  jl_vector_push(parent->childs, self->scope);
 }
 
 void jl_fe_unscope(jl_fe_t *self) {

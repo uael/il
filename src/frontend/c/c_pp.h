@@ -59,6 +59,7 @@ void c_macro_expand(c_macro_t *self, c_pp_t *pp, jl_lexer_t *into);
 
 struct c_pp_t {
   c_macro_ht_t macros;
+  jl_lexer_t lexer;
 };
 
 void c_pp_init(c_pp_t *self);

@@ -66,7 +66,7 @@ struct jl_fe_t {
 void jl_fe_init(jl_fe_t *self, enum jl_fe_n kind, struct jl_compiler_t *compiler);
 void jl_fe_dtor(jl_fe_t *self);
 void jl_fe_push_src(jl_fe_t *self, const char *src);
-void jl_fe_scope(jl_fe_t *self, const char *id);
+void jl_fe_scope(jl_fe_t *self);
 void jl_fe_unscope(jl_fe_t *self);
 
 #define FE_PEEK() jl_lexer_peek(lexer)

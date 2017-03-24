@@ -13,3 +13,4 @@ install:
 
 script:
   - make
+  - cd .. && valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes bin/jay test/hello.jay -ohello --echo

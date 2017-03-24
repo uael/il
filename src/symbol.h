@@ -27,11 +27,13 @@
 # define  JL_SYMBOL_H__
 
 #include <adt/hash.h>
+#include <adt/vector.h>
 
 #include "entity_t.h"
 
 typedef struct jl_sym_t jl_sym_t;
 typedef struct jl_scope_t jl_scope_t;
+typedef jl_vector_of(jl_scope_t *) jl_scope_r;
 
 KHASH_DECLARE(jl_symtab, const char *, jl_sym_t)
 
@@ -46,8 +48,11 @@ struct jl_scope_t {
   jl_scope_t *parent;
   jl_sym_t *sym;
   jl_symtab_t symtab;
+  jl_scope_r childs;
 };
 
+void jl_sym_dtor(jl_sym_t *self);
+void jl_scope_dtor(jl_scope_t *self);
 bool jl_sym_has_flag(jl_sym_t *self, unsigned flag);
 jl_sym_t *jl_sym_put(jl_scope_t *scope, const char *id);
 jl_sym_t *jl_sym_get(jl_scope_t *scope, const char *id);

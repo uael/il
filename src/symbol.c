@@ -25,6 +25,26 @@
 
 #include "symbol.h"
 
+void jl_sym_dtor(jl_sym_t *self) {
+
+}
+
+void jl_scope_dtor(jl_scope_t *self) {
+  jl_sym_t sym;
+  jl_scope_t *scope;
+
+  kh_foreach_value(&self->symtab, sym, {
+    jl_sym_dtor(&sym);
+  });
+  jl_symtab_dtor(&self->symtab);
+  jl_vector_foreach(self->childs, scope) {
+    jl_scope_dtor(scope);
+    free(scope);
+    scope = NULL;
+  }
+  jl_vector_dtor(self->childs);
+}
+
 bool jl_sym_has_flag(jl_sym_t *self, unsigned flag) {
   return (bool) (self->flags & flag);
 }

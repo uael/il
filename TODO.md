@@ -1,0 +1,12 @@
+# TODOLIST
+- [ ] scope init/dtor functions
+- [ ] scope tests
+- [ ] symtab tests
+- [ ] sym init/dtor functions
+- [ ] syms tests
+- [ ] add the field entity, like a var with offset/width in addition
+- [ ] use the new field entity on struct/union, enum still in var
+- [ ] fval refactoring -> no more begin/end, only a token count, on undo decrease cursor by that count
+- [ ] error handling
+- [ ] syntax error handling
+- [ ] token print (type/entity/expr/stmt print) to be able to dump something pretty

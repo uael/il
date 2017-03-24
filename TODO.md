@@ -1,6 +1,6 @@
 # TODOLIST
-- [ ] scope init/dtor functions
-- [ ] scope tests
+- [x] scope init/dtor functions
+- [x] scope tests
 - [ ] symtab tests
 - [ ] sym init/dtor functions
 - [ ] syms tests

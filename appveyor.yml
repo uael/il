@@ -36,6 +36,6 @@ before_build:
 
 build:
   project: C:\projects\jay\build\jay.sln
-  verbosity: normal
+  verbosity: detailed
 
 test: off

@@ -1,4 +1,4 @@
-if(UNIX)
+if(!WIN32)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -Wall -Werror -pedantic -pedantic-errors")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-missing-field-initializers")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-parameter")

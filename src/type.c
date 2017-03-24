@@ -216,6 +216,63 @@ jl_type_t jl_type_deref(jl_type_t a) {
   }
 }
 
+void jl_type_update_size(jl_type_t *self) {
+  jl_entity_t entity;
+  jl_entity_r entities;
+
+  self->size = 0;
+  switch (self->kind) {
+    case JL_TYPE_LITERAL:
+      if (self->qualifiers & JL_TYPE_SPECIFIER_CHAR) self->size += 1;
+      if (self->qualifiers & JL_TYPE_SPECIFIER_SHORT) self->size += 2;
+      if (self->qualifiers & JL_TYPE_SPECIFIER_INT) self->size += 4;
+      if (self->qualifiers & JL_TYPE_SPECIFIER_FLOAT) self->size += 4;
+      if (self->qualifiers & JL_TYPE_SPECIFIER_DOUBLE) self->size += 8;
+      if (self->qualifiers & JL_TYPE_SPECIFIER_DOUBLE) self->size += 8;
+      switch (jl_ptype_literal(self)->kind) {
+        case JL_LITERAL_BOOL:
+        case JL_LITERAL_CHAR:
+          ++self->size;
+          break;
+        case JL_LITERAL_SHORT:
+          self->size += 2;
+          break;
+        case JL_LITERAL_INT:
+        case JL_LITERAL_FLOAT:
+          self->size += 4;
+          break;
+        case JL_LITERAL_LONG:
+        case JL_LITERAL_DOUBLE:
+          self->size += 8;
+          break;
+        case JL_LITERAL_NULL:
+        case JL_LITERAL_STRING:
+          self->size = 8;
+          break;
+        default:
+          break;
+      }
+      break;
+    case JL_TYPE_POINTER:
+      self->size = 8;
+      break;
+    case JL_TYPE_ARRAY:
+      self->size = jl_expr_const(self->u._array->size)->u.i * self->u._array->of.size;
+    case JL_TYPE_COMPOUND:
+      entities = jl_type_fields(*self);
+      jl_vector_foreach(entities, entity) {
+        self->size += jl_entity_type(entity).size;
+      }
+    default:
+      break;
+  }
+}
+
+size_t jl_sizeof(jl_type_t type) {
+  return type.size;
+}
+
+
 jl_entity_r jl_type_fields(jl_type_t self) {
   return jl_entity_fields(jl_type_compound(self)->entity);
 }
@@ -311,6 +368,7 @@ jl_type_t jl_literal(enum jl_literal_n kind) {
 void jl_literal_init(jl_type_t *self, enum jl_literal_n kind) {
   jl_type_switch(self, JL_TYPE_LITERAL);
   jl_ptype_literal(self)->kind = kind;
+  jl_type_update_size(self);
 }
 
 void jl_literal_dtor(jl_type_t *self) {}
@@ -326,6 +384,7 @@ jl_type_t jl_pointer(jl_type_t of) {
 void jl_pointer_init(jl_type_t *self, jl_type_t of) {
   jl_type_switch(self, JL_TYPE_POINTER);
   jl_ptype_pointer(self)->of = of;
+  jl_type_update_size(self);
 }
 
 void jl_pointer_dtor(jl_type_t *self) {}
@@ -349,6 +408,7 @@ void jl_array_init(jl_type_t *self, jl_type_t of, jl_expr_t size) {
   jl_type_switch(self, JL_TYPE_ARRAY);
   jl_ptype_array(self)->of = of;
   jl_ptype_array(self)->size = size;
+  jl_type_update_size(self);
 }
 
 void jl_array_dtor(jl_type_t *self) {}
@@ -364,6 +424,7 @@ jl_type_t jl_compound(jl_entity_t entity) {
 void jl_compound_init(jl_type_t *self, jl_entity_t entity) {
   jl_type_switch(self, JL_TYPE_COMPOUND);
   jl_ptype_compound(self)->entity = entity;
+  jl_type_update_size(self);
 }
 
 void jl_compound_dtor(jl_type_t *self) {}

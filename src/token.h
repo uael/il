@@ -31,7 +31,7 @@
 typedef struct jl_token_t jl_token_t;
 typedef struct jl_loc_t jl_loc_t;
 
-typedef jl_deque_of(jl_token_t) jl_token_r;
+typedef adt_deque_of(jl_token_t) jl_token_r;
 
 enum jl_token_n {
   JL_TOKEN_KEYWORD = 0,

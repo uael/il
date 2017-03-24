@@ -489,7 +489,7 @@ void jl_call_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_r args) {
 }
 
 void jl_expr_call_dtor(jl_expr_t *self) {
-  jl_vector_dtor(jl_pexpr_call(self)->args);
+  adt_vector_dtor(jl_pexpr_call(self)->args);
 }
 
 jl_expr_t jl_exprs(jl_expr_r exprs) {
@@ -505,27 +505,27 @@ void jl_exprs_init(jl_expr_t *self, jl_expr_r exprs) {
 }
 
 size_t jl_exprs_length(jl_expr_t *self) {
-  return jl_vector_length(jl_pexpr_list(self)->exprs);
+  return adt_vector_length(jl_pexpr_list(self)->exprs);
 }
 
 void jl_exprs_push(jl_expr_t *self, jl_expr_t expr) {
   jl_expr_r exprs = jl_pexpr_list(self)->exprs;
-  jl_vector_push(exprs, expr);
+  adt_vector_push(exprs, expr);
 }
 jl_expr_t jl_exprs_pop(jl_expr_t *self) {
-  return jl_vector_pop(jl_pexpr_list(self)->exprs);
+  return adt_vector_pop(jl_pexpr_list(self)->exprs);
 }
 
 void jl_exprs_unshift(jl_expr_t *self, jl_expr_t expr) {
   jl_expr_r exprs = jl_pexpr_list(self)->exprs;
-  jl_vector_unshift(exprs, expr);
+  adt_vector_unshift(exprs, expr);
 }
 
 jl_expr_t jl_exprs_shift(jl_expr_t *self) {
   jl_expr_r exprs = jl_pexpr_list(self)->exprs;
-  return jl_vector_shift(exprs);
+  return adt_vector_shift(exprs);
 }
 
 void jl_expr_list_dtor(jl_expr_t *self) {
-  jl_vector_dtor(jl_pexpr_list(self)->exprs);
+  adt_vector_dtor(jl_pexpr_list(self)->exprs);
 }

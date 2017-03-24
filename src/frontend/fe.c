@@ -50,7 +50,7 @@ void jl_fe_init(jl_fe_t *self, enum jl_fe_n kind, jl_compiler_t *compiler) {
 }
 
 void jl_fe_dtor(jl_fe_t *self) {
-  jl_deque_dtor(self->sources);
+  adt_deque_dtor(self->sources);
   while (self->scope->parent) {
     self->scope = self->scope->parent;
   }
@@ -60,7 +60,7 @@ void jl_fe_dtor(jl_fe_t *self) {
 }
 
 void jl_fe_push_src(jl_fe_t *self, const char *src) {
-  jl_deque_push(self->sources, src);
+  adt_deque_push(self->sources, src);
 }
 
 void jl_fe_scope(jl_fe_t *self) {
@@ -70,7 +70,7 @@ void jl_fe_scope(jl_fe_t *self) {
   self->scope = xmalloc(sizeof(jl_scope_t));
   *self->scope = (jl_scope_t) {0};
   self->scope->parent = parent;
-  jl_vector_push(parent->childs, self->scope);
+  adt_vector_push(parent->childs, self->scope);
 }
 
 void jl_fe_unscope(jl_fe_t *self) {

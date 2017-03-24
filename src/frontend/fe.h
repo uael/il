@@ -52,7 +52,7 @@ enum jl_fe_n {
 struct jl_fe_t {
   struct jl_compiler_t *compiler;
   enum jl_fe_n kind;
-  jl_deque_of(const char *) sources;
+  adt_deque_of(const char *) sources;
 
   struct jl_scope_t *scope;
   jl_entity_t entity;

@@ -34,8 +34,8 @@ void jl_program_init(jl_program_t *self) {
 void jl_program_dtor(jl_program_t *self) {
   jl_entity_t entity;
 
-  jl_vector_foreach(self->entities, entity) {
+  adt_vector_foreach(self->entities, entity) {
     jl_entity_dtor(&entity);
   }
-  jl_vector_dtor(self->entities);
+  adt_vector_dtor(self->entities);
 }

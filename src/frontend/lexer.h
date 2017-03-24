@@ -35,7 +35,7 @@
 typedef struct jl_lexer_t jl_lexer_t;
 typedef struct jl_lexer_event_t jl_lexer_event_t;
 
-typedef jl_vector_of(jl_lexer_event_t) jl_lexer_event_r;
+typedef adt_vector_of(jl_lexer_event_t) jl_lexer_event_r;
 
 enum jl_lexer_event_n {
   JL_LEXER_EVENT_ON_PUSH = 0

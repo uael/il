@@ -44,10 +44,10 @@ void jl_dtor(jl_compiler_t *self) {
   const char *str;
 
   jl_fe_dtor(&self->fe);
-  jl_vector_foreach(self->strtab, str) {
+  adt_vector_foreach(self->strtab, str) {
     free((void *) str);
   }
-  jl_vector_dtor(self->strtab);
+  adt_vector_dtor(self->strtab);
 }
 
 const char *jl_strdup(jl_compiler_t *self, const char *str) {
@@ -55,8 +55,8 @@ const char *jl_strdup(jl_compiler_t *self, const char *str) {
 }
 
 const char *jl_strndup(jl_compiler_t *self, const char *str, size_t n) {
-  jl_vector_push(self->strtab, "");
-  jl_vector_back(self->strtab) = xmalloc(n + 1);
-  strncpy((char *) jl_vector_back(self->strtab), str, n + 1);
-  return jl_vector_back(self->strtab);
+  adt_vector_push(self->strtab, "");
+  adt_vector_back(self->strtab) = xmalloc(n + 1);
+  strncpy((char *) adt_vector_back(self->strtab), str, n + 1);
+  return adt_vector_back(self->strtab);
 }

@@ -260,7 +260,7 @@ void jl_type_update_size(jl_type_t *self) {
       self->size = jl_expr_const(self->u._array->size)->u.i * self->u._array->of.size;
     case JL_TYPE_COMPOUND:
       entities = jl_type_fields(*self);
-      jl_vector_foreach(entities, entity) {
+      adt_vector_foreach(entities, entity) {
         self->size += jl_entity_type(entity).size;
       }
     default:

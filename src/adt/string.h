@@ -31,7 +31,7 @@
 #include "vector.h"
 #include "xmalloc.h"
 
-typedef jl_vector_of(const char *) string_r;
+typedef adt_vector_of(const char *) string_r;
 
 /**
  * Allocates memory and copies string @p str into it.

@@ -64,13 +64,13 @@ void jl_lexer_init_f(jl_lexer_t *self, jl_fe_t *fe) {
   uint32_t file_id;
   const char *filename, *buffer;
 
-  if (!jl_deque_length(fe->sources)) {
+  if (!adt_deque_length(fe->sources)) {
     puts("no sources files to parse");
     exit(1);
   }
 
-  file_id = (uint32_t) jl_deque_cursor(fe->sources);
-  filename = jl_deque_shift(fe->sources);
+  file_id = (uint32_t) adt_deque_cursor(fe->sources);
+  filename = adt_deque_shift(fe->sources);
   if (!jl_fexists(filename)) {
     puts("file does not exists");
     exit(1);
@@ -92,16 +92,16 @@ void jl_lexer_dtor(jl_lexer_t *self) {
   jl_token_t token;
   jl_lexer_event_t event;
   self->queue.cursor = 0;
-  jl_deque_foreach(self->queue, token) {
+  adt_deque_foreach(self->queue, token) {
     jl_token_dtor(&token);
   }
-  jl_deque_dtor(self->queue);
-  jl_vector_foreach(self->events, event) {
+  adt_deque_dtor(self->queue);
+  adt_vector_foreach(self->events, event) {
     if (event.dtor) {
       event.dtor(&event);
     }
   }
-  jl_vector_dtor(self->events);
+  adt_vector_dtor(self->events);
 }
 
 void jl_lexer_fork(jl_lexer_t *destination, jl_lexer_t *source) {
@@ -116,10 +116,10 @@ void jl_lexer_fork(jl_lexer_t *destination, jl_lexer_t *source) {
 
 void jl_lexer_join(jl_lexer_t *fork) {
   fork->buffer = NULL;
-  if (jl_deque_size(fork->queue)) {
+  if (adt_deque_size(fork->queue)) {
     fork->parent->loc = fork->loc;
   }
-  jl_deque_clear(fork->queue);
+  adt_deque_clear(fork->queue);
 }
 
 void jl_lexer_skip(jl_lexer_t *self, unsigned n) {
@@ -127,12 +127,12 @@ void jl_lexer_skip(jl_lexer_t *self, unsigned n) {
 }
 
 size_t jl_lexer_length(jl_lexer_t *self) {
-  return jl_deque_length(self->queue);
+  return adt_deque_length(self->queue);
 }
 
 bool jl_lexer_push(jl_lexer_t *self, jl_token_t token) {
   jl_lexer_event_t event;
-  jl_vector_foreach(self->events, event) {
+  adt_vector_foreach(self->events, event) {
     if (event.kind == JL_LEXER_EVENT_ON_PUSH) {
       if (!event.callback(&event, &token)) {
         jl_token_dtor(&token);
@@ -140,8 +140,8 @@ bool jl_lexer_push(jl_lexer_t *self, jl_token_t token) {
       }
     }
   }
-  token.cursor = jl_deque_size(self->queue);
-  jl_deque_push(self->queue, token);
+  token.cursor = adt_deque_size(self->queue);
+  adt_deque_push(self->queue, token);
   if (jl_lexer_is_root(self) && self->fe->compiler->opts.echo) {
     switch (token.kind) {
       case JL_TOKEN_IDENTIFIER:
@@ -169,7 +169,7 @@ bool jl_lexer_push(jl_lexer_t *self, jl_token_t token) {
 
 void jl_lexer_attach(jl_lexer_t *self, jl_lexer_event_t event) {
   event.lexer = self;
-  jl_vector_push(self->events, event);
+  adt_vector_push(self->events, event);
 }
 
 bool jl_lexer_is_root(jl_lexer_t *self) {
@@ -189,7 +189,7 @@ jl_token_t jl_lexer_peek(jl_lexer_t *self) {
   if (jl_lexer_length(self) < 1) {
     jl_lexer_enqueue(self, self->cap);
   }
-  return jl_deque_front(self->queue);
+  return adt_deque_front(self->queue);
 }
 
 jl_token_t jl_lexer_peekn(jl_lexer_t *self, unsigned n) {
@@ -197,7 +197,7 @@ jl_token_t jl_lexer_peekn(jl_lexer_t *self, unsigned n) {
   if (jl_lexer_length(self) <= n) {
     jl_lexer_enqueue(self, n < self->cap ? self->cap : n);
   }
-  return jl_deque_at(
+  return adt_deque_at(
     self->queue,
     (jl_lexer_length(self) < n ? jl_lexer_length(self) : n)-1
   );
@@ -209,10 +209,10 @@ jl_token_t jl_lexer_next(jl_lexer_t *self) {
   if (jl_lexer_length(self) < 1) {
     jl_lexer_enqueue(self, self->cap);
   }
-  if (jl_lexer_length(self) && jl_deque_front(self->queue).type != 0) {
-    result = jl_deque_shift(self->queue);
+  if (jl_lexer_length(self) && adt_deque_front(self->queue).type != 0) {
+    result = adt_deque_shift(self->queue);
   } else {
-    result = jl_deque_front(self->queue);
+    result = adt_deque_front(self->queue);
   }
   return result;
 }
@@ -249,9 +249,9 @@ jl_token_t jl_lexer_consume_id(jl_lexer_t *self, const char *id) {
 }
 
 void jl_lexer_undo(jl_lexer_t *lexer, jl_token_t until) {
-  while (jl_deque_cursor(lexer->queue) > until.cursor) --jl_deque_cursor(lexer->queue);
+  while (adt_deque_cursor(lexer->queue) > until.cursor) --adt_deque_cursor(lexer->queue);
 }
 
 void jl_lexer_undon(jl_lexer_t *lexer, unsigned n) {
-  jl_deque_cursor(lexer->queue) -= n;
+  adt_deque_cursor(lexer->queue) -= n;
 }

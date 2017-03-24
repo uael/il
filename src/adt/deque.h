@@ -35,81 +35,81 @@
 #define jl_roundup32(x) \
   (--(x), (x)|=(x)>>1, (x)|=(x)>>2, (x)|=(x)>>4, (x)|=(x)>>8, (x)|=(x)>>16, ++(x))
 
-#define jl_deque_of(t) struct { \
+#define adt_deque_of(t) struct { \
     size_t size, capacity, cursor; t *data; \
   }
 
-#define jl_deque_size(v) (v).size
+#define adt_deque_size(v) (v).size
 
-#define jl_deque_capacity(v) (v).capacity
+#define adt_deque_capacity(v) (v).capacity
 
-#define jl_deque_cursor(v) (v).cursor
+#define adt_deque_cursor(v) (v).cursor
 
-#define jl_deque_data(v) (v).data
+#define adt_deque_data(v) (v).data
 
-#define jl_deque_length(v) (jl_deque_size(v)-jl_deque_cursor(v))
+#define adt_deque_length(v) (adt_deque_size(v)-adt_deque_cursor(v))
 
-#define jl_deque_at(v, i) jl_deque_data(v)[jl_deque_cursor(v)+i]
+#define adt_deque_at(v, i) adt_deque_data(v)[adt_deque_cursor(v)+i]
 
-#define jl_deque_front(v) jl_deque_at(v, 0)
+#define adt_deque_front(v) adt_deque_at(v, 0)
 
-#define jl_deque_back(v) jl_deque_at(v, jl_deque_size(v)-1)
+#define adt_deque_back(v) adt_deque_at(v, adt_deque_size(v)-1)
 
-#define jl_deque_dtor(v) do { \
-    jl_deque_size(v) = jl_deque_capacity(v) = jl_deque_cursor(v) = 0; \
-    if (jl_deque_data(v)) free(jl_deque_data(v)); \
-    jl_deque_data(v) = NULL; \
+#define adt_deque_dtor(v) do { \
+    adt_deque_size(v) = adt_deque_capacity(v) = adt_deque_cursor(v) = 0; \
+    if (adt_deque_data(v)) free(adt_deque_data(v)); \
+    adt_deque_data(v) = NULL; \
   } while (false)
 
-#define jl_deque_resize(v, s) ( \
-    jl_deque_capacity(v) = (s), \
-    jl_deque_data(v) = (__typeof__(jl_deque_data(v))) xrealloc(jl_deque_data(v), sizeof(*jl_deque_data(v)) * jl_deque_capacity(v)) \
+#define adt_deque_resize(v, s) ( \
+    adt_deque_capacity(v) = (s), \
+    adt_deque_data(v) = (__typeof__(adt_deque_data(v))) xrealloc(adt_deque_data(v), sizeof(*adt_deque_data(v)) * adt_deque_capacity(v)) \
   )
 
-#define jl_deque_growth(v) ( \
-    jl_deque_size(v) == jl_deque_capacity(v) \
-      ? ((jl_deque_capacity(v) = jl_deque_capacity(v) ? jl_deque_capacity(v) << 1 : 2), (v)) \
-      : ((jl_deque_data(v) = (__typeof__(jl_deque_data(v))) xrealloc(jl_deque_data(v), sizeof(*jl_deque_data(v)) * jl_deque_capacity(v))), (v)) \
+#define adt_deque_growth(v) ( \
+    adt_deque_size(v) == adt_deque_capacity(v) \
+      ? ((adt_deque_capacity(v) = adt_deque_capacity(v) ? adt_deque_capacity(v) << 1 : 2), (v)) \
+      : ((adt_deque_data(v) = (__typeof__(adt_deque_data(v))) xrealloc(adt_deque_data(v), sizeof(*adt_deque_data(v)) * adt_deque_capacity(v))), (v)) \
   )
 
-#define jl_deque_grow(v, i) do { \
+#define adt_deque_grow(v, i) do { \
     size_t __s = (size_t) (i); \
-    if (jl_deque_capacity(v) <= __s) { \
-      jl_deque_capacity(v) = __s + 1; \
-      jl_roundup32(jl_deque_capacity(v)); \
-      jl_deque_data(v) = (__typeof__(jl_deque_data(v))) xrealloc( \
-        jl_deque_data(v), sizeof(*jl_deque_data(v)) * jl_deque_capacity(v) \
+    if (adt_deque_capacity(v) <= __s) { \
+      adt_deque_capacity(v) = __s + 1; \
+      jl_roundup32(adt_deque_capacity(v)); \
+      adt_deque_data(v) = (__typeof__(adt_deque_data(v))) xrealloc( \
+        adt_deque_data(v), sizeof(*adt_deque_data(v)) * adt_deque_capacity(v) \
       ); \
     } \
   } while (false)
 
-#define jl_deque_push(v, x) do { \
-    jl_deque_grow(v, jl_deque_size(v) + 1); \
-    jl_deque_data(v)[jl_deque_size(v)++] = (x); \
+#define adt_deque_push(v, x) do { \
+    adt_deque_grow(v, adt_deque_size(v) + 1); \
+    adt_deque_data(v)[adt_deque_size(v)++] = (x); \
   } while (false)
 
-#define jl_deque_pop(v) jl_deque_data(v)[--jl_deque_size(v)]
+#define adt_deque_pop(v) adt_deque_data(v)[--adt_deque_size(v)]
 
-#define jl_deque_unshift(v, x) do { \
-    jl_deque_grow(v, jl_deque_size(v) + 1); \
+#define adt_deque_unshift(v, x) do { \
+    adt_deque_grow(v, adt_deque_size(v) + 1); \
     memmove( \
-      jl_deque_data(v) + 1 + jl_deque_cursor(v), \
-      jl_deque_data(v) + jl_deque_cursor(v), \
-      jl_deque_size(v) * sizeof(*jl_deque_data(v)) \
+      adt_deque_data(v) + 1 + adt_deque_cursor(v), \
+      adt_deque_data(v) + adt_deque_cursor(v), \
+      adt_deque_size(v) * sizeof(*adt_deque_data(v)) \
     ); \
-    jl_deque_size(v) += 1; \
-    jl_deque_data(v)[jl_deque_cursor(v)] = (x); \
+    adt_deque_size(v) += 1; \
+    adt_deque_data(v)[adt_deque_cursor(v)] = (x); \
   } while (false)
 
-#define jl_deque_shift(v) jl_deque_data(v)[jl_deque_cursor(v)++]
+#define adt_deque_shift(v) adt_deque_data(v)[adt_deque_cursor(v)++]
 
-#define jl_deque_clear(v) do { \
-    memset(jl_deque_data(v), 0, jl_deque_capacity(v)); \
-    jl_deque_size(v) = jl_deque_cursor(v) = 0; \
+#define adt_deque_clear(v) do { \
+    memset(adt_deque_data(v), 0, adt_deque_capacity(v)); \
+    adt_deque_size(v) = adt_deque_cursor(v) = 0; \
   } while (false)
 
-#define jl_deque_foreach(v, var) \
-    for (size_t __k = 1, __i = 0; __k && __i != jl_deque_length(v); __k = !__k, __i++) \
-      for (var = *(jl_deque_data(v)+__i+jl_deque_cursor(v)); __k; __k = !__k)
+#define adt_deque_foreach(v, var) \
+    for (size_t __k = 1, __i = 0; __k && __i != adt_deque_length(v); __k = !__k, __i++) \
+      for (var = *(adt_deque_data(v)+__i+adt_deque_cursor(v)); __k; __k = !__k)
 
 #endif /* JL_DEQUE_H__ */

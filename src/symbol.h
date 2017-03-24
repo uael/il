@@ -33,7 +33,7 @@
 
 typedef struct jl_sym_t jl_sym_t;
 typedef struct jl_scope_t jl_scope_t;
-typedef jl_vector_of(jl_scope_t *) jl_scope_r;
+typedef adt_vector_of(jl_scope_t *) jl_scope_r;
 
 KHASH_DECLARE(jl_symtab, const char *, jl_sym_t)
 

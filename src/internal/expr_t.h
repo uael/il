@@ -44,7 +44,7 @@ typedef struct jl_expr_field_write_t jl_expr_field_write_t;
 typedef struct jl_expr_call_t jl_expr_call_t;
 typedef struct jl_expr_list_t jl_expr_list_t;
 
-typedef jl_vector_of(jl_expr_t) jl_expr_r;
+typedef adt_vector_of(jl_expr_t) jl_expr_r;
 
 enum jl_expr_n {
   JL_EXPR_UNDEFINED = 0,

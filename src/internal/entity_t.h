@@ -37,7 +37,7 @@ typedef struct jl_struct_t jl_struct_t;
 typedef struct jl_union_t jl_union_t;
 typedef struct jl_label_t jl_label_t;
 
-typedef jl_vector_of(jl_entity_t) jl_entity_r;
+typedef adt_vector_of(jl_entity_t) jl_entity_r;
 
 enum jl_entity_n {
   JL_ENTITY_UNDEFINED = 0,

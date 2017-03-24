@@ -35,83 +35,83 @@
 #define jl_roundup32(x) \
   (--(x), (x)|=(x)>>1, (x)|=(x)>>2, (x)|=(x)>>4, (x)|=(x)>>8, (x)|=(x)>>16, ++(x))
 
-#define jl_vector_of(t) struct { \
+#define adt_vector_of(t) struct { \
     size_t size, capacity; t *data; \
   }
 
-#define jl_vector_size(v) (v).size
+#define adt_vector_size(v) (v).size
 
-#define jl_vector_capacity(v) (v).capacity
+#define adt_vector_capacity(v) (v).capacity
 
-#define jl_vector_data(v) (v).data
+#define adt_vector_data(v) (v).data
 
-#define jl_vector_length(v) jl_vector_size(v)
+#define adt_vector_length(v) adt_vector_size(v)
 
-#define jl_vector_at(v, i) jl_vector_data(v)[i]
+#define adt_vector_at(v, i) adt_vector_data(v)[i]
 
-#define jl_vector_front(v) jl_vector_at(v, 0)
+#define adt_vector_front(v) adt_vector_at(v, 0)
 
-#define jl_vector_back(v) jl_vector_at(v, jl_vector_size(v)-1)
+#define adt_vector_back(v) adt_vector_at(v, adt_vector_size(v)-1)
 
-#define jl_vector_dtor(v) do { \
-    jl_vector_size(v) = jl_vector_capacity(v) = 0; \
-    if (jl_vector_data(v)) free(jl_vector_data(v)); \
-    jl_vector_data(v) = NULL; \
+#define adt_vector_dtor(v) do { \
+    adt_vector_size(v) = adt_vector_capacity(v) = 0; \
+    if (adt_vector_data(v)) free(adt_vector_data(v)); \
+    adt_vector_data(v) = NULL; \
   } while (false)
 
-#define jl_vector_resize(v, s) ( \
-    jl_vector_capacity(v) = (s), \
-    jl_vector_data(v) = (__typeof__(jl_vector_data(v))) xrealloc(jl_vector_data(v), sizeof(*jl_vector_data(v)) * jl_vector_capacity(v)) \
+#define adt_vector_resize(v, s) ( \
+    adt_vector_capacity(v) = (s), \
+    adt_vector_data(v) = (__typeof__(adt_vector_data(v))) xrealloc(adt_vector_data(v), sizeof(*adt_vector_data(v)) * adt_vector_capacity(v)) \
   )
 
-#define jl_vector_growth(v) ( \
-    jl_vector_size(v) == jl_vector_capacity(v) \
-      ? ((jl_vector_capacity(v) = jl_vector_capacity(v) ? jl_vector_capacity(v) << 1 : 2), (v)) \
-      : ((jl_vector_data(v) = (__typeof__(jl_vector_data(v))) xrealloc(jl_vector_data(v), sizeof(*jl_vector_data(v)) * jl_vector_capacity(v))), (v)) \
+#define adt_vector_growth(v) ( \
+    adt_vector_size(v) == adt_vector_capacity(v) \
+      ? ((adt_vector_capacity(v) = adt_vector_capacity(v) ? adt_vector_capacity(v) << 1 : 2), (v)) \
+      : ((adt_vector_data(v) = (__typeof__(adt_vector_data(v))) xrealloc(adt_vector_data(v), sizeof(*adt_vector_data(v)) * adt_vector_capacity(v))), (v)) \
   )
 
-#define jl_vector_grow(v, i) do { \
+#define adt_vector_grow(v, i) do { \
     size_t __s = (size_t) (i); \
-    if (jl_vector_capacity(v) <= __s) { \
-      jl_vector_capacity(v) = __s + 1; \
-      jl_roundup32(jl_vector_capacity(v)); \
-      jl_vector_data(v) = (__typeof__(jl_vector_data(v))) xrealloc( \
-        jl_vector_data(v), sizeof(*jl_vector_data(v)) * jl_vector_capacity(v) \
+    if (adt_vector_capacity(v) <= __s) { \
+      adt_vector_capacity(v) = __s + 1; \
+      jl_roundup32(adt_vector_capacity(v)); \
+      adt_vector_data(v) = (__typeof__(adt_vector_data(v))) xrealloc( \
+        adt_vector_data(v), sizeof(*adt_vector_data(v)) * adt_vector_capacity(v) \
       ); \
     } \
   } while (false)
 
-#define jl_vector_push(v, x) do { \
-    jl_vector_grow(v, jl_vector_size(v) + 1); \
-    jl_vector_data(v)[jl_vector_size(v)++] = (x); \
+#define adt_vector_push(v, x) do { \
+    adt_vector_grow(v, adt_vector_size(v) + 1); \
+    adt_vector_data(v)[adt_vector_size(v)++] = (x); \
   } while (false)
 
-#define jl_vector_pop(v) jl_vector_data(v)[--jl_vector_size(v)]
+#define adt_vector_pop(v) adt_vector_data(v)[--adt_vector_size(v)]
 
-#define jl_vector_unshift(v, x) do { \
-    jl_vector_grow(v, jl_vector_size(v) + 1); \
+#define adt_vector_unshift(v, x) do { \
+    adt_vector_grow(v, adt_vector_size(v) + 1); \
     memmove( \
-      jl_vector_data(v) + 1, \
-      jl_vector_data(v), \
-      jl_vector_size(v) * sizeof(*jl_vector_data(v)) \
+      adt_vector_data(v) + 1, \
+      adt_vector_data(v), \
+      adt_vector_size(v) * sizeof(*adt_vector_data(v)) \
     ); \
-    jl_vector_size(v) += 1; \
-    jl_vector_data(v)[0] = (x); \
+    adt_vector_size(v) += 1; \
+    adt_vector_data(v)[0] = (x); \
   } while (false)
 
-#define jl_vector_shift(v) __extension__ ({ \
-    __typeof__(*jl_vector_data(v)) __r = jl_vector_front(v); \
-    memmove(jl_vector_data(v), jl_vector_data(v) + 1, --jl_vector_size(v) * sizeof(*jl_vector_data(v))); \
+#define adt_vector_shift(v) __extension__ ({ \
+    __typeof__(*adt_vector_data(v)) __r = adt_vector_front(v); \
+    memmove(adt_vector_data(v), adt_vector_data(v) + 1, --adt_vector_size(v) * sizeof(*adt_vector_data(v))); \
     __r; \
   })
 
-#define jl_vector_clear(v) do { \
-    memset(jl_vector_data(v), 0, jl_vector_capacity(v)); \
-    jl_vector_size(v) = 0; \
+#define adt_vector_clear(v) do { \
+    memset(adt_vector_data(v), 0, adt_vector_capacity(v)); \
+    adt_vector_size(v) = 0; \
   } while (false)
 
-#define jl_vector_foreach(v, var) \
-    for (size_t __k = 1, __i = 0; __k && __i != jl_vector_length(v); __k = !__k, __i++) \
-      for (var = *(jl_vector_data(v)+__i); __k; __k = !__k)
+#define adt_vector_foreach(v, var) \
+    for (size_t __k = 1, __i = 0; __k && __i != adt_vector_length(v); __k = !__k, __i++) \
+      for (var = *(adt_vector_data(v)+__i); __k; __k = !__k)
 
 #endif /* JL_VECTOR_H__ */

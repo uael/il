@@ -45,7 +45,7 @@ struct jl_stmt_return_t;
 struct jl_stmt_decl_t;
 
 typedef struct jl_stmt_t jl_stmt_t;
-typedef jl_vector_of(jl_stmt_t) jl_stmt_r;
+typedef adt_vector_of(jl_stmt_t) jl_stmt_r;
 
 enum jl_stmt_n {
   JL_STMT_UNDEFINED = 0,

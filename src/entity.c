@@ -102,6 +102,8 @@ void jl_entity_dtor(jl_entity_t *self) {
         self->u._label = NULL;
       }
       break;
+    default:
+      break;
   }
   *self = jl_entity_undefined();
 }
@@ -166,6 +168,8 @@ void jl_entity_acquire(jl_entity_t *self) {
     case JL_ENTITY_LABEL:
       ++self->u._label->refs;
       break;
+    default:
+      break;
   }
 }
 
@@ -194,6 +198,8 @@ void jl_entity_release(jl_entity_t *self) {
       break;
     case JL_ENTITY_LABEL:
       --self->u._label->refs;
+      break;
+    default:
       break;
   }
 }
@@ -234,11 +240,11 @@ bool jl_entity_equals(jl_entity_t a, jl_entity_t b) {
   }
   a_fields = jl_entity_fields(a);
   b_fields = jl_entity_fields(b);
-  if (jl_vector_size(a_fields) != jl_vector_size(b_fields)) {
+  if (adt_vector_size(a_fields) != adt_vector_size(b_fields)) {
     return false;
   }
-  for (i = 0; i < jl_vector_size(a_fields); ++i) {
-    if (!jl_entity_equals(jl_vector_at(a_fields, i), jl_vector_at(b_fields, i))) {
+  for (i = 0; i < adt_vector_size(a_fields); ++i) {
+    if (!jl_entity_equals(adt_vector_at(a_fields, i), adt_vector_at(b_fields, i))) {
       return false;
     }
   }
@@ -472,7 +478,7 @@ void jl_func_init(jl_entity_t *self, enum jl_func_specifier_n s, jl_type_t r, co
 }
 
 void jl_func_dtor(jl_entity_t *self) {
-  jl_vector_dtor(jl_pentity_func(self)->params);
+  adt_vector_dtor(jl_pentity_func(self)->params);
 }
 
 bool jl_func_is_inline(jl_entity_t *self) {
@@ -557,7 +563,7 @@ void jl_enum_init(jl_entity_t *self, const char *name, jl_entity_r fields) {
 }
 
 void jl_enum_dtor(jl_entity_t *self) {
-  jl_vector_dtor(jl_pentity_enum(self)->fields);
+  adt_vector_dtor(jl_pentity_enum(self)->fields);
 }
 
 const char *jl_enum_get_name(jl_entity_t *self) {
@@ -602,7 +608,7 @@ void jl_struct_init(jl_entity_t *self, const char *name, jl_entity_r fields) {
 }
 
 void jl_struct_dtor(jl_entity_t *self) {
-  jl_vector_dtor(jl_pentity_struct(self)->fields);
+  adt_vector_dtor(jl_pentity_struct(self)->fields);
 }
 
 const char *jl_struct_get_name(jl_entity_t *self) {
@@ -647,7 +653,7 @@ void jl_union_init(jl_entity_t *self, const char *name, jl_entity_r fields) {
 }
 
 void jl_union_dtor(jl_entity_t *self) {
-  jl_vector_dtor(jl_pentity_union(self)->fields);
+  adt_vector_dtor(jl_pentity_union(self)->fields);
 }
 
 const char *jl_union_get_name(jl_entity_t *self) {

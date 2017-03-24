@@ -275,18 +275,18 @@ FRULE_DEF(postfix_expression) {
           FE_NEXT();
           args = (jl_expr_r) {0};
           params = jl_type_fields(type);
-          for (i = 0; i < jl_vector_size(params); ++i) {
+          for (i = 0; i < adt_vector_size(params); ++i) {
             if (FE_PEEK().type == ')') {
-              fprintf(stderr, "Too few arguments, expected %zu but got %d.", jl_vector_size(params), i);
+              fprintf(stderr, "Too few arguments, expected %zu but got %d.", adt_vector_size(params), i);
               exit(1);
             }
-            param = jl_vector_at(params, i);
+            param = adt_vector_at(params, i);
             FE_MATCHR(1, assignment_expression) {
               if (!jl_type_equals(jl_expr_get_type(_1.u.expr), jl_entity_type(param))) {
                 jl_fval_init_expr(&_1, jl_cast(jl_entity_type(param), _1.u.expr));
               }
-              jl_vector_push(args, _1.u.expr);
-              if (i < jl_vector_size(params) - 1) {
+              adt_vector_push(args, _1.u.expr);
+              if (i < adt_vector_size(params) - 1) {
                 FE_CONSUME(',');
               }
             }

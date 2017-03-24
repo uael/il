@@ -37,12 +37,12 @@ void jl_scope_dtor(jl_scope_t *self) {
     jl_sym_dtor(&sym);
   });
   jl_symtab_dtor(&self->symtab);
-  jl_vector_foreach(self->childs, scope) {
+  adt_vector_foreach(self->childs, scope) {
     jl_scope_dtor(scope);
     free(scope);
     scope = NULL;
   }
-  jl_vector_dtor(self->childs);
+  adt_vector_dtor(self->childs);
 }
 
 bool jl_sym_has_flag(jl_sym_t *self, unsigned flag) {

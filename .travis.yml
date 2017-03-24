@@ -5,7 +5,7 @@ language: c
 addons:
   apt:
     sources:
-      - kubuntu-backports
+      - george-edison55-precise-backports
     packages:
       - cmake
       - cmake-data

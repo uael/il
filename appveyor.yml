@@ -36,7 +36,6 @@ before_build:
 
 build:
   project: C:\projects\jay\build\jay.sln
-  parallel: true
-  verbosity: detailed
+  verbosity: normal
 
 test: off

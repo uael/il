@@ -27,16 +27,11 @@
 #include "io.h"
 
 #include <fcntl.h>
-#include <ctype.h>
-#include <string.h>
-#include <assert.h>
-#include <sys/stat.h>
 
 #if defined(_WIN32) && !defined(__HAVE_UNISTD)
 # define __HAVE_UNISTD
 # include <stdlib.h>
 # include <io.h>
-# include <getopt.h> /* getopt at: https://gist.github.com/ashelly/7776712 */
 # include <process.h> /* for getpid() and the exec..() family */
 # include <direct.h> /* for _getcwd() and _chdir() */
 
@@ -81,21 +76,16 @@ typedef unsigned __int64  uint64_t;
 #endif
 
 #if defined(__linux)
-
 # include <sys/time.h>
-#include <adt/xmalloc.h>
-
-#endif
-
-#if defined(__MACH__)
+#elif defined(__MACH__)
 # include <mach/mach_time.h>
-#endif
-
-#if defined(_WIN32)
+#elif defined(_WIN32)
 # include <windows.h>
 # include <Shlwapi.h>
 # include <tchar.h>
 #endif
+
+#include <adt/xmalloc.h>
 
 int64_t jl_fsize(const char *path) {
 #ifdef WIN32

@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+#include <stdio.h>
+
 #include <fval.h>
 #include "c_fe.h"
 

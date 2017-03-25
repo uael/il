@@ -24,7 +24,7 @@
  */
 
 #include <stdlib.h>
-#include <token.h>
+#include <stdio.h>
 
 #include <adt/string.h>
 #include <util/io.h>

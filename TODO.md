@@ -10,3 +10,6 @@
 - [ ] error handling
 - [ ] syntax error handling
 - [ ] token print (type/entity/expr/stmt print) to be able to dump something pretty
+- [ ] proper msbuild support
+- [ ] clean current portability additions
+- [ ] msbuild cc flags

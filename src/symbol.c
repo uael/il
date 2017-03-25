@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+#include <stdio.h>
+
 #include "symbol.h"
 
 void jl_sym_dtor(jl_sym_t *self) {

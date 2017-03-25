@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+#include <stdio.h>
+
 #include "stmt.h"
 
 #include "entity.h"

@@ -24,6 +24,7 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "compiler.h"
 #include "lexer.h"

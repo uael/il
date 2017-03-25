@@ -76,17 +76,23 @@ void c_lexer_init(jl_lexer_t *self) {
     push_token; \
   } while (false)
 
-#define ML(l, n, ...) i == (l+n) && M_ ## l(n, __VA_ARGS__)
-#define M(l, n, ...) M_ ## l(n, __VA_ARGS__)
-#define M_(n, i, c) s[i + n] == (c)
-#define M_1(n, a) M_(n, 0, a)
-#define M_2(n, a, b) M_1(n, a) && M_(n, 1, b)
-#define M_3(n, a, b, c) M_2(n, a, b) && M_(n, 2, c)
-#define M_4(n, a, b, c, d) M_3(n, a, b, c) && M_(n, 3, d)
-#define M_5(n, a, b, c, d, e) M_4(n, a, b, c, d) && M_(n, 4, e)
-#define M_6(n, a, b, c, d, e, f) M_5(n, a, b, c, d, e) && M_(n, 5, f)
-#define M_7(n, a, b, c, d, e, f, g) M_6(n, a, b, c, d, e, f) && M_(n, 6, g)
-#define M_8(n, a, b, c, d, e, f, g, h) M_7(n, a, b, c, d, e, f, g) && M_(n, 7, h)
+#define __M(n, i, c) s[i + n] == (c)
+#define __M1(n, a) __M(n, 0, a)
+#define __M2(n, a, b) __M1(n, a) && __M(n, 1, b)
+#define __M3(n, a, b, c) __M2(n, a, b) && __M(n, 2, c)
+#define __M4(n, a, b, c, d) __M3(n, a, b, c) && __M(n, 3, d)
+#define __M5(n, a, b, c, d, e) __M4(n, a, b, c, d) && __M(n, 4, e)
+#define __M6(n, a, b, c, d, e, f) __M5(n, a, b, c, d, e) && __M(n, 5, f)
+#define __M7(n, a, b, c, d, e, f, g) __M6(n, a, b, c, d, e, f) && __M(n, 6, g)
+#define __M8(n, a, b, c, d, e, f, g, h) __M7(n, a, b, c, d, e, f, g) && __M(n, 7, h)
+#define M1(n, a) i == (1+n) && __M1(n, a)
+#define M2(n, a, b) i == (2+n) && __M2(n, a, b)
+#define M3(n, a, b, c) i == (3+n) && __M3(n, a, b, c)
+#define M4(n, a, b, c, d) i == (4+n) && __M4(n, a, b, c, d)
+#define M5(n, a, b, c, d, e) i == (5+n) && __M5(n, a, b, c, d, e)
+#define M6(n, a, b, c, d, e, f) i == (6+n) && __M6(n, a, b, c, d, e, f)
+#define M7(n, a, b, c, d, e, f, g) i == (7+n) && __M7(n, a, b, c, d, e, f, g)
+#define M8(n, a, b, c, d, e, f, g, h) i == (8+n) && __M8(n, a, b, c, d, e, f, g, h)
 
 
 static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
@@ -264,39 +270,39 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
       s[++i] = '\0';
       switch (s[0]) {
         case 'a':
-          if (ML(3, 1, 'u', 't', 'o')) {
+          if (M3(1, 'u', 't', 'o')) {
             token = tokens[C_TOK_AUTO];
             goto lbl_push_token;
           }
           goto lbl_push_ident;
         case 'b':
-          if (ML(4, 1, 'r', 'e', 'a', 'k')) {
+          if (M4(1, 'r', 'e', 'a', 'k')) {
             token = tokens[C_TOK_BREAK];
             goto lbl_push_token;
           }
           goto lbl_push_ident;
         case 'c':
-          if (ML(3, 1, 'a', 's', 'e')) {
+          if (M3(1, 'a', 's', 'e')) {
             token = tokens[C_TOK_CASE];
             goto lbl_push_token;
           }
-          if (ML(3, 1, 'h', 'a', 'r')) {
+          if (M3(1, 'h', 'a', 'r')) {
             token = tokens[C_TOK_CHAR];
             goto lbl_push_token;
           }
           if (i >= 4 && s[1] == 'o' && s[2] == 'n') {
-            if (ML(2, 3, 's', 't')) {
+            if (M2(3, 's', 't')) {
               token = tokens[C_TOK_CONST];
               goto lbl_push_token;
             }
-            if (ML(5, 3, 't', 'i', 'n', 'u', 'e')) {
+            if (M5(3, 't', 'i', 'n', 'u', 'e')) {
               token = tokens[C_TOK_CONTINUE];
               goto lbl_push_token;
             }
           }
           goto lbl_push_ident;
         case 'd':
-          if (ML(6, 1, 'e', 'f', 'a', 'u', 'l', 't')) {
+          if (M6(1, 'e', 'f', 'a', 'u', 'l', 't')) {
             token = tokens[C_TOK_DEFAULT];
             goto lbl_push_token;
           }
@@ -305,103 +311,103 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
               token = tokens[C_TOK_DO];
               goto lbl_push_token;
             }
-            if (ML(4, 2, 'u', 'b', 'l', 'e')) {
+            if (M4(2, 'u', 'b', 'l', 'e')) {
               token = tokens[C_TOK_DOUBLE];
               goto lbl_push_token;
             }
           }
           goto lbl_push_ident;
         case 'e':
-          if (ML(3, 1, 'l', 's', 'e')) {
+          if (M3(1, 'l', 's', 'e')) {
             token = tokens[C_TOK_ELSE];
             goto lbl_push_token;
           }
-          if (ML(3, 1, 'n', 'u', 'm')) {
+          if (M3(1, 'n', 'u', 'm')) {
             token = tokens[C_TOK_ENUM];
             goto lbl_push_token;
           }
-          if (ML(5, 1, 'x', 't', 'e', 'r', 'n')) {
+          if (M5(1, 'x', 't', 'e', 'r', 'n')) {
             token = tokens[C_TOK_EXTERN];
             goto lbl_push_token;
           }
           goto lbl_push_ident;
         case 'f':
-          if (ML(4, 1, 'l', 'o', 'a', 't')) {
+          if (M4(1, 'l', 'o', 'a', 't')) {
             token = tokens[C_TOK_FLOAT];
             goto lbl_push_token;
           }
-          if (ML(2, 1, 'o', 'r')) {
+          if (M2(1, 'o', 'r')) {
             token = tokens[C_TOK_FOR];
             goto lbl_push_token;
           }
           goto lbl_push_ident;
         case 'g':
-          if (ML(3, 1, 'o', 't', 'o')) {
+          if (M3(1, 'o', 't', 'o')) {
             token = tokens[C_TOK_GOTO];
             goto lbl_push_token;
           }
           goto lbl_push_ident;
         case 'i':
-          if (ML(1, 1, 'f')) {
+          if (M1(1, 'f')) {
             token = tokens[C_TOK_IF];
             goto lbl_push_token;
           }
-          if (ML(5, 1, 'n', 'l', 'i', 'n', 'e')) {
+          if (M5(1, 'n', 'l', 'i', 'n', 'e')) {
             token = tokens[C_TOK_INLINE];
             goto lbl_push_token;
           }
-          if (ML(2, 1, 'n', 't')) {
+          if (M2(1, 'n', 't')) {
             token = tokens[C_TOK_INT];
             goto lbl_push_token;
           }
           goto lbl_push_ident;
         case 'l':
-          if (ML(3, 1, 'o', 'n', 'g')) {
+          if (M3(1, 'o', 'n', 'g')) {
             token = tokens[C_TOK_LONG];
             goto lbl_push_token;
           }
           goto lbl_push_ident;
         case 'r':
           if (i > 4 && s[1] == 'e') {
-            if (ML(6, 2, 'g', 'i', 's', 't', 'e', 'r')) {
+            if (M6(2, 'g', 'i', 's', 't', 'e', 'r')) {
               token = tokens[C_TOK_REGISTER];
               goto lbl_push_token;
             }
-            if (ML(4, 2, 't', 'u', 'r', 'n')) {
+            if (M4(2, 't', 'u', 'r', 'n')) {
               token = tokens[C_TOK_RETURN];
               goto lbl_push_token;
             }
           }
           goto lbl_push_ident;
         case 's':
-          if (ML(4, 1, 'h', 'o', 'r', 't')) {
+          if (M4(1, 'h', 'o', 'r', 't')) {
             token = tokens[C_TOK_SHORT];
             goto lbl_push_token;
           }
           if (i == 6) {
             switch (s[1]) {
               case 'i':
-                if (M(4, 2, 'g', 'n', 'e', 'd')) {
+                if (__M4(2, 'g', 'n', 'e', 'd')) {
                   token = tokens[C_TOK_SIGNED];
                   goto lbl_push_token;
                 }
-                if (M(4, 2, 'z', 'e', 'o', 'f')) {
+                if (__M4(2, 'z', 'e', 'o', 'f')) {
                   token = tokens[C_TOK_SIZEOF];
                   goto lbl_push_token;
                 }
                 break;
               case 't':
-                if (M(4, 2, 'a', 't', 'i', 'c')) {
+                if (__M4(2, 'a', 't', 'i', 'c')) {
                   token = tokens[C_TOK_STATIC];
                   goto lbl_push_token;
                 }
-                if (M(4, 2, 'r', 'u', 'c', 't')) {
+                if (__M4(2, 'r', 'u', 'c', 't')) {
                   token = tokens[C_TOK_STRUCT];
                   goto lbl_push_token;
                 }
                 break;
               case 'w':
-                if (M(4, 2, 'i', 't', 'c', 'h')) {
+                if (__M4(2, 'i', 't', 'c', 'h')) {
                   token = tokens[C_TOK_SWITCH];
                   goto lbl_push_token;
                 }
@@ -412,18 +418,18 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
           }
           goto lbl_push_ident;
         case 't':
-          if (ML(6, 1, 'y', 'p', 'e', 'd', 'e', 'f')) {
+          if (M6(1, 'y', 'p', 'e', 'd', 'e', 'f')) {
             token = tokens[C_TOK_TYPEDEF];
             goto lbl_push_token;
           }
           goto lbl_push_ident;
         case 'u':
           if (i > 4 && s[1] == 'n') {
-            if (ML(3, 2, 'i', 'o', 'n')) {
+            if (M3(2, 'i', 'o', 'n')) {
               token = tokens[C_TOK_UNION];
               goto lbl_push_token;
             }
-            if (ML(6, 2, 's', 'i', 'g', 'n', 'e', 'd')) {
+            if (M6(2, 's', 'i', 'g', 'n', 'e', 'd')) {
               token = tokens[C_TOK_UNSIGNED];
               goto lbl_push_token;
             }
@@ -431,24 +437,24 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
           goto lbl_push_ident;
         case 'v':
           if (i > 3 && s[1] == 'o') {
-            if (ML(2, 2, 'i', 'd')) {
+            if (M2(2, 'i', 'd')) {
               token = tokens[C_TOK_VOID];
               goto lbl_push_token;
             }
-            if (ML(6, 2, 'l', 'a', 't', 'i', 'l', 'e')) {
+            if (M6(2, 'l', 'a', 't', 'i', 'l', 'e')) {
               token = tokens[C_TOK_VOLATILE];
               goto lbl_push_token;
             }
           }
           goto lbl_push_ident;
         case 'w':
-          if (ML(4, 1, 'h', 'i', 'l', 'e')) {
+          if (M4(1, 'h', 'i', 'l', 'e')) {
             token = tokens[C_TOK_WHILE];
             goto lbl_push_token;
           }
           goto lbl_push_ident;
         case '_':
-          if (ML(7, 1, 'A', 'l', 'i', 'g', 'n', 'o', 'f')) {
+          if (M7(1, 'A', 'l', 'i', 'g', 'n', 'o', 'f')) {
             token = tokens[C_TOK_ALIGNOF];
             goto lbl_push_token;
           }

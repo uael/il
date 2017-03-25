@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+#include <stdio.h>
+
 #include "c_pp.h"
 
 void c_macro_init(c_macro_t *self) {

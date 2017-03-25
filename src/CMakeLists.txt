@@ -28,6 +28,10 @@ set(jayl_DEPS ${jayl_DEPS})
 set(jayl_LDADD ${jayl_LDADD})
 set(jayl_DEFS ${jayl_DEFS})
 
+if(WIN32)
+    set(jayl_LDADD ${jayl_LDADD} Shlwapi)
+endif()
+
 set(jayl_INCLUDES ${jayl_INCLUDES} .)
 
 include_directories(${jayl_INCLUDES})

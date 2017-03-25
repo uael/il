@@ -82,12 +82,12 @@ typedef unsigned __int64  uint64_t;
 
 #if defined(__linux)
 # include <sys/time.h>
-#elif defined(__MACH__)
-# include <mach/mach_time.h>
 #elif defined(_WIN32)
 # include <windows.h>
 # include <Shlwapi.h>
 # include <tchar.h>
+#elif defined(__MACH__)
+# include <mach/mach_time.h>
 #endif
 
 #include <adt/xmalloc.h>

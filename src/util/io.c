@@ -180,9 +180,9 @@ const char *jl_fbuildpath(const char *filename, const char *dirpath) {
 bool jl_fwrite(const char *path, const char *buffer, size_t len) {
   // RW for owner, R for group, R for others
 #ifdef _WIN32
-  mode_t mode = _S_IWRITE;
+  unsigned mode = _S_IWRITE;
 #else
-  mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+  unsigned mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
 #endif
 
   int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, mode);

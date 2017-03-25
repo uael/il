@@ -32,7 +32,6 @@
 
 #include "lexer.h"
 
-#include "jay/jay_lexer.h"
 #include "c/c_lexer.h"
 
 void jl_lexer_init(jl_lexer_t *self, jl_fe_t *fe, uint32_t file_id, const char *buffer, size_t length) {
@@ -54,7 +53,6 @@ void jl_lexer_init(jl_lexer_t *self, jl_fe_t *fe, uint32_t file_id, const char *
       c_lexer_init(self);
       break;
     case JL_FRONTEND_JAY:
-      self->enqueue = jay_lexer_stack;
       break;
   }
 }

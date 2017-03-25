@@ -26,6 +26,12 @@
 #ifndef   JL_COMPILER_H__
 # define  JL_COMPILER_H__
 
+#ifdef _WIN32
+#pragma warning(disable:4101)
+#pragma warning(disable:4996)
+#pragma warning(disable:4090)
+#endif
+
 #include <adt/string.h>
 
 #include "opts.h"

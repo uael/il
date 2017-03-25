@@ -36,7 +36,7 @@
 # include <direct.h> /* for _getcwd() and _chdir() */
 # include <sys\types.h>
 # include <sys\stat.h>
-# ifnef __HAVE_UNISTD
+# ifndef __HAVE_UNISTD
 # define __HAVE_UNISTD
 
 # define srandom srand

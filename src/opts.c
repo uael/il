@@ -28,12 +28,15 @@
 #include <stdio.h>
 #include <string.h>
 
-#if defined(_WIN32) && !defined(__HAVE_UNISTD)
-# define __HAVE_UNISTD
+#if defined(_WIN32)
 # include <stdlib.h>
 # include <io.h>
 # include <process.h> /* for getpid() and the exec..() family */
 # include <direct.h> /* for _getcwd() and _chdir() */
+# include <sys\types.h>
+# include <sys\stat.h>
+# ifndef __HAVE_UNISTD
+# define __HAVE_UNISTD
 
 # define srandom srand
 # define random rand
@@ -71,6 +74,7 @@ typedef unsigned __int8   uint8_t;
 typedef unsigned __int16  uint16_t;
 typedef unsigned __int32  uint32_t;
 typedef unsigned __int64  uint64_t;
+# endif
 #else
 # include <unistd.h>
 #endif

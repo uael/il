@@ -20,7 +20,7 @@ compiler:
   - clang
 
 before_install:
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew tap homebrew/dupes && brew update && brew install valgrind; fi
+  - if [ $TRAVIS_OS_NAME == osx ]; then brew install valgrind; fi
 
 install:
   - mkdir build

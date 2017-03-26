@@ -80,8 +80,9 @@ typedef unsigned __int64  uint64_t;
 # include <unistd.h>
 #endif
 
-#if defined(__linux)
+#if defined(__linux__) || defined(__APPLE__)
 # include <sys/time.h>
+# include <sys/stat.h>
 #elif defined(_WIN32)
 # include <windows.h>
 # include <Shlwapi.h>

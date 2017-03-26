@@ -26,8 +26,6 @@
 #ifndef   JL_IO_H__
 # define  JL_IO_H__
 
-#include "tinydir/tinydir.h"
-
 #define RESET   "\033[0m"
 #define BLACK   "\033[30m"
 #define RED     "\033[31m"
@@ -40,6 +38,7 @@
 #define BOLD    "\033[1m"
 
 #include <stdint.h>
+#include <stddef.h>
 #include <stdbool.h>
 
 int64_t jl_fsize(const char *path);

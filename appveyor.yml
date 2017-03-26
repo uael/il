@@ -15,7 +15,6 @@ environment:
     - msvc: 'Visual Studio 14 2015'
     - msvc: 'Visual Studio 14 2015'
 
-
 configuration:
   - Debug
   - Release

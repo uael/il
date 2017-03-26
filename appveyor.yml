@@ -10,9 +10,6 @@ environment:
     - msvc: 'Visual Studio 11 2012'
     - msvc: 'Visual Studio 12 2013'
     - msvc: 'Visual Studio 14 2015'
-    - msvc: 'Visual Studio 14 2015'
-    - msvc: 'Visual Studio 14 2015'
-    - msvc: 'Visual Studio 14 2015'
 
 configuration:
   - Release

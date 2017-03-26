@@ -26,8 +26,23 @@
 #ifndef   JAYL_XMALLOC_H__
 # define  JAYL_XMALLOC_H__
 
-#include <stdint.h>
-#include <malloc.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
+
+/* Includes for alloca() */
+#ifndef alloca
+#	if defined(__GNUC__)
+#		define alloca(x)       __builtin_alloca(x)
+#	elif defined(_WIN32)
+#		include <malloc.h>
+#   ifdef _alloca
+#     define alloca _alloca
+#   endif
+#	else
+#		error do not know how to get alloca
+#	endif
+#endif
 
 /**
  * Allocate @p size bytes on the heap.

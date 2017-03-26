@@ -24,10 +24,9 @@
  */
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include "xmalloc.h"
+
 #include "attr.h"
 
 static JL_NORETURN xnomem(void) {

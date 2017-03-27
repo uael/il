@@ -244,7 +244,7 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
     EMPTY,
     {C_TOK_NUMBER, {0}, NULL, 0, JL_TOKEN_NUMBER},
     {C_TOK_IDENTIFIER, {0}, NULL, 0, JL_TOKEN_IDENTIFIER},
-    {C_TOK_STRING, {0}, NULL, 0, JL_TOKEN_STRING},
+    {C_TOK_STRING, {0}, NULL, 0, JL_TOKEN_STRING_LITERAL},
     EMPTY,
 
     /* 0x78 */
@@ -373,6 +373,10 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
               token = tokens[C_TOK_REGISTER];
               goto lbl_push_token;
             }
+            if (M6(2, 's', 't', 'r', 'i', 'c', 't')) {
+              token = tokens[C_TOK_RESTRICT];
+              goto lbl_push_token;
+            }
             if (M4(2, 't', 'u', 'r', 'n')) {
               token = tokens[C_TOK_RETURN];
               goto lbl_push_token;
@@ -454,9 +458,72 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
           }
           goto lbl_push_ident;
         case '_':
-          if (M7(1, 'A', 'l', 'i', 'g', 'n', 'o', 'f')) {
-            token = tokens[C_TOK_ALIGNOF];
-            goto lbl_push_token;
+          switch (s[1]) {
+            case 'A':
+              if (i == 8 && __M4(2, 'l', 'i', 'g', 'n')) {
+                if (__M2(6, 'a', 's')) {
+                  token = tokens[C_TOK_ALIGNAS];
+                  goto lbl_push_token;
+                }
+                if (__M2(6, 'o', 'f')) {
+                  token = tokens[C_TOK_ALIGNOF];
+                  goto lbl_push_token;
+                }
+              }
+              if (M5(2, 't', 'o', 'm', 'i', 'c')) {
+                token = tokens[C_TOK_ATOMIC];
+                goto lbl_push_token;
+              }
+              break;
+            case 'B':
+              if (M3(2, 'o', 'o', 'l')) {
+                token = tokens[C_TOK_BOOL];
+                goto lbl_push_token;
+              }
+              break;
+            case 'C':
+              if (M6(2, 'o', 'm', 'p', 'l', 'e', 'x')) {
+                token = tokens[C_TOK_COMPLEX];
+                goto lbl_push_token;
+              }
+              break;
+            case 'G':
+              if (M6(2, 'e', 'n', 'e', 'r', 'i', 'c')) {
+                token = tokens[C_TOK_GENERIC];
+                goto lbl_push_token;
+              }
+              break;
+            case 'I':
+              if (M8(2, 'm', 'a', 'g', 'i', 'n', 'a', 'r', 'y')) {
+                token = tokens[C_TOK_IMAGINARY];
+                goto lbl_push_token;
+              }
+              break;
+            case 'N':
+              if (M7(2, 'o', 'r', 'e', 't', 'u', 'r', 'n')) {
+                token = tokens[C_TOK_NORETURN];
+                goto lbl_push_token;
+              }
+              break;
+            case 'S':
+              if (i == 14 && __M6(2, 't', 'a', 't', 'i', 'c', '_') && __M6(8, 'a', 's', 's', 'e', 'r', 't')) {
+                token = tokens[C_TOK_STATIC_ASSERT];
+                goto lbl_push_token;
+              }
+              break;
+            case 'T':
+              if (i == 13 && __M6(2, 'h', 'r', 'e', 'a', 'd', '_') && __M5(8, 'l', 'o', 'c', 'a', 'l')) {
+                token = tokens[C_TOK_THREAD_LOCAL];
+                goto lbl_push_token;
+              }
+              break;
+            case '_':
+              if (M6(2, 'f', 'u', 'n', 'c', '_', '_')) {
+                token = tokens[C_TOK_FUNC_NAME];
+                goto lbl_push_token;
+              }
+            default:
+              break;
           }
         default:
         lbl_push_ident:

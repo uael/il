@@ -28,7 +28,7 @@
 #include <errno.h>
 #include <string.h>
 #include <ctype.h>
-#include <values.h>
+#include <limits.h>
 #include <expr_t.h>
 
 #include "expr.h"

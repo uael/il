@@ -136,7 +136,7 @@ FRULE_DEF(primary_expression) {
   FRULE_BODY_BEGIN;
 
   FE_MATCHT(1, C_TOK_IDENTIFIER) {
-    SYM_GET(_1.u.token.u.s);
+    SYM_GET(_1.u.token.value);
     jl_fval_init_expr(_0, jl_id(sym->id, _1.u.token.kind == JL_TOKEN_KEYWORD));
     jl_expr_set_type(&_0->u.expr, jl_entity_var(sym->entity)->type);
   }
@@ -180,12 +180,12 @@ FRULE_DEF(constant) {
   FRULE_BODY_BEGIN;
 
   FE_MATCHT(1, C_TOK_NUMBER) {
-    jl_fval_init_string(_0, _1.u.token.u.s);
+    jl_fval_init_expr(_0, jl_const_parse(_1.u.token.value, _1.u.token.length));
   }
   FRULE_OR
   FE_MATCHT(1, C_TOK_IDENTIFIER) {
-    if (SYM_GET(_1.u.token.u.s) && jl_sym_has_flag(sym, C_TOKEN_FLAG_ENUMERATION_CONSTANT)) {
-      jl_fval_init_string(_0, _1.u.token.u.s);
+    if (SYM_GET(_1.u.token.value) && jl_sym_has_flag(sym, C_TOKEN_FLAG_ENUMERATION_CONSTANT)) {
+      jl_fval_init_string(_0, _1.u.token.value);
     }
   }
 
@@ -196,12 +196,12 @@ FRULE_DEF(enumeration_constant) {
   FRULE_BODY_BEGIN;
 
   FE_MATCHT(1, C_TOK_IDENTIFIER) {
-    if (SYM_GET(_1.u.token.u.s)) {
-      fprintf(stderr, "duplicate enumeration constant %s", _1.u.token.u.s);
+    if (SYM_GET(_1.u.token.value)) {
+      fprintf(stderr, "duplicate enumeration constant %s", _1.u.token.value);
       exit(1);
     }
-    SYM_PUT(_1.u.token.u.s)->flags |= C_TOKEN_FLAG_ENUMERATION_CONSTANT;
-    jl_fval_init_string(_0, _1.u.token.u.s);
+    SYM_PUT(_1.u.token.value)->flags |= C_TOKEN_FLAG_ENUMERATION_CONSTANT;
+    jl_fval_init_string(_0, _1.u.token.value);
   }
 
   FRULE_BODY_END;
@@ -211,7 +211,7 @@ FRULE_DEF(string) {
   FRULE_BODY_BEGIN;
 
   FE_MATCHT(1, C_TOK_STRING) {
-    jl_fval_init_string(_0, _1.u.token.u.s);
+    jl_fval_init_string(_0, _1.u.token.value);
   }
   FRULE_OR
   FE_MATCHT(1, C_TOK_FUNC_NAME) {

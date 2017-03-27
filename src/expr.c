@@ -25,6 +25,11 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
+#include <string.h>
+#include <ctype.h>
+#include <values.h>
+#include <expr_t.h>
 
 #include "expr.h"
 
@@ -322,7 +327,7 @@ jl_expr_t jl_const_int(int d) {
   jl_expr_t expr = {JL_EXPR_UNDEFINED};
 
   jl_const_init(&expr, jl_int());
-  jl_expr_const(expr)->u.i = d;
+  jl_expr_const(expr)->u.ul = (unsigned long) d;
   return expr;
 }
 
@@ -347,8 +352,132 @@ void jl_const_init(jl_expr_t *self, jl_type_t type) {
   jl_expr_set_type(self, type);
 }
 
-
 void jl_expr_const_dtor(jl_expr_t *self) {}
+
+enum suffix {
+  SUFFIX_NONE = 0,
+  SUFFIX_U = 0x1,
+  SUFFIX_L = 0x2,
+  SUFFIX_UL = SUFFIX_U | SUFFIX_L,
+  SUFFIX_LL = (SUFFIX_L << 1) | SUFFIX_L,
+  SUFFIX_ULL = SUFFIX_U | SUFFIX_LL
+};
+
+static enum suffix read_integer_suffix(char *ptr, char **endptr) {
+  enum suffix s = SUFFIX_NONE;
+
+  if (tolower(*ptr) == 'u') {
+    s = SUFFIX_U;
+    ptr++;
+  }
+  if (tolower(*ptr) == 'l') {
+    s |= SUFFIX_L;
+    ptr++;
+    if (*ptr == ptr[-1]) {
+      s |= SUFFIX_LL;
+      ptr++;
+    }
+
+    if (!(s & SUFFIX_U) && tolower(*ptr) == 'u') {
+      s |= SUFFIX_U;
+      ptr++;
+    }
+  }
+  *endptr = ptr;
+  return s;
+}
+
+static jl_type_t constant_integer_type(unsigned long int value, enum suffix suffix, int is_decimal) {
+  switch (suffix) {
+    case SUFFIX_U:
+      if (value <= UINT_MAX) {
+        return jl_uint();
+      } else {
+        return jl_ulong();
+      }
+    case SUFFIX_L:
+    case SUFFIX_LL:
+      if (value <= LONG_MAX) {
+        return jl_long();
+      } else {
+        if (is_decimal) {
+          puts("Conversion of decimal constant to unsigned.");
+        }
+        return jl_ulong();
+      }
+    case SUFFIX_UL:
+    case SUFFIX_ULL:
+      return jl_ulong();
+    case SUFFIX_NONE:
+    default:
+      if (value <= INT_MAX) {
+        return jl_int();
+      } else if (!is_decimal && value <= UINT_MAX) {
+        return jl_uint();
+      } else if (value <= LONG_MAX) {
+        return jl_long();
+      } else {
+        if (is_decimal) {
+          puts("Conversion of decimal constant to unsigned.");
+        }
+        return jl_ulong();
+      }
+  }
+}
+
+jl_expr_t jl_const_parse(const char *s, size_t len) {
+  const char *str;
+  char *endptr;
+  enum suffix suffix;
+  jl_expr_const_t *_const;
+  jl_expr_t expr = jl_expr_undefined();
+
+  str = s;
+  jl_expr_switch(&expr, JL_EXPR_CONST);
+  _const = expr.u._const;
+  /*
+   * Try to read as integer. Handle suffixes u, l, ll, ul, ull, in all
+   * permutations of upper- and lower case.
+   */
+  errno = 0;
+  _const->u.ul = strtoul(str, &endptr, 0);
+  suffix = read_integer_suffix(endptr, &endptr);
+  if ((size_t) (endptr - str) == len) {
+    assert(isdigit(*str));
+    expr.type = constant_integer_type(_const->u.ul, suffix, *str != '0');
+  } else {
+    /*
+     * If the integer conversion did not consume the whole token,
+     * try to read as floating point number.
+     *
+     * Note: not using strtold for long double conversion, so might
+     * get incorrect results compared to other compilers.
+     */
+    errno = 0;
+    expr.type = jl_double();
+    _const->u.d = strtod(str, &endptr);
+    if ((size_t) (endptr - str) < len) {
+      if (*endptr == 'f' || *endptr == 'F') {
+        expr.type = jl_float();
+        _const->u.f = (float) _const->u.d;
+        endptr++;
+      } else if (*endptr == 'l' || *endptr == 'L') {
+        expr.type = jl_ldouble();
+        _const->u.ld = (long double) _const->u.d;
+        endptr++;
+      }
+    }
+  }
+  if (errno || ((size_t) (endptr - str) != len)) {
+    if (errno == ERANGE) {
+      printf("Numeric literal '%s' is out of range.", str);
+    } else {
+      printf("Invalid numeric literal '%s'.", str);
+    }
+    exit(1);
+  }
+  return expr;
+}
 
 
 jl_expr_t jl_unary(enum jl_op_n op, jl_expr_t operand) {

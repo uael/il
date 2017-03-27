@@ -44,8 +44,10 @@ struct jl_expr_const_t {
   unsigned refs;
   union {
     const char *s;
-    int i;
     float f;
+    double d;
+    long double ld;
+    unsigned long int ul;
   } u;
 };
 
@@ -53,6 +55,7 @@ jl_expr_t jl_const_int(int d);
 jl_expr_t jl_const_float(float f);
 jl_expr_t jl_const_string(const char *s);
 void jl_const_init(jl_expr_t *self, jl_type_t type);
+jl_expr_t jl_const_parse(const char *s, size_t len);
 
 struct jl_expr_unary_t {
   unsigned refs;

@@ -96,8 +96,6 @@ struct jl_type_t {
     jl_compound_t *_compound;
   } u;
 };
-
-jl_type_t jl_type_undefined();
 void jl_type_undef(jl_type_t *self);
 void jl_type_dtor(jl_type_t *self);
 void jl_type_switch(jl_type_t *self, enum jl_type_n kind);
@@ -111,6 +109,8 @@ bool jl_type_equals(jl_type_t a, jl_type_t b);
 jl_type_t jl_type_deref(jl_type_t a);
 void jl_type_update_size(jl_type_t *self);
 size_t jl_sizeof(jl_type_t type);
+
+#define jl_type_undefined() ((jl_type_t) {JL_TYPE_UNDEFINED})
 
 #define jl_type_is_literal(t) ((t).kind == JL_TYPE_LITERAL)
 #define jl_type_is_pointer(t) ((t).kind == JL_TYPE_POINTER)

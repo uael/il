@@ -37,10 +37,6 @@ void jl_pointer_dtor(jl_type_t *self);
 void jl_array_dtor(jl_type_t *self);
 void jl_compound_dtor(jl_type_t *self);
 
-jl_type_t jl_type_undefined() {
-  return (jl_type_t) {JL_TYPE_UNDEFINED};
-}
-
 void jl_type_undef(jl_type_t *self) {
   *self = jl_type_undefined();
 }
@@ -258,7 +254,7 @@ void jl_type_update_size(jl_type_t *self) {
       self->size = 8;
       break;
     case JL_TYPE_ARRAY:
-      self->size = jl_expr_const(self->u._array->size)->u.i * self->u._array->of.size;
+      self->size = jl_expr_const(self->u._array->size)->u.ul * self->u._array->of.size;
     case JL_TYPE_COMPOUND:
       entities = jl_type_fields(*self);
       adt_vector_foreach(entities, entity) {
@@ -335,6 +331,15 @@ jl_type_t jl_int() {
   return type;
 }
 
+jl_type_t jl_uint() {
+  static jl_type_t type = {JL_TYPE_UNDEFINED};
+  if (!jl_type_is_defined(type)) {
+    jl_literal_init(&type, JL_LITERAL_INT);
+    type.specifiers |= JL_TYPE_SPECIFIER_UNSIGNED;
+  }
+  return type;
+}
+
 jl_type_t jl_long() {
   static jl_type_t type = {JL_TYPE_UNDEFINED};
   if (!jl_type_is_defined(type)) {
@@ -343,10 +348,28 @@ jl_type_t jl_long() {
   return type;
 }
 
+jl_type_t jl_ulong() {
+  static jl_type_t type = {JL_TYPE_UNDEFINED};
+  if (!jl_type_is_defined(type)) {
+    jl_literal_init(&type, JL_LITERAL_LONG);
+    type.specifiers |= JL_TYPE_SPECIFIER_UNSIGNED;
+  }
+  return type;
+}
+
 jl_type_t jl_double() {
   static jl_type_t type = {JL_TYPE_UNDEFINED};
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_DOUBLE);
+  }
+  return type;
+}
+
+jl_type_t jl_ldouble() {
+  static jl_type_t type = {JL_TYPE_UNDEFINED};
+  if (!jl_type_is_defined(type)) {
+    jl_literal_init(&type, JL_LITERAL_LONG);
+    type.specifiers |= JL_TYPE_SPECIFIER_DOUBLE;
   }
   return type;
 }

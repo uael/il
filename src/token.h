@@ -57,11 +57,7 @@ struct jl_token_t {
   uint32_t length;
   unsigned kind : 8;
   size_t cursor;
-  union {
-    const char *s;
-    float f;
-    int i;
-  } u;
+  const char *value;
 };
 
 void jl_token_dtor(jl_token_t *self);

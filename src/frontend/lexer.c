@@ -144,13 +144,7 @@ bool jl_lexer_push(jl_lexer_t *self, jl_token_t token) {
     switch (token.kind) {
       case JL_TOKEN_IDENTIFIER:
       case JL_TOKEN_NUMBER:
-        printf("%s ", token.u.s);
-        break;
-      case JL_TOKEN_FLOAT:
-        printf("%f ", token.u.f);
-        break;
-      case JL_TOKEN_INT:
-        printf("%d ", token.u.i);
+        printf("%s ", token.value);
         break;
       default:
         if (token.length>1) {
@@ -238,7 +232,7 @@ jl_token_t jl_lexer_consume_id(jl_lexer_t *self, const char *id) {
     puts("unexpected token");
     exit(1);
   }
-  if (strcmp(id, result.u.s) != 0) {
+  if (strcmp(id, result.value) != 0) {
     puts("unexpected identifier");
     exit(1);
   }

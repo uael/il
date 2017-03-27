@@ -43,7 +43,7 @@ void c_macro_expand(c_macro_t *self, c_pp_t *pp, jl_lexer_t *into) {
 
   adt_vector_foreach(self->replacement, t) {
     if (t.kind == JL_TOKEN_IDENTIFIER) {
-      it = kh_get(c_macro_ht, &pp->macros, t.u.s);
+      it = kh_get(c_macro_ht, &pp->macros, t.value);
       if (it != kh_end(&pp->macros)) {
         macro = kh_value(&pp->macros, it);
         if (strcmp(macro.name, self->name) != 0) {
@@ -79,7 +79,7 @@ void c_pp_parse_define(c_pp_t *self, jl_lexer_t *lexer) {
   jl_lexer_consume_id(lexer, "define");
   t = jl_lexer_consume(lexer, C_TOK_IDENTIFIER);
   c_macro_init(&macro);
-  macro.name = t.u.s;
+  macro.name = t.value;
 
   if (jl_lexer_peek(lexer).type == '(') {
     macro.kind = C_MACRO_FUNC;
@@ -122,7 +122,7 @@ void c_pp_parse_undef(c_pp_t *self, jl_lexer_t *lexer) {
 
   jl_lexer_consume_id(lexer, "undef");
   t = jl_lexer_consume(lexer, C_TOK_IDENTIFIER);
-  it = kh_get(c_macro_ht, &self->macros, t.u.s);
+  it = kh_get(c_macro_ht, &self->macros, t.value);
   if (it != kh_end(&self->macros)) {
     kh_del(c_macro_ht, &self->macros, it);
   }
@@ -141,11 +141,11 @@ bool c_pp_op_push_callback(jl_lexer_event_t *self, void *arg) {
   if (token->type == '#') {
     jl_lexer_fork(&pp->lexer, self->lexer);
     if ((t = jl_lexer_peek(&pp->lexer)).kind == JL_TOKEN_IDENTIFIER) {
-      if (strcmp("define", t.u.s) == 0) {
+      if (strcmp("define", t.value) == 0) {
         c_pp_parse_define(pp, &pp->lexer);
         jl_lexer_join(&pp->lexer);
         return false;
-      } else if (strcmp("undef", t.u.s) == 0) {
+      } else if (strcmp("undef", t.value) == 0) {
         c_pp_parse_undef(pp, &pp->lexer);
         jl_lexer_join(&pp->lexer);
 
@@ -153,7 +153,7 @@ bool c_pp_op_push_callback(jl_lexer_event_t *self, void *arg) {
       }
     }
   } else if (token->kind == JL_TOKEN_IDENTIFIER) {
-    it = kh_get(c_macro_ht, &pp->macros, token->u.s);
+    it = kh_get(c_macro_ht, &pp->macros, token->value);
     if (it != kh_end(&pp->macros)) {
       c_macro_expand(&kh_value(&pp->macros, it), pp, self->lexer);
       return false;

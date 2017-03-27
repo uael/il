@@ -27,9 +27,7 @@
 
 #include "symbol.h"
 
-void jl_sym_dtor(jl_sym_t *self) {
-
-}
+void jl_sym_dtor(jl_sym_t *self) {}
 
 void jl_scope_dtor(jl_scope_t *self) {
   jl_sym_t sym;
@@ -70,9 +68,6 @@ jl_sym_t *jl_sym_get(jl_scope_t *scope, const char *id) {
 
   it = kh_get(jl_symtab, &scope->symtab, id);
   if (it == kh_end(&scope->symtab)) {
-    if (scope->parent) {
-      return jl_sym_get(scope->parent, id);
-    }
     fprintf(stderr, "Undefined symbol '%s'.", id);
     exit(1);
   }

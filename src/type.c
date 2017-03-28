@@ -25,6 +25,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <limits.h>
 
 #include "type.h"
 
@@ -183,6 +184,19 @@ bool jl_type_is_func(jl_type_t type) {
   return jl_type_is_compound(type) && jl_entity_is_func(type.u._compound->entity);
 }
 
+bool jl_type_is_struct(jl_type_t type) {
+  return jl_type_is_compound(type) && jl_entity_is_struct(type.u._compound->entity);
+}
+
+bool jl_type_is_union(jl_type_t type) {
+  return jl_type_is_compound(type) && jl_entity_is_union(type.u._compound->entity);
+}
+
+bool jl_type_is_struct_or_union(jl_type_t type) {
+  return jl_type_is_compound(type)
+    && (jl_entity_is_func(type.u._compound->entity) || jl_entity_is_union(type.u._compound->entity));
+}
+
 bool jl_type_equals(jl_type_t a, jl_type_t b) {
   if (!memcmp(&a, &b, sizeof(a))) {
     return true;
@@ -288,6 +302,76 @@ size_t jl_type_alignment(jl_type_t type) {
     return m;
   }
   return jl_sizeof(type);
+}
+
+static size_t adjust_member_alignment(jl_type_t *self, jl_type_t type) {
+  size_t align = 0;
+
+  if (jl_type_is_struct(*self)) {
+    align = jl_type_alignment(type);
+    if (self->size % align) {
+      self->size += align - (self->size % align);
+      assert(self->size % align == 0);
+    }
+
+    align = self->size;
+    if (LONG_MAX - align < type.size) {
+      puts("Object is too large.");
+      exit(1);
+    }
+    if (self->size < align + type.size) {
+      self->size = align + type.size;
+    }
+  }
+
+  return align;
+}
+
+void jl_type_add_field(jl_type_t *self, const char *name, jl_type_t type) {
+  jl_entity_t field, entity;
+  jl_func_t *func;
+  jl_enum_t *e;
+  jl_struct_t *s;
+  jl_union_t *u;
+  jl_field_t *f;
+
+  assert(jl_ptype_is_compound(self));
+  entity = jl_ptype_compound(self)->entity;
+  switch (entity.kind) {
+    case JL_ENTITY_FUNC:
+      if (jl_type_is_array(type)) {
+        type = jl_pointer(jl_type_array(type)->of);
+      }
+      func = jl_entity_func(entity);
+      jl_param_init(&field, (unsigned) adt_vector_length(func->params), name, type, jl_expr_undefined());
+      adt_vector_push(func->params, field);
+      break;
+    case JL_ENTITY_ENUM:
+      e = jl_entity_enum(entity);
+      jl_var_init(&field, name, type, jl_expr_undefined());
+      adt_vector_push(e->vars, field);
+      break;
+    case JL_ENTITY_STRUCT:
+      s = jl_entity_struct(entity);
+      jl_entity_switch(&field, JL_ENTITY_FIELD);
+      f = jl_entity_field(field);
+      f->name = name;
+      f->type = type;
+      f->offset = adjust_member_alignment(self, type);
+      adt_vector_push(s->fields, field);
+      break;
+    case JL_ENTITY_UNION:
+      u = jl_entity_union(entity);
+      jl_entity_switch(&field, JL_ENTITY_FIELD);
+      f = jl_entity_field(field);
+      f->name = name;
+      f->type = type;
+      f->offset = adjust_member_alignment(self, type);
+      adt_vector_push(u->fields, field);
+      break;
+    default:
+      break;
+  }
 }
 
 

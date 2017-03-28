@@ -42,9 +42,6 @@ struct jl_field_t {
   short field_offset;
 };
 
-jl_entity_t jl_field(const char *name, jl_type_t type);
-void jl_field_init(jl_entity_t *self, const char *name, jl_type_t type);
-
 struct jl_var_t {
   unsigned refs;
   const char *name;

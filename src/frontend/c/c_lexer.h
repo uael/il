@@ -104,7 +104,7 @@ enum {
   C_TOK_GEQ,                  /* >= */
   C_TOK_EQ,                   /* == */
   C_TOK_NEQ,                  /* != */
-  C_TOK_ARROW,                /* -> */
+  C_TOK_PTR_OP,                /* -> */
   C_TOK_INCREMENT,            /* ++ */
   C_TOK_DECREMENT,            /* -- */
   C_TOK_LSHIFT,               /* << */

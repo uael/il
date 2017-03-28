@@ -269,6 +269,27 @@ size_t jl_sizeof(jl_type_t type) {
   return type.size;
 }
 
+size_t jl_type_alignment(jl_type_t type) {
+  size_t m = 0, d;
+  jl_entity_t entity;
+  jl_entity_r entities;
+
+  assert(!jl_type_is_func(type));
+  if (jl_type_is_array(type)) {
+    return jl_type_alignment(jl_type_array(type)->of);
+  }
+  if (jl_type_is_compound(type)) {
+    entities = jl_type_fields(type);
+    adt_vector_foreach(entities, entity) {
+      d = jl_type_alignment(jl_entity_type(entity));
+      if (d > m) m = d;
+    }
+    assert(m);
+    return m;
+  }
+  return jl_sizeof(type);
+}
+
 
 jl_entity_r jl_type_fields(jl_type_t self) {
   return jl_entity_fields(jl_type_compound(self)->entity);

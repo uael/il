@@ -185,7 +185,7 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
     SYNTX(C_TOK_GEQ, ">="),
     SYNTX(C_TOK_EQ, "=="),
     SYNTX(C_TOK_NEQ, "!="),
-    SYNTX(C_TOK_ARROW, "->"),
+    SYNTX(C_TOK_PTR_OP, "->"),
 
     /* 0x48 */
     SYNTX(C_TOK_INCREMENT, "++"),
@@ -629,7 +629,7 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
             break;
           }
           if (peekn(1) == '>') {
-            push(C_TOK_ARROW);
+            push(C_TOK_PTR_OP);
             break;
           }
           push('-');

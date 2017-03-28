@@ -29,6 +29,7 @@
 #include <adt/vector.h>
 
 typedef struct jl_entity_t jl_entity_t;
+typedef struct jl_field_t jl_field_t;
 typedef struct jl_var_t jl_var_t;
 typedef struct jl_param_t jl_param_t;
 typedef struct jl_func_t jl_func_t;
@@ -41,6 +42,7 @@ typedef adt_vector_of(jl_entity_t) jl_entity_r;
 
 enum jl_entity_n {
   JL_ENTITY_UNDEFINED = 0,
+  JL_ENTITY_FIELD,
   JL_ENTITY_VAR,
   JL_ENTITY_PARAM,
   JL_ENTITY_FUNC,
@@ -59,6 +61,7 @@ enum jl_func_specifier_n {
 struct jl_entity_t {
   unsigned kind : 8;
   union {
+    struct jl_field_t *_field;
     struct jl_var_t *_var;
     struct jl_param_t *_param;
     struct jl_func_t *_func;
@@ -80,6 +83,7 @@ bool jl_entity_equals(jl_entity_t a, jl_entity_t b);
 jl_entity_r jl_entity_fields(jl_entity_t self);
 const char *jl_entity_name(jl_entity_t self);
 
+#define jl_entity_is_field(e) ((e).kind == JL_ENTITY_FIELD)
 #define jl_entity_is_var(e) ((e).kind == JL_ENTITY_VAR)
 #define jl_entity_is_param(e) ((e).kind == JL_ENTITY_PARAM)
 #define jl_entity_is_func(e) ((e).kind == JL_ENTITY_FUNC)
@@ -87,6 +91,7 @@ const char *jl_entity_name(jl_entity_t self);
 #define jl_entity_is_struct(e) ((e).kind == JL_ENTITY_STRUCT)
 #define jl_entity_is_union(e) ((e).kind == JL_ENTITY_UNION)
 #define jl_entity_is_label(e) ((e).kind == JL_ENTITY_LABEL)
+#define jl_pentity_is_field(e) ((e)->kind == JL_ENTITY_FIELD)
 #define jl_pentity_is_var(e) ((e)->kind == JL_ENTITY_VAR)
 #define jl_pentity_is_param(e) ((e)->kind == JL_ENTITY_PARAM)
 #define jl_pentity_is_func(e) ((e)->kind == JL_ENTITY_FUNC)
@@ -95,6 +100,7 @@ const char *jl_entity_name(jl_entity_t self);
 #define jl_pentity_is_union(e) ((e)->kind == JL_ENTITY_UNION)
 #define jl_pentity_is_label(e) ((e)->kind == JL_ENTITY_LABEL)
 
+#define jl_entity_field(e) ((void) assert(jl_entity_is_field(e)), (e).u._field)
 #define jl_entity_var(e) ((void) assert(jl_entity_is_var(e)), (e).u._var)
 #define jl_entity_param(e) ((void) assert(jl_entity_is_param(e)), (e).u._param)
 #define jl_entity_func(e) ((void) assert(jl_entity_is_func(e)), (e).u._func)
@@ -102,6 +108,7 @@ const char *jl_entity_name(jl_entity_t self);
 #define jl_entity_struct(e) ((void) assert(jl_entity_is_struct(e)), (e).u._struct)
 #define jl_entity_union(e) ((void) assert(jl_entity_is_union(e)), (e).u._union)
 #define jl_entity_label(e) ((void) assert(jl_entity_is_label(e)), (e).u._label)
+#define jl_pentity_field(e) ((void) assert(jl_pentity_is_field(e)), (e)->u._field)
 #define jl_pentity_var(e) ((void) assert(jl_pentity_is_var(e)), (e)->u._var)
 #define jl_pentity_param(e) ((void) assert(jl_pentity_is_param(e)), (e)->u._param)
 #define jl_pentity_func(e) ((void) assert(jl_pentity_is_func(e)), (e)->u._func)

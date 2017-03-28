@@ -304,6 +304,10 @@ FRULE_DEF(postfix_expression) {
           FE_NEXT();
           FE_CONSUME(C_TOK_IDENTIFIER);
           break;
+        case C_TOK_PTR_OP:
+          FE_NEXT();
+          FE_CONSUME(C_TOK_IDENTIFIER);
+          break;
         default:
           FRULE_BODY_END;
       }

@@ -1,12 +1,5 @@
 include(ExternalProject)
 
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-    set(ENV{CFLAGS} ${DEBUG_FLAGS})
-    set(libfirm_VARIANT "debug")
-else()
-    set(libfirm_VARIANT "optimize")
-endif()
-
 set(libfirm_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/firm)
 set(libfirm_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/firm)
 

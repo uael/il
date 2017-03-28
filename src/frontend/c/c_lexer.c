@@ -42,8 +42,8 @@ void c_lexer_init(jl_lexer_t *self) {
   self->enqueue = c_lexer_enqueue;
   event = (jl_lexer_event_t) {
     .kind = JL_LEXER_EVENT_ON_PUSH,
-    .callback = c_pp_op_push_callback,
-    .dtor = c_pp_op_push_dtor,
+    .callback = c_pp_on_push_callback,
+    .dtor = c_pp_on_push_dtor,
     .data = xmalloc(sizeof(c_pp_t))
   };
   c_pp_init(event.data);

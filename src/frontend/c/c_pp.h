@@ -67,7 +67,7 @@ void c_pp_dtor(c_pp_t *self);
 void c_pp_parse_define(c_pp_t *self, jl_lexer_t *lexer);
 void c_pp_parse_undef(c_pp_t *self, jl_lexer_t *lexer);
 
-bool c_pp_op_push_callback(jl_lexer_event_t *self, void *arg);
-void c_pp_op_push_dtor(jl_lexer_event_t *self);
+bool c_pp_on_push_callback(jl_lexer_event_t *self, void *arg);
+void c_pp_on_push_dtor(jl_lexer_event_t *self);
 
 #endif /* JL_C_PP_H__ */

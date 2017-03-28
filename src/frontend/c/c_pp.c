@@ -130,7 +130,7 @@ void c_pp_parse_undef(c_pp_t *self, jl_lexer_t *lexer) {
 }
 
 
-bool c_pp_op_push_callback(jl_lexer_event_t *self, void *arg) {
+bool c_pp_on_push_callback(jl_lexer_event_t *self, void *arg) {
   jl_token_t *token, t;
   c_pp_t *pp;
   unsigned it;
@@ -163,7 +163,7 @@ bool c_pp_op_push_callback(jl_lexer_event_t *self, void *arg) {
   return true;
 }
 
-void c_pp_op_push_dtor(jl_lexer_event_t *self) {
+void c_pp_on_push_dtor(jl_lexer_event_t *self) {
   if (self->data) {
     c_pp_dtor(self->data);
     free(self->data);

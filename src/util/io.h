@@ -44,7 +44,6 @@
 int64_t jl_fsize(const char *path);
 const char *jl_fread(const char *path, size_t *len);
 bool jl_fexists(const char *path);
-const char *jl_fbuildpath(const char *filename, const char *dirpath);
 bool jl_fwrite(const char *path, const char *buffer, size_t len);
 
 #if defined(_WIN32)

@@ -158,26 +158,6 @@ bool jl_fexists(const char *path) {
   return false;
 }
 
-const char *jl_fbuildpath(const char *filename, const char *dirpath) {
-//	#ifdef WIN32
-//	PathCombineA(result, filename, dirpath);
-//	#else
-  size_t len1 = strlen(filename);
-  size_t len2 = strlen(dirpath);
-  size_t len = len1 + len2 + 2;
-
-  char *full_path = (char *) xmalloc(len);
-  if (!full_path) return NULL;
-
-  if ((len2) && (dirpath[len2 - 1] != '/'))
-    snprintf(full_path, len, "%s/%s", dirpath, filename);
-  else
-    snprintf(full_path, len, "%s%s", dirpath, filename);
-//	#endif
-
-  return (const char *) full_path;
-}
-
 bool jl_fwrite(const char *path, const char *buffer, size_t len) {
   // RW for owner, R for group, R for others
 #ifdef _WIN32

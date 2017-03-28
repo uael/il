@@ -25,6 +25,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <limits.h>
 
 #include <adt/xmalloc.h>
 #include <entity_t.h>
@@ -223,6 +224,16 @@ void jl_entity_release(jl_entity_t *self) {
   }
 }
 
+void jl_entity_update_size(jl_entity_t *self) {
+  jl_entity_r fields;
+  jl_entity_t entity;
+
+  self->size = 0;
+  adt_vector_foreach(fields, entity) {
+    self->size += jl_entity_type(entity).size;
+  }
+}
+
 bool jl_entity_is_defined(jl_entity_t *self) {
   switch (self->kind) {
     case JL_ENTITY_FIELD:
@@ -326,6 +337,51 @@ jl_type_t jl_entity_type(jl_entity_t self) {
   }
 }
 
+
+void jl_entity_add_field(jl_entity_t *self, const char *name, jl_type_t type) {
+  jl_entity_t field;
+
+  switch (self->kind) {
+    case JL_ENTITY_FUNC:
+      if (jl_type_is_array(type)) {
+        type = jl_pointer(jl_type_array(type)->of);
+      }
+      jl_param_init(&field, (unsigned) adt_vector_length(self->u._func->params), name, type, jl_expr_undefined());
+      adt_vector_push(self->u._func->params, field);
+      break;
+    case JL_ENTITY_ENUM:
+      jl_var_init(&field, name, type, jl_expr_undefined());
+      adt_vector_push(self->u._enum->vars, field);
+      break;
+    case JL_ENTITY_STRUCT:
+      jl_entity_switch(&field, JL_ENTITY_FIELD);
+      field.u._field->name = name;
+      field.u._field->type = type;
+      field.u._field->offset = jl_type_alignment(type);
+      if (self->size % field.u._field->offset) {
+        self->size += field.u._field->offset - (self->size % field.u._field->offset);
+        assert(self->size % field.u._field->offset == 0);
+      }
+      field.u._field->offset = self->size;
+      if (LONG_MAX - field.u._field->offset < type.size) {
+        puts("Object is too large.");
+        exit(1);
+      }
+      if (self->size < field.u._field->offset + type.size) {
+        self->size = field.u._field->offset + type.size;
+      }
+      adt_vector_push(self->u._struct->fields, field);
+      break;
+    case JL_ENTITY_UNION:
+      jl_entity_switch(&field, JL_ENTITY_FIELD);
+      field.u._field->name = name;
+      field.u._field->type = type;
+      adt_vector_push(self->u._union->fields, field);
+      break;
+    default:
+      break;
+  }
+}
 
 void jl_field_dtor(jl_entity_t *self) {}
 
@@ -447,6 +503,7 @@ void jl_func_init(jl_entity_t *self, enum jl_func_specifier_n s, jl_type_t r, co
   jl_pentity_func(self)->name = n;
   jl_pentity_func(self)->params = p;
   jl_pentity_func(self)->body = b;
+  jl_entity_update_size(self);
 }
 
 void jl_func_dtor(jl_entity_t *self) {
@@ -492,6 +549,7 @@ void jl_enum_init(jl_entity_t *self, const char *name, jl_entity_r fields) {
   jl_entity_switch(self, JL_ENTITY_ENUM);
   jl_pentity_enum(self)->name = name;
   jl_pentity_enum(self)->vars = fields;
+  jl_entity_update_size(self);
 }
 
 void jl_enum_dtor(jl_entity_t *self) {}
@@ -501,24 +559,34 @@ jl_entity_t jl_struct_undefined() {
   return (jl_entity_t) {JL_ENTITY_STRUCT};
 }
 
-jl_entity_t jl_struct(const char *name, jl_entity_r fields) {
+jl_entity_t jl_struct(const char *name, jl_field_t *fields, size_t n_fields) {
   jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
-  jl_struct_init(&entity, name, fields);
+  jl_struct_init(&entity, name, fields, n_fields);
   return entity;
 }
 
-jl_entity_t jl_struct_anonymous(jl_entity_r fields) {
+jl_entity_t jl_struct_anonymous(jl_field_t *fields, size_t n_fields) {
   jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
-  jl_struct_init(&entity, NULL, fields);
+  jl_struct_init(&entity, NULL, fields, n_fields);
   return entity;
 }
 
-void jl_struct_init(jl_entity_t *self, const char *name, jl_entity_r fields) {
+void jl_struct_init(jl_entity_t *self, const char *name, jl_field_t *fields, size_t n_fields) {
+  jl_entity_t field;
+  unsigned i;
+
   jl_entity_switch(self, JL_ENTITY_STRUCT);
   jl_pentity_struct(self)->name = name;
-  jl_pentity_struct(self)->fields = fields;
+  jl_pentity_struct(self)->fields = (jl_entity_r) {0};
+  if (fields) for (i = 0; i < n_fields; ++i) {
+    jl_entity_add_field(self, fields[i].name, fields[i].type);
+    field = adt_vector_back(self->u._struct->fields);
+    jl_entity_field(field)->field_offset = fields[i].field_offset;
+    jl_entity_field(field)->field_width = fields[i].field_width;
+  }
+  jl_entity_update_size(self);
 }
 
 void jl_struct_dtor(jl_entity_t *self) {}
@@ -528,24 +596,34 @@ jl_entity_t jl_union_undefined() {
   return (jl_entity_t) {JL_ENTITY_UNION};
 }
 
-jl_entity_t jl_union(const char *name, jl_entity_r fields) {
+jl_entity_t jl_union(const char *name, jl_field_t *fields, size_t n_fields) {
   jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
-  jl_union_init(&entity, name, fields);
+  jl_union_init(&entity, name, fields, n_fields);
   return entity;
 }
 
-jl_entity_t jl_union_anonymous(jl_entity_r fields) {
+jl_entity_t jl_union_anonymous(jl_field_t *fields, size_t n_fields) {
   jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
-  jl_union_init(&entity, NULL, fields);
+  jl_union_init(&entity, NULL, fields, n_fields);
   return entity;
 }
 
-void jl_union_init(jl_entity_t *self, const char *name, jl_entity_r fields) {
+void jl_union_init(jl_entity_t *self, const char *name, jl_field_t *fields, size_t n_fields) {
+  jl_entity_t field;
+  unsigned i;
+
   jl_entity_switch(self, JL_ENTITY_UNION);
   jl_pentity_union(self)->name = name;
-  jl_pentity_union(self)->fields = fields;
+  jl_pentity_union(self)->fields = (jl_entity_r) {0};
+  if (fields) for (i = 0; i < n_fields; ++i) {
+      jl_entity_add_field(self, fields[i].name, fields[i].type);
+      field = adt_vector_back(self->u._struct->fields);
+      jl_entity_field(field)->field_offset = fields[i].field_offset;
+      jl_entity_field(field)->field_width = fields[i].field_width;
+    }
+  jl_entity_update_size(self);
 }
 
 void jl_union_dtor(jl_entity_t *self) {}

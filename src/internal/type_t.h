@@ -105,15 +105,11 @@ bool jl_type_is_defined(jl_type_t self);
 bool jl_ptype_is_defined(jl_type_t *self);
 bool jl_type_is_ref(jl_type_t type);
 bool jl_type_is_func(jl_type_t type);
-bool jl_type_is_struct(jl_type_t type);
-bool jl_type_is_union(jl_type_t type);
-bool jl_type_is_struct_or_union(jl_type_t type);
 bool jl_type_equals(jl_type_t a, jl_type_t b);
 jl_type_t jl_type_deref(jl_type_t a);
 void jl_type_update_size(jl_type_t *self);
 size_t jl_sizeof(jl_type_t type);
 size_t jl_type_alignment(jl_type_t type);
-void jl_type_add_field(jl_type_t *self, const char *name, jl_type_t type);
 
 #define jl_type_undefined() ((jl_type_t) {JL_TYPE_UNDEFINED})
 

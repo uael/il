@@ -60,6 +60,7 @@ enum jl_func_specifier_n {
 
 struct jl_entity_t {
   unsigned kind : 8;
+  size_t size;
   union {
     struct jl_field_t *_field;
     struct jl_var_t *_var;
@@ -78,6 +79,7 @@ void jl_entity_dtor(jl_entity_t *self);
 void jl_entity_switch(jl_entity_t *self, enum jl_entity_n kind);
 void jl_entity_acquire(jl_entity_t *self);
 void jl_entity_release(jl_entity_t *self);
+void jl_entity_update_size(jl_entity_t *self);
 bool jl_entity_is_defined(jl_entity_t *self);
 bool jl_entity_equals(jl_entity_t a, jl_entity_t b);
 jl_entity_r jl_entity_fields(jl_entity_t self);

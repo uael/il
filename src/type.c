@@ -304,29 +304,6 @@ size_t jl_type_alignment(jl_type_t type) {
   return jl_sizeof(type);
 }
 
-static size_t adjust_member_alignment(jl_type_t *self, jl_type_t type) {
-  size_t align = 0;
-
-  if (jl_type_is_struct(*self)) {
-    align = jl_type_alignment(type);
-    if (self->size % align) {
-      self->size += align - (self->size % align);
-      assert(self->size % align == 0);
-    }
-
-    align = self->size;
-    if (LONG_MAX - align < type.size) {
-      puts("Object is too large.");
-      exit(1);
-    }
-    if (self->size < align + type.size) {
-      self->size = align + type.size;
-    }
-  }
-
-  return align;
-}
-
 void jl_type_add_field(jl_type_t *self, const char *name, jl_type_t type) {
   jl_entity_t field, entity;
   jl_func_t *func;
@@ -357,7 +334,20 @@ void jl_type_add_field(jl_type_t *self, const char *name, jl_type_t type) {
       f = jl_entity_field(field);
       f->name = name;
       f->type = type;
-      f->offset = adjust_member_alignment(self, type);
+      f->offset = jl_type_alignment(type);
+      if (self->size % f->offset) {
+        self->size += f->offset - (self->size % f->offset);
+        assert(self->size % f->offset == 0);
+      }
+
+      f->offset = self->size;
+      if (LONG_MAX - f->offset < type.size) {
+        puts("Object is too large.");
+        exit(1);
+      }
+      if (self->size < f->offset + type.size) {
+        self->size = f->offset + type.size;
+      }
       adt_vector_push(s->fields, field);
       break;
     case JL_ENTITY_UNION:
@@ -366,14 +356,12 @@ void jl_type_add_field(jl_type_t *self, const char *name, jl_type_t type) {
       f = jl_entity_field(field);
       f->name = name;
       f->type = type;
-      f->offset = adjust_member_alignment(self, type);
       adt_vector_push(u->fields, field);
       break;
     default:
       break;
   }
 }
-
 
 jl_entity_r jl_type_fields(jl_type_t self) {
   return jl_entity_fields(jl_type_compound(self)->entity);

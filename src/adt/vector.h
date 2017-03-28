@@ -28,8 +28,8 @@
 
 #include <stdint.h>
 #include <stddef.h>
-#include <stdbool.h>
 #include <string.h>
+#include <adt/bool.h>
 #include <adt/xmalloc.h>
 
 #define jl_roundup32(x) \

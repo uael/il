@@ -26,7 +26,7 @@
 #ifndef   JL_C_PP_H__
 # define  JL_C_PP_H__
 
-#include <stdbool.h>
+#include <adt/bool.h>
 #include <adt/hash.h>
 
 #include "c_lexer.h"

@@ -23,35 +23,16 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_OPTS_H__
-# define  JL_OPTS_H__
+#ifndef   JAYL_BOOL_H__
+# define  JAYL_BOOL_H__
 
-#include <adt/bool.h>
+#if defined(_MSC_VER) && _MSC_VER < 1900
+# define bool	unsigned char
+# define true	1
+# define false	0
+# define __bool_true_false_are_defined	1
+#else
+# include <stdbool.h>
+#endif
 
-#define JL_SRC_DIR_MSIZE 256
-
-typedef struct jl_opts_t jl_opts_t;
-
-enum jl_backend_n {
-  JL_BACKEND_NONE = 0,
-  JL_BACKEND_DOT,
-  JL_BACKEND_PPRINT,
-  JL_BACKEND_FIRM_ASM,
-  JL_BACKEND_FIRM_AMD64,
-  JL_BACKEND_FIRM_ARM,
-  JL_BACKEND_FIRM_IA32,
-  JL_BACKEND_FIRM_MIPS,
-  JL_BACKEND_FIRM_SPARC
-};
-
-struct jl_opts_t {
-  const char *in, *out;
-  char src_dir[JL_SRC_DIR_MSIZE];
-  bool echo, firm_graph, verbose, output_asm;
-  int optimize_lvl;
-  enum jl_backend_n target;
-};
-
-void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]);
-
-#endif /* JL_OPTS_H__ */
+#endif /* JAYL_BOOL_H__ */

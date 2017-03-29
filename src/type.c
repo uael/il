@@ -32,10 +32,10 @@
 #include "expr.h"
 #include "stmt.h"
 
-void jl_literal_dtor(jl_type_t *self);
-void jl_pointer_dtor(jl_type_t *self);
-void jl_array_dtor(jl_type_t *self);
-void jl_compound_dtor(jl_type_t *self);
+void jl_literal_dtor(jl_literal_t *self);
+void jl_pointer_dtor(jl_pointer_t *self);
+void jl_array_dtor(jl_array_t *self);
+void jl_compound_dtor(jl_compound_t *self);
 
 void jl_type_undef(jl_type_t *self) {
   *self = jl_type_undefined();
@@ -46,29 +46,29 @@ void jl_type_dtor(jl_type_t *self) {
     case JL_TYPE_UNDEFINED:
       return;
     case JL_TYPE_LITERAL:
-      if (self->u._literal->refs <= 0) {
-        jl_literal_dtor(self);
+      if (self->u._literal && self->u._literal->refs <= 0) {
+        jl_literal_dtor(self->u._literal);
         free(self->u._literal);
         self->u._literal = NULL;
       }
       break;
     case JL_TYPE_POINTER:
-      if (self->u._pointer->refs <= 0) {
-        jl_pointer_dtor(self);
+      if (self->u._pointer && self->u._pointer->refs <= 0) {
+        jl_pointer_dtor(self->u._pointer);
         free(self->u._pointer);
         self->u._pointer = NULL;
       }
       break;
     case JL_TYPE_ARRAY:
-      if (self->u._array->refs <= 0) {
-        jl_array_dtor(self);
+      if (self->u._array && self->u._array->refs <= 0) {
+        jl_array_dtor(self->u._array);
         free(self->u._array);
         self->u._array = NULL;
       }
       break;
     case JL_TYPE_COMPOUND:
-      if (self->u._compound->refs <= 0) {
-        jl_compound_dtor(self);
+      if (self->u._compound && self->u._compound->refs <= 0) {
+        jl_compound_dtor(self->u._compound);
         free(self->u._compound);
         self->u._compound = NULL;
       }
@@ -97,15 +97,19 @@ void jl_type_switch(jl_type_t *self, enum jl_type_n kind) {
         break;
       case JL_TYPE_LITERAL:
         self->u._literal = xmalloc(sizeof(jl_literal_t));
+        *self->u._literal = (jl_literal_t) {.refs = 0};
         break;
       case JL_TYPE_POINTER:
         self->u._pointer = xmalloc(sizeof(jl_pointer_t));
+        *self->u._pointer = (jl_pointer_t) {.refs = 0};
         break;
       case JL_TYPE_ARRAY:
         self->u._array = xmalloc(sizeof(jl_array_t));
+        *self->u._array = (jl_array_t) {.refs = 0};
         break;
       case JL_TYPE_COMPOUND:
         self->u._compound = xmalloc(sizeof(jl_compound_t));
+        *self->u._compound = (jl_compound_t) {.refs = 0};
         break;
     }
   }
@@ -290,11 +294,16 @@ jl_entity_r jl_type_fields(jl_type_t self) {
   return jl_entity_fields(jl_type_compound(self)->entity);
 }
 
+jl_field_t *jl_field_lookup(jl_type_t self, const char *name) {
+  return jl_entity_field_lookup(jl_type_compound(self)->entity, name);
+}
+
 
 jl_type_t jl_void() {
   static jl_type_t type = {JL_TYPE_UNDEFINED};
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_VOID);
+    jl_type_acquire(&type);
   }
   return type;
 }
@@ -303,6 +312,7 @@ jl_type_t jl_null() {
   static jl_type_t type = {JL_TYPE_UNDEFINED};
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_NULL);
+    jl_type_acquire(&type);
   }
   return type;
 }
@@ -311,6 +321,7 @@ jl_type_t jl_string() {
   static jl_type_t type = {JL_TYPE_UNDEFINED};
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_STRING);
+    jl_type_acquire(&type);
   }
   return type;
 }
@@ -319,6 +330,7 @@ jl_type_t jl_bool() {
   static jl_type_t type = {JL_TYPE_UNDEFINED};
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_BOOL);
+    jl_type_acquire(&type);
   }
   return type;
 }
@@ -327,6 +339,7 @@ jl_type_t jl_char() {
   static jl_type_t type = {JL_TYPE_UNDEFINED};
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_CHAR);
+    jl_type_acquire(&type);
   }
   return type;
 }
@@ -335,6 +348,7 @@ jl_type_t jl_short() {
   static jl_type_t type = {JL_TYPE_UNDEFINED};
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_INT);
+    jl_type_acquire(&type);
   }
   return type;
 }
@@ -343,6 +357,7 @@ jl_type_t jl_int() {
   static jl_type_t type = {JL_TYPE_UNDEFINED};
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_INT);
+    jl_type_acquire(&type);
   }
   return type;
 }
@@ -352,6 +367,7 @@ jl_type_t jl_uint() {
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_INT);
     type.specifiers |= JL_TYPE_SPECIFIER_UNSIGNED;
+    jl_type_acquire(&type);
   }
   return type;
 }
@@ -360,6 +376,7 @@ jl_type_t jl_long() {
   static jl_type_t type = {JL_TYPE_UNDEFINED};
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_LONG);
+    jl_type_acquire(&type);
   }
   return type;
 }
@@ -369,6 +386,7 @@ jl_type_t jl_ulong() {
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_LONG);
     type.specifiers |= JL_TYPE_SPECIFIER_UNSIGNED;
+    jl_type_acquire(&type);
   }
   return type;
 }
@@ -377,6 +395,7 @@ jl_type_t jl_double() {
   static jl_type_t type = {JL_TYPE_UNDEFINED};
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_DOUBLE);
+    jl_type_acquire(&type);
   }
   return type;
 }
@@ -386,6 +405,7 @@ jl_type_t jl_ldouble() {
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_LONG);
     type.specifiers |= JL_TYPE_SPECIFIER_DOUBLE;
+    jl_type_acquire(&type);
   }
   return type;
 }
@@ -394,6 +414,7 @@ jl_type_t jl_float() {
   static jl_type_t type = {JL_TYPE_UNDEFINED};
   if (!jl_type_is_defined(type)) {
     jl_literal_init(&type, JL_LITERAL_FLOAT);
+    jl_type_acquire(&type);
   }
   return type;
 }
@@ -411,7 +432,7 @@ void jl_literal_init(jl_type_t *self, enum jl_literal_n kind) {
   jl_type_update_size(self);
 }
 
-void jl_literal_dtor(jl_type_t *self) {}
+void jl_literal_dtor(jl_literal_t *self) {}
 
 
 jl_type_t jl_pointer(jl_type_t of) {
@@ -427,7 +448,9 @@ void jl_pointer_init(jl_type_t *self, jl_type_t of) {
   jl_type_update_size(self);
 }
 
-void jl_pointer_dtor(jl_type_t *self) {}
+void jl_pointer_dtor(jl_pointer_t *self) {
+  jl_type_dtor(&self->of);
+}
 
 
 jl_type_t jl_array(jl_type_t of) {
@@ -451,7 +474,10 @@ void jl_array_init(jl_type_t *self, jl_type_t of, jl_expr_t size) {
   jl_type_update_size(self);
 }
 
-void jl_array_dtor(jl_type_t *self) {}
+void jl_array_dtor(jl_array_t *self) {
+  jl_type_dtor(&self->of);
+  jl_expr_dtor(&self->size);
+}
 
 
 jl_type_t jl_compound(jl_entity_t entity) {
@@ -467,4 +493,6 @@ void jl_compound_init(jl_type_t *self, jl_entity_t entity) {
   jl_type_update_size(self);
 }
 
-void jl_compound_dtor(jl_type_t *self) {}
+void jl_compound_dtor(jl_compound_t *self) {
+  jl_entity_dtor(&self->entity);
+}

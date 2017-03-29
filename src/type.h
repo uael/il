@@ -32,6 +32,7 @@
 #include "type_t.h"
 
 jl_entity_r jl_type_fields(jl_type_t self);
+jl_field_t *jl_field_lookup(jl_type_t self, const char *name);
 
 struct jl_literal_t {
   unsigned refs;

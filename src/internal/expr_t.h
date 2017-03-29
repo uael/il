@@ -74,7 +74,9 @@ enum jl_op_n {
   JL_OP_DIV,    /* l / r        */
   JL_OP_MOD,    /* l % r        */
   JL_OP_AND,    /* l & r        */
+  JL_OP_LAND,    /* l & r        */
   JL_OP_OR,     /* l | r        */
+  JL_OP_LOR,     /* l | r        */
   JL_OP_XOR,    /* l ^ r        */
   JL_OP_SHL,    /* l << r       */
   JL_OP_SHR,    /* l >> r       */
@@ -82,6 +84,8 @@ enum jl_op_n {
   JL_OP_NE,     /* l != r       */
   JL_OP_GE,     /* l >= r       */
   JL_OP_GT,     /* l > r        */
+  JL_OP_LE,     /* l <= r       */
+  JL_OP_LT,     /* l < r        */
   JL_OP_NEG     /* l ~ r        */
 };
 

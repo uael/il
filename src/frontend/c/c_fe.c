@@ -129,6 +129,10 @@ void c_fe_parse(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
   self->scope->sym = jl_sym_put(self->scope, "foo");
   jl_fe_unscope(self);
 
+  jl_fval_t fval;
+  expression(&fval, self, lexer, out);
+  jl_expr_dtor(&fval.u.expr);
+
   while (FE_NEXT().type != 0);
 }
 
@@ -137,24 +141,11 @@ FRULE_DEF(primary_expression) {
 
   FE_MATCHT(1, C_TOK_IDENTIFIER) {
     SYM_GET(_1.u.token.value);
-    jl_fval_init_expr(_0, jl_id(sym->id, _1.u.token.kind == JL_TOKEN_KEYWORD));
-    jl_expr_set_type(&_0->u.expr, jl_entity_var(sym->entity)->type);
+    jl_fval_init_expr(_0, jl_id(sym->id, jl_entity_type(sym->entity)));
   }
   FRULE_OR
   FE_MATCHR(1, constant) {
-    switch (_1.kind) {
-      case JL_FVAL_STRING:
-        jl_fval_init_expr(_0, jl_const_string(_1.u.s));
-        break;
-      case JL_FVAL_INT:
-        jl_fval_init_expr(_0, jl_const_int(_1.u.d));
-        break;
-      case JL_FVAL_FLOAT:
-        jl_fval_init_expr(_0, jl_const_float(_1.u.f));
-        break;
-      default:
-        break;
-    }
+    jl_fval_init_expr(_0, _1.u.expr);
   }
   FRULE_OR
   FE_MATCHR(1, string) {
@@ -185,7 +176,7 @@ FRULE_DEF(constant) {
   FRULE_OR
   FE_MATCHT(1, C_TOK_IDENTIFIER) {
     if (SYM_GET(_1.u.token.value) && jl_sym_has_flag(sym, C_TOKEN_FLAG_ENUMERATION_CONSTANT)) {
-      jl_fval_init_string(_0, _1.u.token.value);
+      jl_fval_init_expr(_0, jl_id(sym->id, jl_entity_type(sym->entity)));
     }
   }
 
@@ -247,17 +238,15 @@ FRULE_DEF(postfix_expression) {
   jl_entity_t param;
   jl_entity_r params;
   jl_expr_r args;
+  jl_field_t *field;
 
   FE_MATCHR(1, primary_expression) {
-    puts("got pe");
     jl_fval_init_expr(_0, _1.u.expr);
     while (true) {
       switch (FE_PEEK().type) {
         case '[':
-          puts("array");
           FE_NEXT();
           FE_MATCHR(1, expression) {
-            puts("array pe");
             jl_fval_init_expr(_0, jl_array_read(_0->u.expr, _1.u.expr));
           }
           FRULE_OR {
@@ -302,11 +291,33 @@ FRULE_DEF(postfix_expression) {
           break;
         case '.':
           FE_NEXT();
-          FE_CONSUME(C_TOK_IDENTIFIER);
+          token = FE_CONSUME(C_TOK_IDENTIFIER);
+          field = jl_field_lookup(jl_expr_get_type(_0->u.expr), token.value);
+          if (!field) {
+            printf("Invalid access, no member named '%s'.", token.value);
+            exit(1);
+          }
+          jl_fval_init_expr(
+            _0, jl_field_read(_0->u.expr, jl_id(field->name, field->type), field->field_width, field->field_offset)
+          );
           break;
         case C_TOK_PTR_OP:
           FE_NEXT();
-          FE_CONSUME(C_TOK_IDENTIFIER);
+          type = jl_expr_get_type(_0->u.expr);
+          if (!jl_type_is_pointer(type)) {
+            printf("Invalid access on non pointer element '%s'.", token.value);
+            exit(1);
+          }
+          type = jl_type_deref(type);
+          token = FE_CONSUME(C_TOK_IDENTIFIER);
+          field = jl_field_lookup(type, token.value);
+          if (!field) {
+            printf("Invalid access, no member named '%s'.", token.value);
+            exit(1);
+          }
+          jl_fval_init_expr(
+            _0, jl_field_read(_0->u.expr, jl_id(field->name, field->type), field->field_width, field->field_offset)
+          );
           break;
         default:
           FRULE_BODY_END;
@@ -324,6 +335,36 @@ FRULE_DEF(argument_expression_list) {
 
 FRULE_DEF(unary_expression) {
   FRULE_BODY_BEGIN;
+  enum jl_op_n op;
+
+  switch (FE_PEEK().type) {
+    case '&':
+      op = JL_OP_AND;
+      break;
+    case '*':
+      op = JL_OP_AND;
+      break;
+    case '-':
+      op = JL_OP_SUB;
+      break;
+    case '~':
+      op = JL_OP_NEG;
+      break;
+    case '!':
+      op = JL_OP_NOT;
+      break;
+    default:
+      return FE_FRULE_DIRECT(postfix_expression);
+  }
+  FE_NEXT();
+  FE_MATCHR(1, cast_expression) {
+    jl_fval_init_expr(_0, jl_unary(op, _1.u.expr));
+  }
+  FRULE_OR {
+    fprintf(stderr, "Expected cast expression");
+    exit(1);
+  }
+
   FRULE_BODY_END;
 }
 
@@ -334,66 +375,405 @@ FRULE_DEF(unary_operator) {
 
 FRULE_DEF(cast_expression) {
   FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
+
+  if ((token = FE_PEEK()).type == '(') {
+    FE_NEXT();
+    FE_MATCHR(1, type_name) {
+      FE_CONSUME(')');
+      FE_MATCHR(2, cast_expression) {
+        jl_fval_init_expr(_0, jl_cast(_1.u.type, _2.u.expr));
+        FRULE_BODY_END;
+      }
+      FRULE_OR {
+        FE_UNDO(token);
+      }
+    }
+    FRULE_OR {
+      FE_UNDO(token);
+    }
+  }
+
+  return FE_FRULE_DIRECT(unary_expression);
 }
 
 FRULE_DEF(multiplicative_expression) {
   FRULE_BODY_BEGIN;
+
+  FE_MATCHR(1, cast_expression) {
+    jl_fval_init_expr(_0, _1.u.expr);
+    while (true) {
+      switch (FE_PEEK().type) {
+        case '*':
+          FE_NEXT();
+          FE_MATCHR(1, cast_expression) {
+            jl_fval_init_expr(_0, jl_binary(JL_OP_MUL, _0->u.expr, _1.u.expr));
+          }
+          FRULE_OR {
+            fprintf(stderr, "Expected cast expression");
+            exit(1);
+          }
+          break;
+        case '/':
+          FE_NEXT();
+          FE_MATCHR(1, cast_expression) {
+            jl_fval_init_expr(_0, jl_binary(JL_OP_DIV, _0->u.expr, _1.u.expr));
+          }
+          FRULE_OR {
+            fprintf(stderr, "Expected cast expression");
+            exit(1);
+          }
+          break;
+        case '%':
+          FE_NEXT();
+          FE_MATCHR(1, cast_expression) {
+            jl_fval_init_expr(_0, jl_binary(JL_OP_MOD, _0->u.expr, _1.u.expr));
+          }
+          FRULE_OR {
+            fprintf(stderr, "Expected cast expression");
+            exit(1);
+          }
+          break;
+        default:
+          FRULE_BODY_END;
+      }
+    }
+  }
+
   FRULE_BODY_END;
 }
 
 FRULE_DEF(additive_expression) {
   FRULE_BODY_BEGIN;
+
+  FE_MATCHR(1, multiplicative_expression) {
+    jl_fval_init_expr(_0, _1.u.expr);
+    while (true) {
+      switch (FE_PEEK().type) {
+        case '+':
+          FE_NEXT();
+          FE_MATCHR(1, multiplicative_expression) {
+            jl_fval_init_expr(_0, jl_binary(JL_OP_ADD, _0->u.expr, _1.u.expr));
+          }
+          FRULE_OR {
+            fprintf(stderr, "Expected multiplicative expression");
+            exit(1);
+          }
+          break;
+        case '-':
+          FE_NEXT();
+          FE_MATCHR(1, multiplicative_expression) {
+            jl_fval_init_expr(_0, jl_binary(JL_OP_SUB, _0->u.expr, _1.u.expr));
+          }
+          FRULE_OR {
+            fprintf(stderr, "Expected multiplicative expression");
+            exit(1);
+          }
+          break;
+        default:
+          FRULE_BODY_END;
+      }
+    }
+  }
+
   FRULE_BODY_END;
 }
 
 FRULE_DEF(shift_expression) {
   FRULE_BODY_BEGIN;
+
+  FE_MATCHR(1, additive_expression) {
+    jl_fval_init_expr(_0, _1.u.expr);
+    while (true) {
+      switch (FE_PEEK().type) {
+        case C_TOK_LSHIFT:
+          FE_NEXT();
+          FE_MATCHR(1, additive_expression) {
+            jl_fval_init_expr(_0, jl_binary(JL_OP_SHL, _0->u.expr, _1.u.expr));
+          }
+          FRULE_OR {
+            fprintf(stderr, "Expected additive expression");
+            exit(1);
+          }
+          break;
+        case C_TOK_RSHIFT:
+          FE_NEXT();
+          FE_MATCHR(1, additive_expression) {
+            jl_fval_init_expr(_0, jl_binary(JL_OP_SHR, _0->u.expr, _1.u.expr));
+          }
+          FRULE_OR {
+            fprintf(stderr, "Expected additive expression");
+            exit(1);
+          }
+          break;
+        default:
+          FRULE_BODY_END;
+      }
+    }
+  }
+
   FRULE_BODY_END;
 }
 
 FRULE_DEF(relational_expression) {
   FRULE_BODY_BEGIN;
+
+  FE_MATCHR(1, shift_expression) {
+    jl_fval_init_expr(_0, _1.u.expr);
+    while (true) {
+      switch (FE_PEEK().type) {
+        case '<':
+          FE_NEXT();
+          FE_MATCHR(1, shift_expression) {
+            jl_fval_init_expr(_0, jl_binary(JL_OP_LT, _0->u.expr, _1.u.expr));
+          }
+          FRULE_OR {
+            fprintf(stderr, "Expected shift expression");
+            exit(1);
+          }
+          break;
+        case '>':
+          FE_NEXT();
+          FE_MATCHR(1, shift_expression) {
+            jl_fval_init_expr(_0, jl_binary(JL_OP_GT, _0->u.expr, _1.u.expr));
+          }
+          FRULE_OR {
+            fprintf(stderr, "Expected shift expression");
+            exit(1);
+          }
+          break;
+        case C_TOK_LEQ:
+          FE_NEXT();
+          FE_MATCHR(1, shift_expression) {
+            jl_fval_init_expr(_0, jl_binary(JL_OP_LE, _0->u.expr, _1.u.expr));
+          }
+          FRULE_OR {
+            fprintf(stderr, "Expected shift expression");
+            exit(1);
+          }
+          break;
+        case C_TOK_GEQ:
+          FE_NEXT();
+          FE_MATCHR(1, shift_expression) {
+            jl_fval_init_expr(_0, jl_binary(JL_OP_GE, _0->u.expr, _1.u.expr));
+          }
+          FRULE_OR {
+            fprintf(stderr, "Expected shift expression");
+            exit(1);
+          }
+          break;
+        default:
+          FRULE_BODY_END;
+      }
+    }
+  }
+
   FRULE_BODY_END;
 }
 
 FRULE_DEF(equality_expression) {
   FRULE_BODY_BEGIN;
+
+  FE_MATCHR(1, relational_expression) {
+    jl_fval_init_expr(_0, _1.u.expr);
+    while (true) {
+      switch (FE_PEEK().type) {
+        case C_TOK_EQ:
+          FE_NEXT();
+          FE_MATCHR(1, relational_expression) {
+            jl_fval_init_expr(_0, jl_binary(JL_OP_EQ, _0->u.expr, _1.u.expr));
+          }
+          FRULE_OR {
+            fprintf(stderr, "Expected relational expression");
+            exit(1);
+          }
+          break;
+        case C_TOK_NEQ:
+          FE_NEXT();
+          FE_MATCHR(1, relational_expression) {
+            jl_fval_init_expr(_0, jl_binary(JL_OP_NE, _0->u.expr, _1.u.expr));
+          }
+          FRULE_OR {
+            fprintf(stderr, "Expected relational expression");
+            exit(1);
+          }
+          break;
+        default:
+          FRULE_BODY_END;
+      }
+    }
+  }
+
   FRULE_BODY_END;
 }
 
 FRULE_DEF(and_expression) {
   FRULE_BODY_BEGIN;
+
+  FE_MATCHR(1, equality_expression) {
+    jl_fval_init_expr(_0, _1.u.expr);
+    while (true) {
+      switch (FE_PEEK().type) {
+        case '&':
+          FE_NEXT();
+          FE_MATCHR(1, equality_expression) {
+            jl_fval_init_expr(_0, jl_binary(JL_OP_AND, _0->u.expr, _1.u.expr));
+          }
+          FRULE_OR {
+            fprintf(stderr, "Expected equality expression");
+            exit(1);
+          }
+          break;
+        default:
+          FRULE_BODY_END;
+      }
+    }
+  }
+
   FRULE_BODY_END;
 }
 
 FRULE_DEF(exclusive_or_expression) {
   FRULE_BODY_BEGIN;
+
+  FE_MATCHR(1, and_expression) {
+    jl_fval_init_expr(_0, _1.u.expr);
+    while (true) {
+      switch (FE_PEEK().type) {
+        case '^':
+          FE_NEXT();
+          FE_MATCHR(1, and_expression) {
+            jl_fval_init_expr(_0, jl_binary(JL_OP_XOR, _0->u.expr, _1.u.expr));
+          }
+          FRULE_OR {
+            fprintf(stderr, "Expected add expression");
+            exit(1);
+          }
+          break;
+        default:
+          FRULE_BODY_END;
+      }
+    }
+  }
+
   FRULE_BODY_END;
 }
 
 FRULE_DEF(inclusive_or_expression) {
   FRULE_BODY_BEGIN;
+
+  FE_MATCHR(1, exclusive_or_expression) {
+    jl_fval_init_expr(_0, _1.u.expr);
+    while (true) {
+      switch (FE_PEEK().type) {
+        case '|':
+          FE_NEXT();
+          FE_MATCHR(1, exclusive_or_expression) {
+            jl_fval_init_expr(_0, jl_binary(JL_OP_OR, _0->u.expr, _1.u.expr));
+          }
+          FRULE_OR {
+            fprintf(stderr, "Expected exclusive or expression");
+            exit(1);
+          }
+          break;
+        default:
+          FRULE_BODY_END;
+      }
+    }
+  }
+
   FRULE_BODY_END;
 }
 
 FRULE_DEF(logical_and_expression) {
   FRULE_BODY_BEGIN;
+
+  FE_MATCHR(1, inclusive_or_expression) {
+    jl_fval_init_expr(_0, _1.u.expr);
+    while (true) {
+      switch (FE_PEEK().type) {
+        case C_TOK_LOGICAL_AND:
+          FE_NEXT();
+          FE_MATCHR(1, inclusive_or_expression) {
+            jl_fval_init_expr(_0, jl_binary(JL_OP_LAND, _0->u.expr, _1.u.expr));
+          }
+          FRULE_OR {
+            fprintf(stderr, "Expected inclusive or expression");
+            exit(1);
+          }
+          break;
+        default:
+          FRULE_BODY_END;
+      }
+    }
+  }
+
   FRULE_BODY_END;
 }
 
 FRULE_DEF(logical_or_expression) {
   FRULE_BODY_BEGIN;
+
+  FE_MATCHR(1, logical_and_expression) {
+    jl_fval_init_expr(_0, _1.u.expr);
+    while (true) {
+      switch (FE_PEEK().type) {
+        case C_TOK_LOGICAL_OR:
+          FE_NEXT();
+          FE_MATCHR(1, logical_and_expression) {
+            jl_fval_init_expr(_0, jl_binary(JL_OP_LOR, _0->u.expr, _1.u.expr));
+          }
+          FRULE_OR {
+            fprintf(stderr, "Expected logical and expression");
+            exit(1);
+          }
+          break;
+        default:
+          FRULE_BODY_END;
+      }
+    }
+  }
+
   FRULE_BODY_END;
 }
 
 FRULE_DEF(conditional_expression) {
   FRULE_BODY_BEGIN;
+
+  FE_MATCHR(1, logical_or_expression) {
+    jl_fval_init_expr(_0, _1.u.expr);
+    while (true) {
+      switch (FE_PEEK().type) {
+        case '?':
+          FE_NEXT();
+          FE_MATCHR(1, expression) {
+            FE_CONSUME(':');
+            FE_MATCHR(1, conditional_expression) {
+              jl_fval_init_expr(_0, jl_ternary(_0->u.expr, _1.u.expr, _2.u.expr));
+            }
+            FRULE_OR {
+              fprintf(stderr, "Expected conditional expression");
+              exit(1);
+            }
+          }
+          FRULE_OR {
+            fprintf(stderr, "Expected expression");
+            exit(1);
+          }
+          break;
+        default:
+          FRULE_BODY_END;
+      }
+    }
+  }
+
   FRULE_BODY_END;
 }
 
 FRULE_DEF(assignment_expression) {
   FRULE_BODY_BEGIN;
+
+
+
   FRULE_BODY_END;
 }
 
@@ -404,6 +784,11 @@ FRULE_DEF(assignment_operator) {
 
 FRULE_DEF(expression) {
   FRULE_BODY_BEGIN;
+
+  FE_MATCHR(1, conditional_expression) {
+    jl_fval_init_expr(_0, _1.u.expr);
+  }
+
   FRULE_BODY_END;
 }
 

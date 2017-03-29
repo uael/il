@@ -77,8 +77,14 @@ void jl_fe_unscope(jl_fe_t *self);
 #define FE_UNDO(until) jl_lexer_undo(lexer, until)
 #define FE_UNDON(n) jl_lexer_undon(lexer, n)
 
+#define FE_FRULE(val, name) \
+ FRULE_FN(name)(val, fe, lexer, out)
+
+#define FE_FRULE_DIRECT(name) \
+  FE_FRULE(fval, name)
+
 #define FE_MATCHR(n, name) \
-  if (_ ## n = (jl_fval_t) {JL_FVAL_UNDEFINED}, FRULE_FN(name)(&_ ## n, fe, lexer, out))
+  if (_ ## n = (jl_fval_t) {JL_FVAL_UNDEFINED}, FE_FRULE(&_ ## n, name))
 
 #define FE_MATCHT(n, name) \
   if (FE_PEEK().type == name \

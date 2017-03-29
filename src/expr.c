@@ -37,95 +37,96 @@
 #include "stmt.h"
 #include "type.h"
 
-void jl_expr_id_dtor(jl_expr_t *self);
-void jl_expr_const_dtor(jl_expr_t *self);
-void jl_expr_unary_dtor(jl_expr_t *self);
-void jl_expr_binary_dtor(jl_expr_t *self);
-void jl_expr_ternary_dtor(jl_expr_t *self);
-void jl_expr_array_read_dtor(jl_expr_t *self);
-void jl_expr_array_write_dtor(jl_expr_t *self);
-void jl_expr_field_read_dtor(jl_expr_t *self);
-void jl_expr_field_write_dtor(jl_expr_t *self);
-void jl_expr_call_dtor(jl_expr_t *self);
-void jl_expr_list_dtor(jl_expr_t *self);
+void jl_expr_id_dtor(jl_expr_id_t *self);
+void jl_expr_const_dtor(jl_expr_const_t *self);
+void jl_expr_unary_dtor(jl_expr_unary_t *self);
+void jl_expr_binary_dtor(jl_expr_binary_t *self);
+void jl_expr_ternary_dtor(jl_expr_ternary_t *self);
+void jl_expr_array_read_dtor(jl_expr_array_read_t *self);
+void jl_expr_array_write_dtor(jl_expr_array_write_t *self);
+void jl_expr_field_read_dtor(jl_expr_field_read_t *self);
+void jl_expr_field_write_dtor(jl_expr_field_write_t *self);
+void jl_expr_call_dtor(jl_expr_call_t *self);
+void jl_expr_list_dtor(jl_expr_list_t *self);
 
 void jl_expr_dtor(jl_expr_t *self) {
+  jl_type_dtor(&self->type);
   switch (self->kind) {
     case JL_EXPR_UNDEFINED:
       return;
     case JL_EXPR_ID:
-      if (self->u._id->refs <= 0) {
-        jl_expr_id_dtor(self);
+      if (self->u._id && self->u._id->refs <= 0) {
+        jl_expr_id_dtor(self->u._id);
         free(self->u._id);
         self->u._id = NULL;
       }
       break;
     case JL_EXPR_CONST:
-      if (self->u._const->refs <= 0) {
-        jl_expr_const_dtor(self);
+      if (self->u._const && self->u._const->refs <= 0) {
+        jl_expr_const_dtor(self->u._const);
         free(self->u._const);
         self->u._const = NULL;
       }
       break;
     case JL_EXPR_UNARY:
-      if (self->u._unary->refs <= 0) {
-        jl_expr_unary_dtor(self);
+      if (self->u._unary && self->u._unary->refs <= 0) {
+        jl_expr_unary_dtor(self->u._unary);
         free(self->u._unary);
         self->u._unary = NULL;
       }
       break;
     case JL_EXPR_BINARY:
-      if (self->u._binary->refs <= 0) {
-        jl_expr_binary_dtor(self);
+      if (self->u._binary && self->u._binary->refs <= 0) {
+        jl_expr_binary_dtor(self->u._binary);
         free(self->u._binary);
         self->u._binary = NULL;
       }
       break;
     case JL_EXPR_TERNARY:
-      if (self->u._ternary->refs <= 0) {
-        jl_expr_ternary_dtor(self);
+      if (self->u._ternary && self->u._ternary->refs <= 0) {
+        jl_expr_ternary_dtor(self->u._ternary);
         free(self->u._ternary);
         self->u._ternary = NULL;
       }
       break;
     case JL_EXPR_ARRAY_READ:
-      if (self->u._array_read->refs <= 0) {
-        jl_expr_array_read_dtor(self);
+      if (self->u._array_read && self->u._array_read->refs <= 0) {
+        jl_expr_array_read_dtor(self->u._array_read);
         free(self->u._array_read);
         self->u._array_read = NULL;
       }
       break;
     case JL_EXPR_ARRAY_WRITE:
-      if (self->u._array_write->refs <= 0) {
-        jl_expr_array_write_dtor(self);
+      if (self->u._array_write && self->u._array_write->refs <= 0) {
+        jl_expr_array_write_dtor(self->u._array_write);
         free(self->u._array_write);
         self->u._array_write = NULL;
       }
       break;
     case JL_EXPR_FIELD_READ:
-      if (self->u._field_read->refs <= 0) {
-        jl_expr_field_read_dtor(self);
+      if (self->u._field_read && self->u._field_read->refs <= 0) {
+        jl_expr_field_read_dtor(self->u._field_read);
         free(self->u._field_read);
         self->u._field_read = NULL;
       }
       break;
     case JL_EXPR_FIELD_WRITE:
-      if (self->u._field_write->refs <= 0) {
-        jl_expr_field_write_dtor(self);
+      if (self->u._field_write && self->u._field_write->refs <= 0) {
+        jl_expr_field_write_dtor(self->u._field_write);
         free(self->u._field_write);
         self->u._field_write = NULL;
       }
       break;
     case JL_EXPR_CALL:
-      if (self->u._call->refs <= 0) {
-        jl_expr_call_dtor(self);
+      if (self->u._call && self->u._call->refs <= 0) {
+        jl_expr_call_dtor(self->u._call);
         free(self->u._call);
         self->u._call = NULL;
       }
       break;
     case JL_EXPR_LIST:
-      if (self->u._list->refs <= 0) {
-        jl_expr_list_dtor(self);
+      if (self->u._list && self->u._list->refs <= 0) {
+        jl_expr_list_dtor(self->u._list);
         free(self->u._list);
         self->u._list = NULL;
       }
@@ -147,36 +148,47 @@ void jl_expr_switch(jl_expr_t *self, enum jl_expr_n kind) {
         break;
       case JL_EXPR_ID:
         self->u._id = xmalloc(sizeof(jl_expr_id_t));
+        *self->u._id = (jl_expr_id_t) {.refs = 0};
         break;
       case JL_EXPR_CONST:
-        self->u._id = xmalloc(sizeof(jl_expr_const_t));
+        self->u._const = xmalloc(sizeof(jl_expr_const_t));
+        *self->u._const = (jl_expr_const_t) {.refs = 0};
         break;
       case JL_EXPR_UNARY:
-        self->u._id = xmalloc(sizeof(jl_expr_unary_t));
+        self->u._unary = xmalloc(sizeof(jl_expr_unary_t));
+        *self->u._unary = (jl_expr_unary_t) {.refs = 0};
         break;
       case JL_EXPR_BINARY:
-        self->u._id = xmalloc(sizeof(jl_expr_binary_t));
+        self->u._binary = xmalloc(sizeof(jl_expr_binary_t));
+        *self->u._binary = (jl_expr_binary_t) {.refs = 0};
         break;
       case JL_EXPR_TERNARY:
         self->u._ternary = xmalloc(sizeof(jl_expr_ternary_t));
+        *self->u._ternary = (jl_expr_ternary_t) {.refs = 0};
         break;
       case JL_EXPR_ARRAY_READ:
         self->u._array_read = xmalloc(sizeof(struct jl_expr_array_read_t));
+        *self->u._array_read = (jl_expr_array_read_t) {.refs = 0};
         break;
       case JL_EXPR_ARRAY_WRITE:
         self->u._array_write = xmalloc(sizeof(jl_expr_array_write_t));
+        *self->u._array_write = (jl_expr_array_write_t) {.refs = 0};
         break;
       case JL_EXPR_FIELD_READ:
         self->u._field_read = xmalloc(sizeof(jl_expr_field_read_t));
+        *self->u._field_read = (jl_expr_field_read_t) {.refs = 0};
         break;
       case JL_EXPR_FIELD_WRITE:
         self->u._field_write = xmalloc(sizeof(jl_expr_field_write_t));
+        *self->u._field_write = (jl_expr_field_write_t) {.refs = 0};
         break;
       case JL_EXPR_CALL:
         self->u._call = xmalloc(sizeof(jl_expr_call_t));
+        *self->u._call = (jl_expr_call_t) {.refs = 0};
         break;
       case JL_EXPR_LIST:
         self->u._list = xmalloc(sizeof(jl_expr_list_t));
+        *self->u._list = (jl_expr_list_t) {.refs = 0};
         break;
     }
   }
@@ -307,20 +319,20 @@ void jl_expr_set_type(jl_expr_t *self, jl_type_t type) {
 }
 
 
-jl_expr_t jl_id(const char *id, bool is_keyword) {
+jl_expr_t jl_id(const char *id, jl_type_t type) {
   jl_expr_t expr = {JL_EXPR_UNDEFINED};
 
-  jl_id_init(&expr, id, is_keyword);
+  jl_id_init(&expr, id, type);
   return expr;
 }
 
-void jl_id_init(jl_expr_t *self, const char *id, bool is_keyword) {
+void jl_id_init(jl_expr_t *self, const char *id, jl_type_t type) {
   jl_expr_switch(self, JL_EXPR_ID);
   jl_pexpr_id(self)->id = id;
-  jl_pexpr_id(self)->is_keyword = is_keyword;
+  jl_expr_set_type(self, type);
 }
 
-void jl_expr_id_dtor(jl_expr_t *self) {}
+void jl_expr_id_dtor(jl_expr_id_t *self) {}
 
 
 jl_expr_t jl_const_int(int d) {
@@ -352,7 +364,7 @@ void jl_const_init(jl_expr_t *self, jl_type_t type) {
   jl_expr_set_type(self, type);
 }
 
-void jl_expr_const_dtor(jl_expr_t *self) {}
+void jl_expr_const_dtor(jl_expr_const_t *self) {}
 
 enum suffix {
   SUFFIX_NONE = 0,
@@ -501,7 +513,9 @@ void jl_unary_init(jl_expr_t *self, enum jl_op_n op, jl_expr_t operand) {
   jl_pexpr_unary(self)->operand = operand;
 }
 
-void jl_expr_unary_dtor(jl_expr_t *self) {}
+void jl_expr_unary_dtor(jl_expr_unary_t *self) {
+  jl_expr_dtor(&self->operand);
+}
 
 
 jl_expr_t jl_binary(enum jl_op_n op, jl_expr_t lhs, jl_expr_t rhs) {
@@ -513,11 +527,15 @@ jl_expr_t jl_binary(enum jl_op_n op, jl_expr_t lhs, jl_expr_t rhs) {
 
 void jl_binary_init(jl_expr_t *self, enum jl_op_n op, jl_expr_t lhs, jl_expr_t rhs) {
   jl_expr_switch(self, JL_EXPR_BINARY);
+  jl_pexpr_binary(self)->op = op;
   jl_pexpr_binary(self)->lhs = lhs;
   jl_pexpr_binary(self)->rhs = rhs;
 }
 
-void jl_expr_binary_dtor(jl_expr_t *self) {}
+void jl_expr_binary_dtor(jl_expr_binary_t *self) {
+  jl_expr_dtor(&self->lhs);
+  jl_expr_dtor(&self->rhs);
+}
 
 
 jl_expr_t jl_ternary(jl_expr_t lhs, jl_expr_t mhs, jl_expr_t rhs) {
@@ -534,7 +552,11 @@ void jl_ternary_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t mhs, jl_expr_t rh
   jl_pexpr_ternary(self)->rhs = rhs;
 }
 
-void jl_expr_ternary_dtor(jl_expr_t *self) {}
+void jl_expr_ternary_dtor(jl_expr_ternary_t *self) {
+  jl_expr_dtor(&self->lhs);
+  jl_expr_dtor(&self->mhs);
+  jl_expr_dtor(&self->rhs);
+}
 
 
 jl_expr_t jl_array_read(jl_expr_t lhs, jl_expr_t pos) {
@@ -550,7 +572,10 @@ void jl_array_read_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t pos) {
   jl_pexpr_array_read(self)->pos = pos;
 }
 
-void jl_expr_array_read_dtor(jl_expr_t *self) {}
+void jl_expr_array_read_dtor(jl_expr_array_read_t *self) {
+  jl_expr_dtor(&self->lhs);
+  jl_expr_dtor(&self->pos);
+}
 
 
 jl_expr_t jl_array_write(jl_expr_t lhs, jl_expr_t pos, jl_expr_t rhs) {
@@ -567,24 +592,32 @@ void jl_array_write_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t pos, jl_expr_
   jl_pexpr_array_write(self)->rhs = rhs;
 }
 
-void jl_expr_array_write_dtor(jl_expr_t *self) {}
+void jl_expr_array_write_dtor(jl_expr_array_write_t *self) {
+  jl_expr_dtor(&self->lhs);
+  jl_expr_dtor(&self->pos);
+  jl_expr_dtor(&self->rhs);
+}
 
 
-jl_expr_t jl_field_read(jl_expr_t lhs, bool ptr, jl_expr_t field) {
+jl_expr_t jl_field_read(jl_expr_t lhs, jl_expr_t field, short width, short offset) {
   jl_expr_t expr = {JL_EXPR_UNDEFINED};
 
-  jl_field_read_init(&expr, lhs, ptr, field);
+  jl_field_read_init(&expr, lhs, field, width, offset);
   return expr;
 }
 
-void jl_field_read_init(jl_expr_t *self, jl_expr_t lhs, bool ptr, jl_expr_t field) {
+void jl_field_read_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t field, short width, short offset) {
   jl_expr_switch(self, JL_EXPR_FIELD_READ);
   jl_pexpr_field_read(self)->lhs = lhs;
-  jl_pexpr_field_read(self)->ptr = ptr;
   jl_pexpr_field_read(self)->field = field;
+  jl_pexpr_field_read(self)->width = width;
+  jl_pexpr_field_read(self)->offset = offset;
 }
 
-void jl_expr_field_read_dtor(jl_expr_t *self) {}
+void jl_expr_field_read_dtor(jl_expr_field_read_t *self) {
+  jl_expr_dtor(&self->lhs);
+  jl_expr_dtor(&self->field);
+}
 
 
 jl_expr_t jl_field_write(jl_expr_t lhs, bool ptr, jl_expr_t field, jl_expr_t rhs) {
@@ -602,7 +635,11 @@ void jl_field_write_init(jl_expr_t *self, jl_expr_t lhs, bool ptr, jl_expr_t fie
   jl_pexpr_field_write(self)->rhs = rhs;
 }
 
-void jl_expr_field_write_dtor(jl_expr_t *self) {}
+void jl_expr_field_write_dtor(jl_expr_field_write_t *self) {
+  jl_expr_dtor(&self->lhs);
+  jl_expr_dtor(&self->field);
+  jl_expr_dtor(&self->rhs);
+}
 
 
 jl_expr_t jl_call(jl_expr_t lhs, jl_expr_r args) {
@@ -618,8 +655,14 @@ void jl_call_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_r args) {
   jl_pexpr_call(self)->args = args;
 }
 
-void jl_expr_call_dtor(jl_expr_t *self) {
-  adt_vector_dtor(jl_pexpr_call(self)->args);
+void jl_expr_call_dtor(jl_expr_call_t *self) {
+  jl_expr_t arg;
+
+  adt_vector_foreach(self->args, arg) {
+    jl_expr_dtor(&arg);
+  }
+  adt_vector_dtor(self->args);
+  jl_expr_dtor(&self->lhs);
 }
 
 jl_expr_t jl_exprs(jl_expr_r exprs) {
@@ -658,6 +701,11 @@ jl_expr_t jl_exprs_shift(jl_expr_t *self) {
   return expr;
 }
 
-void jl_expr_list_dtor(jl_expr_t *self) {
-  adt_vector_dtor(jl_pexpr_list(self)->exprs);
+void jl_expr_list_dtor(jl_expr_list_t *self) {
+  jl_expr_t expr;
+
+  adt_vector_foreach(self->exprs, expr) {
+    jl_expr_dtor(&expr);
+  }
+  adt_vector_dtor(self->exprs);
 }

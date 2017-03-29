@@ -83,6 +83,7 @@ void jl_entity_update_size(jl_entity_t *self);
 bool jl_entity_is_defined(jl_entity_t *self);
 bool jl_entity_equals(jl_entity_t a, jl_entity_t b);
 jl_entity_r jl_entity_fields(jl_entity_t self);
+jl_field_t *jl_entity_field_lookup(jl_entity_t self, const char *name);
 const char *jl_entity_name(jl_entity_t self);
 
 #define jl_entity_is_field(e) ((e).kind == JL_ENTITY_FIELD)

@@ -37,8 +37,8 @@ struct jl_expr_id_t {
   bool is_keyword;
 };
 
-jl_expr_t jl_id(const char *id, bool is_keyword);
-void jl_id_init(jl_expr_t *self, const char *id, bool is_keyword);
+jl_expr_t jl_id(const char *id, jl_type_t type);
+void jl_id_init(jl_expr_t *self, const char *id, jl_type_t type);
 
 struct jl_expr_const_t {
   unsigned refs;
@@ -105,16 +105,18 @@ struct jl_expr_field_read_t {
   bool ptr;
   jl_expr_t lhs;
   jl_expr_t field;
+  short width, offset;
 };
 
-jl_expr_t jl_field_read(jl_expr_t lhs, bool ptr, jl_expr_t field);
-void jl_field_read_init(jl_expr_t *self, jl_expr_t lhs, bool ptr, jl_expr_t field);
+jl_expr_t jl_field_read(jl_expr_t lhs, jl_expr_t field, short width, short offset);
+void jl_field_read_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t field, short width, short offset);
 
 struct jl_expr_field_write_t {
   unsigned refs;
   bool ptr;
   jl_expr_t lhs, rhs;
   jl_expr_t field;
+  short width, offset;
 };
 
 jl_expr_t jl_field_write(jl_expr_t lhs, bool ptr, jl_expr_t field, jl_expr_t rhs);

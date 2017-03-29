@@ -81,14 +81,14 @@ void jl_fe_unscope(jl_fe_t *self);
  FRULE_FN(name)(val, fe, lexer, out)
 
 #define FE_FRULE_DIRECT(name) \
-  FE_FRULE(fval, name)
+  FE_FRULE(fir, name)
 
 #define FE_MATCHR(n, name) \
-  if (_ ## n = (jl_fval_t) {JL_FVAL_UNDEFINED}, FE_FRULE(&_ ## n, name))
+  if (_ ## n = (jl_fir_t) {JL_FIR_UNDEFINED}, FE_FRULE(&_ ## n, name))
 
 #define FE_MATCHT(n, name) \
   if (FE_PEEK().type == name \
-    ? (_ ## n = (jl_fval_t) {JL_FVAL_UNDEFINED}, jl_fval_init_token(&_ ## n, FE_PEEK()), FE_NEXT(), true) \
+    ? (_ ## n = (jl_fir_t) {JL_FIR_UNDEFINED}, jl_fir_init_token(&_ ## n, FE_PEEK()), FE_NEXT(), true) \
     : (FE_UNDON(n-1), false))
 
 #endif /* JL_FE_H__ */

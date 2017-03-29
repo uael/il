@@ -23,34 +23,34 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_FVAL_H__
-# define  JL_FVAL_H__
+#ifndef   JL_FIR_H__
+# define  JL_FIR_H__
 
 #include "entity_t.h"
 #include "expr_t.h"
 #include "stmt_t.h"
 #include "type_t.h"
 
-typedef struct jl_fval_t jl_fval_t;
+typedef struct jl_fir_t jl_fir_t;
 
-enum jl_fval_n {
-  JL_FVAL_UNDEFINED = 0,
-  JL_FVAL_INT,
-  JL_FVAL_FLOAT,
-  JL_FVAL_STRING,
-  JL_FVAL_TOKEN,
-  JL_FVAL_ENTITY,
-  JL_FVAL_FUNC_SPECIFIER,
-  JL_FVAL_EXPR,
-  JL_FVAL_OP,
-  JL_FVAL_STMT,
-  JL_FVAL_TYPE,
-  JL_FVAL_LITERAL,
-  JL_FVAL_TYPE_SPECIFIER,
-  JL_FVAL_TYPE_QUALIFIER
+enum jl_fir_n {
+  JL_FIR_UNDEFINED = 0,
+  JL_FIR_INT,
+  JL_FIR_FLOAT,
+  JL_FIR_STRING,
+  JL_FIR_TOKEN,
+  JL_FIR_ENTITY,
+  JL_FIR_FUNC_SPECIFIER,
+  JL_FIR_EXPR,
+  JL_FIR_OP,
+  JL_FIR_STMT,
+  JL_FIR_TYPE,
+  JL_FIR_LITERAL,
+  JL_FIR_TYPE_SPECIFIER,
+  JL_FIR_TYPE_QUALIFIER
 };
 
-struct jl_fval_t {
+struct jl_fir_t {
   unsigned kind : 8;
   jl_token_t begin, end;
   union {
@@ -70,12 +70,12 @@ struct jl_fval_t {
   } u;
 };
 
-jl_fval_t jl_fval_undefined();
-void jl_fval_init_string(jl_fval_t *self, const char *s);
-void jl_fval_init_token(jl_fval_t *self, jl_token_t token);
-void jl_fval_init_expr(jl_fval_t *self, jl_expr_t expr);
-void jl_fval_undef(jl_fval_t *self);
-void jl_fval_begin(jl_fval_t *self, jl_token_t token);
-void jl_fval_end(jl_fval_t *self, jl_token_t token);
+jl_fir_t jl_fir_undefined();
+void jl_fir_init_string(jl_fir_t *self, const char *s);
+void jl_fir_init_token(jl_fir_t *self, jl_token_t token);
+void jl_fir_init_expr(jl_fir_t *self, jl_expr_t expr);
+void jl_fir_undef(jl_fir_t *self);
+void jl_fir_begin(jl_fir_t *self, jl_token_t token);
+void jl_fir_end(jl_fir_t *self, jl_token_t token);
 
-#endif /* JL_FVAL_H__ */
+#endif /* JL_FIR_H__ */

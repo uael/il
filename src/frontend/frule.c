@@ -29,12 +29,12 @@
 #include "lexer.h"
 #include "program.h"
 
-bool jl_frule_validate(jl_frule_t self, jl_fval_t *fval, jl_fe_t *fe, jl_lexer_t *lexer, jl_program_t *out) {
-  jl_fval_begin(fval, jl_lexer_peek(lexer));
-  if (!self.callback(fval, fe, lexer, out)) {
-    jl_lexer_undo(lexer, fval->begin);
+bool jl_frule_validate(jl_frule_t self, jl_fir_t *fir, jl_fe_t *fe, jl_lexer_t *lexer, jl_program_t *out) {
+  jl_fir_begin(fir, jl_lexer_peek(lexer));
+  if (!self.callback(fir, fe, lexer, out)) {
+    jl_lexer_undo(lexer, fir->begin);
     return false;
   }
-  jl_fval_end(fval, jl_lexer_peek(lexer));
+  jl_fir_end(fir, jl_lexer_peek(lexer));
   return true;
 }

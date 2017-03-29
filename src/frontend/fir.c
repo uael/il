@@ -23,37 +23,37 @@
  * SOFTWARE.
  */
 
-#include "fval.h"
+#include "fir.h"
 
-jl_fval_t jl_fval_undefined() {
-  return (jl_fval_t) {JL_FVAL_UNDEFINED};
+jl_fir_t jl_fir_undefined() {
+  return (jl_fir_t) {JL_FIR_UNDEFINED};
 }
 
-void jl_fval_init_string(jl_fval_t *self, const char *s) {
-  self->kind = JL_FVAL_STRING;
+void jl_fir_init_string(jl_fir_t *self, const char *s) {
+  self->kind = JL_FIR_STRING;
   self->u.s = s;
 }
 
-void jl_fval_init_token(jl_fval_t *self, jl_token_t token) {
-  self->kind = JL_FVAL_TOKEN;
+void jl_fir_init_token(jl_fir_t *self, jl_token_t token) {
+  self->kind = JL_FIR_TOKEN;
   self->begin = token;
   self->end = token;
   self->u.token = token;
 }
 
-void jl_fval_init_expr(jl_fval_t *self, jl_expr_t expr) {
-  self->kind = JL_FVAL_EXPR;
+void jl_fir_init_expr(jl_fir_t *self, jl_expr_t expr) {
+  self->kind = JL_FIR_EXPR;
   self->u.expr = expr;
 }
 
-void jl_fval_undef(jl_fval_t *self) {
-  *self = jl_fval_undefined();
+void jl_fir_undef(jl_fir_t *self) {
+  *self = jl_fir_undefined();
 }
 
-void jl_fval_begin(jl_fval_t *self, jl_token_t token) {
+void jl_fir_begin(jl_fir_t *self, jl_token_t token) {
   self->begin = token;
 }
 
-void jl_fval_end(jl_fval_t *self, jl_token_t token) {
+void jl_fir_end(jl_fir_t *self, jl_token_t token) {
   self->end = token;
 }

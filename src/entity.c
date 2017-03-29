@@ -233,7 +233,7 @@ void jl_entity_release(jl_entity_t *self) {
 }
 
 void jl_entity_update_size(jl_entity_t *self) {
-  jl_entity_r fields;
+  jl_entity_r fields = jl_entity_fields(*self);
   jl_entity_t entity;
 
   self->size = 0;

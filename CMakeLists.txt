@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(jay)
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/lib")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/lib")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/bin")
 
 if(CMAKE_VERSION VERSION_LESS "3.1")
@@ -11,8 +13,6 @@ else()
     set(CMAKE_C_STANDARD 99)
 endif()
 
-include_directories(lib)
-
-add_subdirectory(lib)
+add_subdirectory(vendor)
 add_subdirectory(src)
 add_subdirectory(test)

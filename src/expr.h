@@ -137,6 +137,7 @@ struct jl_expr_list_t {
 };
 
 jl_expr_t jl_exprs(jl_expr_r exprs);
+jl_expr_t jl_exprs_start(jl_expr_t first);
 void jl_exprs_init(jl_expr_t *self, jl_expr_r exprs);
 size_t jl_exprs_length(jl_expr_t *self);
 void jl_exprs_push(jl_expr_t *self, jl_expr_t expr);

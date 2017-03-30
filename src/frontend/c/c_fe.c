@@ -25,7 +25,6 @@
 
 #include <stdio.h>
 
-#include <fir.h>
 #include "c_fe.h"
 
 #include "c_lexer.h"
@@ -35,92 +34,73 @@
 #include "stmt.h"
 #include "type.h"
 
-FRULE_DECL(primary_expression);
-FRULE_DECL(constant);
-FRULE_DECL(enumeration_constant);
-FRULE_DECL(string);
-FRULE_DECL(generic_selection);
-FRULE_DECL(generic_assoc_list);
-FRULE_DECL(generic_association);
-FRULE_DECL(postfix_expression);
-FRULE_DECL(argument_expression_list);
-FRULE_DECL(unary_expression);
-FRULE_DECL(unary_operator);
-FRULE_DECL(cast_expression);
-FRULE_DECL(multiplicative_expression);
-FRULE_DECL(additive_expression);
-FRULE_DECL(shift_expression);
-FRULE_DECL(relational_expression);
-FRULE_DECL(equality_expression);
-FRULE_DECL(and_expression);
-FRULE_DECL(exclusive_or_expression);
-FRULE_DECL(inclusive_or_expression);
-FRULE_DECL(logical_and_expression);
-FRULE_DECL(logical_or_expression);
-FRULE_DECL(conditional_expression);
-FRULE_DECL(assignment_expression);
-FRULE_DECL(assignment_operator);
-FRULE_DECL(expression);
-FRULE_DECL(constant_expression);
-FRULE_DECL(declaration);
-FRULE_DECL(declaration_specifiers);
-FRULE_DECL(init_declarator_list);
-FRULE_DECL(init_declarator);
-FRULE_DECL(storage_class_specifier);
-FRULE_DECL(type_specifier);
-FRULE_DECL(struct_or_union_specifier);
-FRULE_DECL(struct_or_union);
-FRULE_DECL(struct_declaration_list);
-FRULE_DECL(struct_declaration);
-FRULE_DECL(specifier_qualifier_list);
-FRULE_DECL(struct_declarator_list);
-FRULE_DECL(struct_declarator);
-FRULE_DECL(enum_specifier);
-FRULE_DECL(enumerator_list);
-FRULE_DECL(enumerator);
-FRULE_DECL(atomic_type_specifier);
-FRULE_DECL(type_qualifier);
-FRULE_DECL(function_specifier);
-FRULE_DECL(alignment_specifier);
-FRULE_DECL(declarator);
-FRULE_DECL(direct_declarator);
-FRULE_DECL(pointer);
-FRULE_DECL(type_qualifier_list);
-FRULE_DECL(parameter_type_list);
-FRULE_DECL(parameter_list);
-FRULE_DECL(parameter_declaration);
-FRULE_DECL(identifier_list);
-FRULE_DECL(type_name);
-FRULE_DECL(abstract_declarator);
-FRULE_DECL(direct_abstract_declarator);
-FRULE_DECL(initializer);
-FRULE_DECL(initializer_list);
-FRULE_DECL(designation);
-FRULE_DECL(designator_list);
-FRULE_DECL(designator);
-FRULE_DECL(static_assert_declaration);
-FRULE_DECL(statement);
-FRULE_DECL(labeled_statement);
-FRULE_DECL(compound_statement);
-FRULE_DECL(block_item_list);
-FRULE_DECL(block_item);
-FRULE_DECL(expression_statement);
-FRULE_DECL(selection_statement);
-FRULE_DECL(iteration_statement);
-FRULE_DECL(jump_statement);
-FRULE_DECL(translation_unit);
-FRULE_DECL(external_declaration);
-FRULE_DECL(function_definition);
-FRULE_DECL(declaration_list);
-
-enum {
-  C_TOKEN_FLAG_NONE = 0,
-  C_TOKEN_FLAG_ENUMERATION_CONSTANT = 1 << 0,
-};
-
-#define SYM sym
-#define SYM_GET(id) (SYM = jl_sym_get(fe->scope, id))
-#define SYM_PUT(id) (SYM = jl_sym_put(fe->scope, id))
+static jl_expr_t primary_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_expr_t postfix_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_expr_t unary_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_expr_t cast_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_expr_t multiplicative_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_expr_t additive_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_expr_t shift_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_expr_t relational_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_expr_t equality_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_expr_t and_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_expr_t exclusive_or_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_expr_t inclusive_or_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_expr_t logical_and_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_expr_t logical_or_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_expr_t conditional_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_expr_t assignment_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_expr_t expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_expr_t constant_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t declaration(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_type_t declaration_specifiers(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t init_declarator_list(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t init_declarator(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_type_t type_specifier(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t struct_or_union_specifier(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t struct_or_union(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t struct_declaration_list(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t struct_declaration(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t specifier_qualifier_list(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t struct_declarator_list(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t struct_declarator(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t enum_specifier(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t enumerator_list(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t enumerator(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t atomic_type_specifier(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t type_qualifier(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t function_specifier(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t alignment_specifier(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t declarator(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t direct_declarator(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t pointer(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t type_qualifier_list(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t parameter_type_list(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t parameter_list(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t parameter_declaration(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t identifier_list(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_type_t type_name(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t abstract_declarator(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t direct_abstract_declarator(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t initializer(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t initializer_list(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t designation(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t designator_list(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t designator(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t static_assert_declaration(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t statement(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t labeled_statement(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t compound_statement(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t block_item_list(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t block_item(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t expression_statement(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t selection_statement(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t iteration_statement(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t jump_statement(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t translation_unit(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t external_declaration(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t function_definition(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
+static jl_entity_t declaration_list(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out);
 
 void c_fe_parse(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
   jl_program_init(out);
@@ -129,215 +109,144 @@ void c_fe_parse(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
   self->scope->sym = jl_sym_put(self->scope, "foo");
   jl_fe_unscope(self);
 
-  jl_fir_t fir;
-  expression(&fir, self, lexer, out);
-  jl_expr_dtor(&fir.u.expr);
-
-  while (FE_NEXT().type != 0);
+  while (jl_lexer_next(lexer).type != 0);
 }
 
-FRULE_DEF(primary_expression) {
-  FRULE_BODY_BEGIN;
+enum {
+  C_TOKEN_FLAG_NONE = 0,
+  C_TOKEN_FLAG_ENUMERATION_CONSTANT = 1 << 0,
+};
 
-  FE_MATCHT(1, C_TOK_IDENTIFIER) {
-    SYM_GET(_1.u.token.value);
-    jl_fir_init_expr(_0, jl_id(sym->id, jl_entity_type(sym->entity)));
-  }
-  FRULE_OR
-  FE_MATCHR(1, constant) {
-    jl_fir_init_expr(_0, _1.u.expr);
-  }
-  FRULE_OR
-  FE_MATCHR(1, string) {
-    jl_fir_init_expr(_0, jl_const_string(_1.u.s));
-  }
-  FRULE_OR
-  FE_MATCHT(1, '(') {
-    FE_MATCHR(2, expression) {
-      FE_CONSUME(')');
-      jl_fir_init_expr(_0, jl_unary(JL_OP_EN, _2.u.expr));
-      jl_expr_set_type(&_0->u.expr, _2.u.expr.type);
-    }
-  }
-  FRULE_OR
-  FE_MATCHR(1, generic_selection) {
-    /* todo generic_selection */
-  }
+static jl_expr_t primary_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
+  jl_sym_t *symbol;
+  jl_token_t token;
+  jl_expr_t r1;
 
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(constant) {
-  FRULE_BODY_BEGIN;
-
-  FE_MATCHT(1, C_TOK_NUMBER) {
-    jl_fir_init_expr(_0, jl_const_parse(_1.u.token.value, _1.u.token.length));
-  }
-  FRULE_OR
-  FE_MATCHT(1, C_TOK_IDENTIFIER) {
-    if (SYM_GET(_1.u.token.value) && jl_sym_has_flag(sym, C_TOKEN_FLAG_ENUMERATION_CONSTANT)) {
-      jl_fir_init_expr(_0, jl_id(sym->id, jl_entity_type(sym->entity)));
-    }
-  }
-
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(enumeration_constant) {
-  FRULE_BODY_BEGIN;
-
-  FE_MATCHT(1, C_TOK_IDENTIFIER) {
-    if (SYM_GET(_1.u.token.value)) {
-      fprintf(stderr, "duplicate enumeration constant %s", _1.u.token.value);
-      exit(1);
-    }
-    SYM_PUT(_1.u.token.value)->flags |= C_TOKEN_FLAG_ENUMERATION_CONSTANT;
-    jl_fir_init_string(_0, _1.u.token.value);
-  }
-
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(string) {
-  FRULE_BODY_BEGIN;
-
-  FE_MATCHT(1, C_TOK_STRING) {
-    jl_fir_init_string(_0, _1.u.token.value);
-  }
-  FRULE_OR
-  FE_MATCHT(1, C_TOK_FUNC_NAME) {
-    if (!fe->scope || !jl_entity_is_func(fe->scope->sym->entity)) {
-      fprintf(stderr, "access of __func__ outside of one");
-      exit(1);
-    }
-    jl_fir_init_string(_0, jl_entity_func(fe->scope->sym->entity)->name);
-  }
-
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(generic_selection) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(generic_assoc_list) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(generic_association) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(postfix_expression) {
-  FRULE_BODY_BEGIN;
-  unsigned i;
-  jl_type_t type;
-  jl_entity_t param;
-  jl_entity_r params;
-  jl_expr_r args;
-  jl_field_t *field;
-
-  FE_MATCHR(1, primary_expression) {
-    jl_fir_init_expr(_0, _1.u.expr);
-    while (true) {
-      switch (FE_PEEK().type) {
-        case '[':
-          FE_NEXT();
-          FE_MATCHR(1, expression) {
-            jl_fir_init_expr(_0, jl_array_read(_0->u.expr, _1.u.expr));
-          }
-          FRULE_OR {
-            fprintf(stderr, "Expected expression");
-            exit(1);
-          }
-          FE_CONSUME(']');
-          break;
-        case '(':
-          type = jl_expr_get_type(_0->u.expr);
-          if (jl_type_is_pointer(type) && jl_type_is_func(jl_type_pointer(type)->of)) {
-            type = jl_type_pointer(type)->of;
-          } else if (!jl_type_is_func(type)) {
-            fprintf(stderr, "Expression must have type pointer to function");
-            exit(1);
-          }
-          FE_NEXT();
-          args = (jl_expr_r) {0};
-          params = jl_type_fields(type);
-          for (i = 0; i < adt_vector_size(params); ++i) {
-            if (FE_PEEK().type == ')') {
-              fprintf(stderr, "Too few arguments, expected %zu but got %d.", adt_vector_size(params), i);
-              exit(1);
-            }
-            param = adt_vector_at(params, i);
-            FE_MATCHR(1, assignment_expression) {
-              if (!jl_type_equals(jl_expr_get_type(_1.u.expr), jl_entity_type(param))) {
-                jl_fir_init_expr(&_1, jl_cast(jl_entity_type(param), _1.u.expr));
-              }
-              adt_vector_push(args, _1.u.expr);
-              if (i < adt_vector_size(params) - 1) {
-                FE_CONSUME(',');
-              }
-            }
-            FRULE_OR {
-              fprintf(stderr, "Expected assignment expression");
-              exit(1);
-            }
-          }
-          jl_fir_init_expr(_0, jl_call(_0->u.expr, args));
-          FE_CONSUME(')');
-          break;
-        case '.':
-          FE_NEXT();
-          token = FE_CONSUME(C_TOK_IDENTIFIER);
-          field = jl_field_lookup(jl_expr_get_type(_0->u.expr), token.value);
-          if (!field) {
-            printf("Invalid access, no member named '%s'.", token.value);
-            exit(1);
-          }
-          jl_fir_init_expr(
-            _0, jl_field_read(_0->u.expr, jl_id(field->name, field->type), field->field_width, field->field_offset)
-          );
-          break;
-        case C_TOK_PTR_OP:
-          FE_NEXT();
-          type = jl_expr_get_type(_0->u.expr);
-          if (!jl_type_is_pointer(type)) {
-            printf("Invalid access on non pointer element '%s'.", token.value);
-            exit(1);
-          }
-          type = jl_type_deref(type);
-          token = FE_CONSUME(C_TOK_IDENTIFIER);
-          field = jl_field_lookup(type, token.value);
-          if (!field) {
-            printf("Invalid access, no member named '%s'.", token.value);
-            exit(1);
-          }
-          jl_fir_init_expr(
-            _0, jl_field_read(_0->u.expr, jl_id(field->name, field->type), field->field_width, field->field_offset)
-          );
-          break;
-        default:
-          FRULE_BODY_END;
+  switch ((token = jl_lexer_peek(lexer)).type) {
+    case C_TOK_IDENTIFIER:
+      jl_lexer_next(lexer);
+      symbol = jl_sym_get(self->scope, token.value);
+      if (symbol->flags & C_TOKEN_FLAG_ENUMERATION_CONSTANT) {
+        return jl_u(symbol->entity, var)->initializer;
       }
+      return jl_id(symbol->id, jl_entity_type(symbol->entity));
+    case C_TOK_NUMBER:
+      jl_lexer_next(lexer);
+      return jl_const_parse(token.value, token.length);
+    case C_TOK_STRING:
+      jl_lexer_next(lexer);
+      return jl_const_string(token.value);
+    case C_TOK_FUNC_NAME:
+      if (!(symbol = self->scope->sym) || !jl_entity_is_func(symbol->entity)) {
+        fprintf(stderr, "access of __func__ outside of function");
+        exit(1);
+      }
+      jl_lexer_next(lexer);
+      return jl_const_string(jl_u(symbol->entity, func)->name);
+    case '(':
+      jl_lexer_next(lexer);
+      if (!jl_defined(r1 = expression(self, lexer, out))) {
+        puts("expected expression");
+        exit(1);
+      }
+      jl_lexer_consume(lexer, ')');
+      return jl_unary(JL_OP_EN, r1);
+    default:
+      printf("Unexpected '%s', not a valid primary expression.", token.value ? token.value : "unknown");
+      exit(1);;
+  }
+}
+
+static jl_expr_t postfix_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
+  jl_token_t token;
+  jl_expr_t r1, r2;
+
+  r1 = primary_expression(self, lexer, out);
+  while (true) {
+    switch ((token = jl_lexer_peek(lexer)).type) {
+      case '[':
+        if (!jl_type_is_ref(r1.type)) {
+          puts("array access on non array element");
+          exit(1);
+        }
+        jl_lexer_next(lexer);
+        r1 = jl_array_read(r1, expression(self, lexer, out));
+      case '(': {
+        unsigned i;
+        jl_entity_t param;
+        jl_func_t *func;
+        jl_expr_r args = (jl_expr_r) {0};
+        jl_type_t type = jl_expr_get_type(r1);
+
+        if (jl_type_is_pointer(type) && jl_type_is_func(jl_type_pointer(type)->of)) {
+          type = jl_type_pointer(type)->of;
+        } else if (!jl_type_is_func(type)) {
+          fprintf(stderr, "Expression must have type pointer to function");
+          exit(1);
+        }
+        func = jl_u(jl_u(type, compound)->entity, func);
+        jl_lexer_next(lexer);
+        for (i = 0; i < adt_vector_size(func->params); ++i) {
+          if (jl_lexer_peek(lexer).type == ')') {
+            fprintf(stderr, "Too few arguments, expected %zu but got %d.", adt_vector_size(func->params), i);
+            exit(1);
+          }
+          param = adt_vector_at(func->params, i);
+          r2 = assignment_expression(self, lexer, out);
+          if (!jl_type_equals(jl_expr_get_type(r2), jl_entity_type(param))) {
+            r2 = jl_cast(jl_entity_type(param), r2);
+          }
+          adt_vector_push(args, r2);
+          if (i < adt_vector_size(func->params) - 1) {
+            jl_lexer_consume(lexer, ',');
+          }
+        }
+        jl_lexer_consume(lexer, ')');
+        r1 = jl_call(r1, args);
+        break;
+      }
+      case '.': {
+        jl_field_t *field;
+
+        jl_lexer_next(lexer);
+        token = jl_lexer_consume(lexer, C_TOK_IDENTIFIER);
+        field = jl_field_lookup(jl_expr_get_type(r1), token.value);
+        if (!field) {
+          printf("Invalid access, no member named '%s'.", token.value);
+          exit(1);
+        }
+        r1 = jl_field_read(r1, jl_id(field->name, field->type), field->field_width, field->field_offset);
+        break;
+      }
+      case C_TOK_PTR_OP: {
+        jl_type_t type;
+        jl_field_t *field;
+
+        jl_lexer_next(lexer);
+        if (!jl_type_is_pointer(type = jl_expr_get_type(r1))) {
+          printf("Invalid access on non pointer element '%s'.", token.value);
+          exit(1);
+        }
+        token = jl_lexer_consume(lexer, C_TOK_IDENTIFIER);
+        field = jl_field_lookup(jl_type_deref(type), token.value);
+        if (!field) {
+          printf("Invalid access, no member named '%s'.", token.value);
+          exit(1);
+        }
+        r1 = jl_field_read(r1, jl_id(field->name, field->type), field->field_width, field->field_offset);
+        break;
+      }
+      default:
+        return r1;
     }
   }
-
-  FRULE_BODY_END;
 }
 
-FRULE_DEF(argument_expression_list) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(unary_expression) {
-  FRULE_BODY_BEGIN;
+static jl_expr_t unary_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
+  jl_expr_t r1;
   enum jl_op_n op;
 
-  switch (FE_PEEK().type) {
+  switch (jl_lexer_peek(lexer).type) {
     case '&':
       op = JL_OP_AND;
       break;
@@ -353,696 +262,409 @@ FRULE_DEF(unary_expression) {
     case '!':
       op = JL_OP_NOT;
       break;
+    case C_TOK_INCREMENT:
+      op = JL_OP_ADD;
+      goto self_assign;
+    case C_TOK_DECREMENT:
+      op = JL_OP_SUB;
+      goto self_assign;
     default:
-      return FE_FRULE_DIRECT(postfix_expression);
+      return postfix_expression(self, lexer, out);
+    self_assign:
+      jl_lexer_next(lexer);
+      r1 = unary_expression(self, lexer, out);
+      return jl_unary(JL_OP_EN, jl_binary(JL_OP_ASSIGN, r1, jl_binary(op, r1, jl_const_int(1))));
   }
-  FE_NEXT();
-  FE_MATCHR(1, cast_expression) {
-    jl_fir_init_expr(_0, jl_unary(op, _1.u.expr));
+  jl_lexer_next(lexer);
+  return jl_unary(op, cast_expression(self, lexer, out));
+}
+
+static jl_expr_t cast_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
+  jl_type_t type;
+  jl_token_t token;
+
+  if ((token = jl_lexer_peek(lexer)).type == '(') {
+    jl_lexer_next(lexer);
+    if (!jl_defined(type = type_name(self, lexer, out))) {
+      jl_lexer_undo(lexer, token);
+      return unary_expression(self, lexer, out);
+    }
+    jl_lexer_consume(lexer, ')');
+    return jl_cast(type, cast_expression(self, lexer, out));
   }
-  FRULE_OR {
-    fprintf(stderr, "Expected cast expression");
+
+  return unary_expression(self, lexer, out);
+}
+
+static jl_expr_t multiplicative_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
+  jl_expr_t r1;
+
+  r1 = cast_expression(self, lexer, out);
+  while (true) {
+    switch (jl_lexer_peek(lexer).type) {
+      case '*':
+        jl_lexer_next(lexer);
+        r1 = jl_binary(JL_OP_MUL, r1, cast_expression(self, lexer, out));
+        break;
+      case '/':
+        jl_lexer_next(lexer);
+        r1 = jl_binary(JL_OP_DIV, r1, cast_expression(self, lexer, out));
+        break;
+      case '%':
+        jl_lexer_next(lexer);
+        r1 = jl_binary(JL_OP_MOD, r1, cast_expression(self, lexer, out));
+        break;
+      default:
+        return r1;
+    }
+  }
+}
+
+static jl_expr_t additive_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
+  jl_expr_t r1;
+
+  r1 = multiplicative_expression(self, lexer, out);
+  while (true) {
+    switch (jl_lexer_peek(lexer).type) {
+      case '+':
+        jl_lexer_next(lexer);
+        r1 = jl_binary(JL_OP_ADD, r1, multiplicative_expression(self, lexer, out));
+        break;
+      case '-':
+        jl_lexer_next(lexer);
+        r1 = jl_binary(JL_OP_SUB, r1, multiplicative_expression(self, lexer, out));
+        break;
+      default:
+        return r1;
+    }
+  }
+}
+
+static jl_expr_t shift_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
+  jl_expr_t r1;
+
+  r1 = additive_expression(self, lexer, out);
+  while (true) {
+    switch (jl_lexer_peek(lexer).type) {
+      case C_TOK_LEFT_OP:
+        jl_lexer_next(lexer);
+        r1 = jl_binary(JL_OP_SHL, r1, additive_expression(self, lexer, out));
+        break;
+      case C_TOK_RIGHT_OP:
+        jl_lexer_next(lexer);
+        r1 = jl_binary(JL_OP_SHR, r1, additive_expression(self, lexer, out));
+        break;
+      default:
+        return r1;
+    }
+  }
+}
+
+static jl_expr_t relational_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
+  jl_expr_t r1;
+
+  r1 = shift_expression(self, lexer, out);
+  while (true) {
+    switch (jl_lexer_peek(lexer).type) {
+      case '<':
+        jl_lexer_next(lexer);
+        r1 = jl_binary(JL_OP_LT, r1, shift_expression(self, lexer, out));
+        break;
+      case C_TOK_LE_OP:
+        jl_lexer_next(lexer);
+        r1 = jl_binary(JL_OP_LE, r1, shift_expression(self, lexer, out));
+        break;
+      case '>':
+        jl_lexer_next(lexer);
+        r1 = jl_binary(JL_OP_GT, r1, shift_expression(self, lexer, out));
+        break;
+      case C_TOK_GE_OP:
+        jl_lexer_next(lexer);
+        r1 = jl_binary(JL_OP_GE, r1, shift_expression(self, lexer, out));
+        break;
+      default:
+        return r1;
+    }
+  }
+}
+
+static jl_expr_t equality_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
+  jl_expr_t r1;
+
+  r1 = relational_expression(self, lexer, out);
+  while (true) {
+    switch (jl_lexer_peek(lexer).type) {
+      case C_TOK_EQ_OP:
+        jl_lexer_next(lexer);
+        r1 = jl_binary(JL_OP_EQ, r1, relational_expression(self, lexer, out));
+        break;
+      case C_TOK_NE_OP:
+        jl_lexer_next(lexer);
+        r1 = jl_binary(JL_OP_NE, r1, relational_expression(self, lexer, out));
+        break;
+      default:
+        return r1;
+    }
+  }
+}
+
+static jl_expr_t and_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
+  jl_expr_t r1;
+
+  r1 = equality_expression(self, lexer, out);
+  while (true) {
+    if (jl_lexer_peek(lexer).type != '&') {
+      return r1;
+    }
+    jl_lexer_next(lexer);
+    r1 = jl_binary(JL_OP_AND, r1, equality_expression(self, lexer, out));
+  }
+}
+
+static jl_expr_t exclusive_or_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
+  jl_expr_t r1;
+
+  r1 = and_expression(self, lexer, out);
+  while (true) {
+    if (jl_lexer_peek(lexer).type != '^') {
+      return r1;
+    }
+    jl_lexer_next(lexer);
+    r1 = jl_binary(JL_OP_XOR, r1, and_expression(self, lexer, out));
+  }
+}
+
+static jl_expr_t inclusive_or_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
+  jl_expr_t r1;
+
+  r1 = exclusive_or_expression(self, lexer, out);
+  while (true) {
+    if (jl_lexer_peek(lexer).type != '|') {
+      return r1;
+    }
+    jl_lexer_next(lexer);
+    r1 = jl_binary(JL_OP_OR, r1, exclusive_or_expression(self, lexer, out));
+  }
+}
+
+static jl_expr_t logical_and_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
+  jl_expr_t r1;
+
+  r1 = inclusive_or_expression(self, lexer, out);
+  while (true) {
+    if (jl_lexer_peek(lexer).type != C_TOK_LOGICAL_AND) {
+      return r1;
+    }
+    jl_lexer_next(lexer);
+    r1 = jl_binary(JL_OP_LAND, r1, inclusive_or_expression(self, lexer, out));
+  }
+}
+
+static jl_expr_t logical_or_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
+  jl_expr_t r1;
+
+  r1 = logical_and_expression(self, lexer, out);
+  while (true) {
+    if (jl_lexer_peek(lexer).type != C_TOK_LOGICAL_OR) {
+      return r1;
+    }
+    jl_lexer_next(lexer);
+    r1 = jl_binary(JL_OP_LOR, r1, logical_and_expression(self, lexer, out));
+  }
+}
+
+static jl_expr_t conditional_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
+  jl_expr_t r1, r2;
+
+  r1 = logical_or_expression(self, lexer, out);
+  if (jl_lexer_peek(lexer).type != '?') {
+    return r1;
+  }
+  jl_lexer_next(lexer);
+  r2 = expression(self, lexer, out);
+  jl_lexer_consume(lexer, ':');
+  return jl_ternary(r1, r2, conditional_expression(self, lexer, out));
+}
+
+static jl_expr_t assignment_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
+  jl_expr_t r1;
+  enum jl_op_n op;
+
+  r1 = conditional_expression(self, lexer, out);
+  switch (jl_lexer_peek(lexer).type) {
+    case C_TOK_ASSIGN:
+      jl_lexer_next(lexer);
+      op = JL_OP_ASSIGN;
+      break;
+    case C_TOK_MUL_ASSIGN:
+      jl_lexer_next(lexer);
+      op = JL_OP_MUL;
+      break;
+    case C_TOK_DIV_ASSIGN:
+      jl_lexer_next(lexer);
+      op = JL_OP_DIV;
+      break;
+    case C_TOK_MOD_ASSIGN:
+      jl_lexer_next(lexer);
+      op = JL_OP_MOD;
+      break;
+    case C_TOK_PLUS_ASSIGN:
+      jl_lexer_next(lexer);
+      op = JL_OP_ADD;
+      break;
+    case C_TOK_MINUS_ASSIGN:
+      jl_lexer_next(lexer);
+      op = JL_OP_SUB;
+      break;
+    case C_TOK_AND_ASSIGN:
+      jl_lexer_next(lexer);
+      op = JL_OP_AND;
+      break;
+    case C_TOK_OR_ASSIGN:
+      jl_lexer_next(lexer);
+      op = JL_OP_OR;
+      break;
+    case C_TOK_XOR_ASSIGN:
+      jl_lexer_next(lexer);
+      op = JL_OP_XOR;
+      break;
+    case C_TOK_RSHIFT_ASSIGN:
+      jl_lexer_next(lexer);
+      op = JL_OP_SHR;
+      break;
+    case C_TOK_LSHIFT_ASSIGN:
+      jl_lexer_next(lexer);
+      op = JL_OP_SHL;
+      break;
+    default:
+      return r1;
+  }
+  if (jl_expr_is_binary(r1)) {
+    printf("unexpected left assign operand");
     exit(1);
   }
-
-  FRULE_BODY_END;
+  return jl_binary(JL_OP_ASSIGN, r1, op != JL_OP_ASSIGN
+    ? jl_binary(op, r1, assignment_expression(self, lexer, out))
+    : assignment_expression(self, lexer, out)
+  );
 }
 
-FRULE_DEF(unary_operator) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
+static jl_expr_t expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
+  jl_expr_t r1;
 
-FRULE_DEF(cast_expression) {
-  FRULE_BODY_BEGIN;
-
-  if ((token = FE_PEEK()).type == '(') {
-    FE_NEXT();
-    FE_MATCHR(1, type_name) {
-      FE_CONSUME(')');
-      FE_MATCHR(2, cast_expression) {
-        jl_fir_init_expr(_0, jl_cast(_1.u.type, _2.u.expr));
-        FRULE_BODY_END;
-      }
-      FRULE_OR {
-        FE_UNDO(token);
-      }
+  r1 = assignment_expression(self, lexer, out);
+  while (true) {
+    if (jl_lexer_peek(lexer).type != ',') {
+      return r1;
     }
-    FRULE_OR {
-      FE_UNDO(token);
+    jl_lexer_next(lexer);
+    if (!jl_expr_is_list(r1)) {
+      r1 = jl_exprs_start(r1);
     }
+    adt_vector_push(r1.u._list->exprs, assignment_expression(self, lexer, out));
   }
-
-  return FE_FRULE_DIRECT(unary_expression);
 }
 
-FRULE_DEF(multiplicative_expression) {
-  FRULE_BODY_BEGIN;
+static jl_expr_t constant_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
+  jl_expr_t r1;
 
-  FE_MATCHR(1, cast_expression) {
-    jl_fir_init_expr(_0, _1.u.expr);
-    while (true) {
-      switch (FE_PEEK().type) {
-        case '*':
-          FE_NEXT();
-          FE_MATCHR(1, cast_expression) {
-            jl_fir_init_expr(_0, jl_binary(JL_OP_MUL, _0->u.expr, _1.u.expr));
-          }
-          FRULE_OR {
-            fprintf(stderr, "Expected cast expression");
-            exit(1);
-          }
-          break;
-        case '/':
-          FE_NEXT();
-          FE_MATCHR(1, cast_expression) {
-            jl_fir_init_expr(_0, jl_binary(JL_OP_DIV, _0->u.expr, _1.u.expr));
-          }
-          FRULE_OR {
-            fprintf(stderr, "Expected cast expression");
-            exit(1);
-          }
-          break;
-        case '%':
-          FE_NEXT();
-          FE_MATCHR(1, cast_expression) {
-            jl_fir_init_expr(_0, jl_binary(JL_OP_MOD, _0->u.expr, _1.u.expr));
-          }
-          FRULE_OR {
-            fprintf(stderr, "Expected cast expression");
-            exit(1);
-          }
-          break;
-        default:
-          FRULE_BODY_END;
-      }
-    }
+  r1 = conditional_expression(self, lexer, out);
+  if (!jl_expr_is_constant(r1)) {
+    puts("Constant expression must be computable at compile time.");
+    exit(1);
   }
-
-  FRULE_BODY_END;
+  return r1;
 }
 
-FRULE_DEF(additive_expression) {
-  FRULE_BODY_BEGIN;
+static jl_type_t declaration_specifiers(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
+  jl_type_t type = jl_type_undefined();
 
-  FE_MATCHR(1, multiplicative_expression) {
-    jl_fir_init_expr(_0, _1.u.expr);
-    while (true) {
-      switch (FE_PEEK().type) {
-        case '+':
-          FE_NEXT();
-          FE_MATCHR(1, multiplicative_expression) {
-            jl_fir_init_expr(_0, jl_binary(JL_OP_ADD, _0->u.expr, _1.u.expr));
-          }
-          FRULE_OR {
-            fprintf(stderr, "Expected multiplicative expression");
-            exit(1);
-          }
-          break;
-        case '-':
-          FE_NEXT();
-          FE_MATCHR(1, multiplicative_expression) {
-            jl_fir_init_expr(_0, jl_binary(JL_OP_SUB, _0->u.expr, _1.u.expr));
-          }
-          FRULE_OR {
-            fprintf(stderr, "Expected multiplicative expression");
-            exit(1);
-          }
-          break;
-        default:
-          FRULE_BODY_END;
-      }
+  while (true) {
+    switch (jl_lexer_peek(lexer).type) {
+      case C_TOK_TYPEDEF:
+        jl_lexer_next(lexer);
+        type.specifiers |= JL_TYPE_SPECIFIER_TYPEDEF;
+        break;
+      case C_TOK_EXTERN:
+        jl_lexer_next(lexer);
+        type.specifiers |= JL_TYPE_SPECIFIER_EXTERN;
+        break;
+      case C_TOK_STATIC:
+        jl_lexer_next(lexer);
+        type.specifiers |= JL_TYPE_SPECIFIER_STATIC;
+        break;
+      case C_TOK_THREAD_LOCAL:
+        jl_lexer_next(lexer);
+        type.specifiers |= JL_TYPE_SPECIFIER_THREAD_LOCAL;
+        break;
+      case C_TOK_AUTO:
+        jl_lexer_next(lexer);
+        type.specifiers |= JL_TYPE_SPECIFIER_AUTO;
+        break;
+      case C_TOK_REGISTER:
+        jl_lexer_next(lexer);
+        type.specifiers |= JL_TYPE_SPECIFIER_REGISTER;
+        break;
+      case C_TOK_INLINE:
+        jl_lexer_next(lexer);
+        type.specifiers |= JL_FUNC_SPECIFIER_INLINE;
+        break;
+      case C_TOK_NORETURN:
+        jl_lexer_next(lexer);
+        type.specifiers |= JL_FUNC_SPECIFIER_NORETURN;
+        break;
+      case C_TOK_CONST:
+        jl_lexer_next(lexer);
+        type.qualifiers |= JL_TYPE_QUALIFIER_CONST;
+        break;
+      case C_TOK_RESTRICT:
+        jl_lexer_next(lexer);
+        type.qualifiers |= JL_TYPE_QUALIFIER_RESTRICT;
+        break;
+      case C_TOK_VOLATILE:
+        jl_lexer_next(lexer);
+        type.qualifiers |= JL_TYPE_QUALIFIER_VOLATILE;
+        break;
+      case C_TOK_ATOMIC:
+        jl_lexer_next(lexer);
+        type.qualifiers |= JL_TYPE_QUALIFIER_ATOMIC;
+        break;
+      case C_TOK_ALIGNAS:
+        puts("_Alignas still unsupported");
+        exit(1);
+      default:
+        return type;
     }
   }
-
-  FRULE_BODY_END;
 }
 
-FRULE_DEF(shift_expression) {
-  FRULE_BODY_BEGIN;
+static jl_type_t type_specifier(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
+  jl_token_t token;
+  jl_type_t type = jl_type_undefined();
+  enum jl_type_n type_kind;
 
-  FE_MATCHR(1, additive_expression) {
-    jl_fir_init_expr(_0, _1.u.expr);
-    while (true) {
-      switch (FE_PEEK().type) {
-        case C_TOK_LSHIFT:
-          FE_NEXT();
-          FE_MATCHR(1, additive_expression) {
-            jl_fir_init_expr(_0, jl_binary(JL_OP_SHL, _0->u.expr, _1.u.expr));
-          }
-          FRULE_OR {
-            fprintf(stderr, "Expected additive expression");
-            exit(1);
-          }
-          break;
-        case C_TOK_RSHIFT:
-          FE_NEXT();
-          FE_MATCHR(1, additive_expression) {
-            jl_fir_init_expr(_0, jl_binary(JL_OP_SHR, _0->u.expr, _1.u.expr));
-          }
-          FRULE_OR {
-            fprintf(stderr, "Expected additive expression");
-            exit(1);
-          }
-          break;
-        default:
-          FRULE_BODY_END;
-      }
+  while (true) {
+    switch ((token = jl_lexer_peek(lexer)).type) {
+      case C_TOK_VOID:
+        type_kind = JL_TYPE_VOID;
+        goto dft_literal;
+      case C_TOK_CHAR:
+        type_kind = JL_TYPE_CHAR;
+        goto dft_literal;
+      default:
+        return type;
+      dft_literal:
+        if (jl_defined(type)) {
+          puts("two or more data types in declaration specifiers");
+          exit(1);
+        }
+        jl_lexer_next(lexer);
+        jl_type_switch(&type, type_kind);
+        break;
     }
   }
-
-  FRULE_BODY_END;
 }
 
-FRULE_DEF(relational_expression) {
-  FRULE_BODY_BEGIN;
-
-  FE_MATCHR(1, shift_expression) {
-    jl_fir_init_expr(_0, _1.u.expr);
-    while (true) {
-      switch (FE_PEEK().type) {
-        case '<':
-          FE_NEXT();
-          FE_MATCHR(1, shift_expression) {
-            jl_fir_init_expr(_0, jl_binary(JL_OP_LT, _0->u.expr, _1.u.expr));
-          }
-          FRULE_OR {
-            fprintf(stderr, "Expected shift expression");
-            exit(1);
-          }
-          break;
-        case '>':
-          FE_NEXT();
-          FE_MATCHR(1, shift_expression) {
-            jl_fir_init_expr(_0, jl_binary(JL_OP_GT, _0->u.expr, _1.u.expr));
-          }
-          FRULE_OR {
-            fprintf(stderr, "Expected shift expression");
-            exit(1);
-          }
-          break;
-        case C_TOK_LEQ:
-          FE_NEXT();
-          FE_MATCHR(1, shift_expression) {
-            jl_fir_init_expr(_0, jl_binary(JL_OP_LE, _0->u.expr, _1.u.expr));
-          }
-          FRULE_OR {
-            fprintf(stderr, "Expected shift expression");
-            exit(1);
-          }
-          break;
-        case C_TOK_GEQ:
-          FE_NEXT();
-          FE_MATCHR(1, shift_expression) {
-            jl_fir_init_expr(_0, jl_binary(JL_OP_GE, _0->u.expr, _1.u.expr));
-          }
-          FRULE_OR {
-            fprintf(stderr, "Expected shift expression");
-            exit(1);
-          }
-          break;
-        default:
-          FRULE_BODY_END;
-      }
-    }
-  }
-
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(equality_expression) {
-  FRULE_BODY_BEGIN;
-
-  FE_MATCHR(1, relational_expression) {
-    jl_fir_init_expr(_0, _1.u.expr);
-    while (true) {
-      switch (FE_PEEK().type) {
-        case C_TOK_EQ:
-          FE_NEXT();
-          FE_MATCHR(1, relational_expression) {
-            jl_fir_init_expr(_0, jl_binary(JL_OP_EQ, _0->u.expr, _1.u.expr));
-          }
-          FRULE_OR {
-            fprintf(stderr, "Expected relational expression");
-            exit(1);
-          }
-          break;
-        case C_TOK_NEQ:
-          FE_NEXT();
-          FE_MATCHR(1, relational_expression) {
-            jl_fir_init_expr(_0, jl_binary(JL_OP_NE, _0->u.expr, _1.u.expr));
-          }
-          FRULE_OR {
-            fprintf(stderr, "Expected relational expression");
-            exit(1);
-          }
-          break;
-        default:
-          FRULE_BODY_END;
-      }
-    }
-  }
-
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(and_expression) {
-  FRULE_BODY_BEGIN;
-
-  FE_MATCHR(1, equality_expression) {
-    jl_fir_init_expr(_0, _1.u.expr);
-    while (true) {
-      switch (FE_PEEK().type) {
-        case '&':
-          FE_NEXT();
-          FE_MATCHR(1, equality_expression) {
-            jl_fir_init_expr(_0, jl_binary(JL_OP_AND, _0->u.expr, _1.u.expr));
-          }
-          FRULE_OR {
-            fprintf(stderr, "Expected equality expression");
-            exit(1);
-          }
-          break;
-        default:
-          FRULE_BODY_END;
-      }
-    }
-  }
-
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(exclusive_or_expression) {
-  FRULE_BODY_BEGIN;
-
-  FE_MATCHR(1, and_expression) {
-    jl_fir_init_expr(_0, _1.u.expr);
-    while (true) {
-      switch (FE_PEEK().type) {
-        case '^':
-          FE_NEXT();
-          FE_MATCHR(1, and_expression) {
-            jl_fir_init_expr(_0, jl_binary(JL_OP_XOR, _0->u.expr, _1.u.expr));
-          }
-          FRULE_OR {
-            fprintf(stderr, "Expected add expression");
-            exit(1);
-          }
-          break;
-        default:
-          FRULE_BODY_END;
-      }
-    }
-  }
-
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(inclusive_or_expression) {
-  FRULE_BODY_BEGIN;
-
-  FE_MATCHR(1, exclusive_or_expression) {
-    jl_fir_init_expr(_0, _1.u.expr);
-    while (true) {
-      switch (FE_PEEK().type) {
-        case '|':
-          FE_NEXT();
-          FE_MATCHR(1, exclusive_or_expression) {
-            jl_fir_init_expr(_0, jl_binary(JL_OP_OR, _0->u.expr, _1.u.expr));
-          }
-          FRULE_OR {
-            fprintf(stderr, "Expected exclusive or expression");
-            exit(1);
-          }
-          break;
-        default:
-          FRULE_BODY_END;
-      }
-    }
-  }
-
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(logical_and_expression) {
-  FRULE_BODY_BEGIN;
-
-  FE_MATCHR(1, inclusive_or_expression) {
-    jl_fir_init_expr(_0, _1.u.expr);
-    while (true) {
-      switch (FE_PEEK().type) {
-        case C_TOK_LOGICAL_AND:
-          FE_NEXT();
-          FE_MATCHR(1, inclusive_or_expression) {
-            jl_fir_init_expr(_0, jl_binary(JL_OP_LAND, _0->u.expr, _1.u.expr));
-          }
-          FRULE_OR {
-            fprintf(stderr, "Expected inclusive or expression");
-            exit(1);
-          }
-          break;
-        default:
-          FRULE_BODY_END;
-      }
-    }
-  }
-
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(logical_or_expression) {
-  FRULE_BODY_BEGIN;
-
-  FE_MATCHR(1, logical_and_expression) {
-    jl_fir_init_expr(_0, _1.u.expr);
-    while (true) {
-      switch (FE_PEEK().type) {
-        case C_TOK_LOGICAL_OR:
-          FE_NEXT();
-          FE_MATCHR(1, logical_and_expression) {
-            jl_fir_init_expr(_0, jl_binary(JL_OP_LOR, _0->u.expr, _1.u.expr));
-          }
-          FRULE_OR {
-            fprintf(stderr, "Expected logical and expression");
-            exit(1);
-          }
-          break;
-        default:
-          FRULE_BODY_END;
-      }
-    }
-  }
-
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(conditional_expression) {
-  FRULE_BODY_BEGIN;
-
-  FE_MATCHR(1, logical_or_expression) {
-    jl_fir_init_expr(_0, _1.u.expr);
-    while (true) {
-      switch (FE_PEEK().type) {
-        case '?':
-          FE_NEXT();
-          FE_MATCHR(1, expression) {
-            FE_CONSUME(':');
-            FE_MATCHR(1, conditional_expression) {
-              jl_fir_init_expr(_0, jl_ternary(_0->u.expr, _1.u.expr, _2.u.expr));
-            }
-            FRULE_OR {
-              fprintf(stderr, "Expected conditional expression");
-              exit(1);
-            }
-          }
-          FRULE_OR {
-            fprintf(stderr, "Expected expression");
-            exit(1);
-          }
-          break;
-        default:
-          FRULE_BODY_END;
-      }
-    }
-  }
-
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(assignment_expression) {
-  FRULE_BODY_BEGIN;
-
-
-
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(assignment_operator) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(expression) {
-  FRULE_BODY_BEGIN;
-
-  FE_MATCHR(1, conditional_expression) {
-    jl_fir_init_expr(_0, _1.u.expr);
-  }
-
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(constant_expression) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(declaration) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(declaration_specifiers) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(init_declarator_list) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(init_declarator) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(storage_class_specifier) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(type_specifier) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(struct_or_union_specifier) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(struct_or_union) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(struct_declaration_list) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(struct_declaration) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(specifier_qualifier_list) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(struct_declarator_list) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(struct_declarator) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(enum_specifier) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(enumerator_list) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(enumerator) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(atomic_type_specifier) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(type_qualifier) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(function_specifier) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(alignment_specifier) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(declarator) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(direct_declarator) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(pointer) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(type_qualifier_list) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(parameter_type_list) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(parameter_list) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(parameter_declaration) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(identifier_list) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(type_name) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(abstract_declarator) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(direct_abstract_declarator) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(initializer) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(initializer_list) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(designation) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(designator_list) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(designator) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(static_assert_declaration) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(statement) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(labeled_statement) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(compound_statement) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(block_item_list) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(block_item) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(expression_statement) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(selection_statement) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(iteration_statement) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(jump_statement) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(translation_unit) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(external_declaration) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(function_definition) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
-}
-
-FRULE_DEF(declaration_list) {
-  FRULE_BODY_BEGIN;
-  FRULE_BODY_END;
+static jl_type_t type_name(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
+  return jl_type_undefined();
 }

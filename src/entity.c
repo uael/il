@@ -444,7 +444,7 @@ jl_entity_t jl_var_float(const char *name, float f) {
 jl_entity_t jl_var_string(const char *name, const char *s) {
   jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
-  jl_var_init(&entity, name, jl_string(), jl_const_string(s));
+  jl_var_init(&entity, name, jl_pointer(jl_char()), jl_const_string(s));
   return entity;
 }
 
@@ -489,7 +489,7 @@ jl_entity_t jl_param_float(unsigned position, const char *name, float f) {
 jl_entity_t jl_param_string(unsigned position, const char *name, const char *s) {
   jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
-  jl_param_init(&entity, position, name, jl_string(), jl_const_string(s));
+  jl_param_init(&entity, position, name, jl_pointer(jl_char()), jl_const_string(s));
   return entity;
 }
 
@@ -511,17 +511,17 @@ jl_entity_t jl_func_undefined() {
   return (jl_entity_t) {JL_ENTITY_FUNC};
 }
 
-jl_entity_t jl_func_decl(enum jl_func_specifier_n specifiers, jl_type_t return_type, const char *name, jl_entity_r params) {
+jl_entity_t jl_func_decl(jl_type_t return_type, const char *name, jl_entity_r params) {
   jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
-  jl_func_init(&entity, specifiers, return_type, name, params, jl_stmt_undefined());
+  jl_func_init(&entity, return_type, name, params, jl_stmt_undefined());
   return entity;
 }
 
-jl_entity_t jl_proc_decl(enum jl_func_specifier_n specifiers, const char *name, jl_entity_r params) {
+jl_entity_t jl_proc_decl(const char *name, jl_entity_r params) {
   jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
-  jl_func_init(&entity, specifiers, jl_void(), name, params, jl_stmt_undefined());
+  jl_func_init(&entity, jl_void(), name, params, jl_stmt_undefined());
   return entity;
 }
 
@@ -530,7 +530,6 @@ jl_entity_t jl_func_def(jl_entity_t prototype, jl_stmt_t body) {
 
   jl_func_init(
     &entity,
-    jl_entity_func(prototype)->specifiers,
     jl_entity_func(prototype)->return_type,
     jl_entity_func(prototype)->name,
     jl_entity_func(prototype)->params,
@@ -539,9 +538,8 @@ jl_entity_t jl_func_def(jl_entity_t prototype, jl_stmt_t body) {
   return entity;
 }
 
-void jl_func_init(jl_entity_t *self, enum jl_func_specifier_n s, jl_type_t r, const char * n, jl_entity_r p, jl_stmt_t b) {
+void jl_func_init(jl_entity_t *self, jl_type_t r, const char * n, jl_entity_r p, jl_stmt_t b) {
   jl_entity_switch(self, JL_ENTITY_FUNC);
-  jl_pentity_func(self)->specifiers = s;
   jl_pentity_func(self)->return_type = r;
   jl_pentity_func(self)->name = n;
   jl_pentity_func(self)->params = p;
@@ -558,22 +556,6 @@ void jl_func_dtor(jl_func_t *self) {
   adt_vector_dtor(self->params);
   jl_type_dtor(&self->return_type);
   jl_stmt_dtor(&self->body);
-}
-
-bool jl_func_is_inline(jl_entity_t *self) {
-  return jl_pentity_func(self)->specifiers & JL_FUNC_SPECIFIER_INLINE;
-}
-
-bool jl_func_is_noreturn(jl_entity_t *self) {
-  return jl_pentity_func(self)->specifiers & JL_FUNC_SPECIFIER_NORETURN;
-}
-
-void jl_func_add_specifier(jl_entity_t *self, enum jl_func_specifier_n specifier) {
-  jl_pentity_func(self)->specifiers |= specifier;
-}
-
-void jl_func_rem_specifier(jl_entity_t *self, enum jl_func_specifier_n specifier) {
-  jl_pentity_func(self)->specifiers &= ~specifier;
 }
 
 

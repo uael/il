@@ -28,6 +28,8 @@
 
 #include <adt/vector.h>
 
+#include "api.h"
+
 struct jl_stmt_expr_t;
 struct jl_stmt_label_t;
 struct jl_stmt_case_t;

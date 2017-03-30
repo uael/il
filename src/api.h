@@ -23,39 +23,12 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_FRULE_H__
-# define  JL_FRULE_H__
+#ifndef   JL_API_H__
+# define  JL_API_H__
 
-#include "fir.h"
+#define jl_u(e, member) ((e).u._ ## member)
+#define jl_pu(e, member) ((e)->u._ ## member)
+#define jl_defined(e) ((e).kind != 0)
+#define jl_pdefined(e) ((e)->kind != 0)
 
-struct jl_lexer_t;
-struct jl_fe_t;
-struct jl_program_t;
-
-typedef struct jl_frule_t jl_frule_t;
-
-struct jl_frule_t {
-  enum jl_fir_n expected;
-  bool (*callback)(jl_fir_t *, struct jl_fe_t *, struct jl_lexer_t *, struct jl_program_t *);
-};
-
-bool jl_frule_validate(jl_frule_t self, jl_fir_t *fir, struct jl_fe_t *fe, struct jl_lexer_t *lexer, struct jl_program_t *out);
-
-#define _0 fir
-#define FRULE_FN(name) name
-
-#define FRULE_DECL(name) \
-  static bool FRULE_FN(name)(jl_fir_t *fir, jl_fe_t *fe, jl_lexer_t *lexer, jl_program_t *out)
-
-#define FRULE_DEF(name) \
-  FRULE_DECL(name)
-
-#define FRULE_BODY_BEGIN \
-  jl_fir_t _1, _2, _3, _4, _5, _6, _7, _8, _9; jl_sym_t *sym; jl_token_t token; *fir = (jl_fir_t) {JL_FIR_UNDEFINED}
-
-#define FRULE_BODY_END \
-  return fir->kind != JL_FIR_UNDEFINED
-
-#define FRULE_OR else
-
-#endif /* JL_FRULE_H__ */
+#endif /* JL_API_H__ */

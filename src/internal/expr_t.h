@@ -74,9 +74,9 @@ enum jl_op_n {
   JL_OP_DIV,    /* l / r        */
   JL_OP_MOD,    /* l % r        */
   JL_OP_AND,    /* l & r        */
-  JL_OP_LAND,    /* l & r        */
+  JL_OP_LAND,    /* l && r        */
   JL_OP_OR,     /* l | r        */
-  JL_OP_LOR,     /* l | r        */
+  JL_OP_LOR,     /* l || r        */
   JL_OP_XOR,    /* l ^ r        */
   JL_OP_SHL,    /* l << r       */
   JL_OP_SHR,    /* l >> r       */
@@ -112,10 +112,11 @@ void jl_expr_switch(jl_expr_t *self, enum jl_expr_n kind);
 void jl_expr_acquire(jl_expr_t *self);
 void jl_expr_release(jl_expr_t *self);
 bool jl_expr_is_defined(jl_expr_t *self);
+bool jl_expr_is_constant(jl_expr_t self);
 jl_type_t jl_expr_get_type(jl_expr_t self);
 void jl_expr_set_type(jl_expr_t *self, jl_type_t type);
 
-#define jl_expr_undefined() ((jl_expr_t) {JL_EXPR_UNDEFINED})
+#define jl_expr_undefined() ((jl_expr_t) {0})
 
 #define jl_expr_is_id(t) ((t).kind == JL_EXPR_ID)
 #define jl_expr_is_const(t) ((t).kind == JL_EXPR_CONST)

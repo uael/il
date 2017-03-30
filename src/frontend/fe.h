@@ -28,7 +28,10 @@
 
 #include <adt/deque.h>
 
-#include "frule.h"
+#include "entity_t.h"
+#include "expr_t.h"
+#include "stmt_t.h"
+#include "type_t.h"
 
 struct jl_compiler_t;
 struct jl_lexer_t;
@@ -68,27 +71,5 @@ void jl_fe_dtor(jl_fe_t *self);
 void jl_fe_push_src(jl_fe_t *self, const char *src);
 void jl_fe_scope(jl_fe_t *self);
 void jl_fe_unscope(jl_fe_t *self);
-
-#define FE_PEEK() jl_lexer_peek(lexer)
-#define FE_PEEKN(n) jl_lexer_peekn(lexer, n)
-#define FE_NEXT() jl_lexer_next(lexer)
-#define FE_CONSUME(t) jl_lexer_consume(lexer, t)
-#define FE_CONSUME_ID(id) jl_lexer_consume_id(lexer, id)
-#define FE_UNDO(until) jl_lexer_undo(lexer, until)
-#define FE_UNDON(n) jl_lexer_undon(lexer, n)
-
-#define FE_FRULE(val, name) \
- FRULE_FN(name)(val, fe, lexer, out)
-
-#define FE_FRULE_DIRECT(name) \
-  FE_FRULE(fir, name)
-
-#define FE_MATCHR(n, name) \
-  if (_ ## n = (jl_fir_t) {JL_FIR_UNDEFINED}, FE_FRULE(&_ ## n, name))
-
-#define FE_MATCHT(n, name) \
-  if (FE_PEEK().type == name \
-    ? (_ ## n = (jl_fir_t) {JL_FIR_UNDEFINED}, jl_fir_init_token(&_ ## n, FE_PEEK()), FE_NEXT(), true) \
-    : (FE_UNDON(n-1), false))
 
 #endif /* JL_FE_H__ */

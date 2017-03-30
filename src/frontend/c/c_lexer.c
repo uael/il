@@ -181,17 +181,17 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
     SYNTX(C_TOK_DOTS, "..."),
     SYNTX(C_TOK_LOGICAL_OR, "||"),
     SYNTX(C_TOK_LOGICAL_AND, "&&"),
-    SYNTX(C_TOK_LEQ, "<="),
-    SYNTX(C_TOK_GEQ, ">="),
-    SYNTX(C_TOK_EQ, "=="),
-    SYNTX(C_TOK_NEQ, "!="),
+    SYNTX(C_TOK_LE_OP, "<="),
+    SYNTX(C_TOK_GE_OP, ">="),
+    SYNTX(C_TOK_EQ_OP, "=="),
+    SYNTX(C_TOK_NE_OP, "!="),
     SYNTX(C_TOK_PTR_OP, "->"),
 
     /* 0x48 */
     SYNTX(C_TOK_INCREMENT, "++"),
     SYNTX(C_TOK_DECREMENT, "--"),
-    SYNTX(C_TOK_LSHIFT, "<<"),
-    SYNTX(C_TOK_RSHIFT, ">>"),
+    SYNTX(C_TOK_LEFT_OP, "<<"),
+    SYNTX(C_TOK_RIGHT_OP, ">>"),
     SYNTX(C_TOK_MUL_ASSIGN, "*="),
     SYNTX(C_TOK_DIV_ASSIGN, "/="),
     SYNTX(C_TOK_MOD_ASSIGN, "%="),
@@ -562,7 +562,7 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
       switch (peek) {
         case '!':
           if (peekn(1) == '=') {
-            push(C_TOK_NEQ);
+            push(C_TOK_NE_OP);
             break;
           }
           push('!');
@@ -694,18 +694,18 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
               push(C_TOK_LSHIFT_ASSIGN);
               break;
             }
-            push(C_TOK_LSHIFT);
+            push(C_TOK_LEFT_OP);
             break;
           }
           if (peekn(1) == '=') {
-            push(C_TOK_LEQ);
+            push(C_TOK_LE_OP);
             break;
           }
           push('<');
           break;
         case '=':
           if (peekn(1) == '=') {
-            push(C_TOK_EQ);
+            push(C_TOK_EQ_OP);
             break;
           }
           push('=');
@@ -716,11 +716,11 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
               push(C_TOK_RSHIFT_ASSIGN);
               break;
             }
-            push(C_TOK_RSHIFT);
+            push(C_TOK_RIGHT_OP);
             break;
           }
           if (peekn(1) == '=') {
-            push(C_TOK_GEQ);
+            push(C_TOK_GE_OP);
             break;
           }
           push('>');

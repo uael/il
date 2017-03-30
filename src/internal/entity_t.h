@@ -28,6 +28,8 @@
 
 #include <adt/vector.h>
 
+#include "api.h"
+
 typedef struct jl_entity_t jl_entity_t;
 typedef struct jl_field_t jl_field_t;
 typedef struct jl_var_t jl_var_t;
@@ -50,12 +52,6 @@ enum jl_entity_n {
   JL_ENTITY_STRUCT,
   JL_ENTITY_UNION,
   JL_ENTITY_LABEL
-};
-
-enum jl_func_specifier_n {
-  JL_FUNC_SPECIFIER_NONE = 0,
-  JL_FUNC_SPECIFIER_INLINE = 1 << 0,
-  JL_FUNC_SPECIFIER_NORETURN = 1 << 1
 };
 
 struct jl_entity_t {

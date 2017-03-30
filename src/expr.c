@@ -310,6 +310,22 @@ bool jl_expr_is_defined(jl_expr_t *self) {
   }
 }
 
+bool jl_expr_is_constant(jl_expr_t self) {
+  switch (self.kind) {
+    case JL_EXPR_CONST:
+      return true;
+    case JL_EXPR_UNARY:
+      return jl_expr_is_constant(jl_expr_unary(self)->operand);
+    case JL_EXPR_BINARY:
+      return jl_expr_is_constant(jl_expr_binary(self)->lhs) && jl_expr_is_constant(jl_expr_binary(self)->rhs);
+    case JL_EXPR_TERNARY:
+      return jl_expr_is_constant(jl_expr_ternary(self)->lhs) && jl_expr_is_constant(jl_expr_ternary(self)->mhs)
+        && jl_expr_is_constant(jl_expr_ternary(self)->rhs);
+    default:
+      return false;
+  }
+}
+
 jl_type_t jl_expr_get_type(jl_expr_t self) {
   return self.type;
 }
@@ -354,7 +370,7 @@ jl_expr_t jl_const_float(float f) {
 jl_expr_t jl_const_string(const char *s) {
   jl_expr_t expr = {JL_EXPR_UNDEFINED};
 
-  jl_const_init(&expr, jl_string());
+  jl_const_init(&expr, jl_pointer(jl_char()));
   jl_expr_const(expr)->u.s = s;
   return expr;
 }
@@ -474,7 +490,7 @@ jl_expr_t jl_const_parse(const char *s, size_t len) {
         _const->u.f = (float) _const->u.d;
         endptr++;
       } else if (*endptr == 'l' || *endptr == 'L') {
-        expr.type = jl_ldouble();
+        expr.type = jl_long_double();
         _const->u.ld = (long double) _const->u.d;
         endptr++;
       }
@@ -669,6 +685,14 @@ jl_expr_t jl_exprs(jl_expr_r exprs) {
   jl_expr_t expr = {JL_EXPR_UNDEFINED};
 
   jl_exprs_init(&expr, exprs);
+  return expr;
+}
+
+jl_expr_t jl_exprs_start(jl_expr_t first) {
+  jl_expr_t expr = {JL_EXPR_UNDEFINED};
+
+  jl_exprs_init(&expr, (jl_expr_r) {0});
+  adt_vector_push(expr.u._list->exprs, first);
   return expr;
 }
 

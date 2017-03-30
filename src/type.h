@@ -34,30 +34,6 @@
 jl_entity_r jl_type_fields(jl_type_t self);
 jl_field_t *jl_field_lookup(jl_type_t self, const char *name);
 
-struct jl_literal_t {
-  unsigned refs;
-  unsigned int kind : 8;
-};
-
-jl_type_t jl_void();
-jl_type_t jl_null();
-jl_type_t jl_string();
-jl_type_t jl_bool();
-jl_type_t jl_char();
-jl_type_t jl_short();
-jl_type_t jl_int();
-jl_type_t jl_uint();
-jl_type_t jl_long();
-jl_type_t jl_ulong();
-jl_type_t jl_double();
-jl_type_t jl_ldouble();
-jl_type_t jl_float();
-jl_type_t jl_literal(enum jl_literal_n kind);
-void jl_literal_init(jl_type_t *self, enum jl_literal_n kind);
-
-#define jl_literal_is(t, T) (jl_type_literal(t)->kind == JL_LITERAL_ ## T)
-#define jl_literal_is_number(t) (jl_type_literal(t)->kind >= JL_LITERAL_CHAR)
-
 struct jl_pointer_t {
   unsigned refs;
   jl_type_t of;

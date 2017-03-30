@@ -100,15 +100,15 @@ enum {
   C_TOK_DOTS = C_TOK_QUESTION + 1,  /* ... */
   C_TOK_LOGICAL_OR,           /* || */
   C_TOK_LOGICAL_AND,          /* && */
-  C_TOK_LEQ,                  /* <= */
-  C_TOK_GEQ,                  /* >= */
-  C_TOK_EQ,                   /* == */
-  C_TOK_NEQ,                  /* != */
+  C_TOK_LE_OP,                  /* <= */
+  C_TOK_GE_OP,                  /* >= */
+  C_TOK_EQ_OP,                   /* == */
+  C_TOK_NE_OP,                  /* != */
   C_TOK_PTR_OP,                /* -> */
   C_TOK_INCREMENT,            /* ++ */
   C_TOK_DECREMENT,            /* -- */
-  C_TOK_LSHIFT,               /* << */
-  C_TOK_RSHIFT,               /* >> */
+  C_TOK_LEFT_OP,               /* << */
+  C_TOK_RIGHT_OP,               /* >> */
   C_TOK_MUL_ASSIGN,           /* *= */
   C_TOK_DIV_ASSIGN,           /* /= */
   C_TOK_MOD_ASSIGN,           /* %= */

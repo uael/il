@@ -102,8 +102,7 @@ void c_pp_parse_define(c_pp_t *self, jl_lexer_t *lexer) {
         jl_token_dtor(&t);
         continue;
       }
-    } else
-    if (t.type != '\\') {
+    } else if (t.type != '\\') {
       adt_vector_push(macro.replacement, t);
     }
     pt = t;

@@ -109,6 +109,9 @@ void c_fe_parse(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out) {
   self->scope->sym = jl_sym_put(self->scope, "foo");
   jl_fe_unscope(self);
 
+  jl_expr_t expr = expression(self, lexer, out);
+  jl_expr_dtor(&expr);
+
   while (jl_lexer_next(lexer).type != 0);
 }
 
@@ -152,7 +155,7 @@ static jl_expr_t primary_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program
       jl_lexer_consume(lexer, ')');
       return jl_unary(JL_OP_EN, r1);
     default:
-      printf("Unexpected '%s', not a valid primary expression.", token.value ? token.value : "unknown");
+      printf("Unexpected '%s', not a valid primary expression.", token.value ? token.value : token.name);
       exit(1);;
   }
 }

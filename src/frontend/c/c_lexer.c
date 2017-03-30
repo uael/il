@@ -51,15 +51,15 @@ void c_lexer_init(jl_lexer_t *self) {
 }
 
 #define EMPTY {0}
-#define SYNTX(t, s) {(t), {0}, s, sizeof(s)-1, JL_TOKEN_SYNTAX}
-#define KEYWD(t, s) {(t), {0}, s, sizeof(s)-1, JL_TOKEN_KEYWORD}
+#define SYNTX(t, s) {.type=(t), .loc={0}, .name=s, .length=sizeof(s)-1, .kind=JL_TOKEN_SYNTAX}
+#define KEYWD(t, s) {.type=(t), .loc={0}, .name=s, .length=sizeof(s)-1, .kind=JL_TOKEN_KEYWORD}
 
 #define peek *(self->buffer + self->loc.position)
 #define peekn(n) (self->buffer + self->loc.position)[n]
 #define next (self->loc.colno++, self->loc.position++, peek)
 #define nextn(n) (self->loc.colno+=n, self->loc.position+=n, peek)
 
-#define set_loc token.loc = self->loc
+#define set_loc token.loc = self->loc; token.leading_ws = lws; lws = 0
 #define set_s do { \
     token.length = i; \
     token.loc.colno -= i; \
@@ -260,6 +260,7 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
   char s[256];
   jl_token_t token;
   unsigned i;
+  uint32_t lws = 0;
 
   while (n && peek != C_TOK_END) {
     if (peek == '_' || isalpha(peek)) {
@@ -780,6 +781,7 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
           self->loc.colno = 0;
           break;
         case ' ':
+          ++lws;
         case '\t':
         default:
           next;

@@ -130,6 +130,8 @@ size_t jl_lexer_length(jl_lexer_t *self) {
 
 bool jl_lexer_push(jl_lexer_t *self, jl_token_t token) {
   jl_lexer_event_t event;
+  unsigned i;
+
   adt_vector_foreach(self->events, event) {
     if (event.kind == JL_LEXER_EVENT_ON_PUSH) {
       if (!event.callback(&event, &token)) {
@@ -141,18 +143,16 @@ bool jl_lexer_push(jl_lexer_t *self, jl_token_t token) {
   token.cursor = adt_deque_size(self->queue);
   adt_deque_push(self->queue, token);
   if (jl_lexer_is_root(self) && self->fe->compiler->opts.echo) {
+    for (i = 0; i<token.leading_ws; ++i) {
+      putc(' ', stdout);
+    }
     switch (token.kind) {
       case JL_TOKEN_IDENTIFIER:
       case JL_TOKEN_NUMBER:
-        printf("%s ", token.value);
+        fputs(token.value, stdout);
         break;
       default:
-        if (token.length>1) {
-          printf("%s ", token.name);
-        }
-        else {
-          printf("%s", token.name);
-        }
+        fputs(token.name, stdout);
         break;
     }
   }

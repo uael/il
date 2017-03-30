@@ -13,4 +13,4 @@
 - [ ] proper msbuild support
 - [ ] clean current portability additions
 - [x] msbuild cc flags
-- [ ] token leading ws
+- [x] token leading ws

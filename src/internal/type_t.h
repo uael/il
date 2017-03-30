@@ -178,11 +178,11 @@ jl_type_t jl_long_double();
 #define jl_ptype_is_restrict(t) ((t)->qualifiers & JL_TYPE_QUALIFIER_RESTRICT)
 #define jl_ptype_is_atomic(t) ((t)->qualifiers & JL_TYPE_QUALIFIER_ATOMIC)
 
-#define jl_type_pointer(t) ((void) assert(jl_type_is_pointer(t)), (t).u._pointer)
-#define jl_type_array(t) ((void) assert(jl_type_is_array(t)), (t).u._array)
-#define jl_type_compound(t) ((void) assert(jl_type_is_compound(t)), (t).u._compound)
-#define jl_ptype_pointer(t) ((void) assert(jl_ptype_is_pointer(t)), (t)->u._pointer)
-#define jl_ptype_array(t) ((void) assert(jl_ptype_is_array(t)), (t)->u._array)
-#define jl_ptype_compound(t) ((void) assert(jl_ptype_is_compound(t)), (t)->u._compound)
+#define jl_type_pointer(t) (assert(jl_type_is_pointer(t)), jl_u(t, pointer))
+#define jl_type_array(t) (assert(jl_type_is_array(t)), jl_u(t, array))
+#define jl_type_compound(t) (assert(jl_type_is_compound(t)), jl_u(t, compound))
+#define jl_ptype_pointer(t) (assert(jl_ptype_is_pointer(t)), jl_pu(t, pointer))
+#define jl_ptype_array(t) (assert(jl_ptype_is_array(t)), jl_pu(t, array))
+#define jl_ptype_compound(t) (assert(jl_ptype_is_compound(t)), jl_pu(t, compound))
 
 #endif /* JL_TYPE_T_H__ */

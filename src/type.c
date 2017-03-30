@@ -45,24 +45,24 @@ void jl_type_dtor(jl_type_t *self) {
     case JL_TYPE_UNDEFINED:
       return;
     case JL_TYPE_POINTER:
-      if (self->u._pointer && self->u._pointer->refs <= 0) {
-        jl_pointer_dtor(self->u._pointer);
-        free(self->u._pointer);
-        self->u._pointer = NULL;
+      if (jl_pu(self, pointer) && jl_pu(self, pointer)->refs <= 0) {
+        jl_pointer_dtor(jl_pu(self, pointer));
+        free(jl_pu(self, pointer));
+        jl_pu(self, pointer) = NULL;
       }
       break;
     case JL_TYPE_ARRAY:
-      if (self->u._array && self->u._array->refs <= 0) {
-        jl_array_dtor(self->u._array);
-        free(self->u._array);
-        self->u._array = NULL;
+      if (jl_pu(self, array) && jl_pu(self, array)->refs <= 0) {
+        jl_array_dtor(jl_pu(self, array));
+        free(jl_pu(self, array));
+        jl_pu(self, array) = NULL;
       }
       break;
     case JL_TYPE_COMPOUND:
-      if (self->u._compound && self->u._compound->refs <= 0) {
-        jl_compound_dtor(self->u._compound);
-        free(self->u._compound);
-        self->u._compound = NULL;
+      if (jl_pu(self, compound) && jl_pu(self, compound)->refs <= 0) {
+        jl_compound_dtor(jl_pu(self, compound));
+        free(jl_pu(self, compound));
+        jl_pu(self, compound) = NULL;
       }
       break;
     default:
@@ -91,16 +91,16 @@ void jl_type_switch(jl_type_t *self, enum jl_type_n kind) {
       self->qualifiers = qualifiers;
       switch (kind) {
         case JL_TYPE_POINTER:
-          self->u._pointer = xmalloc(sizeof(jl_pointer_t));
-          *self->u._pointer = (jl_pointer_t) {.refs = 0};
+          jl_pu(self, pointer) = xmalloc(sizeof(jl_pointer_t));
+          *jl_pu(self, pointer) = (jl_pointer_t) {.refs = 0};
           break;
         case JL_TYPE_ARRAY:
-          self->u._array = xmalloc(sizeof(jl_array_t));
-          *self->u._array = (jl_array_t) {.refs = 0};
+          jl_pu(self, array) = xmalloc(sizeof(jl_array_t));
+          *jl_pu(self, array) = (jl_array_t) {.refs = 0};
           break;
         case JL_TYPE_COMPOUND:
-          self->u._compound = xmalloc(sizeof(jl_compound_t));
-          *self->u._compound = (jl_compound_t) {.refs = 0};
+          jl_pu(self, compound) = xmalloc(sizeof(jl_compound_t));
+          *jl_pu(self, compound) = (jl_compound_t) {.refs = 0};
           break;
         default:
           break;
@@ -116,13 +116,13 @@ void jl_type_acquire(jl_type_t *self) {
       puts("cannot acquire undefined type");
       exit(1);
     case JL_TYPE_POINTER:
-      ++self->u._pointer->refs;
+      ++jl_pu(self, pointer)->refs;
       break;
     case JL_TYPE_ARRAY:
-      ++self->u._array->refs;
+      ++jl_pu(self, array)->refs;
       break;
     case JL_TYPE_COMPOUND:
-      ++self->u._compound->refs;
+      ++jl_pu(self, compound)->refs;
       break;
     default:
       break;
@@ -135,13 +135,13 @@ void jl_type_release(jl_type_t *self) {
       puts("cannot release undefined type");
       exit(1);
     case JL_TYPE_POINTER:
-      --self->u._pointer->refs;
+      --jl_pu(self, pointer)->refs;
       break;
     case JL_TYPE_ARRAY:
-      --self->u._array->refs;
+      --jl_pu(self, array)->refs;
       break;
     case JL_TYPE_COMPOUND:
-      --self->u._compound->refs;
+      --jl_pu(self, compound)->refs;
       break;
     default:
       break;
@@ -151,11 +151,11 @@ void jl_type_release(jl_type_t *self) {
 bool jl_type_is_defined(jl_type_t self) {
   switch (self.kind) {
     case JL_TYPE_POINTER:
-      return self.u._pointer != NULL;
+      return jl_u(self, pointer) != NULL;
     case JL_TYPE_ARRAY:
-      return self.u._array != NULL;
+      return jl_u(self, array) != NULL;
     case JL_TYPE_COMPOUND:
-      return self.u._compound != NULL;
+      return jl_u(self, compound) != NULL;
     case JL_TYPE_UNDEFINED:
       return false;
     default:
@@ -172,7 +172,7 @@ bool jl_type_is_ref(jl_type_t type) {
 }
 
 bool jl_type_is_func(jl_type_t type) {
-  return jl_type_is_compound(type) && jl_entity_is_func(type.u._compound->entity);
+  return jl_type_is_compound(type) && jl_entity_is_func(jl_u(type, compound)->entity);
 }
 
 bool jl_type_equals(jl_type_t a, jl_type_t b) {
@@ -197,9 +197,9 @@ bool jl_type_equals(jl_type_t a, jl_type_t b) {
 jl_type_t jl_type_deref(jl_type_t a) {
   switch (a.kind) {
     case JL_TYPE_POINTER:
-      return a.u._pointer->of;
+      return jl_u(a, pointer)->of;
     case JL_TYPE_ARRAY:
-      return a.u._array->of;
+      return jl_u(a, array)->of;
     default:
       exit(1);
   }
@@ -231,10 +231,10 @@ void jl_type_update_size(jl_type_t *self) {
       self->size = 8;
       break;
     case JL_TYPE_ARRAY:
-      self->size = jl_expr_const(self->u._array->size)->u.ul * self->u._array->of.size;
+      self->size = jl_pu(jl_expr_const(jl_pu(self, array)->size), ul) * jl_pu(self, array)->of.size;
       break;
     case JL_TYPE_COMPOUND:
-      self->size = self->u._compound->entity.size;
+      self->size = jl_pu(self, compound)->entity.size;
       break;
     default:
       break;

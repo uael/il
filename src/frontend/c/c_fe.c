@@ -561,7 +561,7 @@ static jl_expr_t expression(jl_fe_t *self, jl_lexer_t *lexer, jl_program_t *out)
     if (!jl_expr_is_list(r1)) {
       r1 = jl_exprs_start(r1);
     }
-    adt_vector_push(r1.u._list->exprs, assignment_expression(self, lexer, out));
+    adt_vector_push(jl_u(r1, list)->exprs, assignment_expression(self, lexer, out));
   }
 }
 

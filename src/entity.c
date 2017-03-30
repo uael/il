@@ -58,59 +58,59 @@ void jl_entity_dtor(jl_entity_t *self) {
     case JL_ENTITY_UNDEFINED:
       return;
     case JL_ENTITY_FIELD:
-      if (self->u._field && self->u._field->refs <= 0) {
-        jl_field_dtor(self->u._field);
-        free(self->u._field);
-        self->u._field = NULL;
+      if (jl_pu(self, field) && jl_pu(self, field)->refs <= 0) {
+        jl_field_dtor(jl_pu(self, field));
+        free(jl_pu(self, field));
+        jl_pu(self, field) = NULL;
       }
       break;
     case JL_ENTITY_VAR:
-      if (self->u._var && self->u._var->refs <= 0) {
-        jl_var_dtor(self->u._var);
-        free(self->u._var);
-        self->u._var = NULL;
+      if (jl_pu(self, var) && jl_pu(self, var)->refs <= 0) {
+        jl_var_dtor(jl_pu(self, var));
+        free(jl_pu(self, var));
+        jl_pu(self, var) = NULL;
       }
       break;
     case JL_ENTITY_PARAM:
-      if (self->u._param && self->u._param->refs <= 0) {
-        jl_param_dtor(self->u._param);
-        free(self->u._param);
-        self->u._param = NULL;
+      if (jl_pu(self, param) && jl_pu(self, param)->refs <= 0) {
+        jl_param_dtor(jl_pu(self, param));
+        free(jl_pu(self, param));
+        jl_pu(self, param) = NULL;
       }
       break;
     case JL_ENTITY_FUNC:
-      if (self->u._func && self->u._func->refs <= 0) {
-        jl_func_dtor(self->u._func);
-        free(self->u._func);
-        self->u._func = NULL;
+      if (jl_pu(self, func) && jl_pu(self, func)->refs <= 0) {
+        jl_func_dtor(jl_pu(self, func));
+        free(jl_pu(self, func));
+        jl_pu(self, func) = NULL;
       }
       break;
     case JL_ENTITY_ENUM:
-      if (self->u._enum && self->u._enum->refs <= 0) {
-        jl_enum_dtor(self->u._enum);
-        free(self->u._enum);
-        self->u._enum = NULL;
+      if (jl_pu(self, enum) && jl_pu(self, enum)->refs <= 0) {
+        jl_enum_dtor(jl_pu(self, enum));
+        free(jl_pu(self, enum));
+        jl_pu(self, enum) = NULL;
       }
       break;
     case JL_ENTITY_STRUCT:
-      if (self->u._struct && self->u._struct->refs <= 0) {
-        jl_struct_dtor(self->u._struct);
-        free(self->u._struct);
-        self->u._struct = NULL;
+      if (jl_pu(self, struct) && jl_pu(self, struct)->refs <= 0) {
+        jl_struct_dtor(jl_pu(self, struct));
+        free(jl_pu(self, struct));
+        jl_pu(self, struct) = NULL;
       }
       break;
     case JL_ENTITY_UNION:
-      if (self->u._union && self->u._union->refs <= 0) {
-        jl_union_dtor(self->u._union);
-        free(self->u._union);
-        self->u._union = NULL;
+      if (jl_pu(self, union) && jl_pu(self, union)->refs <= 0) {
+        jl_union_dtor(jl_pu(self, union));
+        free(jl_pu(self, union));
+        jl_pu(self, union) = NULL;
       }
       break;
     case JL_ENTITY_LABEL:
-      if (self->u._label && self->u._label->refs <= 0) {
-        jl_label_dtor(self->u._label);
-        free(self->u._label);
-        self->u._label = NULL;
+      if (jl_pu(self, label) && jl_pu(self, label)->refs <= 0) {
+        jl_label_dtor(jl_pu(self, label));
+        free(jl_pu(self, label));
+        jl_pu(self, label) = NULL;
       }
       break;
     default:
@@ -129,36 +129,36 @@ void jl_entity_switch(jl_entity_t *self, enum jl_entity_n kind) {
       case JL_ENTITY_UNDEFINED:
         break;
       case JL_ENTITY_FIELD:
-        self->u._field = xmalloc(sizeof(jl_field_t));
-        *self->u._field = (jl_field_t) {.refs = 0};
+        jl_pu(self, field) = xmalloc(sizeof(jl_field_t));
+        *jl_pu(self, field) = (jl_field_t) {.refs = 0};
         break;
       case JL_ENTITY_VAR:
-        self->u._var = xmalloc(sizeof(jl_var_t));
-        *self->u._var = (jl_var_t) {.refs = 0};
+        jl_pu(self, var) = xmalloc(sizeof(jl_var_t));
+        *jl_pu(self, var) = (jl_var_t) {.refs = 0};
         break;
       case JL_ENTITY_PARAM:
-        self->u._param = xmalloc(sizeof(jl_param_t));
-        *self->u._param = (jl_param_t) {.refs = 0};
+        jl_pu(self, param) = xmalloc(sizeof(jl_param_t));
+        *jl_pu(self, param) = (jl_param_t) {.refs = 0};
         break;
       case JL_ENTITY_FUNC:
-        self->u._func = xmalloc(sizeof(jl_func_t));
-        *self->u._func = (jl_func_t) {.refs = 0};
+        jl_pu(self, func) = xmalloc(sizeof(jl_func_t));
+        *jl_pu(self, func) = (jl_func_t) {.refs = 0};
         break;
       case JL_ENTITY_ENUM:
-        self->u._enum = xmalloc(sizeof(jl_enum_t));
-        *self->u._enum = (jl_enum_t) {.refs = 0};
+        jl_pu(self, enum) = xmalloc(sizeof(jl_enum_t));
+        *jl_pu(self, enum) = (jl_enum_t) {.refs = 0};
         break;
       case JL_ENTITY_STRUCT:
-        self->u._struct = xmalloc(sizeof(jl_struct_t));
-        *self->u._struct = (jl_struct_t) {.refs = 0};
+        jl_pu(self, struct) = xmalloc(sizeof(jl_struct_t));
+        *jl_pu(self, struct) = (jl_struct_t) {.refs = 0};
         break;
       case JL_ENTITY_UNION:
-        self->u._union = xmalloc(sizeof(jl_union_t));
-        *self->u._union = (jl_union_t) {.refs = 0};
+        jl_pu(self, union) = xmalloc(sizeof(jl_union_t));
+        *jl_pu(self, union) = (jl_union_t) {.refs = 0};
         break;
       case JL_ENTITY_LABEL:
-        self->u._label = xmalloc(sizeof(jl_label_t));
-        *self->u._label = (jl_label_t) {.refs = 0};
+        jl_pu(self, label) = xmalloc(sizeof(jl_label_t));
+        *jl_pu(self, label) = (jl_label_t) {.refs = 0};
         break;
     }
   }
@@ -170,28 +170,28 @@ void jl_entity_acquire(jl_entity_t *self) {
       puts("cannot acquire undefined type");
       exit(1);
     case JL_ENTITY_FIELD:
-      ++self->u._field->refs;
+      ++jl_pu(self, field)->refs;
       break;
     case JL_ENTITY_VAR:
-      ++self->u._var->refs;
+      ++jl_pu(self, var)->refs;
       break;
     case JL_ENTITY_PARAM:
-      ++self->u._param->refs;
+      ++jl_pu(self, param)->refs;
       break;
     case JL_ENTITY_FUNC:
-      ++self->u._func->refs;
+      ++jl_pu(self, func)->refs;
       break;
     case JL_ENTITY_ENUM:
-      ++self->u._enum->refs;
+      ++jl_pu(self, enum)->refs;
       break;
     case JL_ENTITY_STRUCT:
-      ++self->u._struct->refs;
+      ++jl_pu(self, struct)->refs;
       break;
     case JL_ENTITY_UNION:
-      ++self->u._union->refs;
+      ++jl_pu(self, union)->refs;
       break;
     case JL_ENTITY_LABEL:
-      ++self->u._label->refs;
+      ++jl_pu(self, label)->refs;
       break;
     default:
       break;
@@ -204,28 +204,28 @@ void jl_entity_release(jl_entity_t *self) {
       puts("cannot release undefined type");
       exit(1);
     case JL_ENTITY_FIELD:
-      --self->u._field->refs;
+      --jl_pu(self, field)->refs;
       break;
     case JL_ENTITY_VAR:
-      --self->u._var->refs;
+      --jl_pu(self, var)->refs;
       break;
     case JL_ENTITY_PARAM:
-      --self->u._param->refs;
+      --jl_pu(self, param)->refs;
       break;
     case JL_ENTITY_FUNC:
-      --self->u._func->refs;
+      --jl_pu(self, func)->refs;
       break;
     case JL_ENTITY_ENUM:
-      --self->u._enum->refs;
+      --jl_pu(self, enum)->refs;
       break;
     case JL_ENTITY_STRUCT:
-      --self->u._struct->refs;
+      --jl_pu(self, struct)->refs;
       break;
     case JL_ENTITY_UNION:
-      --self->u._union->refs;
+      --jl_pu(self, union)->refs;
       break;
     case JL_ENTITY_LABEL:
-      --self->u._label->refs;
+      --jl_pu(self, label)->refs;
       break;
     default:
       break;
@@ -245,21 +245,21 @@ void jl_entity_update_size(jl_entity_t *self) {
 bool jl_entity_is_defined(jl_entity_t *self) {
   switch (self->kind) {
     case JL_ENTITY_FIELD:
-      return self->u._field != NULL;
+      return jl_pu(self, field) != NULL;
     case JL_ENTITY_VAR:
-      return self->u._var != NULL;
+      return jl_pu(self, var) != NULL;
     case JL_ENTITY_PARAM:
-      return self->u._param != NULL;
+      return jl_pu(self, param) != NULL;
     case JL_ENTITY_FUNC:
-      return self->u._func != NULL;
+      return jl_pu(self, func) != NULL;
     case JL_ENTITY_ENUM:
-      return self->u._enum != NULL;
+      return jl_pu(self, enum) != NULL;
     case JL_ENTITY_STRUCT:
-      return self->u._struct != NULL;
+      return jl_pu(self, struct) != NULL;
     case JL_ENTITY_UNION:
-      return self->u._union != NULL;
+      return jl_pu(self, union) != NULL;
     case JL_ENTITY_LABEL:
-      return self->u._label != NULL;
+      return jl_pu(self, label) != NULL;
     case JL_ENTITY_UNDEFINED:
     default:
       return false;
@@ -294,13 +294,13 @@ bool jl_entity_equals(jl_entity_t a, jl_entity_t b) {
 jl_entity_r jl_entity_fields(jl_entity_t self) {
   switch (self.kind) {
     case JL_ENTITY_FUNC:
-      return self.u._func->params;
+      return jl_u(self, func)->params;
     case JL_ENTITY_ENUM:
-      return self.u._enum->vars;
+      return jl_u(self, enum)->vars;
     case JL_ENTITY_STRUCT:
-      return self.u._struct->fields;
+      return jl_u(self, struct)->fields;
     case JL_ENTITY_UNION:
-      return self.u._union->fields;
+      return jl_u(self, union)->fields;
     default:
       return (jl_entity_r) {0};
   }
@@ -336,21 +336,21 @@ jl_field_t *jl_entity_field_lookup(jl_entity_t self, const char *name) {
 const char *jl_entity_name(jl_entity_t self) {
   switch (self.kind) {
     case JL_ENTITY_FIELD:
-      return self.u._field->name;
+      return jl_u(self, field)->name;
     case JL_ENTITY_VAR:
-      return self.u._var->name;
+      return jl_u(self, var)->name;
     case JL_ENTITY_PARAM:
-      return self.u._param->name;
+      return jl_u(self, param)->name;
     case JL_ENTITY_FUNC:
-      return self.u._func->name;
+      return jl_u(self, func)->name;
     case JL_ENTITY_ENUM:
-      return self.u._enum->name;
+      return jl_u(self, enum)->name;
     case JL_ENTITY_STRUCT:
-      return self.u._struct->name;
+      return jl_u(self, struct)->name;
     case JL_ENTITY_UNION:
-      return self.u._union->name;
+      return jl_u(self, union)->name;
     case JL_ENTITY_LABEL:
-      return self.u._label->name;
+      return jl_u(self, label)->name;
     default:
       break;
   }
@@ -360,11 +360,11 @@ const char *jl_entity_name(jl_entity_t self) {
 jl_type_t jl_entity_type(jl_entity_t self) {
   switch (self.kind) {
     case JL_ENTITY_FIELD:
-      return self.u._field->type;
+      return jl_u(self, field)->type;
     case JL_ENTITY_VAR:
-      return self.u._var->type;
+      return jl_u(self, var)->type;
     case JL_ENTITY_PARAM:
-      return self.u._param->type;
+      return jl_u(self, param)->type;
     case JL_ENTITY_FUNC:
       return jl_pointer(jl_compound(self));
     default:
@@ -381,37 +381,37 @@ void jl_entity_add_field(jl_entity_t *self, const char *name, jl_type_t type) {
       if (jl_type_is_array(type)) {
         type = jl_pointer(jl_type_array(type)->of);
       }
-      jl_param_init(&field, (unsigned) adt_vector_length(self->u._func->params), name, type, jl_expr_undefined());
-      adt_vector_push(self->u._func->params, field);
+      jl_param_init(&field, (unsigned) adt_vector_length(jl_pu(self, func)->params), name, type, jl_expr_undefined());
+      adt_vector_push(jl_pu(self, func)->params, field);
       break;
     case JL_ENTITY_ENUM:
       jl_var_init(&field, name, type, jl_expr_undefined());
-      adt_vector_push(self->u._enum->vars, field);
+      adt_vector_push(jl_pu(self, enum)->vars, field);
       break;
     case JL_ENTITY_STRUCT:
       jl_entity_switch(&field, JL_ENTITY_FIELD);
-      field.u._field->name = name;
-      field.u._field->type = type;
-      field.u._field->offset = jl_type_alignment(type);
-      if (self->size % field.u._field->offset) {
-        self->size += field.u._field->offset - (self->size % field.u._field->offset);
-        assert(self->size % field.u._field->offset == 0);
+      jl_u(field, field)->name = name;
+      jl_u(field, field)->type = type;
+      jl_u(field, field)->offset = jl_type_alignment(type);
+      if (self->size % jl_u(field, field)->offset) {
+        self->size += jl_u(field, field)->offset - (self->size % jl_u(field, field)->offset);
+        assert(self->size % jl_u(field, field)->offset == 0);
       }
-      field.u._field->offset = self->size;
-      if (LONG_MAX - field.u._field->offset < type.size) {
+      jl_u(field, field)->offset = self->size;
+      if (LONG_MAX - jl_u(field, field)->offset < type.size) {
         puts("Object is too large.");
         exit(1);
       }
-      if (self->size < field.u._field->offset + type.size) {
-        self->size = field.u._field->offset + type.size;
+      if (self->size < jl_u(field, field)->offset + type.size) {
+        self->size = jl_u(field, field)->offset + type.size;
       }
-      adt_vector_push(self->u._struct->fields, field);
+      adt_vector_push(jl_pu(self, struct)->fields, field);
       break;
     case JL_ENTITY_UNION:
       jl_entity_switch(&field, JL_ENTITY_FIELD);
-      field.u._field->name = name;
-      field.u._field->type = type;
-      adt_vector_push(self->u._union->fields, field);
+      jl_u(field, field)->name = name;
+      jl_u(field, field)->type = type;
+      adt_vector_push(jl_pu(self, union)->fields, field);
       break;
     default:
       break;
@@ -621,7 +621,7 @@ void jl_struct_init(jl_entity_t *self, const char *name, jl_field_t *fields, siz
   jl_pentity_struct(self)->fields = (jl_entity_r) {0};
   if (fields) for (i = 0; i < n_fields; ++i) {
     jl_entity_add_field(self, fields[i].name, fields[i].type);
-    field = adt_vector_back(self->u._struct->fields);
+    field = adt_vector_back(jl_pu(self, struct)->fields);
     jl_entity_field(field)->field_offset = fields[i].field_offset;
     jl_entity_field(field)->field_width = fields[i].field_width;
   }
@@ -665,7 +665,7 @@ void jl_union_init(jl_entity_t *self, const char *name, jl_field_t *fields, size
   jl_pentity_union(self)->fields = (jl_entity_r) {0};
   if (fields) for (i = 0; i < n_fields; ++i) {
       jl_entity_add_field(self, fields[i].name, fields[i].type);
-      field = adt_vector_back(self->u._struct->fields);
+      field = adt_vector_back(jl_pu(self, struct)->fields);
       jl_entity_field(field)->field_offset = fields[i].field_offset;
       jl_entity_field(field)->field_width = fields[i].field_width;
     }

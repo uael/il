@@ -43,11 +43,11 @@ void jl_id_init(jl_expr_t *self, const char *id, jl_type_t type);
 struct jl_expr_const_t {
   unsigned refs;
   union {
-    const char *s;
-    float f;
-    double d;
-    long double ld;
-    unsigned long int ul;
+    const char *_s;
+    float _f;
+    double _d;
+    long double _ld;
+    unsigned long int _ul;
   } u;
 };
 

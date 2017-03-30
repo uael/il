@@ -55,80 +55,80 @@ void jl_expr_dtor(jl_expr_t *self) {
     case JL_EXPR_UNDEFINED:
       return;
     case JL_EXPR_ID:
-      if (self->u._id && self->u._id->refs <= 0) {
-        jl_expr_id_dtor(self->u._id);
-        free(self->u._id);
-        self->u._id = NULL;
+      if (jl_pu(self, id) && jl_pu(self, id)->refs <= 0) {
+        jl_expr_id_dtor(jl_pu(self, id));
+        free(jl_pu(self, id));
+        jl_pu(self, id) = NULL;
       }
       break;
     case JL_EXPR_CONST:
-      if (self->u._const && self->u._const->refs <= 0) {
-        jl_expr_const_dtor(self->u._const);
-        free(self->u._const);
-        self->u._const = NULL;
+      if (jl_pu(self, const) && jl_pu(self, const)->refs <= 0) {
+        jl_expr_const_dtor(jl_pu(self, const));
+        free(jl_pu(self, const));
+        jl_pu(self, const) = NULL;
       }
       break;
     case JL_EXPR_UNARY:
-      if (self->u._unary && self->u._unary->refs <= 0) {
-        jl_expr_unary_dtor(self->u._unary);
-        free(self->u._unary);
-        self->u._unary = NULL;
+      if (jl_pu(self, unary) && jl_pu(self, unary)->refs <= 0) {
+        jl_expr_unary_dtor(jl_pu(self, unary));
+        free(jl_pu(self, unary));
+        jl_pu(self, unary) = NULL;
       }
       break;
     case JL_EXPR_BINARY:
-      if (self->u._binary && self->u._binary->refs <= 0) {
-        jl_expr_binary_dtor(self->u._binary);
-        free(self->u._binary);
-        self->u._binary = NULL;
+      if (jl_pu(self, binary) && jl_pu(self, binary)->refs <= 0) {
+        jl_expr_binary_dtor(jl_pu(self, binary));
+        free(jl_pu(self, binary));
+        jl_pu(self, binary) = NULL;
       }
       break;
     case JL_EXPR_TERNARY:
-      if (self->u._ternary && self->u._ternary->refs <= 0) {
-        jl_expr_ternary_dtor(self->u._ternary);
-        free(self->u._ternary);
-        self->u._ternary = NULL;
+      if (jl_pu(self, ternary) && jl_pu(self, ternary)->refs <= 0) {
+        jl_expr_ternary_dtor(jl_pu(self, ternary));
+        free(jl_pu(self, ternary));
+        jl_pu(self, ternary) = NULL;
       }
       break;
     case JL_EXPR_ARRAY_READ:
-      if (self->u._array_read && self->u._array_read->refs <= 0) {
-        jl_expr_array_read_dtor(self->u._array_read);
-        free(self->u._array_read);
-        self->u._array_read = NULL;
+      if (jl_pu(self, array_read) && jl_pu(self, array_read)->refs <= 0) {
+        jl_expr_array_read_dtor(jl_pu(self, array_read));
+        free(jl_pu(self, array_read));
+        jl_pu(self, array_read) = NULL;
       }
       break;
     case JL_EXPR_ARRAY_WRITE:
-      if (self->u._array_write && self->u._array_write->refs <= 0) {
-        jl_expr_array_write_dtor(self->u._array_write);
-        free(self->u._array_write);
-        self->u._array_write = NULL;
+      if (jl_pu(self, array_write) && jl_pu(self, array_write)->refs <= 0) {
+        jl_expr_array_write_dtor(jl_pu(self, array_write));
+        free(jl_pu(self, array_write));
+        jl_pu(self, array_write) = NULL;
       }
       break;
     case JL_EXPR_FIELD_READ:
-      if (self->u._field_read && self->u._field_read->refs <= 0) {
-        jl_expr_field_read_dtor(self->u._field_read);
-        free(self->u._field_read);
-        self->u._field_read = NULL;
+      if (jl_pu(self, field_read) && jl_pu(self, field_read)->refs <= 0) {
+        jl_expr_field_read_dtor(jl_pu(self, field_read));
+        free(jl_pu(self, field_read));
+        jl_pu(self, field_read) = NULL;
       }
       break;
     case JL_EXPR_FIELD_WRITE:
-      if (self->u._field_write && self->u._field_write->refs <= 0) {
-        jl_expr_field_write_dtor(self->u._field_write);
-        free(self->u._field_write);
-        self->u._field_write = NULL;
+      if (jl_pu(self, field_write) && jl_pu(self, field_write)->refs <= 0) {
+        jl_expr_field_write_dtor(jl_pu(self, field_write));
+        free(jl_pu(self, field_write));
+        jl_pu(self, field_write) = NULL;
       }
       break;
     case JL_EXPR_CALL:
-      if (self->u._call && self->u._call->refs <= 0) {
-        jl_expr_call_dtor(self->u._call);
-        free(self->u._call);
-        self->u._call = NULL;
+      if (jl_pu(self, call) && jl_pu(self, call)->refs <= 0) {
+        jl_expr_call_dtor(jl_pu(self, call));
+        free(jl_pu(self, call));
+        jl_pu(self, call) = NULL;
       }
       break;
     case JL_EXPR_LIST:
-      if (self->u._list && self->u._list->refs <= 0) {
-        jl_expr_list_dtor(self->u._list);
-        free(self->u._list);
-        self->u._list = NULL;
+      if (jl_pu(self, list) && jl_pu(self, list)->refs <= 0) {
+        jl_expr_list_dtor(jl_pu(self, list));
+        free(jl_pu(self, list));
+        jl_pu(self, list) = NULL;
       }
       break;
     default:
@@ -147,48 +147,48 @@ void jl_expr_switch(jl_expr_t *self, enum jl_expr_n kind) {
       case JL_EXPR_UNDEFINED:
         break;
       case JL_EXPR_ID:
-        self->u._id = xmalloc(sizeof(jl_expr_id_t));
-        *self->u._id = (jl_expr_id_t) {.refs = 0};
+        jl_pu(self, id) = xmalloc(sizeof(jl_expr_id_t));
+        *jl_pu(self, id) = (jl_expr_id_t) {.refs = 0};
         break;
       case JL_EXPR_CONST:
-        self->u._const = xmalloc(sizeof(jl_expr_const_t));
-        *self->u._const = (jl_expr_const_t) {.refs = 0};
+        jl_pu(self, const) = xmalloc(sizeof(jl_expr_const_t));
+        *jl_pu(self, const) = (jl_expr_const_t) {.refs = 0};
         break;
       case JL_EXPR_UNARY:
-        self->u._unary = xmalloc(sizeof(jl_expr_unary_t));
-        *self->u._unary = (jl_expr_unary_t) {.refs = 0};
+        jl_pu(self, unary) = xmalloc(sizeof(jl_expr_unary_t));
+        *jl_pu(self, unary) = (jl_expr_unary_t) {.refs = 0};
         break;
       case JL_EXPR_BINARY:
-        self->u._binary = xmalloc(sizeof(jl_expr_binary_t));
-        *self->u._binary = (jl_expr_binary_t) {.refs = 0};
+        jl_pu(self, binary) = xmalloc(sizeof(jl_expr_binary_t));
+        *jl_pu(self, binary) = (jl_expr_binary_t) {.refs = 0};
         break;
       case JL_EXPR_TERNARY:
-        self->u._ternary = xmalloc(sizeof(jl_expr_ternary_t));
-        *self->u._ternary = (jl_expr_ternary_t) {.refs = 0};
+        jl_pu(self, ternary) = xmalloc(sizeof(jl_expr_ternary_t));
+        *jl_pu(self, ternary) = (jl_expr_ternary_t) {.refs = 0};
         break;
       case JL_EXPR_ARRAY_READ:
-        self->u._array_read = xmalloc(sizeof(struct jl_expr_array_read_t));
-        *self->u._array_read = (jl_expr_array_read_t) {.refs = 0};
+        jl_pu(self, array_read) = xmalloc(sizeof(struct jl_expr_array_read_t));
+        *jl_pu(self, array_read) = (jl_expr_array_read_t) {.refs = 0};
         break;
       case JL_EXPR_ARRAY_WRITE:
-        self->u._array_write = xmalloc(sizeof(jl_expr_array_write_t));
-        *self->u._array_write = (jl_expr_array_write_t) {.refs = 0};
+        jl_pu(self, array_write) = xmalloc(sizeof(jl_expr_array_write_t));
+        *jl_pu(self, array_write) = (jl_expr_array_write_t) {.refs = 0};
         break;
       case JL_EXPR_FIELD_READ:
-        self->u._field_read = xmalloc(sizeof(jl_expr_field_read_t));
-        *self->u._field_read = (jl_expr_field_read_t) {.refs = 0};
+        jl_pu(self, field_read) = xmalloc(sizeof(jl_expr_field_read_t));
+        *jl_pu(self, field_read) = (jl_expr_field_read_t) {.refs = 0};
         break;
       case JL_EXPR_FIELD_WRITE:
-        self->u._field_write = xmalloc(sizeof(jl_expr_field_write_t));
-        *self->u._field_write = (jl_expr_field_write_t) {.refs = 0};
+        jl_pu(self, field_write) = xmalloc(sizeof(jl_expr_field_write_t));
+        *jl_pu(self, field_write) = (jl_expr_field_write_t) {.refs = 0};
         break;
       case JL_EXPR_CALL:
-        self->u._call = xmalloc(sizeof(jl_expr_call_t));
-        *self->u._call = (jl_expr_call_t) {.refs = 0};
+        jl_pu(self, call) = xmalloc(sizeof(jl_expr_call_t));
+        *jl_pu(self, call) = (jl_expr_call_t) {.refs = 0};
         break;
       case JL_EXPR_LIST:
-        self->u._list = xmalloc(sizeof(jl_expr_list_t));
-        *self->u._list = (jl_expr_list_t) {.refs = 0};
+        jl_pu(self, list) = xmalloc(sizeof(jl_expr_list_t));
+        *jl_pu(self, list) = (jl_expr_list_t) {.refs = 0};
         break;
     }
   }
@@ -200,37 +200,37 @@ void jl_expr_acquire(jl_expr_t *self) {
       puts("cannot acquire undefined type");
       exit(1);
     case JL_EXPR_ID:
-      ++self->u._id->refs;
+      ++jl_pu(self, id)->refs;
       break;
     case JL_EXPR_CONST:
-      ++self->u._const->refs;
+      ++jl_pu(self, const)->refs;
       break;
     case JL_EXPR_UNARY:
-      ++self->u._unary->refs;
+      ++jl_pu(self, unary)->refs;
       break;
     case JL_EXPR_BINARY:
-      ++self->u._binary->refs;
+      ++jl_pu(self, binary)->refs;
       break;
     case JL_EXPR_TERNARY:
-      ++self->u._ternary->refs;
+      ++jl_pu(self, ternary)->refs;
       break;
     case JL_EXPR_ARRAY_READ:
-      ++self->u._array_read->refs;
+      ++jl_pu(self, array_read)->refs;
       break;
     case JL_EXPR_ARRAY_WRITE:
-      ++self->u._array_write->refs;
+      ++jl_pu(self, array_write)->refs;
       break;
     case JL_EXPR_FIELD_READ:
-      ++self->u._field_read->refs;
+      ++jl_pu(self, field_read)->refs;
       break;
     case JL_EXPR_FIELD_WRITE:
-      ++self->u._field_write->refs;
+      ++jl_pu(self, field_write)->refs;
       break;
     case JL_EXPR_CALL:
-      ++self->u._call->refs;
+      ++jl_pu(self, call)->refs;
       break;
     case JL_EXPR_LIST:
-      ++self->u._list->refs;
+      ++jl_pu(self, list)->refs;
       break;
     default:
       break;
@@ -243,37 +243,37 @@ void jl_expr_release(jl_expr_t *self) {
       puts("cannot release undefined type");
       exit(1);
     case JL_EXPR_ID:
-      --self->u._id->refs;
+      --jl_pu(self, id)->refs;
       break;
     case JL_EXPR_CONST:
-      --self->u._const->refs;
+      --jl_pu(self, const)->refs;
       break;
     case JL_EXPR_UNARY:
-      --self->u._unary->refs;
+      --jl_pu(self, unary)->refs;
       break;
     case JL_EXPR_BINARY:
-      --self->u._binary->refs;
+      --jl_pu(self, binary)->refs;
       break;
     case JL_EXPR_TERNARY:
-      --self->u._ternary->refs;
+      --jl_pu(self, ternary)->refs;
       break;
     case JL_EXPR_ARRAY_READ:
-      --self->u._array_read->refs;
+      --jl_pu(self, array_read)->refs;
       break;
     case JL_EXPR_ARRAY_WRITE:
-      --self->u._array_write->refs;
+      --jl_pu(self, array_write)->refs;
       break;
     case JL_EXPR_FIELD_READ:
-      --self->u._field_read->refs;
+      --jl_pu(self, field_read)->refs;
       break;
     case JL_EXPR_FIELD_WRITE:
-      --self->u._field_write->refs;
+      --jl_pu(self, field_write)->refs;
       break;
     case JL_EXPR_CALL:
-      --self->u._call->refs;
+      --jl_pu(self, call)->refs;
       break;
     case JL_EXPR_LIST:
-      --self->u._list->refs;
+      --jl_pu(self, list)->refs;
       break;
     default:
       break;
@@ -283,27 +283,27 @@ void jl_expr_release(jl_expr_t *self) {
 bool jl_expr_is_defined(jl_expr_t *self) {
   switch (self->kind) {
     case JL_EXPR_ID:
-      return self->u._id != NULL;
+      return jl_pu(self, id) != NULL;
     case JL_EXPR_CONST:
-      return self->u._const != NULL;
+      return jl_pu(self, const) != NULL;
     case JL_EXPR_UNARY:
-      return self->u._unary != NULL;
+      return jl_pu(self, unary) != NULL;
     case JL_EXPR_BINARY:
-      return self->u._binary != NULL;
+      return jl_pu(self, binary) != NULL;
     case JL_EXPR_TERNARY:
-      return self->u._ternary != NULL;
+      return jl_pu(self, ternary) != NULL;
     case JL_EXPR_ARRAY_READ:
-      return self->u._array_read != NULL;
+      return jl_pu(self, array_read) != NULL;
     case JL_EXPR_ARRAY_WRITE:
-      return self->u._array_write != NULL;
+      return jl_pu(self, array_write) != NULL;
     case JL_EXPR_FIELD_READ:
-      return self->u._field_read != NULL;
+      return jl_pu(self, field_read) != NULL;
     case JL_EXPR_FIELD_WRITE:
-      return self->u._field_write != NULL;
+      return jl_pu(self, field_write) != NULL;
     case JL_EXPR_CALL:
-      return self->u._call != NULL;
+      return jl_pu(self, call) != NULL;
     case JL_EXPR_LIST:
-      return self->u._list != NULL;
+      return jl_pu(self, list) != NULL;
     case JL_EXPR_UNDEFINED:
     default:
       return false;
@@ -355,7 +355,7 @@ jl_expr_t jl_const_int(int d) {
   jl_expr_t expr = {JL_EXPR_UNDEFINED};
 
   jl_const_init(&expr, jl_int());
-  jl_expr_const(expr)->u.ul = (unsigned long) d;
+  jl_pu(jl_u(expr, const), ul) = (unsigned long) d;
   return expr;
 }
 
@@ -363,7 +363,7 @@ jl_expr_t jl_const_float(float f) {
   jl_expr_t expr = {JL_EXPR_UNDEFINED};
 
   jl_const_init(&expr, jl_float());
-  jl_expr_const(expr)->u.f = f;
+  jl_pu(jl_u(expr, const), f) = f;
   return expr;
 }
 
@@ -371,7 +371,7 @@ jl_expr_t jl_const_string(const char *s) {
   jl_expr_t expr = {JL_EXPR_UNDEFINED};
 
   jl_const_init(&expr, jl_pointer(jl_char()));
-  jl_expr_const(expr)->u.s = s;
+  jl_pu(jl_u(expr, const), s) = s;
   return expr;
 }
 
@@ -462,17 +462,17 @@ jl_expr_t jl_const_parse(const char *s, size_t len) {
 
   str = s;
   jl_expr_switch(&expr, JL_EXPR_CONST);
-  _const = expr.u._const;
+  _const = jl_u(expr, const);
   /*
    * Try to read as integer. Handle suffixes u, l, ll, ul, ull, in all
    * permutations of upper- and lower case.
    */
   errno = 0;
-  _const->u.ul = strtoul(str, &endptr, 0);
+  jl_pu(_const, ul) = strtoul(str, &endptr, 0);
   suffix = read_integer_suffix(endptr, &endptr);
   if ((size_t) (endptr - str) == len) {
     assert(isdigit(*str));
-    expr.type = constant_integer_type(_const->u.ul, suffix, *str != '0');
+    expr.type = constant_integer_type(jl_pu(_const, ul), suffix, *str != '0');
   } else {
     /*
      * If the integer conversion did not consume the whole token,
@@ -483,15 +483,15 @@ jl_expr_t jl_const_parse(const char *s, size_t len) {
      */
     errno = 0;
     expr.type = jl_double();
-    _const->u.d = strtod(str, &endptr);
+    _const->u._d = strtod(str, &endptr);
     if ((size_t) (endptr - str) < len) {
       if (*endptr == 'f' || *endptr == 'F') {
         expr.type = jl_float();
-        _const->u.f = (float) _const->u.d;
+        jl_pu(_const, f) = (float) jl_pu(_const, d);
         endptr++;
       } else if (*endptr == 'l' || *endptr == 'L') {
         expr.type = jl_long_double();
-        _const->u.ld = (long double) _const->u.d;
+        jl_pu(_const, ld) = (long double) jl_pu(_const, d);
         endptr++;
       }
     }
@@ -692,7 +692,7 @@ jl_expr_t jl_exprs_start(jl_expr_t first) {
   jl_expr_t expr = {JL_EXPR_UNDEFINED};
 
   jl_exprs_init(&expr, (jl_expr_r) {0});
-  adt_vector_push(expr.u._list->exprs, first);
+  adt_vector_push(jl_u(expr, list)->exprs, first);
   return expr;
 }
 

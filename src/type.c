@@ -276,62 +276,62 @@ jl_field_t *jl_field_lookup(jl_type_t self, const char *name) {
 
 
 jl_type_t jl_void() {
-  static jl_type_t type = {JL_TYPE_VOID};
+  static jl_type_t type = {JL_TYPE_VOID, .size = 0};
   return type;
 }
 
 jl_type_t jl_bool() {
-  static jl_type_t type = {JL_TYPE_DOUBLE};
+  static jl_type_t type = {JL_TYPE_DOUBLE, .size = 1};
   return type;
 }
 
 jl_type_t jl_char() {
-  static jl_type_t type = {JL_TYPE_CHAR};
+  static jl_type_t type = {JL_TYPE_CHAR, .size = 1};
   return type;
 }
 
 jl_type_t jl_short() {
-  static jl_type_t type = {JL_TYPE_SHORT};
+  static jl_type_t type = {JL_TYPE_SHORT, .size = 2};
   return type;
 }
 
 jl_type_t jl_int() {
-  static jl_type_t type = {JL_TYPE_INT};
+  static jl_type_t type = {JL_TYPE_INT, .size = 4};
   return type;
 }
 
 jl_type_t jl_uint() {
-  static jl_type_t type = {JL_TYPE_INT, .specifiers = JL_TYPE_SPECIFIER_UNSIGNED};
+  static jl_type_t type = {JL_TYPE_INT, .size = 4, .specifiers = JL_TYPE_SPECIFIER_UNSIGNED};
   return type;
 }
 
 jl_type_t jl_long() {
-  static jl_type_t type = {JL_TYPE_LONG};
+  static jl_type_t type = {JL_TYPE_LONG, .size = 8};
   return type;
 }
 
 jl_type_t jl_ulong() {
-  static jl_type_t type = {JL_TYPE_LONG, .specifiers = JL_TYPE_SPECIFIER_UNSIGNED};
+  static jl_type_t type = {JL_TYPE_LONG, .size = 8, .specifiers = JL_TYPE_SPECIFIER_UNSIGNED};
   return type;
 }
 
 jl_type_t jl_double() {
-  static jl_type_t type = {JL_TYPE_DOUBLE};
+  static jl_type_t type = {JL_TYPE_DOUBLE, .size = 8};
   return type;
 }
 
 jl_type_t jl_float() {
-  static jl_type_t type = {JL_TYPE_FLOAT};
+  static jl_type_t type = {JL_TYPE_FLOAT, .size = 4};
   return type;
 }
 
 jl_type_t jl_long_long() {
-  static jl_type_t type = {JL_TYPE_LONG_LONG};
+  static jl_type_t type = {JL_TYPE_LONG_LONG, .size = 8};
   return type;
 }
 
 jl_type_t jl_long_double() {
-  static jl_type_t type = {JL_TYPE_LONG_DOUBLE};
+  static jl_type_t type = {JL_TYPE_LONG_DOUBLE, .size = 16};
   return type;
 }
 

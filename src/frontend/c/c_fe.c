@@ -573,7 +573,7 @@ static jl_expr_t constant_expression(jl_fe_t *self, jl_lexer_t *lexer, jl_progra
 
   r1 = conditional_expression(self, lexer, out);
   if (!jl_expr_is_constant(r1)) {
-    puts("Constant expression must be computable at compile time.");
+    puts("Constant expression must be computable at compile time");
     exit(1);
   }
   return r1;

@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+#include <stdio.h>
+
 #include "fe.h"
 
 #include "compiler.h"
@@ -87,7 +89,7 @@ void jl_fe_parse(struct jl_fe_t *self, struct jl_lexer_t *lexer, struct jl_progr
 }
 
 void jl_fe_push_src(jl_fe_t *self, const char *src) {
-  const char *file = xmalloc(PATH_MAX + 1);
+  const char *file = xmalloc(FILENAME_MAX + 1);
 
   realpath(src, (char *) file);
   adt_deque_push(self->sources, file);

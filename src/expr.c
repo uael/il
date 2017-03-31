@@ -196,9 +196,6 @@ void jl_expr_switch(jl_expr_t *self, enum jl_expr_n kind) {
 
 void jl_expr_acquire(jl_expr_t *self) {
   switch (self->kind) {
-    case JL_EXPR_UNDEFINED:
-      puts("cannot acquire undefined type");
-      exit(1);
     case JL_EXPR_ID:
       ++jl_pu(self, id)->refs;
       break;
@@ -239,9 +236,6 @@ void jl_expr_acquire(jl_expr_t *self) {
 
 void jl_expr_release(jl_expr_t *self) {
   switch (self->kind) {
-    case JL_EXPR_UNDEFINED:
-      puts("cannot release undefined type");
-      exit(1);
     case JL_EXPR_ID:
       --jl_pu(self, id)->refs;
       break;
@@ -453,7 +447,7 @@ static jl_type_t constant_integer_type(unsigned long int value, enum suffix suff
   }
 }
 
-jl_expr_t jl_const_parse(const char *s, size_t len) {
+int jl_const_parse(const char *s, size_t len, jl_expr_t *out) {
   const char *str;
   char *endptr;
   enum suffix suffix;
@@ -498,13 +492,13 @@ jl_expr_t jl_const_parse(const char *s, size_t len) {
   }
   if (errno || ((size_t) (endptr - str) != len)) {
     if (errno == ERANGE) {
-      printf("Numeric literal '%s' is out of range.", str);
+      return ERANGE;
     } else {
-      printf("Invalid numeric literal '%s'.", str);
+      return 1;
     }
-    exit(1);
   }
-  return expr;
+  *out = expr;
+  return 0;
 }
 
 

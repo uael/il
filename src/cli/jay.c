@@ -27,21 +27,17 @@
 #include <stdio.h>
 
 #include "compiler.h"
-#include "lexer.h"
 #include "program.h"
 
 #include <libfirm/firm.h>
 
 int main(int argc, char *argv[]) {
   jl_compiler_t compiler;
-  jl_lexer_t lexer;
   jl_program_t program;
 
   jl_init(&compiler, argc, argv);
-  jl_lexer_init_f(&lexer, &compiler.fe);
-  compiler.fe.parse(&compiler.fe, &lexer, &program);
+  jl_fe_parse(&compiler.fe, NULL, &program);
   jl_dtor(&compiler);
-  jl_lexer_dtor(&lexer);
 
   return EXIT_SUCCESS;
 }

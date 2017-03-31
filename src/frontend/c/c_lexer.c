@@ -535,6 +535,8 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
           break;
         lbl_push_token:
           set_loc;
+          token.loc.colno -= i;
+          token.loc.position -= i;
           push_token;
           break;
       }
@@ -652,6 +654,7 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
                   break;
                 }
               } else if (peekn(1) == 0) {
+                /* todo */
                 exit(1);
               } else {
                 switch (peek) {

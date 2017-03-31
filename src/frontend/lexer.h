@@ -35,6 +35,7 @@
 typedef struct jl_lexer_t jl_lexer_t;
 typedef struct jl_lexer_event_t jl_lexer_event_t;
 
+typedef adt_vector_of(jl_lexer_t) jl_lexer_r;
 typedef adt_vector_of(jl_lexer_event_t) jl_lexer_event_r;
 
 enum jl_lexer_event_n {
@@ -59,13 +60,14 @@ struct jl_lexer_t {
   unsigned char cap;
   jl_lexer_event_r events;
   jl_lexer_t *parent;
+  jl_lexer_r childs;
 
   void (*enqueue)(jl_lexer_t *self, unsigned n);
 };
 
 void jl_lexer_init(jl_lexer_t *self, jl_fe_t *fe, uint32_t file_id, const char *buffer, size_t length);
 void jl_lexer_init_f(jl_lexer_t *self, jl_fe_t *fe);
-void jl_lexer_dtor(jl_lexer_t *self);
+void jl_lexer_dtor(jl_lexer_t *self, bool free_all);
 void jl_lexer_fork(jl_lexer_t *destination, jl_lexer_t *source);
 void jl_lexer_join(jl_lexer_t *fork);
 void jl_lexer_skip(jl_lexer_t *self, unsigned n);

@@ -166,9 +166,6 @@ void jl_entity_switch(jl_entity_t *self, enum jl_entity_n kind) {
 
 void jl_entity_acquire(jl_entity_t *self) {
   switch (self->kind) {
-    case JL_ENTITY_UNDEFINED:
-      puts("cannot acquire undefined type");
-      exit(1);
     case JL_ENTITY_FIELD:
       ++jl_pu(self, field)->refs;
       break;
@@ -200,9 +197,6 @@ void jl_entity_acquire(jl_entity_t *self) {
 
 void jl_entity_release(jl_entity_t *self) {
   switch (self->kind) {
-    case JL_ENTITY_UNDEFINED:
-      puts("cannot release undefined type");
-      exit(1);
     case JL_ENTITY_FIELD:
       --jl_pu(self, field)->refs;
       break;
@@ -398,10 +392,6 @@ void jl_entity_add_field(jl_entity_t *self, const char *name, jl_type_t type) {
         assert(self->size % jl_u(field, field)->offset == 0);
       }
       jl_u(field, field)->offset = self->size;
-      if (LONG_MAX - jl_u(field, field)->offset < type.size) {
-        puts("Object is too large.");
-        exit(1);
-      }
       if (self->size < jl_u(field, field)->offset + type.size) {
         self->size = jl_u(field, field)->offset + type.size;
       }

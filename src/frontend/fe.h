@@ -48,12 +48,14 @@ void jl_lexer_undo(struct jl_lexer_t *lexer, jl_token_t until);
 typedef struct jl_fe_t jl_fe_t;
 
 enum jl_fe_n {
-  JL_FRONTEND_C = 0,
+  JL_FRONTEND_UNDEFINED = 0,
+  JL_FRONTEND_C,
   JL_FRONTEND_JAY
 };
 
 struct jl_fe_t {
   struct jl_compiler_t *compiler;
+  struct jl_lexer_t *lexer;
   enum jl_fe_n kind;
   adt_deque_of(const char *) sources;
 
@@ -63,11 +65,12 @@ struct jl_fe_t {
   jl_stmt_t stmt;
   jl_type_t type;
 
-  void (*parse)(struct jl_fe_t *self, struct jl_lexer_t *lexer, struct jl_program_t *out);
+  void (*parse)(struct jl_fe_t *self, struct jl_program_t *out);
 };
 
 void jl_fe_init(jl_fe_t *self, enum jl_fe_n kind, struct jl_compiler_t *compiler);
 void jl_fe_dtor(jl_fe_t *self);
+void jl_fe_parse(struct jl_fe_t *self, struct jl_lexer_t *lexer, struct jl_program_t *out);
 void jl_fe_push_src(jl_fe_t *self, const char *src);
 void jl_fe_scope(jl_fe_t *self);
 void jl_fe_unscope(jl_fe_t *self);

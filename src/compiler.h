@@ -27,6 +27,7 @@
 # define  JL_COMPILER_H__
 
 #include <adt/string.h>
+#include <adt/attr.h>
 
 #include "opts.h"
 #include "fe.h"
@@ -44,6 +45,9 @@ struct jl_compiler_t {
 
 void jl_init(jl_compiler_t *self, int argc, char **argv);
 void jl_dtor(jl_compiler_t *self);
+JL_NORETURN jl_err(jl_compiler_t *self, const char *format, ...);
+JL_NORETURN jl_fatal_err(jl_compiler_t *self, const char *format, ...);
+JL_NORETURN jl_parse_err(jl_compiler_t *self, jl_loc_t loc, const char *format, ...);
 
 const char *jl_strdup(jl_compiler_t *self, const char *str);
 const char *jl_strndup(jl_compiler_t *self, const char *str, size_t n);

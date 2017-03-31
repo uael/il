@@ -86,8 +86,7 @@ typedef unsigned __int64  uint64_t;
 
 #include "util/io.h"
 
-void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
-  adt_vector_of(char *) errs = {0};
+bool jl_opts_init(jl_opts_t *self, int argc, char **argv) {
   char err[256], *sep, *arg;
   int value;
   static const char *usage =
@@ -117,7 +116,7 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
             case 'S':
               if (strlen(arg) > 2) {
                 sprintf(err, "unrecognized command line option "BOLD"‘%s’"RESET, arg);
-                adt_vector_push(errs, xstrdup(err));
+                adt_vector_push(self->opts_errs, xstrdup(err));
               } else {
                 self->output_asm = true;
               }
@@ -127,12 +126,12 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
                 arg += 2;
                 if (strlen(arg) > 1 || !isalnum(arg[0])) {
                   sprintf(err, "invalid argument provided to command line option -O"BOLD"‘%s’"RESET, arg);
-                  adt_vector_push(errs, xstrdup(err));
+                  adt_vector_push(self->opts_errs, xstrdup(err));
                 } else {
                   value = atoi(arg);
                   if (value < 0 || value > 5) {
                     sprintf(err, "invalid optimize level provided to command line option -O"BOLD"‘%s’"RESET, arg);
-                    adt_vector_push(errs, xstrdup(err));
+                    adt_vector_push(self->opts_errs, xstrdup(err));
                   } else {
                     self->optimize_lvl = value;
                   }
@@ -141,12 +140,12 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
                 arg = argv[++i];
                 if (strlen(arg) > 1 || !isalnum(arg[0])) {
                   sprintf(err, "invalid argument provided to command line option -O "BOLD"‘%s’"RESET, arg);
-                  adt_vector_push(errs, xstrdup(err));
+                  adt_vector_push(self->opts_errs, xstrdup(err));
                 } else {
                   value = atoi(arg);
                   if (value < 0 || value > 5) {
                     sprintf(err, "invalid optimize level provided to command line option -O "BOLD"‘%s’"RESET, arg);
-                    adt_vector_push(errs, xstrdup(err));
+                    adt_vector_push(self->opts_errs, xstrdup(err));
                   } else {
                     self->optimize_lvl = value;
                   }
@@ -154,9 +153,9 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
               } else {
                 if (strlen(arg) > 2) {
                   sprintf(err, "unrecognized command line option "BOLD"‘%s’"RESET, arg);
-                  adt_vector_push(errs, xstrdup(err));
+                  adt_vector_push(self->opts_errs, xstrdup(err));
                 } else {
-                  adt_vector_push(errs, xstrdup("command line option argument missing "BOLD"‘-O’"RESET));
+                  adt_vector_push(self->opts_errs, xstrdup("command line option argument missing "BOLD"‘-O’"RESET));
                 }
               }
               break;
@@ -169,16 +168,16 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
               } else {
                 if (strlen(arg) > 2) {
                   sprintf(err, "unrecognized command line option "BOLD"‘%s’"RESET, arg);
-                  adt_vector_push(errs, xstrdup(err));
+                  adt_vector_push(self->opts_errs, xstrdup(err));
                 } else {
-                  adt_vector_push(errs, xstrdup("command line option argument missing "BOLD"‘-o’"RESET));
+                  adt_vector_push(self->opts_errs, xstrdup("command line option argument missing "BOLD"‘-o’"RESET));
                 }
               }
               break;
             case 'v':
               if (strlen(arg) > 2) {
                 sprintf(err, "unrecognized command line option "BOLD"‘%s’"RESET, arg);
-                adt_vector_push(errs, xstrdup(err));
+                adt_vector_push(self->opts_errs, xstrdup(err));
               } else {
                 self->verbose = true;
               }
@@ -186,15 +185,15 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
             case 'h':
               if (strlen(arg) > 2) {
                 sprintf(err, "unrecognized command line option "BOLD"‘%s’"RESET, arg);
-                adt_vector_push(errs, xstrdup(err));
+                adt_vector_push(self->opts_errs, xstrdup(err));
               } else {
                 printf(usage, argv[0], argv[0]);
-                goto exit_success;
+                return false;
               }
               break;
             default:
               sprintf(err, "unrecognized command line option "BOLD"‘%s’"RESET, arg);
-              adt_vector_push(errs, xstrdup(err));
+              adt_vector_push(self->opts_errs, xstrdup(err));
           }
         } else if (arg[1] == '-') {
           arg += 2;
@@ -218,14 +217,14 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
                 } else {
                   optimize_err:
                   sprintf(err, "invalid argument provided to command line option --optimize"BOLD"‘%s’"RESET, arg);
-                  adt_vector_push(errs, xstrdup(err));
+                  adt_vector_push(self->opts_errs, xstrdup(err));
                 }
               } else {
                 optimize_match:
                 value = atoi(arg);
                 if (value < 0 || value > 5) {
                   sprintf(err, "invalid optimize level provided to command line option --optimize"BOLD"‘%s’"RESET, arg);
-                  adt_vector_push(errs, xstrdup(err));
+                  adt_vector_push(self->opts_errs, xstrdup(err));
                 } else {
                   self->optimize_lvl = value;
                 }
@@ -234,12 +233,12 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
               arg = argv[++i];
               if (strlen(arg) > 1 || !isalnum(arg[0])) {
                 sprintf(err, "invalid argument provided to command line option --optimize "BOLD"‘%s’"RESET, arg);
-                adt_vector_push(errs, xstrdup(err));
+                adt_vector_push(self->opts_errs, xstrdup(err));
               } else {
                 value = atoi(arg);
                 if (value < 0 || value > 5) {
                   sprintf(err, "invalid optimize level provided to command line option --optimize "BOLD"‘%s’"RESET, arg);
-                  adt_vector_push(errs, xstrdup(err));
+                  adt_vector_push(self->opts_errs, xstrdup(err));
                 } else {
                   self->optimize_lvl = value;
                 }
@@ -247,9 +246,9 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
             } else {
               if (strlen(arg) > 2) {
                 sprintf(err, "unrecognized command line option "BOLD"‘%s’"RESET, arg);
-                adt_vector_push(errs, xstrdup(err));
+                adt_vector_push(self->opts_errs, xstrdup(err));
               } else {
-                adt_vector_push(errs, xstrdup("command line option argument missing "BOLD"‘-o’"RESET));
+                adt_vector_push(self->opts_errs, xstrdup("command line option argument missing "BOLD"‘-o’"RESET));
               }
             }
           } else if (strncmp(arg, "output", 6) == 0) {
@@ -266,7 +265,7 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
                 } else {
                   output_err:
                   sprintf(err, "invalid argument provided to --output: %s", arg);
-                  adt_vector_push(errs, xstrdup(err));
+                  adt_vector_push(self->opts_errs, xstrdup(err));
                 }
               } else {
                 output_match:
@@ -276,30 +275,30 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
               arg = argv[++i];
               if (!isalnum(arg[0])) {
                 sprintf(err, "invalid argument provided to --output: %s", arg);
-                adt_vector_push(errs, xstrdup(err));
+                adt_vector_push(self->opts_errs, xstrdup(err));
               } else {
                 self->out = arg;
               }
             } else {
               if (strlen(arg) > 2) {
                 sprintf(err, "unrecognized command line option "BOLD"‘%s’"RESET, arg);
-                adt_vector_push(errs, xstrdup(err));
+                adt_vector_push(self->opts_errs, xstrdup(err));
               } else {
-                adt_vector_push(errs, xstrdup("command line option argument missing "BOLD"‘--output’"RESET));
+                adt_vector_push(self->opts_errs, xstrdup("command line option argument missing "BOLD"‘--output’"RESET));
               }
             }
           } else if (strcmp(arg, "verbose") == 0) {
             self->verbose = true;
           } else if (strcmp(arg, "help") == 0) {
             printf(usage, argv[0], argv[0]);
-            goto exit_success;
+            return false;
           } else {
             sprintf(err, "unrecognized command line option "BOLD"‘--%s’"RESET, arg);
-            adt_vector_push(errs, xstrdup(err));
+            adt_vector_push(self->opts_errs, xstrdup(err));
           }
         } else {
           sprintf(err, "unrecognized command line option "BOLD"‘%s’"RESET, arg);
-          adt_vector_push(errs, xstrdup(err));
+          adt_vector_push(self->opts_errs, xstrdup(err));
         }
         break;
       default:
@@ -307,41 +306,24 @@ void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]) {
           self->in = arg;
         } else {
           sprintf(err, "unrecognized command line option "BOLD"‘%s’"RESET, arg);
-          adt_vector_push(errs, xstrdup(err));
+          adt_vector_push(self->opts_errs, xstrdup(err));
         }
         break;
     }
   }
-
-  if (!self->in) {
-    printf(BOLD "%s: " BOLD RED "fatal error: " RESET "no input files\n", argv[0]);
-    goto exit_failure;
-  }
-
-  if (adt_vector_size(errs)) {
-    printf(BOLD "%s: " BOLD RED "error: " RESET "%s\n", argv[0], adt_vector_at(errs, 0));
-    goto exit_failure;
-  }
-
-  if ((sep = strrchr(self->in, '/'))) {
+  if (self->in && (sep = strrchr(self->in, '/'))) {
     memcpy(self->src_dir, self->in, (size_t) (sep - self->in));
   } else {
     (void) getcwd(self->src_dir, JL_SRC_DIR_MSIZE);
   }
+  return true;
+}
 
-  return;
+void jl_opts_dtor(jl_opts_t *self) {
+  char *sep;
 
-  exit_success:
-  adt_vector_foreach(errs, sep) {
+  adt_vector_foreach(self->opts_errs, sep) {
     free(sep);
   }
-  adt_vector_dtor(errs);
-  exit(EXIT_SUCCESS);
-
-  exit_failure:
-  adt_vector_foreach(errs, sep) {
-    free(sep);
-  }
-  adt_vector_dtor(errs);
-  exit(EXIT_FAILURE);
+  adt_vector_dtor(self->opts_errs);
 }

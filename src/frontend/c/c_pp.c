@@ -68,7 +68,7 @@ void c_pp_dtor(c_pp_t *self) {
     c_macro_dtor(&macro);
   });
   c_macro_ht_dtor(&self->macros);
-  jl_lexer_dtor(&self->lexer);
+  jl_lexer_dtor(&self->lexer, true);
 }
 
 void c_pp_parse_define(c_pp_t *self, jl_lexer_t *lexer) {

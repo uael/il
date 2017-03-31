@@ -54,7 +54,7 @@ struct jl_scope_t {
 void jl_sym_dtor(jl_sym_t *self);
 void jl_scope_dtor(jl_scope_t *self);
 bool jl_sym_has_flag(jl_sym_t *self, unsigned flag);
-jl_sym_t *jl_sym_put(jl_scope_t *scope, const char *id);
-jl_sym_t *jl_sym_get(jl_scope_t *scope, const char *id);
+jl_sym_t *jl_sym_put(jl_scope_t *scope, const char *id, int *r);
+jl_sym_t *jl_sym_get(jl_scope_t *scope, const char *id, int *r);
 
 #endif /* JL_SYMBOL_H__ */

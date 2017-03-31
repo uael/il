@@ -112,9 +112,6 @@ void jl_type_switch(jl_type_t *self, enum jl_type_n kind) {
 
 void jl_type_acquire(jl_type_t *self) {
   switch (self->kind) {
-    case JL_TYPE_UNDEFINED:
-      puts("cannot acquire undefined type");
-      exit(1);
     case JL_TYPE_POINTER:
       ++jl_pu(self, pointer)->refs;
       break;
@@ -131,9 +128,6 @@ void jl_type_acquire(jl_type_t *self) {
 
 void jl_type_release(jl_type_t *self) {
   switch (self->kind) {
-    case JL_TYPE_UNDEFINED:
-      puts("cannot release undefined type");
-      exit(1);
     case JL_TYPE_POINTER:
       --jl_pu(self, pointer)->refs;
       break;
@@ -237,7 +231,7 @@ jl_type_t jl_type_deref(jl_type_t a) {
     case JL_TYPE_ARRAY:
       return jl_u(a, array)->of;
     default:
-      exit(1);
+      return jl_type_undefined();
   }
 }
 

@@ -49,12 +49,11 @@ bool jl_sym_has_flag(jl_sym_t *self, unsigned flag) {
   return (bool) (self->flags & flag);
 }
 
-jl_sym_t *jl_sym_put(jl_scope_t *scope, const char *id) {
+jl_sym_t *jl_sym_put(jl_scope_t *scope, const char *id, int *r) {
   jl_sym_t *sym;
   unsigned it;
-  int r;
 
-  it = kh_put(jl_symtab, &scope->symtab, id, &r);
+  it = kh_put(jl_symtab, &scope->symtab, id, r);
   if (r == 0) {
     return NULL;
   }
@@ -63,14 +62,15 @@ jl_sym_t *jl_sym_put(jl_scope_t *scope, const char *id) {
   return sym;
 }
 
-jl_sym_t *jl_sym_get(jl_scope_t *scope, const char *id) {
+jl_sym_t *jl_sym_get(jl_scope_t *scope, const char *id, int *r) {
   unsigned it;
 
   it = kh_get(jl_symtab, &scope->symtab, id);
   if (it == kh_end(&scope->symtab)) {
-    fprintf(stderr, "Undefined symbol '%s'.", id);
-    exit(1);
+    *r = 1;
+    return NULL;
   }
+  *r = 0;
   return &kh_value(&scope->symtab, it);
 }
 

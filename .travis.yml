@@ -30,4 +30,4 @@ install:
   - cd ..
 
 script:
-  - valgrind --leak-check=full --track-origins=yes bin/jay test/hello.jay -ohello --echo
+  - valgrind --leak-check=full --track-origins=yes bin/jay test/hello.jay -ohello

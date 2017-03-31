@@ -38,7 +38,7 @@ void jl_lexer_init(jl_lexer_t *self, jl_fe_t *fe, uint32_t file_id, const char *
   *self = (jl_lexer_t) {
     .fe = fe,
     .loc = (jl_loc_t) {
-      .file_id = file_id,
+      .file_id = file_id
     },
     .buffer = buffer ? xstrndup(buffer, length) : NULL,
     .length = length,
@@ -54,6 +54,8 @@ void jl_lexer_init(jl_lexer_t *self, jl_fe_t *fe, uint32_t file_id, const char *
       break;
     case JL_FRONTEND_JAY:
       break;
+    default:
+      break;
   }
 }
 
@@ -63,43 +65,52 @@ void jl_lexer_init_f(jl_lexer_t *self, jl_fe_t *fe) {
   const char *filename, *buffer;
 
   if (!adt_deque_length(fe->sources)) {
-    puts("no sources files to parse");
-    exit(1);
+    jl_fatal_err(fe->compiler, "No input files");
   }
 
   file_id = (uint32_t) adt_deque_cursor(fe->sources);
   filename = adt_deque_shift(fe->sources);
   if (!jl_fexists(filename)) {
-    puts("file does not exists");
-    exit(1);
+    jl_fatal_err(fe->compiler, "Input file does not exists '%s'", filename);
   }
   buffer = jl_fread(filename, &len);
   if (!buffer) {
-    puts("unable to read source file");
-    exit(1);
+    jl_fatal_err(fe->compiler, "Unable to read input file '%s'", filename);
   }
 
   jl_lexer_init(self,  fe, file_id, buffer, len);
   free((char *) buffer);
 }
 
-void jl_lexer_dtor(jl_lexer_t *self) {
-  if (self->buffer) {
-    free(self->buffer);
-  }
+void jl_lexer_dtor(jl_lexer_t *self, bool free_all) {
   jl_token_t token;
   jl_lexer_event_t event;
+  jl_lexer_t child;
+
+  if (self->buffer && jl_lexer_is_root(self)) {
+    free(self->buffer);
+  }
   self->queue.cursor = 0;
   adt_deque_foreach(self->queue, token) {
     jl_token_dtor(&token);
   }
-  adt_deque_dtor(self->queue);
   adt_vector_foreach(self->events, event) {
     if (event.dtor) {
       event.dtor(&event);
     }
   }
-  adt_vector_dtor(self->events);
+  adt_vector_foreach(self->childs, child) {
+    jl_lexer_dtor(&child, true);
+  }
+  if (free_all) {
+    adt_vector_dtor(self->childs);
+    adt_deque_dtor(self->queue);
+    adt_vector_dtor(self->events);
+  } else {
+    adt_vector_clear(self->childs);
+    adt_deque_clear(self->queue);
+    adt_vector_clear(self->events);
+  }
 }
 
 void jl_lexer_fork(jl_lexer_t *destination, jl_lexer_t *source) {
@@ -113,7 +124,6 @@ void jl_lexer_fork(jl_lexer_t *destination, jl_lexer_t *source) {
 }
 
 void jl_lexer_join(jl_lexer_t *fork) {
-  fork->buffer = NULL;
   if (adt_deque_size(fork->queue)) {
     fork->parent->loc = fork->loc;
   }
@@ -168,12 +178,26 @@ bool jl_lexer_is_root(jl_lexer_t *self) {
   return self->parent == NULL;
 }
 
+void jl_lexer_next_src(jl_lexer_t *self, jl_fe_t *fe) {
+  jl_lexer_dtor(self, false);
+  jl_lexer_init_f(self, fe);
+  self->fe = fe;
+}
+
 void jl_lexer_enqueue(jl_lexer_t *self, unsigned n) {
-  if (self->loc.position < self->length) {
+  if (adt_vector_size(self->childs)) {
+    jl_lexer_enqueue(&adt_vector_back(self->childs), n);
+  } else if (self->loc.position < self->length) {
     self->enqueue(self, n);
+  } else if (!jl_lexer_is_root(self)) {
+    (void) adt_vector_pop(self->parent->childs);
   } else if (!jl_lexer_length(self)) {
-    jl_token_t token = {'\0'};
-    jl_lexer_push(self, token);
+    if (adt_deque_length(self->fe->sources)) {
+      jl_lexer_next_src(self, self->fe);
+    } else {
+      jl_token_t token = {'\0'};
+      jl_lexer_push(self, token);
+    }
   }
 }
 
@@ -219,8 +243,11 @@ jl_token_t jl_lexer_consume(jl_lexer_t *self, unsigned char type) {
   }
 
   if ((result = jl_lexer_peek(self)).type != type) {
-    puts("unexpected token");
-    exit(1);
+    jl_parse_err(self->fe->compiler, result.loc,
+      "Unexpected token '" BOLD "%c" RESET "' expected '" BOLD "%c" "'" RESET,
+      result.type,
+      type
+    );
   }
   jl_lexer_next(self);
   return result;
@@ -229,12 +256,18 @@ jl_token_t jl_lexer_consume(jl_lexer_t *self, unsigned char type) {
 jl_token_t jl_lexer_consume_id(jl_lexer_t *self, const char *id) {
   jl_token_t result;
   if ((result = jl_lexer_peek(self)).kind != JL_TOKEN_IDENTIFIER) {
-    puts("unexpected token");
-    exit(1);
+    jl_parse_err(self->fe->compiler, result.loc,
+      "Unexpected token '" BOLD "%c" RESET "' expected identifier '" BOLD "%s" "'" RESET,
+      result.type,
+      id
+    );
   }
-  if (strcmp(id, result.value) != 0) {
-    puts("unexpected identifier");
-    exit(1);
+  if (id && strcmp(id, result.value) != 0) {
+    jl_parse_err(self->fe->compiler, result.loc,
+      "Unexpected identifier '" BOLD "%s" RESET "' expected '" BOLD "%s" "'" RESET,
+      result.value,
+      id
+    );
   }
   jl_lexer_next(self);
   return result;

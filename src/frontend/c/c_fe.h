@@ -28,6 +28,6 @@
 
 #include "fe.h"
 
-void c_fe_parse(struct jl_fe_t *self, struct jl_lexer_t *lexer, struct jl_program_t *out);
+void c_fe_parse(struct jl_fe_t *self, struct jl_program_t *out);
 
 #endif /* JL_C_FE_H__ */

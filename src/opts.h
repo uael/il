@@ -50,8 +50,10 @@ struct jl_opts_t {
   bool echo, firm_graph, verbose, output_asm;
   int optimize_lvl;
   enum jl_backend_n target;
+  adt_vector_of(char *) opts_errs;
 };
 
-void jl_opts_parse(jl_opts_t *self, int argc, char *argv[]);
+bool jl_opts_init(jl_opts_t *self, int argc, char **argv);
+void jl_opts_dtor(jl_opts_t *self);
 
 #endif /* JL_OPTS_H__ */

@@ -24,7 +24,13 @@
  * SOFTWARE.
  */
 
+#include <stdarg.h>
+#include <stdio.h>
+
 #include "compiler.h"
+
+#include "lexer.h"
+#include "util/io.h"
 
 void jl_init(jl_compiler_t *self, int argc, char **argv) {
   char *sep;
@@ -35,7 +41,16 @@ void jl_init(jl_compiler_t *self, int argc, char **argv) {
   *self = (jl_compiler_t) {
     .program = argv[0]
   };
-  jl_opts_parse(&self->opts, argc, argv);
+  if (!jl_opts_init(&self->opts, argc, argv)) {
+    jl_opts_dtor(&self->opts);
+    exit(EXIT_SUCCESS);
+  }
+  if (!self->opts.in) {
+    jl_fatal_err(self, "no input file");
+  }
+  if (adt_vector_size(self->opts.opts_errs)) {
+    jl_err(self, adt_vector_front(self->opts.opts_errs));
+  }
   jl_fe_init(&self->fe, JL_FRONTEND_C, self);
   jl_fe_push_src(&self->fe, self->opts.in);
 }
@@ -43,11 +58,80 @@ void jl_init(jl_compiler_t *self, int argc, char **argv) {
 void jl_dtor(jl_compiler_t *self) {
   const char *str;
 
-  jl_fe_dtor(&self->fe);
+  jl_opts_dtor(&self->opts);
+  if (jl_defined(self->fe)) {
+    jl_fe_dtor(&self->fe);
+  }
   adt_vector_foreach(self->strtab, str) {
     free((void *) str);
   }
   adt_vector_dtor(self->strtab);
+}
+
+JL_NORETURN jl_err(jl_compiler_t *self, const char *format, ...) {
+  va_list args;
+
+  if (self) {
+    printf(BOLD "%s: " BOLD RED "error: " RESET, self->program);
+  } else {
+    fputs(BOLD RED "error: " RESET, stdout);
+  }
+  va_start(args, format);
+  vprintf(format, args);
+  va_end(args);
+  putc('\n', stdout);
+
+  if (self) {
+    jl_dtor(self);
+  }
+  exit(EXIT_FAILURE);
+}
+
+JL_NORETURN jl_fatal_err(jl_compiler_t *self, const char *format, ...) {
+  va_list args;
+
+  if (self) {
+    printf(BOLD "%s: " BOLD RED "fatal error: " RESET, self->program);
+  } else {
+    fputs(BOLD RED "fatal error: " RESET, stdout);
+  }
+  va_start(args, format);
+  vprintf(format, args);
+  va_end(args);
+  putc('\n', stdout);
+
+  if (self) {
+    jl_dtor(self);
+  }
+  exit(EXIT_FAILURE);
+}
+
+JL_NORETURN jl_parse_err(jl_compiler_t *self, jl_loc_t loc, const char *format, ...) {
+  size_t begin = loc.position - loc.colno;
+  const char *ptr, *file;
+  jl_lexer_t lexer = (jl_lexer_t) {0};
+  jl_token_t eol;
+  va_list args;
+
+  file = adt_vector_at(self->fe.sources, loc.file_id);
+  jl_lexer_fork(&lexer, self->fe.lexer);
+  lexer.loc = loc;
+  ptr = lexer.buffer + begin;
+  while ((eol = jl_lexer_next(&lexer)).type != '\n' && eol.type != '\0');
+  printf(BOLD "%s:" RESET " In function ‘" BOLD "syntax_error" RESET "’:\n", file);
+  printf(BOLD "%s:%d:%d: " BOLD RED "error: " RESET, file, loc.colno + 1, loc.lineno + 1);
+  va_start(args, format);
+  vprintf(format, args);
+  va_end(args);
+  printf("\n%.*s\n", (int) (eol.loc.position - begin), ptr);
+  for (unsigned i = 0; i < loc.colno; ++i) {
+    putc(' ', stdout);
+  }
+  fputs(BOLD YELLOW "^\n" RESET, stdout);
+
+  jl_lexer_dtor(&lexer, true);
+  jl_dtor(self);
+  exit(EXIT_FAILURE);
 }
 
 const char *jl_strdup(jl_compiler_t *self, const char *str) {

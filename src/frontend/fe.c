@@ -46,10 +46,18 @@ void jl_fe_init(jl_fe_t *self, enum jl_fe_n kind, jl_compiler_t *compiler) {
       break;
     case JL_FRONTEND_JAY:
       break;
+    default:
+      break;
   }
 }
 
 void jl_fe_dtor(jl_fe_t *self) {
+  const char *src;
+
+  adt_vector_foreach(self->sources, src) {
+    free((void *) src);
+    src = NULL;
+  }
   adt_deque_dtor(self->sources);
   while (self->scope->parent) {
     self->scope = self->scope->parent;
@@ -57,10 +65,32 @@ void jl_fe_dtor(jl_fe_t *self) {
   jl_scope_dtor(self->scope);
   free(self->scope);
   self->scope = NULL;
+  if (self->lexer) {
+    jl_lexer_dtor(self->lexer, true);
+    self->lexer = NULL;
+  }
+}
+
+void jl_fe_parse(struct jl_fe_t *self, struct jl_lexer_t *lexer, struct jl_program_t *out) {
+  jl_lexer_t l = (jl_lexer_t) {0};
+
+  if (!lexer) {
+    jl_lexer_init_f(&l, self);
+    self->lexer = &l;
+  }
+  jl_program_init(out);
+  self->parse(self, out);
+  if (!lexer) {
+    jl_lexer_dtor(&l, true);
+    self->lexer = NULL;
+  }
 }
 
 void jl_fe_push_src(jl_fe_t *self, const char *src) {
-  adt_deque_push(self->sources, src);
+  const char *file = xmalloc(PATH_MAX + 1);
+
+  realpath(src, (char *) file);
+  adt_deque_push(self->sources, file);
 }
 
 void jl_fe_scope(jl_fe_t *self) {

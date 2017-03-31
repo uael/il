@@ -392,7 +392,7 @@ void jl_entity_add_field(jl_entity_t *self, const char *name, jl_type_t type) {
       jl_entity_switch(&field, JL_ENTITY_FIELD);
       jl_u(field, field)->name = name;
       jl_u(field, field)->type = type;
-      jl_u(field, field)->offset = jl_type_alignment(type);
+      jl_u(field, field)->offset = jl_alignof(type);
       if (self->size % jl_u(field, field)->offset) {
         self->size += jl_u(field, field)->offset - (self->size % jl_u(field, field)->offset);
         assert(self->size % jl_u(field, field)->offset == 0);

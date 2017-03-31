@@ -88,8 +88,8 @@ struct jl_type_t {
   } u;
 };
 
-void jl_type_undef(jl_type_t *self);
 void jl_type_dtor(jl_type_t *self);
+void jl_type_undef(jl_type_t *self);
 void jl_type_switch(jl_type_t *self, enum jl_type_n kind);
 void jl_type_acquire(jl_type_t *self);
 void jl_type_release(jl_type_t *self);
@@ -102,7 +102,7 @@ bool jl_type_equals(jl_type_t a, jl_type_t b);
 jl_type_t jl_literal(enum jl_type_n kind);
 jl_type_t jl_type_deref(jl_type_t a);
 size_t jl_sizeof(jl_type_t type);
-size_t jl_type_alignment(jl_type_t type);
+size_t jl_alignof(jl_type_t type);
 
 jl_type_t jl_void();
 jl_type_t jl_bool();
@@ -119,6 +119,7 @@ jl_type_t jl_long_double();
 
 #define jl_type_undefined() ((jl_type_t) {JL_TYPE_UNDEFINED})
 
+#define jl_type_is_literal(t) ((t).kind >= JL_TYPE_BOOL)
 #define jl_type_is_bool(t) ((t).kind == JL_TYPE_BOOL)
 #define jl_type_is_char(t) ((t).kind == JL_TYPE_CHAR)
 #define jl_type_is_short(t) ((t).kind == JL_TYPE_SHORT)
@@ -132,7 +133,6 @@ jl_type_t jl_long_double();
 #define jl_type_is_pointer(t) ((t).kind == JL_TYPE_POINTER)
 #define jl_type_is_array(t) ((t).kind == JL_TYPE_ARRAY)
 #define jl_type_is_compound(t) ((t).kind == JL_TYPE_COMPOUND)
-#define jl_type_is_literal(t) ((t).kind >= JL_TYPE_BOOL)
 #define jl_ptype_is_literal(t) ((t)->kind >= JL_TYPE_BOOL)
 #define jl_ptype_is_bool(t) ((t)->kind == JL_TYPE_BOOL)
 #define jl_ptype_is_char(t) ((t)->kind == JL_TYPE_CHAR)

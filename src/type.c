@@ -36,10 +36,6 @@ void jl_pointer_dtor(jl_pointer_t *self);
 void jl_array_dtor(jl_array_t *self);
 void jl_compound_dtor(jl_compound_t *self);
 
-void jl_type_undef(jl_type_t *self) {
-  *self = jl_type_undefined();
-}
-
 void jl_type_dtor(jl_type_t *self) {
   switch (self->kind) {
     case JL_TYPE_UNDEFINED:
@@ -68,6 +64,10 @@ void jl_type_dtor(jl_type_t *self) {
     default:
       break;
   }
+  jl_type_undef(self);
+}
+
+void jl_type_undef(jl_type_t *self) {
   *self = jl_type_undefined();
 }
 
@@ -148,6 +148,42 @@ void jl_type_release(jl_type_t *self) {
   }
 }
 
+void jl_type_update_size(jl_type_t *self) {
+  self->size = 0;
+  switch (self->kind) {
+    case JL_TYPE_BOOL:
+    case JL_TYPE_CHAR:
+      self->size = 1;
+      break;
+    case JL_TYPE_SHORT:
+      self->size = 2;
+      break;
+    case JL_TYPE_INT:
+    case JL_TYPE_FLOAT:
+      self->size = 4;
+      break;
+    case JL_TYPE_LONG:
+    case JL_TYPE_DOUBLE:
+    case JL_TYPE_LONG_LONG:
+      self->size = 8;
+      break;
+    case JL_TYPE_LONG_DOUBLE:
+      self->size = 16;
+      break;
+    case JL_TYPE_POINTER:
+      self->size = 8;
+      break;
+    case JL_TYPE_ARRAY:
+      self->size = jl_pu(jl_expr_const(jl_pu(self, array)->size), ul) * jl_pu(self, array)->of.size;
+      break;
+    case JL_TYPE_COMPOUND:
+      self->size = jl_pu(self, compound)->entity.size;
+      break;
+    default:
+      break;
+  }
+}
+
 bool jl_type_is_defined(jl_type_t self) {
   switch (self.kind) {
     case JL_TYPE_POINTER:
@@ -205,59 +241,31 @@ jl_type_t jl_type_deref(jl_type_t a) {
   }
 }
 
-void jl_type_update_size(jl_type_t *self) {
-  self->size = 0;
-  switch (self->kind) {
-    case JL_TYPE_BOOL:
-    case JL_TYPE_CHAR:
-      self->size = 1;
-      break;
-    case JL_TYPE_SHORT:
-      self->size = 2;
-      break;
-    case JL_TYPE_INT:
-    case JL_TYPE_FLOAT:
-      self->size = 4;
-      break;
-    case JL_TYPE_LONG:
-    case JL_TYPE_DOUBLE:
-    case JL_TYPE_LONG_LONG:
-      self->size = 8;
-      break;
-    case JL_TYPE_LONG_DOUBLE:
-      self->size = 16;
-      break;
-    case JL_TYPE_POINTER:
-      self->size = 8;
-      break;
-    case JL_TYPE_ARRAY:
-      self->size = jl_pu(jl_expr_const(jl_pu(self, array)->size), ul) * jl_pu(self, array)->of.size;
-      break;
-    case JL_TYPE_COMPOUND:
-      self->size = jl_pu(self, compound)->entity.size;
-      break;
-    default:
-      break;
-  }
+jl_type_t jl_literal(enum jl_type_n kind) {
+  jl_type_t type = {kind};
+
+  assert(kind >= JL_TYPE_BOOL && kind <= JL_TYPE_LONG_DOUBLE);
+  jl_type_update_size(&type);
+  return type;
 }
 
 size_t jl_sizeof(jl_type_t type) {
   return type.size;
 }
 
-size_t jl_type_alignment(jl_type_t type) {
+size_t jl_alignof(jl_type_t type) {
   size_t m = 0, d;
   jl_entity_t entity;
   jl_entity_r entities;
 
   assert(!jl_type_is_func(type));
   if (jl_type_is_array(type)) {
-    return jl_type_alignment(jl_type_array(type)->of);
+    return jl_alignof(jl_type_array(type)->of);
   }
   if (jl_type_is_compound(type)) {
     entities = jl_type_fields(type);
     adt_vector_foreach(entities, entity) {
-      d = jl_type_alignment(jl_entity_type(entity));
+      d = jl_alignof(jl_entity_type(entity));
       if (d > m) m = d;
     }
     assert(m);
@@ -265,6 +273,7 @@ size_t jl_type_alignment(jl_type_t type) {
   }
   return jl_sizeof(type);
 }
+
 
 jl_entity_r jl_type_fields(jl_type_t self) {
   return jl_entity_fields(jl_type_compound(self)->entity);
@@ -332,14 +341,6 @@ jl_type_t jl_long_long() {
 
 jl_type_t jl_long_double() {
   static jl_type_t type = {JL_TYPE_LONG_DOUBLE, .size = 16};
-  return type;
-}
-
-jl_type_t jl_literal(enum jl_type_n kind) {
-  jl_type_t type = {kind};
-
-  assert(kind >= JL_TYPE_BOOL && kind <= JL_TYPE_LONG_DOUBLE);
-  jl_type_update_size(&type);
   return type;
 }
 

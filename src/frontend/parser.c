@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 
-#include "fe.h"
+#include "parser.h"
 
 #include "compiler.h"
 #include "lexer.h"
@@ -34,8 +34,8 @@
 
 #include "c/c_fe.h"
 
-void jl_fe_init(jl_fe_t *self, enum jl_fe_n kind, jl_compiler_t *compiler) {
-  *self = (jl_fe_t) {
+void jl_fe_init(jl_parser_t *self, enum jl_parser_n kind, jl_compiler_t *compiler) {
+  *self = (jl_parser_t) {
     .compiler = compiler,
     .kind = kind,
     .scope = xmalloc(sizeof(jl_scope_t))
@@ -43,17 +43,17 @@ void jl_fe_init(jl_fe_t *self, enum jl_fe_n kind, jl_compiler_t *compiler) {
   *self->scope = (jl_scope_t) {0};
 
   switch (self->kind) {
-    case JL_FRONTEND_C:
+    case JL_PARSER_C:
       self->parse = c_fe_parse;
       break;
-    case JL_FRONTEND_JAY:
+    case JL_PARSER_JAY:
       break;
     default:
       break;
   }
 }
 
-void jl_fe_dtor(jl_fe_t *self) {
+void jl_fe_dtor(jl_parser_t *self) {
   const char *src;
 
   adt_vector_foreach(self->sources, src) {
@@ -73,7 +73,7 @@ void jl_fe_dtor(jl_fe_t *self) {
   }
 }
 
-void jl_fe_parse(struct jl_fe_t *self, struct jl_lexer_t *lexer, struct jl_program_t *out) {
+void jl_fe_parse(jl_parser_t *self, struct jl_lexer_t *lexer, struct jl_program_t *out) {
   jl_lexer_t l = (jl_lexer_t) {0};
 
   if (!lexer) {
@@ -88,7 +88,7 @@ void jl_fe_parse(struct jl_fe_t *self, struct jl_lexer_t *lexer, struct jl_progr
   }
 }
 
-void jl_fe_push_src(jl_fe_t *self, const char *src) {
+void jl_fe_push_src(jl_parser_t *self, const char *src) {
   const char *file;
 
 #ifdef _MSC_VER
@@ -101,7 +101,7 @@ void jl_fe_push_src(jl_fe_t *self, const char *src) {
   adt_deque_push(self->sources, file);
 }
 
-void jl_fe_scope(jl_fe_t *self) {
+void jl_fe_scope(jl_parser_t *self) {
   jl_scope_t *parent;
 
   parent = self->scope;
@@ -111,6 +111,6 @@ void jl_fe_scope(jl_fe_t *self) {
   adt_vector_push(parent->childs, self->scope);
 }
 
-void jl_fe_unscope(jl_fe_t *self) {
+void jl_fe_unscope(jl_parser_t *self) {
   self->scope = self->scope->parent;
 }

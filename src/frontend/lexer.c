@@ -34,7 +34,7 @@
 
 #include "c/c_lexer.h"
 
-void jl_lexer_init(jl_lexer_t *self, jl_fe_t *fe, uint32_t file_id, const char *buffer, size_t length) {
+void jl_lexer_init(jl_lexer_t *self, jl_parser_t *fe, uint32_t file_id, const char *buffer, size_t length) {
   *self = (jl_lexer_t) {
     .fe = fe,
     .loc = (jl_loc_t) {
@@ -49,17 +49,17 @@ void jl_lexer_init(jl_lexer_t *self, jl_fe_t *fe, uint32_t file_id, const char *
     self->buffer[length] = '\0';
   }
   switch (fe->kind) {
-    case JL_FRONTEND_C:
+    case JL_PARSER_C:
       c_lexer_init(self);
       break;
-    case JL_FRONTEND_JAY:
+    case JL_PARSER_JAY:
       break;
     default:
       break;
   }
 }
 
-void jl_lexer_init_f(jl_lexer_t *self, jl_fe_t *fe) {
+void jl_lexer_init_f(jl_lexer_t *self, jl_parser_t *fe) {
   size_t len;
   uint32_t file_id;
   const char *filename, *buffer;
@@ -178,7 +178,7 @@ bool jl_lexer_is_root(jl_lexer_t *self) {
   return self->parent == NULL;
 }
 
-void jl_lexer_next_src(jl_lexer_t *self, jl_fe_t *fe) {
+void jl_lexer_next_src(jl_lexer_t *self, jl_parser_t *fe) {
   jl_lexer_dtor(self, false);
   jl_lexer_init_f(self, fe);
   self->fe = fe;

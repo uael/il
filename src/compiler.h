@@ -30,7 +30,7 @@
 #include <adt/attr.h>
 
 #include "opts.h"
-#include "fe.h"
+#include "parser.h"
 #include "be.h"
 
 typedef struct jl_compiler_t jl_compiler_t;
@@ -38,7 +38,7 @@ typedef struct jl_compiler_t jl_compiler_t;
 struct jl_compiler_t {
   const char *program;
   jl_opts_t opts;
-  jl_fe_t fe;
+  jl_parser_t fe;
   jl_backend_t be;
   string_r strtab;
 };

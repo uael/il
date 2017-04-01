@@ -51,7 +51,7 @@ void jl_init(jl_compiler_t *self, int argc, char **argv) {
   if (adt_vector_size(self->opts.opts_errs)) {
     jl_err(self, adt_vector_front(self->opts.opts_errs));
   }
-  jl_fe_init(&self->fe, JL_FRONTEND_C, self);
+  jl_fe_init(&self->fe, JL_PARSER_C, self);
   jl_fe_push_src(&self->fe, self->opts.in);
 }
 

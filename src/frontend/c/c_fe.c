@@ -36,75 +36,75 @@
 #include "stmt.h"
 #include "type.h"
 
-static jl_expr_t primary_expression(jl_fe_t *self, jl_program_t *out);
-static jl_expr_t postfix_expression(jl_fe_t *self, jl_program_t *out);
-static jl_expr_t unary_expression(jl_fe_t *self, jl_program_t *out);
-static jl_expr_t cast_expression(jl_fe_t *self, jl_program_t *out);
-static jl_expr_t multiplicative_expression(jl_fe_t *self, jl_program_t *out);
-static jl_expr_t additive_expression(jl_fe_t *self, jl_program_t *out);
-static jl_expr_t shift_expression(jl_fe_t *self, jl_program_t *out);
-static jl_expr_t relational_expression(jl_fe_t *self, jl_program_t *out);
-static jl_expr_t equality_expression(jl_fe_t *self, jl_program_t *out);
-static jl_expr_t and_expression(jl_fe_t *self, jl_program_t *out);
-static jl_expr_t exclusive_or_expression(jl_fe_t *self, jl_program_t *out);
-static jl_expr_t inclusive_or_expression(jl_fe_t *self, jl_program_t *out);
-static jl_expr_t logical_and_expression(jl_fe_t *self, jl_program_t *out);
-static jl_expr_t logical_or_expression(jl_fe_t *self, jl_program_t *out);
-static jl_expr_t conditional_expression(jl_fe_t *self, jl_program_t *out);
-static jl_expr_t assignment_expression(jl_fe_t *self, jl_program_t *out);
-static jl_expr_t expression(jl_fe_t *self, jl_program_t *out);
-static jl_expr_t constant_expression(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t declaration(jl_fe_t *self, jl_program_t *out);
-static jl_type_t declaration_specifiers(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t init_declarator_list(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t init_declarator(jl_fe_t *self, jl_program_t *out);
-static jl_type_t type_specifier(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t struct_or_union_specifier(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t struct_or_union(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t struct_declaration_list(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t struct_declaration(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t specifier_qualifier_list(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t struct_declarator_list(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t struct_declarator(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t enum_specifier(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t enumerator_list(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t enumerator(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t atomic_type_specifier(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t type_qualifier(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t function_specifier(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t alignment_specifier(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t declarator(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t direct_declarator(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t pointer(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t type_qualifier_list(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t parameter_type_list(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t parameter_list(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t parameter_declaration(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t identifier_list(jl_fe_t *self, jl_program_t *out);
-static jl_type_t type_name(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t abstract_declarator(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t direct_abstract_declarator(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t initializer(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t initializer_list(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t designation(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t designator_list(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t designator(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t static_assert_declaration(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t statement(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t labeled_statement(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t compound_statement(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t block_item_list(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t block_item(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t expression_statement(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t selection_statement(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t iteration_statement(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t jump_statement(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t translation_unit(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t external_declaration(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t function_definition(jl_fe_t *self, jl_program_t *out);
-static jl_entity_t declaration_list(jl_fe_t *self, jl_program_t *out);
+static jl_expr_t primary_expression(jl_parser_t *self, jl_program_t *out);
+static jl_expr_t postfix_expression(jl_parser_t *self, jl_program_t *out);
+static jl_expr_t unary_expression(jl_parser_t *self, jl_program_t *out);
+static jl_expr_t cast_expression(jl_parser_t *self, jl_program_t *out);
+static jl_expr_t multiplicative_expression(jl_parser_t *self, jl_program_t *out);
+static jl_expr_t additive_expression(jl_parser_t *self, jl_program_t *out);
+static jl_expr_t shift_expression(jl_parser_t *self, jl_program_t *out);
+static jl_expr_t relational_expression(jl_parser_t *self, jl_program_t *out);
+static jl_expr_t equality_expression(jl_parser_t *self, jl_program_t *out);
+static jl_expr_t and_expression(jl_parser_t *self, jl_program_t *out);
+static jl_expr_t exclusive_or_expression(jl_parser_t *self, jl_program_t *out);
+static jl_expr_t inclusive_or_expression(jl_parser_t *self, jl_program_t *out);
+static jl_expr_t logical_and_expression(jl_parser_t *self, jl_program_t *out);
+static jl_expr_t logical_or_expression(jl_parser_t *self, jl_program_t *out);
+static jl_expr_t conditional_expression(jl_parser_t *self, jl_program_t *out);
+static jl_expr_t assignment_expression(jl_parser_t *self, jl_program_t *out);
+static jl_expr_t expression(jl_parser_t *self, jl_program_t *out);
+static jl_expr_t constant_expression(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t declaration(jl_parser_t *self, jl_program_t *out);
+static jl_type_t declaration_specifiers(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t init_declarator_list(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t init_declarator(jl_parser_t *self, jl_program_t *out);
+static jl_type_t type_specifier(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t struct_or_union_specifier(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t struct_or_union(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t struct_declaration_list(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t struct_declaration(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t specifier_qualifier_list(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t struct_declarator_list(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t struct_declarator(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t enum_specifier(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t enumerator_list(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t enumerator(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t atomic_type_specifier(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t type_qualifier(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t function_specifier(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t alignment_specifier(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t declarator(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t direct_declarator(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t pointer(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t type_qualifier_list(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t parameter_type_list(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t parameter_list(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t parameter_declaration(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t identifier_list(jl_parser_t *self, jl_program_t *out);
+static jl_type_t type_name(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t abstract_declarator(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t direct_abstract_declarator(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t initializer(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t initializer_list(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t designation(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t designator_list(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t designator(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t static_assert_declaration(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t statement(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t labeled_statement(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t compound_statement(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t block_item_list(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t block_item(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t expression_statement(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t selection_statement(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t iteration_statement(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t jump_statement(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t translation_unit(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t external_declaration(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t function_definition(jl_parser_t *self, jl_program_t *out);
+static jl_entity_t declaration_list(jl_parser_t *self, jl_program_t *out);
 
-void c_fe_parse(jl_fe_t *self, jl_program_t *out) {
+void c_fe_parse(jl_parser_t *self, jl_program_t *out) {
   int r;
 
   jl_fe_scope(self);
@@ -122,7 +122,7 @@ enum {
   C_TOKEN_FLAG_ENUMERATION_CONSTANT = 1 << 0
 };
 
-static jl_expr_t primary_expression(jl_fe_t *self, jl_program_t *out) {
+static jl_expr_t primary_expression(jl_parser_t *self, jl_program_t *out) {
   int r;
   jl_sym_t *symbol;
   jl_token_t token;
@@ -174,7 +174,7 @@ static jl_expr_t primary_expression(jl_fe_t *self, jl_program_t *out) {
   }
 }
 
-static jl_expr_t postfix_expression(jl_fe_t *self, jl_program_t *out) {
+static jl_expr_t postfix_expression(jl_parser_t *self, jl_program_t *out) {
   jl_token_t token;
   jl_expr_t r1, r2;
 
@@ -269,7 +269,7 @@ static jl_expr_t postfix_expression(jl_fe_t *self, jl_program_t *out) {
   }
 }
 
-static jl_expr_t unary_expression(jl_fe_t *self, jl_program_t *out) {
+static jl_expr_t unary_expression(jl_parser_t *self, jl_program_t *out) {
   jl_expr_t r1;
   enum jl_op_n op;
 
@@ -306,7 +306,7 @@ static jl_expr_t unary_expression(jl_fe_t *self, jl_program_t *out) {
   return jl_unary(op, cast_expression(self, out));
 }
 
-static jl_expr_t cast_expression(jl_fe_t *self, jl_program_t *out) {
+static jl_expr_t cast_expression(jl_parser_t *self, jl_program_t *out) {
   jl_type_t type;
   jl_token_t token;
 
@@ -323,7 +323,7 @@ static jl_expr_t cast_expression(jl_fe_t *self, jl_program_t *out) {
   return unary_expression(self, out);
 }
 
-static jl_expr_t multiplicative_expression(jl_fe_t *self, jl_program_t *out) {
+static jl_expr_t multiplicative_expression(jl_parser_t *self, jl_program_t *out) {
   jl_expr_t r1;
 
   r1 = cast_expression(self, out);
@@ -347,7 +347,7 @@ static jl_expr_t multiplicative_expression(jl_fe_t *self, jl_program_t *out) {
   }
 }
 
-static jl_expr_t additive_expression(jl_fe_t *self, jl_program_t *out) {
+static jl_expr_t additive_expression(jl_parser_t *self, jl_program_t *out) {
   jl_expr_t r1;
 
   r1 = multiplicative_expression(self, out);
@@ -367,7 +367,7 @@ static jl_expr_t additive_expression(jl_fe_t *self, jl_program_t *out) {
   }
 }
 
-static jl_expr_t shift_expression(jl_fe_t *self, jl_program_t *out) {
+static jl_expr_t shift_expression(jl_parser_t *self, jl_program_t *out) {
   jl_expr_t r1;
 
   r1 = additive_expression(self, out);
@@ -387,7 +387,7 @@ static jl_expr_t shift_expression(jl_fe_t *self, jl_program_t *out) {
   }
 }
 
-static jl_expr_t relational_expression(jl_fe_t *self, jl_program_t *out) {
+static jl_expr_t relational_expression(jl_parser_t *self, jl_program_t *out) {
   jl_expr_t r1;
 
   r1 = shift_expression(self, out);
@@ -415,7 +415,7 @@ static jl_expr_t relational_expression(jl_fe_t *self, jl_program_t *out) {
   }
 }
 
-static jl_expr_t equality_expression(jl_fe_t *self, jl_program_t *out) {
+static jl_expr_t equality_expression(jl_parser_t *self, jl_program_t *out) {
   jl_expr_t r1;
 
   r1 = relational_expression(self, out);
@@ -435,7 +435,7 @@ static jl_expr_t equality_expression(jl_fe_t *self, jl_program_t *out) {
   }
 }
 
-static jl_expr_t and_expression(jl_fe_t *self, jl_program_t *out) {
+static jl_expr_t and_expression(jl_parser_t *self, jl_program_t *out) {
   jl_expr_t r1;
 
   r1 = equality_expression(self, out);
@@ -448,7 +448,7 @@ static jl_expr_t and_expression(jl_fe_t *self, jl_program_t *out) {
   }
 }
 
-static jl_expr_t exclusive_or_expression(jl_fe_t *self, jl_program_t *out) {
+static jl_expr_t exclusive_or_expression(jl_parser_t *self, jl_program_t *out) {
   jl_expr_t r1;
 
   r1 = and_expression(self, out);
@@ -461,7 +461,7 @@ static jl_expr_t exclusive_or_expression(jl_fe_t *self, jl_program_t *out) {
   }
 }
 
-static jl_expr_t inclusive_or_expression(jl_fe_t *self, jl_program_t *out) {
+static jl_expr_t inclusive_or_expression(jl_parser_t *self, jl_program_t *out) {
   jl_expr_t r1;
 
   r1 = exclusive_or_expression(self, out);
@@ -474,7 +474,7 @@ static jl_expr_t inclusive_or_expression(jl_fe_t *self, jl_program_t *out) {
   }
 }
 
-static jl_expr_t logical_and_expression(jl_fe_t *self, jl_program_t *out) {
+static jl_expr_t logical_and_expression(jl_parser_t *self, jl_program_t *out) {
   jl_expr_t r1;
 
   r1 = inclusive_or_expression(self, out);
@@ -487,7 +487,7 @@ static jl_expr_t logical_and_expression(jl_fe_t *self, jl_program_t *out) {
   }
 }
 
-static jl_expr_t logical_or_expression(jl_fe_t *self, jl_program_t *out) {
+static jl_expr_t logical_or_expression(jl_parser_t *self, jl_program_t *out) {
   jl_expr_t r1;
 
   r1 = logical_and_expression(self, out);
@@ -500,7 +500,7 @@ static jl_expr_t logical_or_expression(jl_fe_t *self, jl_program_t *out) {
   }
 }
 
-static jl_expr_t conditional_expression(jl_fe_t *self, jl_program_t *out) {
+static jl_expr_t conditional_expression(jl_parser_t *self, jl_program_t *out) {
   jl_expr_t r1, r2;
 
   r1 = logical_or_expression(self, out);
@@ -513,7 +513,7 @@ static jl_expr_t conditional_expression(jl_fe_t *self, jl_program_t *out) {
   return jl_ternary(r1, r2, conditional_expression(self, out));
 }
 
-static jl_expr_t assignment_expression(jl_fe_t *self, jl_program_t *out) {
+static jl_expr_t assignment_expression(jl_parser_t *self, jl_program_t *out) {
   jl_expr_t r1;
   enum jl_op_n op;
 
@@ -577,7 +577,7 @@ static jl_expr_t assignment_expression(jl_fe_t *self, jl_program_t *out) {
   );
 }
 
-static jl_expr_t expression(jl_fe_t *self, jl_program_t *out) {
+static jl_expr_t expression(jl_parser_t *self, jl_program_t *out) {
   jl_expr_t r1;
 
   r1 = assignment_expression(self, out);
@@ -593,7 +593,7 @@ static jl_expr_t expression(jl_fe_t *self, jl_program_t *out) {
   }
 }
 
-static jl_expr_t constant_expression(jl_fe_t *self, jl_program_t *out) {
+static jl_expr_t constant_expression(jl_parser_t *self, jl_program_t *out) {
   jl_expr_t r1;
 
   r1 = conditional_expression(self, out);
@@ -605,7 +605,7 @@ static jl_expr_t constant_expression(jl_fe_t *self, jl_program_t *out) {
   return r1;
 }
 
-static jl_type_t declaration_specifiers(jl_fe_t *self, jl_program_t *out) {
+static jl_type_t declaration_specifiers(jl_parser_t *self, jl_program_t *out) {
   jl_token_t token;
   jl_type_t type = jl_type_undefined();
 
@@ -669,7 +669,7 @@ static jl_type_t declaration_specifiers(jl_fe_t *self, jl_program_t *out) {
   }
 }
 
-static jl_type_t type_specifier(jl_fe_t *self, jl_program_t *out) {
+static jl_type_t type_specifier(jl_parser_t *self, jl_program_t *out) {
   jl_token_t token;
   jl_type_t type = jl_type_undefined();
   enum jl_type_n type_kind;
@@ -697,6 +697,6 @@ static jl_type_t type_specifier(jl_fe_t *self, jl_program_t *out) {
   }
 }
 
-static jl_type_t type_name(jl_fe_t *self, jl_program_t *out) {
+static jl_type_t type_name(jl_parser_t *self, jl_program_t *out) {
   return jl_type_undefined();
 }

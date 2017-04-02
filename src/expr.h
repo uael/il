@@ -51,8 +51,6 @@ struct jl_expr_const_t {
   } u;
 };
 
-
-
 jl_expr_t jl_const_int(int d);
 jl_expr_t jl_const_float(float f);
 jl_expr_t jl_const_string(const char *s);

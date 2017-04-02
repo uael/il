@@ -27,16 +27,16 @@
 #include <stdio.h>
 
 #include <adt/string.h>
-#include <util/io.h>
-#include <compiler.h>
 
 #include "lexer.h"
 
+#include "util/io.h"
+#include "compiler.h"
 #include "c/c_lexer.h"
 
-void jl_lexer_init(jl_lexer_t *self, jl_parser_t *fe, uint32_t file_id, const char *buffer, size_t length) {
+void jl_lexer_init(jl_lexer_t *self, jl_compiler_t *compiler, uint32_t file_id, const char *buffer, size_t length) {
   *self = (jl_lexer_t) {
-    .fe = fe,
+    .compiler = compiler,
     .loc = (jl_loc_t) {
       .file_id = file_id
     },
@@ -48,7 +48,7 @@ void jl_lexer_init(jl_lexer_t *self, jl_parser_t *fe, uint32_t file_id, const ch
   if (self->buffer) {
     self->buffer[length] = '\0';
   }
-  switch (fe->kind) {
+  switch (compiler->fe.kind) {
     case JL_PARSER_C:
       c_lexer_init(self);
       break;
@@ -78,7 +78,7 @@ void jl_lexer_init_f(jl_lexer_t *self, jl_parser_t *fe) {
     jl_fatal_err(fe->compiler, "Unable to read input file '%s'", filename);
   }
 
-  jl_lexer_init(self,  fe, file_id, buffer, len);
+  jl_lexer_init(self,  fe->compiler, file_id, buffer, len);
   free((char *) buffer);
 }
 
@@ -115,7 +115,7 @@ void jl_lexer_dtor(jl_lexer_t *self, bool free_all) {
 
 void jl_lexer_fork(jl_lexer_t *destination, jl_lexer_t *source) {
   destination->parent = source;
-  destination->fe = source->fe;
+  destination->compiler = source->compiler;
   destination->loc = source->loc;
   destination->buffer = source->buffer;
   destination->length = source->length;
@@ -152,7 +152,7 @@ bool jl_lexer_push(jl_lexer_t *self, jl_token_t token) {
   }
   token.cursor = adt_deque_size(self->queue);
   adt_deque_push(self->queue, token);
-  if (jl_lexer_is_root(self) && self->fe->compiler->opts.echo) {
+  if (jl_lexer_is_root(self) && self->compiler->opts.echo) {
     for (i = 0; i<token.leading_ws; ++i) {
       putc(' ', stdout);
     }
@@ -181,7 +181,7 @@ bool jl_lexer_is_root(jl_lexer_t *self) {
 void jl_lexer_next_src(jl_lexer_t *self, jl_parser_t *fe) {
   jl_lexer_dtor(self, false);
   jl_lexer_init_f(self, fe);
-  self->fe = fe;
+  self->compiler = fe->compiler;
 }
 
 void jl_lexer_enqueue(jl_lexer_t *self, unsigned n) {
@@ -192,8 +192,8 @@ void jl_lexer_enqueue(jl_lexer_t *self, unsigned n) {
   } else if (!jl_lexer_is_root(self)) {
     (void) adt_vector_pop(self->parent->childs);
   } else if (!jl_lexer_length(self)) {
-    if (adt_deque_length(self->fe->sources)) {
-      jl_lexer_next_src(self, self->fe);
+    if (adt_deque_length(self->compiler->fe.sources)) {
+      jl_lexer_next_src(self, &self->compiler->fe);
     } else {
       jl_token_t token = {'\0'};
       jl_lexer_push(self, token);
@@ -243,7 +243,7 @@ jl_token_t jl_lexer_consume(jl_lexer_t *self, unsigned char type) {
   }
 
   if ((result = jl_lexer_peek(self)).type != type) {
-    jl_parse_err(self->fe->compiler, result.loc,
+    jl_parse_err(self->compiler, result.loc,
       "Unexpected token '" BOLD "%c" RESET "' expected '" BOLD "%c" "'" RESET,
       result.type,
       type
@@ -256,14 +256,14 @@ jl_token_t jl_lexer_consume(jl_lexer_t *self, unsigned char type) {
 jl_token_t jl_lexer_consume_id(jl_lexer_t *self, const char *id) {
   jl_token_t result;
   if ((result = jl_lexer_peek(self)).kind != JL_TOKEN_IDENTIFIER) {
-    jl_parse_err(self->fe->compiler, result.loc,
+    jl_parse_err(self->compiler, result.loc,
       "Unexpected token '" BOLD "%c" RESET "' expected identifier '" BOLD "%s" "'" RESET,
       result.type,
       id
     );
   }
   if (id && strcmp(id, result.value) != 0) {
-    jl_parse_err(self->fe->compiler, result.loc,
+    jl_parse_err(self->compiler, result.loc,
       "Unexpected identifier '" BOLD "%s" RESET "' expected '" BOLD "%s" "'" RESET,
       result.value,
       id

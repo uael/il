@@ -28,6 +28,8 @@
 
 #include <adt/deque.h>
 
+#include "api.h"
+
 typedef struct jl_token_t jl_token_t;
 typedef struct jl_loc_t jl_loc_t;
 

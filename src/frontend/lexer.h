@@ -26,11 +26,12 @@
 #ifndef   JL_LEXER_H__
 # define  JL_LEXER_H__
 
-#include <adt/deque.h>
+#include <adt/vector.h>
 
-#include "parser.h"
 #include "token.h"
-#include "entity_t.h"
+
+struct jl_compiler_t;
+struct jl_parser_t;
 
 typedef struct jl_lexer_t jl_lexer_t;
 typedef struct jl_lexer_event_t jl_lexer_event_t;
@@ -52,7 +53,7 @@ struct jl_lexer_event_t {
 };
 
 struct jl_lexer_t {
-  jl_parser_t *fe;
+  struct jl_compiler_t *compiler;
   char *buffer;
   size_t length;
   jl_loc_t loc;
@@ -65,8 +66,8 @@ struct jl_lexer_t {
   void (*enqueue)(jl_lexer_t *self, unsigned n);
 };
 
-void jl_lexer_init(jl_lexer_t *self, jl_parser_t *fe, uint32_t file_id, const char *buffer, size_t length);
-void jl_lexer_init_f(jl_lexer_t *self, jl_parser_t *fe);
+void jl_lexer_init(jl_lexer_t *self, struct jl_compiler_t *compiler, uint32_t file_id, const char *buffer, size_t length);
+void jl_lexer_init_f(jl_lexer_t *self, struct jl_parser_t *fe);
 void jl_lexer_dtor(jl_lexer_t *self, bool free_all);
 void jl_lexer_fork(jl_lexer_t *destination, jl_lexer_t *source);
 void jl_lexer_join(jl_lexer_t *fork);

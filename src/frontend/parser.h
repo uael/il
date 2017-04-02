@@ -28,13 +28,9 @@
 
 #include <adt/deque.h>
 
-#include "entity_t.h"
-#include "expr_t.h"
-#include "stmt_t.h"
-#include "type_t.h"
+#include "lexer.h"
 
 struct jl_compiler_t;
-struct jl_lexer_t;
 struct jl_scope_t;
 struct jl_program_t;
 
@@ -55,22 +51,17 @@ enum jl_parser_n {
 
 struct jl_parser_t {
   struct jl_compiler_t *compiler;
-  struct jl_lexer_t *lexer;
+  jl_lexer_t *lexer;
   enum jl_parser_n kind;
   adt_deque_of(const char *) sources;
-
   struct jl_scope_t *scope;
-  jl_entity_t entity;
-  jl_expr_t expr;
-  jl_stmt_t stmt;
-  jl_type_t type;
 
-  void (*parse)(struct jl_parser_t *self, struct jl_program_t *out);
+  void (*parse)(jl_parser_t *self, struct jl_program_t *out);
 };
 
 void jl_fe_init(jl_parser_t *self, enum jl_parser_n kind, struct jl_compiler_t *compiler);
 void jl_fe_dtor(jl_parser_t *self);
-void jl_fe_parse(jl_parser_t *self, struct jl_lexer_t *lexer, struct jl_program_t *out);
+void jl_fe_parse(jl_parser_t *self, jl_lexer_t *lexer, struct jl_program_t *out);
 void jl_fe_push_src(jl_parser_t *self, const char *src);
 void jl_fe_scope(jl_parser_t *self);
 void jl_fe_unscope(jl_parser_t *self);

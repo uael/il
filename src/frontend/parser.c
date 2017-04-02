@@ -28,7 +28,6 @@
 #include "parser.h"
 
 #include "compiler.h"
-#include "lexer.h"
 #include "symbol.h"
 #include "program.h"
 

@@ -29,7 +29,6 @@
 
 #include "compiler.h"
 
-#include "lexer.h"
 #include "util/io.h"
 
 void jl_init(jl_compiler_t *self, int argc, char **argv) {

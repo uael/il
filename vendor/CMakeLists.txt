@@ -16,6 +16,10 @@ set(jayl_DEFS ${jayl_DEFS} -DWITH_LIBFIRM)
 
 option(LTALLOC "With ltalloc" 1)
 
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    set(LTALLOC 0)
+endif()
+
 if(LTALLOC)
     add_subdirectory(ltalloc)
 

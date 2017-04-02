@@ -32,12 +32,14 @@
 #include "opts.h"
 #include "parser.h"
 #include "be.h"
+#include "program.h"
 
 typedef struct jl_compiler_t jl_compiler_t;
 
 struct jl_compiler_t {
   const char *program;
   jl_opts_t opts;
+  jl_program_t ast;
   jl_parser_t fe;
   jl_backend_t be;
   string_r strtab;
@@ -45,6 +47,7 @@ struct jl_compiler_t {
 
 void jl_init(jl_compiler_t *self, int argc, char **argv);
 void jl_dtor(jl_compiler_t *self);
+void jl_parse(jl_compiler_t *self);
 JL_NORETURN jl_err(jl_compiler_t *self, const char *format, ...);
 JL_NORETURN jl_fatal_err(jl_compiler_t *self, const char *format, ...);
 JL_NORETURN jl_parse_err(jl_compiler_t *self, jl_loc_t loc, const char *format, ...);

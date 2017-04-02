@@ -72,7 +72,7 @@ void jl_fe_dtor(jl_parser_t *self) {
   }
 }
 
-void jl_fe_parse(jl_parser_t *self, struct jl_lexer_t *lexer, struct jl_program_t *out) {
+void jl_fe_parse(jl_parser_t *self, jl_lexer_t *lexer, struct jl_program_t *out) {
   jl_lexer_t l = (jl_lexer_t) {0};
 
   if (!lexer) {

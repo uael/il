@@ -27,16 +27,14 @@
 #include <stdio.h>
 
 #include "compiler.h"
-#include "program.h"
 
 #include <libfirm/firm.h>
 
 int main(int argc, char *argv[]) {
   jl_compiler_t compiler;
-  jl_program_t program;
 
   jl_init(&compiler, argc, argv);
-  jl_fe_parse(&compiler.fe, NULL, &program);
+  jl_parse(&compiler);
   jl_dtor(&compiler);
 
   return EXIT_SUCCESS;

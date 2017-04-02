@@ -67,6 +67,10 @@ void jl_dtor(jl_compiler_t *self) {
   adt_vector_dtor(self->strtab);
 }
 
+void jl_parse(jl_compiler_t *self) {
+  jl_fe_parse(&self->fe, NULL, &self->ast);
+}
+
 JL_NORETURN jl_err(jl_compiler_t *self, const char *format, ...) {
   va_list args;
 

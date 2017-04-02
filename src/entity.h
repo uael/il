@@ -75,6 +75,13 @@ jl_entity_t jl_param_float(unsigned position, const char *name, float f);
 jl_entity_t jl_param_string(unsigned position, const char *name, const char *s);
 void jl_param_init(jl_entity_t *self, unsigned position, const char *name, jl_type_t type, jl_expr_t initializer);
 
+#define jl_param(x) \
+  _Generic(x, \
+    int: jl_param_int, \
+    float: jl_param_float, \
+    const char *: jl_param_string \
+  )(x)
+
 struct jl_func_t {
   const char *name;
   jl_type_t return_type;

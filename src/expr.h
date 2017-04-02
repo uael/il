@@ -63,7 +63,7 @@ int jl_const_parse(const char *s, size_t len, jl_expr_t *out);
   _Generic(x, \
     int: jl_const_int, \
     float: jl_const_float, \
-    const char *: jl_const_string\
+    const char *: jl_const_string \
   )(x)
 
 struct jl_expr_unary_t {

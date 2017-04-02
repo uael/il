@@ -472,14 +472,14 @@ jl_entity_t jl_param_int(unsigned position, const char *name, int d) {
 jl_entity_t jl_param_float(unsigned position, const char *name, float f) {
   jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
-  jl_param_init(&entity, position, name, jl_float(), jl_const_float(f));
+  jl_param_init(&entity, position, name, jl_float(), jl_const(f));
   return entity;
 }
 
 jl_entity_t jl_param_string(unsigned position, const char *name, const char *s) {
   jl_entity_t entity = {JL_ENTITY_UNDEFINED};
 
-  jl_param_init(&entity, position, name, jl_pointer(jl_char()), jl_const_string(s));
+  jl_param_init(&entity, position, name, jl_pointer(jl_char()), jl_const(s));
   return entity;
 }
 

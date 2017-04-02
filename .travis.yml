@@ -134,20 +134,14 @@ matrix:
 
     - os: osx
       osx_image: xcode6.4
-      compiler:
-        - gcc
-        - clang
+      compiler: clang
       before_install: brew install valgrind
       script: valgrind --leak-check=full --track-origins=yes bin/jay test/hello.jay -ohello
 
     - os: osx
       osx_image: xcode7.3
-      compiler:
-        - gcc
-        - clang
+      compiler: clang
 
     - os: osx
       osx_image: xcode8.3
-      compiler:
-        - gcc
-        - clang
+      compiler: clang

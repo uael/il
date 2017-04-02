@@ -2,18 +2,12 @@ sudo: false
 
 language: c
 
-before_install:
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew install valgrind; fi
-
 install:
   - mkdir build
   - cd build
   - cmake ..
   - make
   - cd ..
-
-script:
-  - valgrind --leak-check=full --track-origins=yes bin/jay test/hello.jay -ohello
 
 matrix:
   include:
@@ -29,6 +23,7 @@ matrix:
             - cmake-data
             - valgrind
             - gcc-4.9
+      script: valgrind --leak-check=full --track-origins=yes bin/jay test/hello.jay -ohello
 
     - os: linux
       compiler: gcc-5
@@ -40,7 +35,6 @@ matrix:
           packages:
             - cmake
             - cmake-data
-            - valgrind
             - gcc-5
 
     - os: linux
@@ -53,7 +47,6 @@ matrix:
           packages:
             - cmake
             - cmake-data
-            - valgrind
             - gcc-6
 
     - os: linux
@@ -69,6 +62,7 @@ matrix:
             - cmake-data
             - valgrind
             - clang-3.5
+      script: valgrind --leak-check=full --track-origins=yes bin/jay test/hello.jay -ohello
 
     - os: linux
       compiler: clang-3.6
@@ -81,7 +75,6 @@ matrix:
           packages:
             - cmake
             - cmake-data
-            - valgrind
             - clang-3.6
 
     - os: linux
@@ -95,7 +88,6 @@ matrix:
           packages:
             - cmake
             - cmake-data
-            - valgrind
             - clang-3.7
 
     - os: linux
@@ -109,7 +101,6 @@ matrix:
           packages:
             - cmake
             - cmake-data
-            - valgrind
             - clang-3.8
 
     - os: linux
@@ -124,7 +115,6 @@ matrix:
           packages:
             - cmake
             - cmake-data
-            - valgrind
             - clang-3.9
 
     - os: linux
@@ -139,17 +129,24 @@ matrix:
           packages:
             - cmake
             - cmake-data
-            - valgrind
             - clang-4.0
 
     - os: osx
       osx_image: xcode6.4
-      compiler: clang
+      compiler:
+        - gcc
+        - clang
+      before_install: brew install valgrind
+      script: valgrind --leak-check=full --track-origins=yes bin/jay test/hello.jay -ohello
 
     - os: osx
       osx_image: xcode7.3
-      compiler: clang
+      compiler:
+        - gcc
+        - clang
 
     - os: osx
       osx_image: xcode8.3
-      compiler: clang
+      compiler:
+        - gcc
+        - clang

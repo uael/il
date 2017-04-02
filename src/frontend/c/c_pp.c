@@ -165,7 +165,7 @@ bool c_pp_on_push_callback(jl_lexer_event_t *self, void *arg) {
 void c_pp_on_push_dtor(jl_lexer_event_t *self) {
   if (self->data) {
     c_pp_dtor(self->data);
-    free(self->data);
+    xfree(self->data);
     self->data = NULL;
   }
 }

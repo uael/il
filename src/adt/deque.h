@@ -57,7 +57,7 @@
 
 #define adt_deque_dtor(v) do { \
     adt_deque_size(v) = adt_deque_capacity(v) = adt_deque_cursor(v) = 0; \
-    if (adt_deque_data(v)) free(adt_deque_data(v)); \
+    if (adt_deque_data(v)) xfree(adt_deque_data(v)); \
     adt_deque_data(v) = NULL; \
   } while (false)
 

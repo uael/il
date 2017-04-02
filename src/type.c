@@ -43,21 +43,21 @@ void jl_type_dtor(jl_type_t *self) {
     case JL_TYPE_POINTER:
       if (jl_pu(self, pointer) && jl_pu(self, pointer)->refs <= 0) {
         jl_pointer_dtor(jl_pu(self, pointer));
-        free(jl_pu(self, pointer));
+        xfree(jl_pu(self, pointer));
         jl_pu(self, pointer) = NULL;
       }
       break;
     case JL_TYPE_ARRAY:
       if (jl_pu(self, array) && jl_pu(self, array)->refs <= 0) {
         jl_array_dtor(jl_pu(self, array));
-        free(jl_pu(self, array));
+        xfree(jl_pu(self, array));
         jl_pu(self, array) = NULL;
       }
       break;
     case JL_TYPE_COMPOUND:
       if (jl_pu(self, compound) && jl_pu(self, compound)->refs <= 0) {
         jl_compound_dtor(jl_pu(self, compound));
-        free(jl_pu(self, compound));
+        xfree(jl_pu(self, compound));
         jl_pu(self, compound) = NULL;
       }
       break;

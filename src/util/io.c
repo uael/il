@@ -129,7 +129,7 @@ const char *jl_fread(const char *path, size_t *len) {
   return (const char *) buffer;
 
   abort_read:
-  if (buffer) free((void *) buffer);
+  if (buffer) xfree((void *) buffer);
   if (fd >= 0) close(fd);
   return NULL;
 }

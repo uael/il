@@ -55,7 +55,7 @@
 
 #define adt_vector_dtor(v) do { \
     adt_vector_size(v) = adt_vector_capacity(v) = 0; \
-    if (adt_vector_data(v)) free(adt_vector_data(v)); \
+    if (adt_vector_data(v)) xfree(adt_vector_data(v)); \
     adt_vector_data(v) = NULL; \
   } while (false)
 

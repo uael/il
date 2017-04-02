@@ -56,7 +56,7 @@ void jl_fe_dtor(jl_parser_t *self) {
   const char *src;
 
   adt_vector_foreach(self->sources, src) {
-    free((void *) src);
+    xfree((void *) src);
     src = NULL;
   }
   adt_deque_dtor(self->sources);
@@ -64,7 +64,7 @@ void jl_fe_dtor(jl_parser_t *self) {
     self->scope = self->scope->parent;
   }
   jl_scope_dtor(self->scope);
-  free(self->scope);
+  xfree(self->scope);
   self->scope = NULL;
   if (self->lexer) {
     jl_lexer_dtor(self->lexer, true);

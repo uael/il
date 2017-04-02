@@ -79,7 +79,7 @@ void jl_lexer_init_f(jl_lexer_t *self, jl_parser_t *fe) {
   }
 
   jl_lexer_init(self,  fe->compiler, file_id, buffer, len);
-  free((char *) buffer);
+  xfree((char *) buffer);
 }
 
 void jl_lexer_dtor(jl_lexer_t *self, bool free_all) {
@@ -88,7 +88,7 @@ void jl_lexer_dtor(jl_lexer_t *self, bool free_all) {
   jl_lexer_t child;
 
   if (self->buffer && jl_lexer_is_root(self)) {
-    free(self->buffer);
+    xfree(self->buffer);
   }
   self->queue.cursor = 0;
   adt_deque_foreach(self->queue, token) {

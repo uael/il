@@ -57,77 +57,77 @@ void jl_expr_dtor(jl_expr_t *self) {
     case JL_EXPR_ID:
       if (jl_pu(self, id) && jl_pu(self, id)->refs <= 0) {
         jl_expr_id_dtor(jl_pu(self, id));
-        free(jl_pu(self, id));
+        xfree(jl_pu(self, id));
         jl_pu(self, id) = NULL;
       }
       break;
     case JL_EXPR_CONST:
       if (jl_pu(self, const) && jl_pu(self, const)->refs <= 0) {
         jl_expr_const_dtor(jl_pu(self, const));
-        free(jl_pu(self, const));
+        xfree(jl_pu(self, const));
         jl_pu(self, const) = NULL;
       }
       break;
     case JL_EXPR_UNARY:
       if (jl_pu(self, unary) && jl_pu(self, unary)->refs <= 0) {
         jl_expr_unary_dtor(jl_pu(self, unary));
-        free(jl_pu(self, unary));
+        xfree(jl_pu(self, unary));
         jl_pu(self, unary) = NULL;
       }
       break;
     case JL_EXPR_BINARY:
       if (jl_pu(self, binary) && jl_pu(self, binary)->refs <= 0) {
         jl_expr_binary_dtor(jl_pu(self, binary));
-        free(jl_pu(self, binary));
+        xfree(jl_pu(self, binary));
         jl_pu(self, binary) = NULL;
       }
       break;
     case JL_EXPR_TERNARY:
       if (jl_pu(self, ternary) && jl_pu(self, ternary)->refs <= 0) {
         jl_expr_ternary_dtor(jl_pu(self, ternary));
-        free(jl_pu(self, ternary));
+        xfree(jl_pu(self, ternary));
         jl_pu(self, ternary) = NULL;
       }
       break;
     case JL_EXPR_ARRAY_READ:
       if (jl_pu(self, array_read) && jl_pu(self, array_read)->refs <= 0) {
         jl_expr_array_read_dtor(jl_pu(self, array_read));
-        free(jl_pu(self, array_read));
+        xfree(jl_pu(self, array_read));
         jl_pu(self, array_read) = NULL;
       }
       break;
     case JL_EXPR_ARRAY_WRITE:
       if (jl_pu(self, array_write) && jl_pu(self, array_write)->refs <= 0) {
         jl_expr_array_write_dtor(jl_pu(self, array_write));
-        free(jl_pu(self, array_write));
+        xfree(jl_pu(self, array_write));
         jl_pu(self, array_write) = NULL;
       }
       break;
     case JL_EXPR_FIELD_READ:
       if (jl_pu(self, field_read) && jl_pu(self, field_read)->refs <= 0) {
         jl_expr_field_read_dtor(jl_pu(self, field_read));
-        free(jl_pu(self, field_read));
+        xfree(jl_pu(self, field_read));
         jl_pu(self, field_read) = NULL;
       }
       break;
     case JL_EXPR_FIELD_WRITE:
       if (jl_pu(self, field_write) && jl_pu(self, field_write)->refs <= 0) {
         jl_expr_field_write_dtor(jl_pu(self, field_write));
-        free(jl_pu(self, field_write));
+        xfree(jl_pu(self, field_write));
         jl_pu(self, field_write) = NULL;
       }
       break;
     case JL_EXPR_CALL:
       if (jl_pu(self, call) && jl_pu(self, call)->refs <= 0) {
         jl_expr_call_dtor(jl_pu(self, call));
-        free(jl_pu(self, call));
+        xfree(jl_pu(self, call));
         jl_pu(self, call) = NULL;
       }
       break;
     case JL_EXPR_LIST:
       if (jl_pu(self, list) && jl_pu(self, list)->refs <= 0) {
         jl_expr_list_dtor(jl_pu(self, list));
-        free(jl_pu(self, list));
+        xfree(jl_pu(self, list));
         jl_pu(self, list) = NULL;
       }
       break;

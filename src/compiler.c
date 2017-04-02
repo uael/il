@@ -62,7 +62,7 @@ void jl_dtor(jl_compiler_t *self) {
     jl_fe_dtor(&self->fe);
   }
   adt_vector_foreach(self->strtab, str) {
-    free((void *) str);
+    xfree((void *) str);
   }
   adt_vector_dtor(self->strtab);
 }

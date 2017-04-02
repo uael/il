@@ -24,10 +24,12 @@
  */
 
 #include <stdio.h>
+#include <assert.h>
 
 #include "xmalloc.h"
 
 #include "attr.h"
+#include "ltalloc.h"
 
 static JL_NORETURN xnomem(void) {
   fputs("out of memory", stderr);
@@ -35,15 +37,33 @@ static JL_NORETURN xnomem(void) {
 }
 
 void *xmalloc(size_t size) {
-  void *res = malloc(size);
-
-  if (!res) xnomem();
-  return res;
+  return ltalloc(size);
 }
 
 void *xrealloc(void *ptr, size_t size) {
-  void *res = ptr ? realloc(ptr, size) : malloc(size);
+  if (ptr) {
+    size_t uSize = ltalloc_usable_size(ptr);
+    if (size <= uSize)
+      return ptr;
+    void *newp = ltalloc(size);
+    memcpy(newp, ptr, uSize);
+    ltfree(ptr);
+    return newp;
+  }
+  return ltalloc(size);
+}
 
-  if (!res) xnomem();
-  return res;
+void *xcalloc(size_t n, size_t esize) {
+  size_t size = n * esize;
+  if (esize == 0 || size / esize == n) {
+    xnomem();
+  }
+  void *result = ltalloc(size);
+  if (result && size <= (64*1024))//memory obtained directly from the system are already zero filled
+    memset(result, 0, size);
+  return result;
+}
+
+void xfree(void *ptr) {
+  ltfree(ptr);
 }

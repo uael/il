@@ -56,56 +56,56 @@ void jl_entity_dtor(jl_entity_t *self) {
     case JL_ENTITY_FIELD:
       if (jl_pu(self, field) && jl_pu(self, field)->refs <= 0) {
         jl_field_dtor(jl_pu(self, field));
-        free(jl_pu(self, field));
+        xfree(jl_pu(self, field));
         jl_pu(self, field) = NULL;
       }
       break;
     case JL_ENTITY_VAR:
       if (jl_pu(self, var) && jl_pu(self, var)->refs <= 0) {
         jl_var_dtor(jl_pu(self, var));
-        free(jl_pu(self, var));
+        xfree(jl_pu(self, var));
         jl_pu(self, var) = NULL;
       }
       break;
     case JL_ENTITY_PARAM:
       if (jl_pu(self, param) && jl_pu(self, param)->refs <= 0) {
         jl_param_dtor(jl_pu(self, param));
-        free(jl_pu(self, param));
+        xfree(jl_pu(self, param));
         jl_pu(self, param) = NULL;
       }
       break;
     case JL_ENTITY_FUNC:
       if (jl_pu(self, func) && jl_pu(self, func)->refs <= 0) {
         jl_func_dtor(jl_pu(self, func));
-        free(jl_pu(self, func));
+        xfree(jl_pu(self, func));
         jl_pu(self, func) = NULL;
       }
       break;
     case JL_ENTITY_ENUM:
       if (jl_pu(self, enum) && jl_pu(self, enum)->refs <= 0) {
         jl_enum_dtor(jl_pu(self, enum));
-        free(jl_pu(self, enum));
+        xfree(jl_pu(self, enum));
         jl_pu(self, enum) = NULL;
       }
       break;
     case JL_ENTITY_STRUCT:
       if (jl_pu(self, struct) && jl_pu(self, struct)->refs <= 0) {
         jl_struct_dtor(jl_pu(self, struct));
-        free(jl_pu(self, struct));
+        xfree(jl_pu(self, struct));
         jl_pu(self, struct) = NULL;
       }
       break;
     case JL_ENTITY_UNION:
       if (jl_pu(self, union) && jl_pu(self, union)->refs <= 0) {
         jl_union_dtor(jl_pu(self, union));
-        free(jl_pu(self, union));
+        xfree(jl_pu(self, union));
         jl_pu(self, union) = NULL;
       }
       break;
     case JL_ENTITY_LABEL:
       if (jl_pu(self, label) && jl_pu(self, label)->refs <= 0) {
         jl_label_dtor(jl_pu(self, label));
-        free(jl_pu(self, label));
+        xfree(jl_pu(self, label));
         jl_pu(self, label) = NULL;
       }
       break;

@@ -323,7 +323,7 @@ void jl_opts_dtor(jl_opts_t *self) {
   char *sep;
 
   adt_vector_foreach(self->opts_errs, sep) {
-    free(sep);
+    xfree(sep);
   }
   adt_vector_dtor(self->opts_errs);
 }

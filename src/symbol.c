@@ -39,7 +39,7 @@ void jl_scope_dtor(jl_scope_t *self) {
   jl_symtab_dtor(&self->symtab);
   adt_vector_foreach(self->childs, scope) {
     jl_scope_dtor(scope);
-    free(scope);
+    xfree(scope);
     scope = NULL;
   }
   adt_vector_dtor(self->childs);

@@ -23,11 +23,11 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_C_FE_H__
-# define  JL_C_FE_H__
+#ifndef   JL_C_PARSER_H__
+# define  JL_C_PARSER_H__
 
 #include "parser.h"
 
-void c_fe_parse(struct jl_parser_t *self, struct jl_program_t *out);
+void c_parser_parse(struct jl_parser_t *self, struct jl_program_t *out);
 
-#endif /* JL_C_FE_H__ */
+#endif /* JL_C_PARSER_H__ */

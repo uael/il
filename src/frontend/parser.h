@@ -23,8 +23,8 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_FE_H__
-# define  JL_FE_H__
+#ifndef   JL_PARSER_H__
+# define  JL_PARSER_H__
 
 #include <adt/deque.h>
 
@@ -75,4 +75,4 @@ void jl_fe_push_src(jl_parser_t *self, const char *src);
 void jl_fe_scope(jl_parser_t *self);
 void jl_fe_unscope(jl_parser_t *self);
 
-#endif /* JL_FE_H__ */
+#endif /* JL_PARSER_H__ */

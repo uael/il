@@ -32,7 +32,7 @@
 #include "symbol.h"
 #include "program.h"
 
-#include "c/c_fe.h"
+#include "c/c_parser.h"
 
 void jl_fe_init(jl_parser_t *self, enum jl_parser_n kind, jl_compiler_t *compiler) {
   *self = (jl_parser_t) {
@@ -44,7 +44,7 @@ void jl_fe_init(jl_parser_t *self, enum jl_parser_n kind, jl_compiler_t *compile
 
   switch (self->kind) {
     case JL_PARSER_C:
-      self->parse = c_fe_parse;
+      self->parse = c_parser_parse;
       break;
     case JL_PARSER_JAY:
       break;

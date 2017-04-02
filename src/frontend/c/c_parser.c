@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <errno.h>
 
-#include "c_fe.h"
+#include "c_parser.h"
 
 #include "c_lexer.h"
 #include "compiler.h"
@@ -104,7 +104,7 @@ static jl_entity_t external_declaration(jl_parser_t *self, jl_program_t *out);
 static jl_entity_t function_definition(jl_parser_t *self, jl_program_t *out);
 static jl_entity_t declaration_list(jl_parser_t *self, jl_program_t *out);
 
-void c_fe_parse(jl_parser_t *self, jl_program_t *out) {
+void c_parser_parse(jl_parser_t *self, jl_program_t *out) {
   int r;
 
   jl_fe_scope(self);

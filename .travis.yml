@@ -9,6 +9,8 @@ install:
   - make
   - cd ..
 
+script: bin/jay test/hello.jay -ohello
+
 matrix:
   include:
     - os: linux

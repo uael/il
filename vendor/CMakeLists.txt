@@ -1,19 +1,31 @@
-include(ExternalProject)
+add_subdirectory(firm)
 
 set(libfirm_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/firm)
 set(libfirm_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/firm)
 
-add_subdirectory(firm)
-add_subdirectory(ltalloc)
-
-set(jayl_DEPS ${jayl_DEPS} firm ltalloc PARENT_SCOPE)
+set(jayl_DEPS ${jayl_DEPS} firm)
 if(WIN32)
-    set(jayl_LDADD ${jayl_LDADD} firm ltalloc winmm PARENT_SCOPE)
+    set(jayl_LDADD ${jayl_LDADD} firm winmm)
 elseif(UNIX)
-    set(jayl_LDADD ${jayl_LDADD} firm ltalloc m PARENT_SCOPE)
+    set(jayl_LDADD ${jayl_LDADD} firm m)
 endif()
 set(jayl_INCLUDES ${jayl_INCLUDES} ${libfirm_SOURCE_DIR}/include)
 set(jayl_INCLUDES ${jayl_INCLUDES} ${libfirm_BINARY_DIR}/gen/include)
 set(jayl_INCLUDES ${jayl_INCLUDES} ${libfirm_BINARY_DIR}/gen/include/libfirm)
-set(jayl_INCLUDES ${jayl_INCLUDES} ${CMAKE_CURRENT_LIST_DIR}/ltalloc PARENT_SCOPE)
-set(jayl_DEFS ${jayl_DEFS} -DWITH_LIBFIRM -DWITH_LTALLOC PARENT_SCOPE)
+set(jayl_DEFS ${jayl_DEFS} -DWITH_LIBFIRM)
+
+option(LTALLOC "With ltalloc" 1)
+
+if(LTALLOC)
+    add_subdirectory(ltalloc)
+
+    set(jayl_DEPS ${jayl_DEPS} ltalloc)
+    set(jayl_LDADD ${jayl_LDADD} ltalloc)
+    set(jayl_INCLUDES ${jayl_INCLUDES} ${CMAKE_CURRENT_LIST_DIR}/ltalloc)
+    set(jayl_DEFS ${jayl_DEFS} -DWITH_LTALLOC)
+endif()
+
+set(jayl_DEPS ${jayl_DEPS} PARENT_SCOPE)
+set(jayl_LDADD ${jayl_LDADD} PARENT_SCOPE)
+set(jayl_INCLUDES ${jayl_INCLUDES} PARENT_SCOPE)
+set(jayl_DEFS ${jayl_DEFS} PARENT_SCOPE)

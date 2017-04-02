@@ -69,7 +69,6 @@ struct jl_entity_t {
   } u;
 };
 
-jl_entity_t jl_entity_undefined();
 void jl_entity_undef(jl_entity_t *self);
 void jl_entity_dtor(jl_entity_t *self);
 void jl_entity_switch(jl_entity_t *self, enum jl_entity_n kind);
@@ -81,6 +80,8 @@ bool jl_entity_equals(jl_entity_t a, jl_entity_t b);
 jl_entity_r jl_entity_fields(jl_entity_t self);
 jl_field_t *jl_entity_field_lookup(jl_entity_t self, const char *name);
 const char *jl_entity_name(jl_entity_t self);
+
+#define jl_entity_undefined() (jl_entity_t) {JL_ENTITY_UNDEFINED};
 
 #define jl_entity_is_field(e) ((e).kind == JL_ENTITY_FIELD)
 #define jl_entity_is_var(e) ((e).kind == JL_ENTITY_VAR)

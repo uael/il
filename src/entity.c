@@ -45,10 +45,6 @@ void jl_struct_dtor(jl_struct_t *self);
 void jl_union_dtor(jl_union_t *self);
 void jl_label_dtor(jl_label_t *self);
 
-jl_entity_t jl_entity_undefined() {
-  return (jl_entity_t) {JL_ENTITY_UNDEFINED};
-}
-
 void jl_entity_undef(jl_entity_t *self) {
   *self = jl_entity_undefined();
 }
@@ -368,7 +364,7 @@ jl_type_t jl_entity_type(jl_entity_t self) {
 
 
 void jl_entity_add_field(jl_entity_t *self, const char *name, jl_type_t type) {
-  jl_entity_t field;
+  jl_entity_t field = jl_entity_undefined();
 
   switch (self->kind) {
     case JL_ENTITY_FUNC:

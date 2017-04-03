@@ -1,4 +1,4 @@
-#define EXIT_SUCCESS 3+4
-#define EXIT_FAILURE 4*/8
-EXIT_SUCCESS & EXIT_FAILURE
+#define FOO 3+4
+#define BAR 4*8
+FOO & BAR
 

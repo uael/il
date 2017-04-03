@@ -30,10 +30,10 @@
 
 #include "token.h"
 
-typedef struct jl_type_t jl_type_t;
-typedef struct jl_pointer_t jl_pointer_t;
-typedef struct jl_array_t jl_array_t;
-typedef struct jl_compound_t jl_compound_t;
+typedef struct jl_type jl_type_t;
+typedef struct jl_pointer jl_pointer_t;
+typedef struct jl_array jl_array_t;
+typedef struct jl_compound jl_compound_t;
 
 enum jl_type_n {
   JL_TYPE_UNDEFINED = 0,
@@ -76,46 +76,99 @@ enum jl_type_qualifier_n {
   JL_TYPE_QUALIFIER_ATOMIC = 1 << 3
 };
 
-struct jl_type_t {
-  enum jl_type_n kind;
+struct jl_pointer {
   jl_lloc_t lloc;
   enum jl_type_specifier_n specifiers;
   enum jl_type_qualifier_n qualifiers;
   size_t size;
+  jl_type_t *next;
+};
+
+struct jl_array {
+  jl_lloc_t lloc;
+  enum jl_type_specifier_n specifiers;
+  enum jl_type_qualifier_n qualifiers;
+  size_t size;
+  jl_type_t *next;
+  struct jl_expr *expr;
+};
+
+struct jl_compound {
+  jl_lloc_t lloc;
+  enum jl_type_specifier_n specifiers;
+  enum jl_type_qualifier_n qualifiers;
+  size_t size;
+  struct jl_entity *next;
+};
+
+struct jl_type {
+  enum jl_type_n kind;
   union {
-    jl_pointer_t *_pointer;
-    jl_array_t *_array;
-    jl_compound_t *_compound;
-  } u;
+    struct {
+      jl_lloc_t lloc;
+      enum jl_type_specifier_n specifiers;
+      enum jl_type_qualifier_n qualifiers;
+      size_t size;
+      void *next;
+    };
+    struct jl_pointer pointer;
+    struct jl_array array;
+    struct jl_compound compound;
+  };
 };
 
 void jl_type_dtor(jl_type_t *self);
+
 void jl_type_undef(jl_type_t *self);
+
 void jl_type_switch(jl_type_t *self, enum jl_type_n kind);
+
 void jl_type_acquire(jl_type_t *self);
+
 void jl_type_release(jl_type_t *self);
+
 void jl_type_update_size(jl_type_t *self);
+
 bool jl_type_is_defined(jl_type_t self);
+
 bool jl_ptype_is_defined(jl_type_t *self);
+
 bool jl_type_is_ref(jl_type_t type);
+
 bool jl_type_is_func(jl_type_t type);
+
 bool jl_type_equals(jl_type_t a, jl_type_t b);
+
 jl_type_t jl_literal(enum jl_type_n kind);
+
 jl_type_t jl_type_deref(jl_type_t a);
+
 size_t jl_sizeof(jl_type_t type);
+
 size_t jl_alignof(jl_type_t type);
 
 jl_type_t jl_void();
+
 jl_type_t jl_bool();
+
 jl_type_t jl_char();
+
 jl_type_t jl_short();
+
 jl_type_t jl_int();
+
 jl_type_t jl_uint();
+
 jl_type_t jl_long();
+
 jl_type_t jl_ulong();
+
 jl_type_t jl_double();
+
 jl_type_t jl_float();
+
 jl_type_t jl_long_long();
+
 jl_type_t jl_long_double();
 
 #define jl_type_undefined() ((jl_type_t) {JL_TYPE_UNDEFINED})

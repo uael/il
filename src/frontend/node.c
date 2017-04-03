@@ -25,6 +25,30 @@
 
 #include "node.h"
 
-void jl_node_switch(jl_node_t *self, enum jl_node_n kind) {
+jl_node_t jl_entity(jl_entity_t entity) {
+  return (jl_node_t) {
+    .kind = JL_NODE_ENTITY,
+    .entity = entity
+  };
+}
 
+jl_node_t jl_expr(jl_expr_t expr) {
+  return (jl_node_t) {
+    .kind = JL_NODE_EXPR,
+    .expr = expr
+  };
+}
+
+jl_node_t jl_stmt(jl_stmt_t stmt) {
+  return (jl_node_t) {
+    .kind = JL_NODE_STMT,
+    .stmt = stmt
+  };
+}
+
+jl_node_t jl_type(jl_type_t type) {
+  return (jl_node_t) {
+    .kind = JL_NODE_TYPE,
+    .type = type
+  };
 }

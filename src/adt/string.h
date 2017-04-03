@@ -27,6 +27,7 @@
 # define  JL_STRING_H__
 
 #include <string.h>
+#include <stdarg.h>
 
 #include "vector.h"
 #include "xmalloc.h"
@@ -46,5 +47,23 @@ char *xstrdup(const char *str);
  * error handling is required for code using it.
  */
 char *xstrndup(const char *str, size_t n);
+
+/**
+ * Sets `char **' pointer to be a buffer
+ * large enough to hold the formatted string
+ * accepting a `va_list' args of variadic
+ * arguments.
+ */
+
+int vasprintf(char **, const char *, va_list);
+
+/**
+ * Sets `char **' pointer to be a buffer
+ * large enough to hold the formatted
+ * string accepting `n' arguments of
+ * variadic arguments.
+ */
+
+int asprintf(char **, const char *, ...);
 
 #endif /* JL_STRING_H__ */

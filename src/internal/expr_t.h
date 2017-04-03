@@ -28,7 +28,6 @@
 
 #include <adt/vector.h>
 
-#include "token.h"
 #include "type_t.h"
 
 typedef struct jl_expr_t jl_expr_t;
@@ -90,7 +89,8 @@ enum jl_op_n {
 };
 
 struct jl_expr_t {
-  unsigned kind : 8;
+  enum jl_expr_n kind;
+  jl_lloc_t lloc;
   jl_type_t type;
   union {
     struct jl_expr_id_t *_id;
@@ -113,8 +113,6 @@ void jl_expr_acquire(jl_expr_t *self);
 void jl_expr_release(jl_expr_t *self);
 bool jl_expr_is_defined(jl_expr_t *self);
 bool jl_expr_is_constant(jl_expr_t self);
-jl_type_t jl_expr_get_type(jl_expr_t self);
-void jl_expr_set_type(jl_expr_t *self, jl_type_t type);
 
 #define jl_expr_undefined() ((jl_expr_t) {0})
 

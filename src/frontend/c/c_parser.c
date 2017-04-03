@@ -30,7 +30,6 @@
 
 #include "c_lexer.h"
 #include "compiler.h"
-#include "program.h"
 #include "entity.h"
 #include "expr.h"
 #include "stmt.h"
@@ -194,7 +193,7 @@ static jl_expr_t postfix_expression(jl_parser_t *self, jl_program_t *out) {
         jl_entity_t param;
         jl_func_t *func;
         jl_expr_r args = (jl_expr_r) {0};
-        jl_type_t type = jl_expr_get_type(r1);
+        jl_type_t type = r1.type;
 
         if (jl_type_is_pointer(type) && jl_type_is_func(jl_type_pointer(type)->of)) {
           type = jl_type_pointer(type)->of;
@@ -214,7 +213,7 @@ static jl_expr_t postfix_expression(jl_parser_t *self, jl_program_t *out) {
           }
           param = adt_vector_at(func->params, i);
           r2 = assignment_expression(self, out);
-          if (!jl_type_equals(jl_expr_get_type(r2), jl_entity_type(param))) {
+          if (!jl_type_equals(r2.type, jl_entity_type(param))) {
             r2 = jl_cast(jl_entity_type(param), r2);
           }
           adt_vector_push(args, r2);
@@ -231,7 +230,7 @@ static jl_expr_t postfix_expression(jl_parser_t *self, jl_program_t *out) {
 
         jl_lexer_next(self->lexer);
         token = jl_lexer_consume(self->lexer, C_TOK_IDENTIFIER);
-        field = jl_field_lookup(jl_expr_get_type(r1), token.value);
+        field = jl_field_lookup(r1.type, token.value);
         if (!field) {
           jl_parse_err(self->compiler, token.loc,
             "Invalid access, no member named '%s'",
@@ -246,7 +245,7 @@ static jl_expr_t postfix_expression(jl_parser_t *self, jl_program_t *out) {
         jl_field_t *field;
 
         jl_lexer_next(self->lexer);
-        if (!jl_type_is_pointer(type = jl_expr_get_type(r1))) {
+        if (!jl_type_is_pointer(type = r1.type)) {
           jl_parse_err(self->compiler, token.loc,
             "Invalid access on non pointer element '%s'",
             token.value

@@ -25,4 +25,28 @@
 
 #include "token.h"
 
+#include "frontend/lexer.h"
+
 void jl_token_dtor(jl_token_t *self) {}
+
+jl_lloc_t jl_lloc_begin(jl_lexer_t *lexer) {
+  return (jl_lloc_t) {
+    .lexer = lexer,
+    .begin = jl_lexer_peek(lexer).cursor
+  };
+}
+
+jl_lloc_t jl_lloc_end(jl_lloc_t self){
+  self.end = jl_lexer_peek(self.lexer).cursor;
+  return self;
+}
+
+jl_rtoken_t jl_llocate(jl_lloc_t lloc) {
+  if (lloc.lexer) {
+    return (jl_rtoken_t) {
+      adt_vector_at(lloc.lexer->queue, lloc.begin),
+      adt_vector_at(lloc.lexer->queue, lloc.end)
+    };
+  }
+  return (jl_rtoken_t) {{0}, {0}};
+}

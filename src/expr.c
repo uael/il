@@ -339,7 +339,7 @@ jl_expr_t jl_id(const char *id, jl_type_t type) {
 void jl_id_init(jl_expr_t *self, const char *id, jl_type_t type) {
   jl_expr_switch(self, JL_EXPR_ID);
   jl_pexpr_id(self)->id = id;
-  jl_expr_set_type(self, type);
+  self->type = type;
 }
 
 void jl_expr_id_dtor(jl_expr_id_t *self) {}
@@ -371,7 +371,7 @@ jl_expr_t jl_const_string(const char *s) {
 
 void jl_const_init(jl_expr_t *self, jl_type_t type) {
   jl_expr_switch(self, JL_EXPR_CONST);
-  jl_expr_set_type(self, type);
+  self->type = type;
 }
 
 void jl_expr_const_dtor(jl_expr_const_t *self) {}
@@ -513,7 +513,7 @@ jl_expr_t jl_cast(jl_type_t type, jl_expr_t operand) {
   jl_expr_t expr = {JL_EXPR_UNDEFINED};
 
   jl_unary_init(&expr, JL_OP_CAST, operand);
-  jl_expr_set_type(&expr, type);
+  expr.type = type;
   return expr;
 }
 

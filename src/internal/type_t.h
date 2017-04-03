@@ -28,7 +28,7 @@
 
 #include <assert.h>
 
-#include "api.h"
+#include "token.h"
 
 typedef struct jl_type_t jl_type_t;
 typedef struct jl_pointer_t jl_pointer_t;
@@ -77,7 +77,8 @@ enum jl_type_qualifier_n {
 };
 
 struct jl_type_t {
-  unsigned kind : 8;
+  enum jl_type_n kind;
+  jl_lloc_t lloc;
   enum jl_type_specifier_n specifiers;
   enum jl_type_qualifier_n qualifiers;
   size_t size;

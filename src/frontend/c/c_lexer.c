@@ -51,8 +51,10 @@ void c_lexer_init(jl_lexer_t *self) {
 }
 
 #define EMPTY {0}
-#define SYNTX(t, s) {.type=(t), .loc={0}, .name=s, .length=sizeof(s)-1, .kind=JL_TOKEN_SYNTAX}
+#define SYNTX(t, s) {.type=(t), .loc={0}, .name=s, .value=s, .length=sizeof(s)-1, .kind=JL_TOKEN_SYNTAX}
+#define XSYNT(t, s, n) {.type=(t), .loc={0}, .name=n, .value=s, .length=sizeof(s)-1, .kind=JL_TOKEN_SYNTAX}
 #define KEYWD(t, s) {.type=(t), .loc={0}, .name=s, .length=sizeof(s)-1, .kind=JL_TOKEN_KEYWORD}
+#define TOKEN(t, k, n) {.type=(t), .loc={0}, .name=n, .kind=(k)}
 
 #define peek *(self->buffer + self->loc.position)
 #define peekn(n) (self->buffer + self->loc.position)[n]
@@ -98,7 +100,7 @@ void c_lexer_init(jl_lexer_t *self) {
 static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
   static const jl_token_t tokens[] = {
     /* 0x00 */
-    SYNTX(C_TOK_END, "\0"),
+    XSYNT(C_TOK_END, "\0", "END"),
     KEYWD(C_TOK_AUTO, "auto"),
     KEYWD(C_TOK_BREAK, "break"),
     KEYWD(C_TOK_CASE, "case"),
@@ -110,7 +112,7 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
     /* 0x08 */
     KEYWD(C_TOK_DO, "do"),
     KEYWD(C_TOK_DOUBLE, "double"),
-    SYNTX(C_TOK_EOL, "\n"),
+    XSYNT(C_TOK_EOL, "\n", "EOL"),
     KEYWD(C_TOK_ELSE, "else"),
     KEYWD(C_TOK_ENUM, "enum"),
     KEYWD(C_TOK_EXTERN, "extern"),
@@ -158,8 +160,8 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
     SYNTX(C_TOK_SLASH, "/"),
 
     /* 0x30 */
-    SYNTX(C_TOK_ALIGNAS, "_Alignas"),
-    SYNTX(C_TOK_ALIGNOF, "_Alignof"),
+    KEYWD(C_TOK_ALIGNAS, "_Alignas"),
+    KEYWD(C_TOK_ALIGNOF, "_Alignof"),
     KEYWD(C_TOK_ATOMIC, "_Atomic"),
     KEYWD(C_TOK_BOOL, "_Bool"),
     KEYWD(C_TOK_COMPLEX, "_Complex"),
@@ -242,9 +244,9 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
     EMPTY,
     EMPTY,
     EMPTY,
-    {C_TOK_NUMBER, {0}, NULL, 0, JL_TOKEN_NUMBER},
-    {C_TOK_IDENTIFIER, {0}, NULL, 0, JL_TOKEN_IDENTIFIER},
-    {C_TOK_STRING, {0}, NULL, 0, JL_TOKEN_STRING_LITERAL},
+    TOKEN(C_TOK_NUMBER, JL_TOKEN_NUMBER, "Number"),
+    TOKEN(C_TOK_IDENTIFIER, JL_TOKEN_IDENTIFIER, "Identifier"),
+    TOKEN(C_TOK_STRING, JL_TOKEN_STRING_LITERAL, "String"),
     EMPTY,
 
     /* 0x78 */

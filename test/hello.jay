@@ -1,1 +1,4 @@
-9 / 8 - 7 + 6 | 5 & 4
+#define EXIT_SUCCESS 3+4
+#define EXIT_FAILURE 4*/8
+EXIT_SUCCESS & EXIT_FAILURE
+

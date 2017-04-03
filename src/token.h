@@ -30,39 +30,54 @@
 
 #include "api.h"
 
-typedef struct jl_token_t jl_token_t;
-typedef struct jl_loc_t jl_loc_t;
+struct jl_lexer_t;
+
+typedef struct jl_loc jl_loc_t;
+typedef struct jl_token jl_token_t;
+typedef struct jl_rtoken jl_rtoken_t;
+typedef struct jl_lloc jl_lloc_t;
 
 typedef adt_deque_of(jl_token_t) jl_token_r;
 
-enum jl_token_n {
-  JL_TOKEN_KEYWORD = 0,
+enum {
+  JL_TOKEN_UNDEFINED = 0,
+  JL_TOKEN_KEYWORD,
   JL_TOKEN_SYNTAX,
   JL_TOKEN_NUMBER,
   JL_TOKEN_IDENTIFIER,
-  JL_TOKEN_STRING_LITERAL,
-  JL_TOKEN_FLOAT,
-  JL_TOKEN_INT
+  JL_TOKEN_STRING_LITERAL
 };
 
-struct jl_loc_t {
+struct jl_loc {
   uint32_t lineno;
   uint32_t colno;
   uint32_t position;
   uint32_t file_id;
 };
 
-struct jl_token_t {
-  char type;
-  jl_loc_t loc;
-  const char *name;
-  uint32_t length;
+struct jl_token {
   unsigned kind : 8;
-  size_t cursor;
+  char type;
+  const char *name;
   const char *value;
-  uint32_t leading_ws;
+  size_t cursor;
+  jl_loc_t loc;
+  uint32_t length, leading_ws;
 };
 
 void jl_token_dtor(jl_token_t *self);
+
+struct jl_rtoken {
+  jl_token_t begin, end;
+};
+
+struct jl_lloc {
+  struct jl_lexer_t *lexer;
+  size_t begin, end;
+};
+
+jl_lloc_t jl_lloc_begin(struct jl_lexer_t *lexer);
+jl_lloc_t jl_lloc_end(jl_lloc_t self);
+jl_rtoken_t jl_llocate(jl_lloc_t lloc);
 
 #endif /* JL_TOKEN_H__ */

@@ -50,11 +50,11 @@ enum jl_parser_n {
 };
 
 struct jl_parser_t {
-  struct jl_compiler_t *compiler;
-  jl_lexer_t *lexer;
   enum jl_parser_n kind;
-  adt_deque_of(const char *) sources;
+  struct jl_compiler_t *compiler;
   struct jl_scope_t *scope;
+  jl_lexer_t *lexer;
+  adt_deque_of(const char *) sources;
 
   void (*parse)(jl_parser_t *self, struct jl_program_t *out);
 };

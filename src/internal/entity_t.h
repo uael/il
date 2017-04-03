@@ -28,7 +28,7 @@
 
 #include <adt/vector.h>
 
-#include "api.h"
+#include "token.h"
 
 typedef struct jl_entity_t jl_entity_t;
 typedef struct jl_field_t jl_field_t;
@@ -55,7 +55,8 @@ enum jl_entity_n {
 };
 
 struct jl_entity_t {
-  unsigned kind : 8;
+  enum jl_entity_n kind;
+  jl_lloc_t lloc;
   size_t size;
   union {
     struct jl_field_t *_field;

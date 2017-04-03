@@ -27,11 +27,13 @@
 #include <stdio.h>
 
 #include "compiler.h"
+#include "frontend/node.h"
 
 #include <libfirm/firm.h>
 
 int main(int argc, char *argv[]) {
   jl_compiler_t compiler;
+  jl_node_t node = (jl_node_t) {JL_NODE_UNDEFINED};
 
   jl_init(&compiler, argc, argv);
   jl_parse(&compiler);

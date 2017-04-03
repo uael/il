@@ -23,37 +23,8 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_NODE_H__
-# define  JL_NODE_H__
+#include "node.h"
 
-#include "entity_t.h"
-#include "expr_t.h"
-#include "stmt_t.h"
-#include "type_t.h"
+void jl_node_switch(jl_node_t *self, enum jl_node_n kind) {
 
-typedef struct jl_node jl_node_t;
-
-enum jl_node_n {
-  JL_NODE_UNDEFINED = 0,
-  JL_NODE_ENTITY,
-  JL_NODE_EXPR,
-  JL_NODE_TYPE
-};
-
-struct jl_node {
-  enum jl_node_n kind;
-  union {
-    struct {
-      unsigned int vkind : 4;
-      jl_lloc_t lloc;
-    };
-    jl_entity_t entity;
-    jl_expr_t expr;
-    jl_stmt_t stmt;
-    jl_type_t type;
-  };
-};
-
-void jl_node_switch(jl_node_t *self, enum jl_node_n kind);
-
-#endif /* JL_NODE_H__ */
+}

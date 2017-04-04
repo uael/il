@@ -61,7 +61,7 @@ enum jl_entity_n {
 
 struct jl_field {
   jl_lloc_t lloc;
-  size_t size;
+  size_t size, align;
   jl_type_t type;
   const char *name;
 
@@ -71,7 +71,7 @@ struct jl_field {
 
 struct jl_var {
   jl_lloc_t lloc;
-  size_t size;
+  size_t size, align;
   jl_type_t type;
   const char *name;
 
@@ -80,7 +80,7 @@ struct jl_var {
 
 struct jl_param {
   jl_lloc_t lloc;
-  size_t size;
+  size_t size, align;
   jl_type_t type;
   const char *name;
 
@@ -90,7 +90,7 @@ struct jl_param {
 
 struct jl_func {
   jl_lloc_t lloc;
-  size_t size;
+  size_t size, align;
   jl_type_t return_type;
   const char *name;
 
@@ -100,7 +100,7 @@ struct jl_func {
 
 struct jl_enum {
   jl_lloc_t lloc;
-  size_t size;
+  size_t size, align;
   jl_type_t type;
   const char *name;
 
@@ -109,7 +109,7 @@ struct jl_enum {
 
 struct jl_struct {
   jl_lloc_t lloc;
-  size_t size;
+  size_t size, align;
   jl_type_t type;
   const char *name;
 
@@ -118,7 +118,7 @@ struct jl_struct {
 
 struct jl_union {
   jl_lloc_t lloc;
-  size_t size;
+  size_t size, align;
   jl_type_t type;
   const char *name;
 
@@ -127,7 +127,7 @@ struct jl_union {
 
 struct jl_label {
   jl_lloc_t lloc;
-  size_t size;
+  size_t size, align;
   jl_type_t type;
   const char *name;
 
@@ -138,7 +138,7 @@ struct jl_entity {
   union {
     struct {
       jl_lloc_t lloc;
-      size_t size;
+      size_t size, align;
       jl_type_t type;
       const char *name;
     };

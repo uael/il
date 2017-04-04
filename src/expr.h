@@ -206,6 +206,9 @@ void jl_expr_release(jl_expr_t *self);
 bool jl_expr_is_defined(jl_expr_t *self);
 bool jl_expr_is_constant(jl_expr_t self);
 
+long jl_eval_long(jl_expr_t expr);
+unsigned long jl_eval_ulong(jl_expr_t expr);
+
 #define jl_expr_undefined() ((jl_expr_t) {0})
 
 #define jl_expr_is_id(t) ((t).kind == JL_EXPR_ID)

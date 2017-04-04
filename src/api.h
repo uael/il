@@ -26,9 +26,10 @@
 #ifndef   JL_API_H__
 # define  JL_API_H__
 
-#define jl_u(e, member) ((e).u._ ## member)
-#define jl_pu(e, member) ((e)->u._ ## member)
 #define jl_defined(e) ((e).kind != 0)
 #define jl_pdefined(e) ((e)->kind != 0)
+
+#define jl_is(e, a) ((e).kind == a)
+#define jl_pis(e, a) ((e)->kind == a)
 
 #endif /* JL_API_H__ */

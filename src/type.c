@@ -56,55 +56,12 @@ void jl_type_dtor(jl_type_t *self) {
   jl_type_undef(self);
 }
 
-void jl_type_undef(jl_type_t *self) {
-  *self = jl_type_undefined();
-}
-
-void jl_type_update_size(jl_type_t *self) {
-  self->size = 0;
-  switch (self->kind) {
-    case JL_TYPE_BOOL:
-    case JL_TYPE_CHAR:
-      self->size = 1;
-      break;
-    case JL_TYPE_SHORT:
-      self->size = 2;
-      break;
-    case JL_TYPE_INT:
-    case JL_TYPE_FLOAT:
-      self->size = 4;
-      break;
-    case JL_TYPE_LONG:
-    case JL_TYPE_DOUBLE:
-    case JL_TYPE_LONG_LONG:
-      self->size = 8;
-      break;
-    case JL_TYPE_LONG_DOUBLE:
-      self->size = 16;
-      break;
-    case JL_TYPE_POINTER:
-      self->size = 8;
-      break;
-    case JL_TYPE_ARRAY:
-      if (jl_pexpr_is_const(self->array.length))
-        self->size = self->array.length->constant.ul * self->array.of->size;
-      else
-        self->size = self->array.of->size;
-      break;
-    case JL_TYPE_COMPOUND:
-      self->size = self->compound.entity->size;
-      break;
-    default:
-      break;
-  }
-}
-
 bool jl_type_is_ref(jl_type_t type) {
-  return jl_type_is_array(type) || jl_type_is_pointer(type);
+  return jl_is(type, JL_TYPE_ARRAY) || jl_is(type, JL_TYPE_POINTER);
 }
 
 bool jl_type_is_func(jl_type_t type) {
-  return jl_type_is_compound(type) && jl_pentity_is_func(type.compound.entity);
+  return jl_is(type, JL_TYPE_COMPOUND) && jl_pis(type.compound.entity, JL_ENTITY_FUNC);
 }
 
 bool jl_type_equals(jl_type_t a, jl_type_t b) {
@@ -117,11 +74,11 @@ bool jl_type_equals(jl_type_t a, jl_type_t b) {
   if (jl_type_is_ref(b)) {
     return false;
   }
-  if (a.kind != b.kind || a.size != b.size || jl_type_is_unsigned(a) != jl_type_is_unsigned(b)) {
+  if (a.kind != b.kind || a.size != b.size || jl_type_specified(a, UNSIGNED) != jl_type_specified(b, UNSIGNED)) {
     return false;
   }
-  if (jl_type_is_compound(a)) {
-    return jl_entity_equals(*a.compound.entity, *b.compound.entity);
+  if (jl_is(a, JL_TYPE_COMPOUND)) {
+    return jl_is(b, JL_TYPE_COMPOUND) && jl_entity_equals(*a.compound.entity, *b.compound.entity);
   }
   return true;
 }
@@ -137,167 +94,180 @@ jl_type_t jl_type_deref(jl_type_t a) {
   }
 }
 
-jl_type_t jl_literal(enum jl_type_n kind) {
-  jl_type_t type = {.kind = kind};
-
-  jl_type_update_size(&type);
-  return type;
-}
-
-size_t jl_sizeof(jl_type_t type) {
-  return type.size;
-}
-
-size_t jl_alignof(jl_type_t type) {
-  size_t m = 0, d;
-  jl_entity_t entity;
-  jl_entity_r entities;
-
-  assert(!jl_type_is_func(type));
-  if (jl_type_is_ref(type)) {
-    return jl_alignof(jl_type_deref(type));
-  }
-  if (jl_type_is_compound(type)) {
-    entities = jl_type_fields(type);
-    adt_vector_foreach(entities, entity) {
-      d = jl_alignof(jl_entity_type(entity));
-      if (d > m) m = d;
-    }
-    assert(m);
-    return m;
-  }
-  return jl_sizeof(type);
-}
-
-
 jl_entity_r jl_type_fields(jl_type_t self) {
-  return jl_entity_fields(jl_type_compound(self)->entity);
+  return jl_entity_fields(*self.compound.entity);
 }
 
 jl_field_t *jl_field_lookup(jl_type_t self, const char *name) {
-  return jl_entity_field_lookup(jl_type_compound(self)->entity, name);
+  return jl_entity_field_lookup(*self.compound.entity, name);
 }
 
-
 jl_type_t jl_void() {
-  static jl_type_t type = {JL_TYPE_VOID, .size = 0};
-  return type;
+  return (jl_type_t) {
+    .kind = JL_TYPE_VOID,
+    .size = 0,
+    .align = 0
+  };
 }
 
 jl_type_t jl_bool() {
-  static jl_type_t type = {JL_TYPE_DOUBLE, .size = 1};
-  return type;
+  return (jl_type_t) {
+    .kind = JL_TYPE_BOOL,
+    .size = 1,
+    .align = 1
+  };
 }
 
 jl_type_t jl_char() {
-  static jl_type_t type = {JL_TYPE_CHAR, .size = 1};
-  return type;
+  return (jl_type_t) {
+    .kind = JL_TYPE_CHAR,
+    .size = 1,
+    .align = 1
+  };
 }
 
 jl_type_t jl_short() {
-  static jl_type_t type = {JL_TYPE_SHORT, .size = 2};
-  return type;
+  return (jl_type_t) {
+    .kind = JL_TYPE_SHORT,
+    .size = 2,
+    .align = 2
+  };
 }
 
 jl_type_t jl_int() {
-  static jl_type_t type = {JL_TYPE_INT, .size = 4};
-  return type;
+  return (jl_type_t) {
+    .kind = JL_TYPE_INT,
+    .size = 4,
+    .align = 4
+  };
 }
 
 jl_type_t jl_uint() {
-  static jl_type_t type = {JL_TYPE_INT, .size = 4, .specifiers = JL_TYPE_SPECIFIER_UNSIGNED};
-  return type;
+  return (jl_type_t) {
+    .kind = JL_TYPE_INT,
+    .size = 4,
+    .align = 4,
+    .specifiers = JL_TYPE_SPECIFIER_UNSIGNED
+  };
 }
 
 jl_type_t jl_long() {
-  static jl_type_t type = {JL_TYPE_LONG, .size = 8};
-  return type;
+  return (jl_type_t) {
+    .kind = JL_TYPE_LONG,
+    .size = 8,
+    .align = 8
+  };
 }
 
 jl_type_t jl_ulong() {
-  static jl_type_t type = {JL_TYPE_LONG, .size = 8, .specifiers = JL_TYPE_SPECIFIER_UNSIGNED};
-  return type;
+  return (jl_type_t) {
+    .kind = JL_TYPE_LONG,
+    .size = 8,
+    .align = 8,
+    .specifiers = JL_TYPE_SPECIFIER_UNSIGNED
+  };
 }
 
 jl_type_t jl_double() {
-  static jl_type_t type = {JL_TYPE_DOUBLE, .size = 8};
-  return type;
+  return (jl_type_t) {
+    .kind = JL_TYPE_DOUBLE,
+    .size = 8,
+    .align = 8
+  };
 }
 
 jl_type_t jl_float() {
-  static jl_type_t type = {JL_TYPE_FLOAT, .size = 4};
-  return type;
+  return (jl_type_t) {
+    .kind = JL_TYPE_FLOAT,
+    .size = 4,
+    .align = 4
+  };
 }
 
 jl_type_t jl_long_long() {
-  static jl_type_t type = {JL_TYPE_LONG_LONG, .size = 8};
-  return type;
+  return (jl_type_t) {
+    .kind = JL_TYPE_LONG_LONG,
+    .size = 8,
+    .align = 8
+  };
 }
 
 jl_type_t jl_long_double() {
-  static jl_type_t type = {JL_TYPE_LONG_DOUBLE, .size = 16};
-  return type;
+  return (jl_type_t) {
+    .kind = JL_TYPE_LONG_DOUBLE,
+    .size = 16,
+    .align = 16
+  };
 }
-
 
 jl_type_t jl_pointer(jl_type_t of) {
-  jl_type_t type = {JL_TYPE_UNDEFINED};
+  jl_type_t type = {
+    .kind = JL_TYPE_POINTER,
+    .size = 8,
+    .align = 8,
+    .pointer.of = xmalloc(sizeof(jl_type_t))
+  };
 
-  jl_pointer_init(&type, of);
+  *type.pointer.of = of;
   return type;
-}
-
-void jl_pointer_init(jl_type_t *self, jl_type_t of) {
-  jl_type_switch(self, JL_TYPE_POINTER);
-  jl_ptype_pointer(self)->of = of;
-  jl_type_update_size(self);
 }
 
 void jl_pointer_dtor(jl_pointer_t *self) {
-  jl_type_dtor(&self->of);
+  jl_type_dtor(self->of);
+  xfree(self->of);
 }
 
+jl_type_t jl_array(jl_type_t of, jl_expr_t length) {
+  jl_type_t type = {
+    .kind = JL_TYPE_ARRAY,
+    .size = of.size,
+    .align = of.align,
+    .array.of = xmalloc(sizeof(jl_type_t)),
+    .array.length = xmalloc(sizeof(jl_expr_t))
+  };
 
-jl_type_t jl_array(jl_type_t of) {
-  jl_type_t type = {JL_TYPE_UNDEFINED};
-
-  jl_array_init(&type, of, jl_expr_undefined());
+  *type.array.of = of;
+  *type.array.length = length;
+  if (jl_expr_is_constant(length)) {
+    type.size *= jl_eval_ulong(length);
+  }
   return type;
-}
-
-jl_type_t jl_narray(jl_type_t of, jl_expr_t size) {
-  jl_type_t type = {JL_TYPE_UNDEFINED};
-
-  jl_array_init(&type, of, size);
-  return type;
-}
-
-void jl_array_init(jl_type_t *self, jl_type_t of, jl_expr_t size) {
-  jl_type_switch(self, JL_TYPE_ARRAY);
-  jl_ptype_array(self)->of = of;
-  jl_ptype_array(self)->size = size;
-  jl_type_update_size(self);
 }
 
 void jl_array_dtor(jl_array_t *self) {
-  jl_type_dtor(&self->of);
-  jl_expr_dtor(&self->size);
+  jl_type_dtor(self->of);
+  xfree(self->of);
+  jl_expr_dtor(self->length);
+  xfree(self->length);
 }
 
-
 jl_type_t jl_compound(jl_entity_t entity) {
-  jl_type_t type = {JL_TYPE_UNDEFINED};
+  size_t m = 0, d;
+  jl_entity_r entities;
+  jl_type_t type = {
+    .kind = JL_TYPE_COMPOUND,
+    .size = entity.size,
+    .compound.entity = xmalloc(sizeof(jl_entity_t))
+  };
 
-  jl_compound_init(&type, entity);
+  *type.compound.entity = entity;
+  if (!jl_is(entity, JL_ENTITY_FUNC)) {
+    entities = jl_entity_fields(entity);
+    adt_vector_foreach(entities, entity) {
+      d = entity.align;
+      if (d > m) m = d;
+    }
+    assert(m);
+    type.align = m;
+  }
   return type;
 }
 
-void jl_compound_init(jl_type_t *self, jl_entity_t entity) {
-  jl_type_switch(self, JL_TYPE_COMPOUND);
-  jl_ptype_compound(self)->entity = entity;
-  jl_type_update_size(self);
+void jl_compound_dtor(jl_compound_t *self) {
+  jl_entity_dtor(self->entity);
+  xfree(self->entity);
 }
 
-void jl_compound_dtor(jl_compound_t *self) {
-  jl_entity_dtor(&self->entity);
+jl_type_t jl_type_merge(jl_type_t a, jl_type_t b) {
+  return a;
 }

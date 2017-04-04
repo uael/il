@@ -43,11 +43,7 @@ enum jl_node_n {
 
 struct jl_node {
   union {
-    struct {
-      jl_lloc_t lloc;
-      jl_type_t *type;
-      size_t size;
-    };
+    jl_lloc_t lloc;
     jl_entity_t entity;
     jl_expr_t expr;
     jl_stmt_t stmt;

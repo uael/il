@@ -25,6 +25,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
 #include "type.h"
 
@@ -41,25 +42,13 @@ void jl_type_dtor(jl_type_t *self) {
     case JL_TYPE_UNDEFINED:
       return;
     case JL_TYPE_POINTER:
-      if (jl_pu(self, pointer) && jl_pu(self, pointer)->refs <= 0) {
-        jl_pointer_dtor(jl_pu(self, pointer));
-        xfree(jl_pu(self, pointer));
-        jl_pu(self, pointer) = NULL;
-      }
+      jl_pointer_dtor(&self->pointer);
       break;
     case JL_TYPE_ARRAY:
-      if (jl_pu(self, array) && jl_pu(self, array)->refs <= 0) {
-        jl_array_dtor(jl_pu(self, array));
-        xfree(jl_pu(self, array));
-        jl_pu(self, array) = NULL;
-      }
+      jl_array_dtor(&self->array);
       break;
     case JL_TYPE_COMPOUND:
-      if (jl_pu(self, compound) && jl_pu(self, compound)->refs <= 0) {
-        jl_compound_dtor(jl_pu(self, compound));
-        xfree(jl_pu(self, compound));
-        jl_pu(self, compound) = NULL;
-      }
+      jl_compound_dtor(&self->compound);
       break;
     default:
       break;
@@ -69,77 +58,6 @@ void jl_type_dtor(jl_type_t *self) {
 
 void jl_type_undef(jl_type_t *self) {
   *self = jl_type_undefined();
-}
-
-void jl_type_switch(jl_type_t *self, enum jl_type_n kind) {
-  enum jl_type_specifier_n specifiers;
-  enum jl_type_qualifier_n qualifiers;
-
-  if (self->kind != kind || !jl_ptype_is_defined(self)) {
-    specifiers = self->specifiers;
-    qualifiers = self->qualifiers;
-    if (jl_ptype_is_literal(self)) {
-      *self = (jl_type_t) {
-        .kind = kind,
-        .specifiers = specifiers,
-        .qualifiers = qualifiers
-      };
-    } else {
-      jl_type_dtor(self);
-      self->kind = kind;
-      self->specifiers = specifiers;
-      self->qualifiers = qualifiers;
-      switch (kind) {
-        case JL_TYPE_POINTER:
-          jl_pu(self, pointer) = xmalloc(sizeof(jl_pointer_t));
-          *jl_pu(self, pointer) = (jl_pointer_t) {.refs = 0};
-          break;
-        case JL_TYPE_ARRAY:
-          jl_pu(self, array) = xmalloc(sizeof(jl_array_t));
-          *jl_pu(self, array) = (jl_array_t) {.refs = 0};
-          break;
-        case JL_TYPE_COMPOUND:
-          jl_pu(self, compound) = xmalloc(sizeof(jl_compound_t));
-          *jl_pu(self, compound) = (jl_compound_t) {.refs = 0};
-          break;
-        default:
-          break;
-      }
-    }
-    jl_type_update_size(self);
-  }
-}
-
-void jl_type_acquire(jl_type_t *self) {
-  switch (self->kind) {
-    case JL_TYPE_POINTER:
-      ++jl_pu(self, pointer)->refs;
-      break;
-    case JL_TYPE_ARRAY:
-      ++jl_pu(self, array)->refs;
-      break;
-    case JL_TYPE_COMPOUND:
-      ++jl_pu(self, compound)->refs;
-      break;
-    default:
-      break;
-  }
-}
-
-void jl_type_release(jl_type_t *self) {
-  switch (self->kind) {
-    case JL_TYPE_POINTER:
-      --jl_pu(self, pointer)->refs;
-      break;
-    case JL_TYPE_ARRAY:
-      --jl_pu(self, array)->refs;
-      break;
-    case JL_TYPE_COMPOUND:
-      --jl_pu(self, compound)->refs;
-      break;
-    default:
-      break;
-  }
 }
 
 void jl_type_update_size(jl_type_t *self) {
@@ -168,33 +86,17 @@ void jl_type_update_size(jl_type_t *self) {
       self->size = 8;
       break;
     case JL_TYPE_ARRAY:
-      self->size = jl_pu(jl_expr_const(jl_pu(self, array)->size), ul) * jl_pu(self, array)->of.size;
+      if (jl_pexpr_is_const(self->array.length))
+        self->size = self->array.length->constant.ul * self->array.of->size;
+      else
+        self->size = self->array.of->size;
       break;
     case JL_TYPE_COMPOUND:
-      self->size = jl_pu(self, compound)->entity.size;
+      self->size = self->compound.entity->size;
       break;
     default:
       break;
   }
-}
-
-bool jl_type_is_defined(jl_type_t self) {
-  switch (self.kind) {
-    case JL_TYPE_POINTER:
-      return jl_u(self, pointer) != NULL;
-    case JL_TYPE_ARRAY:
-      return jl_u(self, array) != NULL;
-    case JL_TYPE_COMPOUND:
-      return jl_u(self, compound) != NULL;
-    case JL_TYPE_UNDEFINED:
-      return false;
-    default:
-      return true;
-  }
-}
-
-bool jl_ptype_is_defined(jl_type_t *self) {
-  return jl_type_is_defined(*self);
 }
 
 bool jl_type_is_ref(jl_type_t type) {
@@ -202,7 +104,7 @@ bool jl_type_is_ref(jl_type_t type) {
 }
 
 bool jl_type_is_func(jl_type_t type) {
-  return jl_type_is_compound(type) && jl_entity_is_func(jl_u(type, compound)->entity);
+  return jl_type_is_compound(type) && jl_pentity_is_func(type.compound.entity);
 }
 
 bool jl_type_equals(jl_type_t a, jl_type_t b) {
@@ -219,7 +121,7 @@ bool jl_type_equals(jl_type_t a, jl_type_t b) {
     return false;
   }
   if (jl_type_is_compound(a)) {
-    return jl_entity_equals(jl_type_compound(a)->entity, jl_type_compound(b)->entity);
+    return jl_entity_equals(*a.compound.entity, *b.compound.entity);
   }
   return true;
 }
@@ -227,18 +129,17 @@ bool jl_type_equals(jl_type_t a, jl_type_t b) {
 jl_type_t jl_type_deref(jl_type_t a) {
   switch (a.kind) {
     case JL_TYPE_POINTER:
-      return jl_u(a, pointer)->of;
+      return *a.pointer.of;
     case JL_TYPE_ARRAY:
-      return jl_u(a, array)->of;
+      return *a.array.of;
     default:
       return jl_type_undefined();
   }
 }
 
 jl_type_t jl_literal(enum jl_type_n kind) {
-  jl_type_t type = {kind};
+  jl_type_t type = {.kind = kind};
 
-  assert(kind >= JL_TYPE_BOOL && kind <= JL_TYPE_LONG_DOUBLE);
   jl_type_update_size(&type);
   return type;
 }
@@ -253,8 +154,8 @@ size_t jl_alignof(jl_type_t type) {
   jl_entity_r entities;
 
   assert(!jl_type_is_func(type));
-  if (jl_type_is_array(type)) {
-    return jl_alignof(jl_type_array(type)->of);
+  if (jl_type_is_ref(type)) {
+    return jl_alignof(jl_type_deref(type));
   }
   if (jl_type_is_compound(type)) {
     entities = jl_type_fields(type);

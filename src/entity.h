@@ -28,7 +28,7 @@
 
 #include <adt/vector.h>
 
-#include "token.h"
+#include "type.h"
 
 struct jl_expr;
 struct jl_stmt;
@@ -61,8 +61,8 @@ enum jl_entity_n {
 
 struct jl_field {
   jl_lloc_t lloc;
-  struct jl_type *type;
   size_t size;
+  jl_type_t type;
   const char *name;
 
   size_t offset;
@@ -71,8 +71,8 @@ struct jl_field {
 
 struct jl_var {
   jl_lloc_t lloc;
-  struct jl_type *type;
   size_t size;
+  jl_type_t type;
   const char *name;
 
   struct jl_expr *initializer;
@@ -80,8 +80,8 @@ struct jl_var {
 
 struct jl_param {
   jl_lloc_t lloc;
-  struct jl_type *type;
   size_t size;
+  jl_type_t type;
   const char *name;
 
   unsigned position;
@@ -90,8 +90,8 @@ struct jl_param {
 
 struct jl_func {
   jl_lloc_t lloc;
-  struct jl_type *return_type;
   size_t size;
+  jl_type_t return_type;
   const char *name;
 
   jl_entity_r params;
@@ -100,8 +100,8 @@ struct jl_func {
 
 struct jl_enum {
   jl_lloc_t lloc;
-  struct jl_type *type;
   size_t size;
+  jl_type_t type;
   const char *name;
 
   jl_entity_r vars;
@@ -109,8 +109,8 @@ struct jl_enum {
 
 struct jl_struct {
   jl_lloc_t lloc;
-  struct jl_type *type;
   size_t size;
+  jl_type_t type;
   const char *name;
 
   jl_entity_r fields;
@@ -118,8 +118,8 @@ struct jl_struct {
 
 struct jl_union {
   jl_lloc_t lloc;
-  struct jl_type *type;
   size_t size;
+  jl_type_t type;
   const char *name;
 
   jl_entity_r fields;
@@ -127,8 +127,8 @@ struct jl_union {
 
 struct jl_label {
   jl_lloc_t lloc;
-  struct jl_type *type;
   size_t size;
+  jl_type_t type;
   const char *name;
 
   struct jl_stmt *next;
@@ -138,8 +138,8 @@ struct jl_entity {
   union {
     struct {
       jl_lloc_t lloc;
-      struct jl_type *type;
       size_t size;
+      jl_type_t type;
       const char *name;
     };
     jl_field_t field;
@@ -163,7 +163,7 @@ void jl_entity_update_size(jl_entity_t *self);
 bool jl_entity_is_defined(jl_entity_t *self);
 bool jl_entity_equals(jl_entity_t a, jl_entity_t b);
 const char *jl_entity_name(jl_entity_t self);
-struct jl_type *jl_entity_type(jl_entity_t self);
+jl_type_t jl_entity_type(jl_entity_t self);
 jl_entity_r jl_entity_fields(jl_entity_t self);
 jl_field_t *jl_entity_field_lookup(jl_entity_t self, const char *name);
 
@@ -186,26 +186,26 @@ jl_field_t *jl_entity_field_lookup(jl_entity_t self, const char *name);
 #define jl_pentity_is_union(e) ((e)->kind == JL_ENTITY_UNION)
 #define jl_pentity_is_label(e) ((e)->kind == JL_ENTITY_LABEL)
 
-void jl_entity_add_field(jl_entity_t *self, const char *name, struct jl_type *type);
+void jl_entity_add_field(jl_entity_t *self, const char *name, jl_type_t type);
 
 jl_entity_t jl_var_undefined();
 jl_entity_t jl_var_int(const char *name, int d);
 jl_entity_t jl_var_float(const char *name, float f);
 jl_entity_t jl_var_string(const char *name, const char *s);
-jl_entity_t jl_var(const char *name, struct jl_type *type, struct jl_expr *initializer);
-void jl_var_init(jl_entity_t *self, const char *name, struct jl_type *type, struct jl_expr *initializer);
+jl_entity_t jl_var(const char *name, jl_type_t type, struct jl_expr *initializer);
+void jl_var_init(jl_entity_t *self, const char *name, jl_type_t type, struct jl_expr *initializer);
 
 jl_entity_t jl_param_undefined();
 jl_entity_t jl_param_int(unsigned position, const char *name, int d);
 jl_entity_t jl_param_float(unsigned position, const char *name, float f);
 jl_entity_t jl_param_string(unsigned position, const char *name, const char *s);
-void jl_param_init(jl_entity_t *self, unsigned position, const char *name, struct jl_type *type, struct jl_expr *initializer);
+void jl_param_init(jl_entity_t *self, unsigned position, const char *name, jl_type_t type, struct jl_expr *initializer);
 
 jl_entity_t jl_func_undefined();
-jl_entity_t jl_func_decl(struct jl_type *return_type, const char *name, jl_entity_r params);
+jl_entity_t jl_func_decl(jl_type_t return_type, const char *name, jl_entity_r params);
 jl_entity_t jl_proc_decl(const char *name, jl_entity_r params);
 jl_entity_t jl_func_def(jl_entity_t prototype, struct jl_stmt *body);
-void jl_func_init(jl_entity_t *self, struct jl_type *r, const char * n, jl_entity_r p, struct jl_stmt *b);
+void jl_func_init(jl_entity_t *self, jl_type_t r, const char * n, jl_entity_r p, struct jl_stmt *b);
 
 jl_entity_t jl_enum_undefined();
 jl_entity_t jl_enum(const char *name, jl_entity_r fields);

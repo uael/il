@@ -27,7 +27,7 @@
 #include <stdio.h>
 
 #include "compiler.h"
-#include "frontend/node.h"
+#include "node.h"
 
 #include <libfirm/firm.h>
 

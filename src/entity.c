@@ -28,7 +28,6 @@
 #include <limits.h>
 
 #include <adt/xmalloc.h>
-#include <entity_t.h>
 
 #include "entity.h"
 

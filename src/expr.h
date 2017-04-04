@@ -26,11 +26,6 @@
 #ifndef   JL_EXPR_H__
 # define  JL_EXPR_H__
 
-#include "entity_t.h"
-#include "expr_t.h"
-#include "stmt_t.h"
-#include "type_t.h"
-
 struct jl_expr_id_t {
   unsigned refs;
   const char *id;

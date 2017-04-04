@@ -29,7 +29,7 @@
 #include <adt/hash.h>
 #include <adt/vector.h>
 
-#include "entity_t.h"
+#include "entity.h"
 
 typedef struct jl_sym_t jl_sym_t;
 typedef struct jl_scope_t jl_scope_t;

@@ -26,10 +26,10 @@
 #ifndef   JL_NODE_H__
 # define  JL_NODE_H__
 
-#include "entity_t.h"
-#include "expr_t.h"
-#include "stmt_t.h"
-#include "type_t.h"
+#include "entity.h"
+#include "expr.h"
+#include "stmt.h"
+#include "type.h"
 
 typedef struct jl_node jl_node_t;
 
@@ -42,17 +42,18 @@ enum jl_node_n {
 };
 
 struct jl_node {
-  enum jl_node_n kind;
   union {
     struct {
-      unsigned int vkind : 4;
       jl_lloc_t lloc;
+      jl_type_t *type;
+      size_t size;
     };
     jl_entity_t entity;
     jl_expr_t expr;
     jl_stmt_t stmt;
     jl_type_t type;
   };
+  enum jl_node_n kind;
 };
 
 jl_node_t jl_entity(jl_entity_t entity);

@@ -26,11 +26,6 @@
 #ifndef   JL_STMT_H__
 # define  JL_STMT_H__
 
-#include "entity_t.h"
-#include "expr_t.h"
-#include "stmt_t.h"
-#include "type_t.h"
-
 typedef struct jl_stmt_expr_t jl_stmt_expr_t;
 typedef struct jl_stmt_label_t jl_stmt_label_t;
 typedef struct jl_stmt_case_t jl_stmt_case_t;

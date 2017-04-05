@@ -26,100 +26,10 @@
 #ifndef   JL_STMT_H__
 # define  JL_STMT_H__
 
-typedef struct jl_stmt_expr_t jl_stmt_expr_t;
-typedef struct jl_stmt_label_t jl_stmt_label_t;
-typedef struct jl_stmt_case_t jl_stmt_case_t;
-typedef struct jl_stmt_default_t jl_stmt_default_t;
-typedef struct jl_stmt_compound_t jl_stmt_compound_t;
-typedef struct jl_stmt_if_t jl_stmt_if_t;
-typedef struct jl_stmt_switch_t jl_stmt_switch_t;
-typedef struct jl_stmt_while_t jl_stmt_while_t;
-typedef struct jl_stmt_do_t jl_stmt_do_t;
-typedef struct jl_stmt_for_t jl_stmt_for_t;
-typedef struct jl_stmt_goto_t jl_stmt_goto_t;
-typedef struct jl_stmt_break_t jl_stmt_break_t;
-typedef struct jl_stmt_continue_t jl_stmt_continue_t;
-typedef struct jl_stmt_return_t jl_stmt_return_t;
-typedef struct jl_stmt_decl_t jl_stmt_decl_t;
+#include "ir.h"
 
-struct jl_stmt_expr_t {
-  unsigned refs;
-  jl_expr_t expr;
-};
+void jl_stmt_dtor(jl_stmt_t *self);
 
-struct jl_stmt_label_t {
-  unsigned refs;
-  const char *name;
-};
-
-struct jl_stmt_case_t {
-  unsigned refs;
-  jl_expr_t cond;
-  jl_stmt_t body;
-};
-
-struct jl_stmt_default_t {
-  unsigned refs;
-  jl_stmt_t body;
-};
-
-struct jl_stmt_compound_t {
-  unsigned refs;
-  jl_stmt_r stmts;
-};
-
-struct jl_stmt_if_t {
-  unsigned refs;
-  jl_expr_t cond;
-  jl_stmt_t then_body, else_body;
-};
-
-struct jl_stmt_switch_t {
-  unsigned refs;
-  jl_expr_t cond;
-  jl_stmt_t body;
-};
-
-struct jl_stmt_while_t {
-  unsigned refs;
-  jl_expr_t cond;
-  jl_stmt_t body;
-};
-
-struct jl_stmt_do_t {
-  unsigned refs;
-  jl_expr_t cond;
-  jl_stmt_t body;
-};
-
-struct jl_stmt_for_t {
-  jl_stmt_expr_t lhs, mhs;
-  jl_expr_t rhs;
-  jl_stmt_t body;
-};
-
-struct jl_stmt_goto_t {
-  unsigned refs;
-  const char *label;
-};
-
-struct jl_stmt_break_t {
-  unsigned refs;
-};
-
-struct jl_stmt_continue_t {
-  unsigned refs;
-};
-
-struct jl_stmt_return_t {
-  unsigned refs;
-  jl_expr_t expr;
-};
-
-struct jl_stmt_decl_t {
-  jl_type_t decl;
-};
-
-jl_stmt_t jl_stmt_undefined();
+#define jl_stmt_undefined() ((jl_stmt_t) {.kind = JL_STMT_UNDEFINED})
 
 #endif /* JL_STMT_H__ */

@@ -23,7 +23,7 @@ add_subdirectory(adt)
 add_subdirectory(backend)
 add_subdirectory(frontend)
 
-set(jayl_INCLUDES ${jayl_INCLUDES} backend frontend internal)
+set(jayl_INCLUDES ${jayl_INCLUDES} backend frontend)
 
 set(jayl_HEADERS ${jayl_HEADERS})
 set(jayl_SOURCES ${jayl_SOURCES})

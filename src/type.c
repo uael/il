@@ -33,75 +33,6 @@
 #include "expr.h"
 #include "stmt.h"
 
-void jl_pointer_dtor(jl_pointer_t *self);
-void jl_array_dtor(jl_array_t *self);
-void jl_compound_dtor(jl_compound_t *self);
-
-void jl_type_dtor(jl_type_t *self) {
-  switch (self->kind) {
-    case JL_TYPE_UNDEFINED:
-      return;
-    case JL_TYPE_POINTER:
-      jl_pointer_dtor(&self->pointer);
-      break;
-    case JL_TYPE_ARRAY:
-      jl_array_dtor(&self->array);
-      break;
-    case JL_TYPE_COMPOUND:
-      jl_compound_dtor(&self->compound);
-      break;
-    default:
-      break;
-  }
-  jl_type_undef(self);
-}
-
-bool jl_type_is_ref(jl_type_t type) {
-  return jl_is(type, JL_TYPE_ARRAY) || jl_is(type, JL_TYPE_POINTER);
-}
-
-bool jl_type_is_func(jl_type_t type) {
-  return jl_is(type, JL_TYPE_COMPOUND) && jl_pis(type.compound.entity, JL_ENTITY_FUNC);
-}
-
-bool jl_type_equals(jl_type_t a, jl_type_t b) {
-  if (!memcmp(&a, &b, sizeof(a))) {
-    return true;
-  }
-  if (jl_type_is_ref(a)) {
-    return jl_type_is_ref(b) && jl_type_equals(jl_type_deref(a), jl_type_deref(b));
-  }
-  if (jl_type_is_ref(b)) {
-    return false;
-  }
-  if (a.kind != b.kind || a.size != b.size || jl_type_specified(a, UNSIGNED) != jl_type_specified(b, UNSIGNED)) {
-    return false;
-  }
-  if (jl_is(a, JL_TYPE_COMPOUND)) {
-    return jl_is(b, JL_TYPE_COMPOUND) && jl_entity_equals(*a.compound.entity, *b.compound.entity);
-  }
-  return true;
-}
-
-jl_type_t jl_type_deref(jl_type_t a) {
-  switch (a.kind) {
-    case JL_TYPE_POINTER:
-      return *a.pointer.of;
-    case JL_TYPE_ARRAY:
-      return *a.array.of;
-    default:
-      return jl_type_undefined();
-  }
-}
-
-jl_entity_r jl_type_fields(jl_type_t self) {
-  return jl_entity_fields(*self.compound.entity);
-}
-
-jl_field_t *jl_field_lookup(jl_type_t self, const char *name) {
-  return jl_entity_field_lookup(*self.compound.entity, name);
-}
-
 jl_type_t jl_void() {
   return (jl_type_t) {
     .kind = JL_TYPE_VOID,
@@ -212,7 +143,7 @@ jl_type_t jl_pointer(jl_type_t of) {
   return type;
 }
 
-void jl_pointer_dtor(jl_pointer_t *self) {
+static void jl_pointer_dtor(jl_pointer_t *self) {
   jl_type_dtor(self->of);
   xfree(self->of);
 }
@@ -234,7 +165,7 @@ jl_type_t jl_array(jl_type_t of, jl_expr_t length) {
   return type;
 }
 
-void jl_array_dtor(jl_array_t *self) {
+static void jl_array_dtor(jl_array_t *self) {
   jl_type_dtor(self->of);
   xfree(self->of);
   jl_expr_dtor(self->length);
@@ -254,20 +185,86 @@ jl_type_t jl_compound(jl_entity_t entity) {
   if (!jl_is(entity, JL_ENTITY_FUNC)) {
     entities = jl_entity_fields(entity);
     adt_vector_foreach(entities, entity) {
-      d = entity.align;
-      if (d > m) m = d;
-    }
+        d = entity.align;
+        if (d > m) m = d;
+      }
     assert(m);
     type.align = m;
   }
   return type;
 }
 
-void jl_compound_dtor(jl_compound_t *self) {
+static void jl_compound_dtor(jl_compound_t *self) {
   jl_entity_dtor(self->entity);
   xfree(self->entity);
 }
 
-jl_type_t jl_type_merge(jl_type_t a, jl_type_t b) {
-  return a;
+
+void jl_type_dtor(jl_type_t *self) {
+  switch (self->kind) {
+    case JL_TYPE_UNDEFINED:
+      return;
+    case JL_TYPE_POINTER:
+      jl_pointer_dtor(&self->pointer);
+      break;
+    case JL_TYPE_ARRAY:
+      jl_array_dtor(&self->array);
+      break;
+    case JL_TYPE_COMPOUND:
+      jl_compound_dtor(&self->compound);
+      break;
+    default:
+      break;
+  }
+  jl_type_undef(self);
+}
+
+bool jl_type_is_ref(jl_type_t type) {
+  return jl_is(type, JL_TYPE_ARRAY) || jl_is(type, JL_TYPE_POINTER);
+}
+
+bool jl_type_is_func(jl_type_t type) {
+  return jl_is(type, JL_TYPE_COMPOUND) && jl_pis(type.compound.entity, JL_ENTITY_FUNC);
+}
+
+bool jl_type_equals(jl_type_t a, jl_type_t b) {
+  if (!memcmp(&a, &b, sizeof(a))) {
+    return true;
+  }
+  if (jl_type_is_ref(a)) {
+    return jl_type_is_ref(b) && jl_type_equals(jl_type_deref(a), jl_type_deref(b));
+  }
+  if (jl_type_is_ref(b)) {
+    return false;
+  }
+  if (a.kind != b.kind || a.size != b.size || jl_type_specified(a, UNSIGNED) != jl_type_specified(b, UNSIGNED)) {
+    return false;
+  }
+  if (jl_is(a, JL_TYPE_COMPOUND)) {
+    return jl_is(b, JL_TYPE_COMPOUND) && jl_entity_equals(*a.compound.entity, *b.compound.entity);
+  }
+  return true;
+}
+
+jl_type_t jl_type_deref(jl_type_t a) {
+  switch (a.kind) {
+    case JL_TYPE_POINTER:
+      return *a.pointer.of;
+    case JL_TYPE_ARRAY:
+      return *a.array.of;
+    default:
+      return jl_type_undefined();
+  }
+}
+
+jl_entity_r jl_type_fields(jl_type_t self) {
+  return jl_entity_fields(*self.compound.entity);
+}
+
+jl_field_t *jl_field_lookup(jl_type_t self, const char *name) {
+  return jl_entity_field_lookup(*self.compound.entity, name);
+}
+
+unsigned jl_type_merge(jl_type_t *self, enum jl_type_n with) {
+  return JL_TYPE_MERGE_ERROR_NONE;
 }

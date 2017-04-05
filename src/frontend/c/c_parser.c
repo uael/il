@@ -135,9 +135,9 @@ static jl_expr_t primary_expression(jl_parser_t *self, jl_program_t *out) {
         jl_parse_err(self->compiler, token.loc, "Undefined symbol '%s'", token.value);
       }
       if (symbol->flags & C_TOKEN_FLAG_ENUMERATION_CONSTANT) {
-        return jl_u(symbol->entity, var)->initializer;
+        return *symbol->entity.variable.initializer;
       }
-      return jl_id(symbol->id, jl_entity_type(symbol->entity));
+      return jl_id(symbol->id, symbol->entity.type);
     case C_TOK_NUMBER:
       jl_lexer_next(self->lexer);
       switch (jl_const_parse(token.value, token.length, &r2)) {
@@ -153,13 +153,13 @@ static jl_expr_t primary_expression(jl_parser_t *self, jl_program_t *out) {
       jl_lexer_next(self->lexer);
       return jl_const_string(token.value);
     case C_TOK_FUNC_NAME:
-      if (!(symbol = self->scope->sym) || !jl_entity_is_func(symbol->entity)) {
+      if (!(symbol = self->scope->sym) || !jl_is(symbol->entity, JL_ENTITY_FUNC)) {
         jl_parse_err(self->compiler, token.loc,
           "access of __func__ outside of function"
         );
       }
       jl_lexer_next(self->lexer);
-      return jl_const_string(jl_u(symbol->entity, func)->name);
+      return jl_const_string(symbol->entity.name);
     case '(':
       jl_lexer_next(self->lexer);
       r1 = expression(self, out);

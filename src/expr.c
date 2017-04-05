@@ -29,7 +29,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <limits.h>
-#include <expr_t.h>
 
 #include "expr.h"
 

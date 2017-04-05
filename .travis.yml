@@ -18,6 +18,7 @@ matrix:
         apt:
           sources:
             - george-edison55-precise-backports
+            - ubuntu-toolchain-r-test
           packages:
             - cmake
             - cmake-data

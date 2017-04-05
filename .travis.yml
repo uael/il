@@ -28,7 +28,7 @@ matrix:
         - cmake -DCOVERALLS=ON -DCMAKE_BUILD_TYPE=Debug ..
         - make
         - cd ..
-      after_success: coveralls -e build/CMakeFiles -e test -e vendor --gcov-options '\-lp'
+      after_success: coveralls -e build/CMakeFiles -e build/vendor -e test -e vendor --gcov-options '\-lp'
 
     - os: linux
       compiler: gcc-4.9

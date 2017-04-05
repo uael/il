@@ -25,7 +25,9 @@ matrix:
             - cmake-data
             - gcc-6
             - python3
-      before_install: pip install --user cpp-coveralls
+      before_install:
+        - alias python=python3
+        - pip install --user cpp-coveralls
       install:
         - mkdir build && cd build
         - cmake -DCOVERALLS=ON -DCMAKE_BUILD_TYPE=Debug ..

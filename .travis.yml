@@ -14,6 +14,7 @@ matrix:
     # coverage build
     - os: linux
       distro: trusty
+      compiler: gcc-6
       addons:
         apt:
           sources:
@@ -22,6 +23,7 @@ matrix:
           packages:
             - cmake
             - cmake-data
+            - gcc-6
             - python3
       before_install: pip install --user cpp-coveralls
       install:

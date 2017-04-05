@@ -23,6 +23,7 @@ matrix:
             - cmake-data
             - valgrind
             - gcc-4.9
+            - python-yaml
       before_install: pip install --user cpp-coveralls
       install:
         - mkdir build && cd build

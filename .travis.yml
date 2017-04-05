@@ -12,6 +12,26 @@ script: bin/jay test/hello.jay -ohello
 matrix:
   include:
     - os: linux
+      distro: trusty
+      addons:
+        apt:
+          sources:
+            - george-edison55-precise-backports
+            - ubuntu-toolchain-r-test
+          packages:
+            - cmake
+            - cmake-data
+            - gcc-6
+            - python3
+      before_install: pip install --user cpp-coveralls
+      install:
+        - mkdir build && cd build
+        - cmake -DCOVERALLS=ON -DCMAKE_BUILD_TYPE=Debug ..
+        - make
+        - cd ..
+      after_success: coveralls -e build/CMakeFiles -e test -e vendor --gcov-options '\-lp'
+
+    - os: linux
       compiler: gcc-4.9
       addons:
         apt:
@@ -23,15 +43,12 @@ matrix:
             - cmake-data
             - valgrind
             - gcc-4.9
-            - python-yaml
-      before_install: pip install --user cpp-coveralls
       install:
         - mkdir build && cd build
-        - cmake -DCOVERALLS=ON -DCMAKE_BUILD_TYPE=Debug ..
+        - cmake -DCMAKE_BUILD_TYPE=Debug ..
         - make
         - cd ..
       script: valgrind --leak-check=full --track-origins=yes bin/jay test/hello.jay -ohello
-      after_success: coveralls -e build -e test -e vendor --gcov-options '\-lp'
 
     - os: linux
       compiler: gcc-5

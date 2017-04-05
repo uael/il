@@ -1,6 +1,7 @@
 # Jay - Toy programming language
 [![Build Status](https://img.shields.io/travis/jayl/jay/master.svg)](https://travis-ci.org/jayl/jay)
 [![Build status](https://ci.appveyor.com/api/projects/status/fb59sbx09mgpqyjv/branch/master?svg=true)](https://ci.appveyor.com/project/uael/jay/branch/master)
+[![Coverage Status](https://coveralls.io/repos/github/jayl/jay/badge.svg?branch=master)](https://coveralls.io/github/jayl/jay?branch=master)
 
 
 **For fun**

@@ -30,7 +30,7 @@ matrix:
         - make
         - cd ..
       after_success:
-        - alias gcov=gcov-5
+        - alias gcov=gcov-6
         - gcov -v
         - cd build && lcov -d src -c
         - bash <(curl -s https://codecov.io/bash)

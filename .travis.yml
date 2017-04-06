@@ -25,10 +25,14 @@ matrix:
             - lcov
             - gcc-6
       install:
+        - mkdir build && cd build
         - cmake -DCOVERAGE=ON -DCMAKE_BUILD_TYPE=Debug .
         - make
+        - cd ..
       after_success:
-        - lcov -d src -c
+        - alias gcov=gcov-5
+        - gcov -v
+        - cd build && lcov -d src -c
         - bash <(curl -s https://codecov.io/bash)
 
     - os: linux

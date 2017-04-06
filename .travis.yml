@@ -27,8 +27,8 @@ matrix:
           build_command_prepend: "mkdir build && cd build && cmake .."
           build_command:   "make && cd .."
           branch_pattern: coverity_scan
-      install: - echo "coverity scan"
-      script: - echo "coverity scan"
+      install: echo "coverity scan"
+      script: echo "coverity scan"
 
     # coverage build
     - os: linux

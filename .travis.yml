@@ -1,198 +1,21 @@
+os: linux
 sudo: false
 language: c
 
-install:
-  - mkdir build && cd build
-  - cmake ..
-  - make
-  - cd ..
+addons:
+  apt:
+    sources:
+      - george-edison55-precise-backports
+    packages:
+      - cmake
+      - cmake-data
+  coverity_scan:
+    project:
+      name: "jayl/jay"
+      description: "Build submitted via Travis CI"
+    build_command_prepend: "mkdir build && cd build && cmake .."
+    build_command:   "make && cd .."
+    branch_pattern: coverity_scan
 
-script: bin/jay test/hello.jay -ohello
-
-matrix:
-  include:
-    # coverity scan
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - george-edison55-precise-backports
-          packages:
-            - cmake
-            - cmake-data
-        coverity_scan:
-          project:
-            name: "jayl/jay"
-            description: "Build submitted via Travis CI"
-          build_command_prepend: "mkdir build && cd build && cmake .."
-          build_command:   "make && cd .."
-          branch_pattern: coverity_scan
-      install: echo "coverity scan"
-      script: echo "coverity scan"
-
-    # coverage build
-    - os: linux
-      distro: trusty
-      addons:
-        apt:
-          sources:
-            - george-edison55-precise-backports
-          packages:
-            - cmake
-            - cmake-data
-      before_install:
-        - pip install --user urllib3[secure] cpp-coveralls
-      install:
-        - mkdir build && cd build
-        - cmake -DCOVERALLS=ON -DCMAKE_BUILD_TYPE=Debug ..
-        - make
-        - cd ..
-      after_success: coveralls -e build/CMakeFiles -e build/vendor -e test -e vendor --gcov-options '\-lp'
-
-    - os: linux
-      compiler: gcc-4.9
-      addons:
-        apt:
-          sources:
-            - george-edison55-precise-backports
-            - ubuntu-toolchain-r-test
-          packages:
-            - cmake
-            - cmake-data
-            - valgrind
-            - gcc-4.9
-      install:
-        - mkdir build && cd build
-        - cmake -DCMAKE_BUILD_TYPE=Debug ..
-        - make
-        - cd ..
-      script: valgrind --leak-check=full --track-origins=yes bin/jay test/hello.jay -ohello
-
-    - os: linux
-      compiler: gcc-5
-      addons:
-        apt:
-          sources:
-            - george-edison55-precise-backports
-            - ubuntu-toolchain-r-test
-          packages:
-            - cmake
-            - cmake-data
-            - gcc-5
-
-    - os: linux
-      compiler: gcc-6
-      addons:
-        apt:
-          sources:
-            - george-edison55-precise-backports
-            - ubuntu-toolchain-r-test
-          packages:
-            - cmake
-            - cmake-data
-            - gcc-6
-
-    - os: linux
-      compiler: clang-3.5
-      addons:
-        apt:
-          sources:
-            - george-edison55-precise-backports
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.5
-          packages:
-            - cmake
-            - cmake-data
-            - valgrind
-            - clang-3.5
-      install:
-        - mkdir build && cd build
-        - cmake DCMAKE_BUILD_TYPE=Debug ..
-        - make
-        - cd ..
-      script: valgrind --leak-check=full --track-origins=yes bin/jay test/hello.jay -ohello
-
-    - os: linux
-      compiler: clang-3.6
-      addons:
-        apt:
-          sources:
-            - george-edison55-precise-backports
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.6
-          packages:
-            - cmake
-            - cmake-data
-            - clang-3.6
-
-    - os: linux
-      compiler: clang-3.7
-      addons:
-        apt:
-          sources:
-            - george-edison55-precise-backports
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.7
-          packages:
-            - cmake
-            - cmake-data
-            - clang-3.7
-
-    - os: linux
-      compiler: clang-3.8
-      addons:
-        apt:
-          sources:
-            - george-edison55-precise-backports
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.8
-          packages:
-            - cmake
-            - cmake-data
-            - clang-3.8
-
-    - os: linux
-      compiler: clang-3.9
-      addons:
-        apt:
-          sources:
-            - george-edison55-precise-backports
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.9
-          packages:
-            - cmake
-            - cmake-data
-            - clang-3.9
-
-    - os: linux
-      dist: trusty
-      compiler: clang-4.0
-      addons:
-        apt:
-          sources:
-            - george-edison55-precise-backports
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-4.0
-          packages:
-            - cmake
-            - cmake-data
-            - clang-4.0
-
-    - os: osx
-      osx_image: xcode6.4
-      compiler: clang
-      before_install: brew install valgrind
-      install:
-        - mkdir build && cd build
-        - cmake DCMAKE_BUILD_TYPE=Debug ..
-        - make
-        - cd ..
-      script: valgrind --leak-check=full --track-origins=yes bin/jay test/hello.jay -ohello
-
-    - os: osx
-      osx_image: xcode7.3
-      compiler: clang
-
-    - os: osx
-      osx_image: xcode8.3
-      compiler: clang
+before_install: mkdir build && cd build && cmake ..
+install: make && cd ..

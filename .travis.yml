@@ -1,10 +1,8 @@
 sudo: false
-
 language: c
 
 install:
-  - mkdir build
-  - cd build
+  - mkdir build && cd build
   - cmake ..
   - make
   - cd ..
@@ -13,6 +11,25 @@ script: bin/jay test/hello.jay -ohello
 
 matrix:
   include:
+    # coverage build
+    - os: linux
+      distro: trusty
+      addons:
+        apt:
+          sources:
+            - george-edison55-precise-backports
+          packages:
+            - cmake
+            - cmake-data
+      before_install:
+        - pip install --user urllib3[secure] cpp-coveralls
+      install:
+        - mkdir build && cd build
+        - cmake -DCOVERALLS=ON -DCMAKE_BUILD_TYPE=Debug ..
+        - make
+        - cd ..
+      after_success: coveralls -e build/CMakeFiles -e build/vendor -e test -e vendor --gcov-options '\-lp'
+
     - os: linux
       compiler: gcc-4.9
       addons:
@@ -26,9 +43,8 @@ matrix:
             - valgrind
             - gcc-4.9
       install:
-        - mkdir build
-        - cd build
-        - cmake -DLTALLOC=0 ..
+        - mkdir build && cd build
+        - cmake -DCMAKE_BUILD_TYPE=Debug ..
         - make
         - cd ..
       script: valgrind --leak-check=full --track-origins=yes bin/jay test/hello.jay -ohello
@@ -71,9 +87,8 @@ matrix:
             - valgrind
             - clang-3.5
       install:
-        - mkdir build
-        - cd build
-        - cmake -DLTALLOC=0 ..
+        - mkdir build && cd build
+        - cmake DCMAKE_BUILD_TYPE=Debug ..
         - make
         - cd ..
       script: valgrind --leak-check=full --track-origins=yes bin/jay test/hello.jay -ohello
@@ -149,9 +164,8 @@ matrix:
       compiler: clang
       before_install: brew install valgrind
       install:
-        - mkdir build
-        - cd build
-        - cmake -DLTALLOC=0 ..
+        - mkdir build && cd build
+        - cmake DCMAKE_BUILD_TYPE=Debug ..
         - make
         - cd ..
       script: valgrind --leak-check=full --track-origins=yes bin/jay test/hello.jay -ohello

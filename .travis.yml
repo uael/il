@@ -13,7 +13,7 @@ matrix:
   include:
     # coverage build
     - os: linux
-      distro: trusty
+      compiler: clang
       addons:
         apt:
           sources:

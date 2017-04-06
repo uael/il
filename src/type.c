@@ -173,24 +173,14 @@ static void jl_array_dtor(jl_array_t *self) {
 }
 
 jl_type_t jl_compound(jl_entity_t entity) {
-  size_t m = 0, d;
-  jl_entity_r entities;
   jl_type_t type = {
     .kind = JL_TYPE_COMPOUND,
     .size = entity.size,
+    .align = entity.align,
     .compound.entity = xmalloc(sizeof(jl_entity_t))
   };
 
   *type.compound.entity = entity;
-  if (!jl_is(entity, JL_ENTITY_FUNC)) {
-    entities = jl_entity_fields(entity);
-    adt_vector_foreach(entities, entity) {
-        d = entity.align;
-        if (d > m) m = d;
-      }
-    assert(m);
-    type.align = m;
-  }
   return type;
 }
 

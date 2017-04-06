@@ -26,15 +26,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <limits.h>
+#include <assert.h>
 
 #include <adt/xmalloc.h>
-#include <assert.h>
 
 #include "entity.h"
 
 #include "expr.h"
 #include "stmt.h"
 #include "type.h"
+#include "compiler.h"
 
 void jl_field_dtor(jl_field_t *self);
 void jl_var_dtor(jl_var_t *self);
@@ -350,7 +351,215 @@ jl_entity_t jl_struct_anonymous(jl_field_t *fields) {
   return jl_struct(NULL, fields);
 }
 
+static void type_add_field(jl_entity_t *self, const char *name, jl_type_t type, short width);
+
+static void reset_field_alignment(jl_entity_t *self) {
+  int d;
+  size_t n;
+  const jl_entity_t *m;
+
+  assert(jl_pis(self, JL_ENTITY_STRUCT));
+  n = adt_vector_length(self->structure.fields);
+  if (n) {
+    m = &adt_vector_at(self->structure.fields, n - 1);
+    if (m->field.field_width) {
+      d = m->field.field_offset + m->field.field_width;
+      if (d < 32) {
+        type_add_field(self, NULL, jl_int(), (short) (32 - d));
+      }
+    } else if (self->size % 4 != 0) {
+      self->size += self->size % 4;
+    }
+  }
+}
+
+static size_t adjust_member_alignment(jl_entity_t *self, jl_type_t type) {
+  size_t align = 0;
+
+  if (jl_pis(self, JL_ENTITY_STRUCT)) {
+    align = type.align;
+    if (self->size % align) {
+      self->size += align - (self->size % align);
+      assert(self->size % align == 0);
+    }
+
+    align = self->size;
+  }
+  return align;
+}
+
+static void add_member(jl_entity_t *self, jl_entity_t m) {
+  jl_entity_r entities;
+
+  if (m.name && strcmp(m.name, "...") == 0) {
+    // TODO: va_args
+    exit(1);
+  } else {
+    if (m.name && jl_entity_field_lookup(*self, m.name)) {
+      jl_fatal_err(NULL, "Member '%s' already exists.", m.name);
+    }
+    switch (self->kind) {
+      case JL_ENTITY_STRUCT:
+        entities = self->structure.fields;
+        break;
+      case JL_ENTITY_UNION:
+        entities = self->u_structure.fields;
+        break;
+      default:
+        return;
+    }
+    adt_vector_push(entities, m);
+    if (m.type.size == 0) {
+      jl_fatal_err(NULL, "Member '%s' has incomplete type.", m.name);
+    }
+    if (LONG_MAX - m.field.offset < m.type.size) {
+      jl_fatal_err(NULL, "Object is too large.");
+    }
+    if (self->size < m.field.offset + m.type.size) {
+      self->size = m.field.offset + m.type.size;
+    }
+  }
+}
+
+static void type_add_member(jl_entity_t *self, const char *name, jl_type_t type) {
+  jl_entity_t m = jl_field(name, type);
+
+  m.field.offset = adjust_member_alignment(self, type);
+  m.name = name;
+  m.type = type;
+  add_member(self, m);
+}
+
+static int pack_field(const jl_entity_t *prev, jl_entity_t *m) {
+  short bits;
+
+  assert(prev);
+  bits = prev->field.field_offset + prev->field.field_width;
+  if (bits + m->field.field_width <= sizeof(int) * 8) {
+    m->field.offset = prev->field.offset;
+    m->field.field_offset = bits;
+    return 1;
+  }
+  return 0;
+}
+
+static size_t remove_anonymous_fields(jl_entity_t *self) {
+  int i;
+  size_t align, maxalign;
+  jl_field_t *m;
+  jl_entity_r entities;
+
+  switch (self->kind) {
+    case JL_ENTITY_STRUCT:
+      entities = self->structure.fields;
+      break;
+    case JL_ENTITY_UNION:
+      entities = self->u_structure.fields;
+      break;
+    default:
+      return 0;
+  }
+
+  maxalign = 0;
+  for (i = (int) (adt_vector_length(entities) - 1); i >= 0; --i) {
+    m = &adt_vector_at(entities, i).field;
+    if (!m->name) {
+      jl_entity_dtor(&adt_vector_at(entities, i));
+      adt_vector_erase(entities, i);
+    } else {
+      align = m->align;
+      if (align > maxalign) {
+        maxalign = align;
+      }
+    }
+  }
+
+  return maxalign;
+}
+
+static void type_add_field(jl_entity_t *self, const char *name, jl_type_t type, short width) {
+  jl_entity_t m;
+  const jl_entity_t *prev;
+
+  if (name && !width) {
+    jl_fatal_err(NULL, "Zero length field %s.", name);
+  }
+  if (jl_pis(self, JL_ENTITY_UNION) && !name) {
+    return;
+  }
+  m = jl_field(name, type);
+  m.field.field_width = width;
+  if (jl_pis(self, JL_ENTITY_STRUCT)) {
+    prev = &adt_vector_back(self->structure.fields);
+    if (!prev || !pack_field(prev, &m)) {
+      m.field.field_offset = 0;
+      m.field.offset = adjust_member_alignment(self, type);
+    }
+  }
+  if (!width) {
+    reset_field_alignment(self);
+  } else {
+    add_member(self, m);
+  }
+}
+
+void type_add_anonymous_member(jl_entity_t *self, jl_type_t type) {
+  int i;
+  size_t offset;
+  jl_entity_t m;
+  jl_entity_t *member;
+  jl_entity_r entities;
+
+  if (!jl_is(type, JL_TYPE_COMPOUND)) {
+    // TODO: handle error
+    exit(1);
+  }
+  member = type.compound.entity;
+  switch (member->kind) {
+    case JL_ENTITY_STRUCT:
+      entities = member->structure.fields;
+      break;
+    case JL_ENTITY_UNION:
+      entities = member->u_structure.fields;
+      break;
+    default:
+      return;
+  }
+  if (jl_pis(self, JL_ENTITY_STRUCT) && jl_pis(member, JL_ENTITY_UNION)) {
+    offset = adjust_member_alignment(self, type);
+    for (i = 0; i < adt_vector_size(entities); ++i) {
+      m = adt_vector_at(entities, i);
+      m.field.offset += offset;
+      add_member(self, m);
+    }
+  } else if (jl_pis(self, JL_ENTITY_UNION) && jl_pis(member, JL_ENTITY_STRUCT)) {
+    for (i = 0; i < adt_vector_size(entities); ++i) {
+      m = adt_vector_at(entities, i);
+      add_member(self, m);
+    }
+  } else {
+    for (i = 0; i < adt_vector_size(entities); ++i) {
+      m = adt_vector_at(entities, i);
+      type_add_member(self, m.name, m.type);
+    }
+  }
+}
+
+void type_seal(jl_entity_t *self) {
+  size_t align;
+
+  align = remove_anonymous_fields(self);
+  if (align == 0) {
+    // TODO: handle error
+    exit(1);
+  }
+  if (self->size % align) {
+    self->size += align - (self->size % align);
+  }
+}
+
 jl_entity_t jl_struct(const char *name, jl_field_t *fields) {
+  size_t m = 0;
   jl_entity_t field, entity = (jl_entity_t) {
     .kind = JL_ENTITY_STRUCT,
     .name = name
@@ -358,7 +567,6 @@ jl_entity_t jl_struct(const char *name, jl_field_t *fields) {
   if (fields) {
     while (fields->name) {
       field = jl_field(fields->name, fields->type);
-      entity.size += field.type.size;
       if (entity.size % field.field.offset) {
         entity.size += field.field.offset - (entity.size % field.field.offset);
         assert(entity.size % field.field.offset == 0);
@@ -367,9 +575,12 @@ jl_entity_t jl_struct(const char *name, jl_field_t *fields) {
       if (entity.size < field.field.offset + field.type.size) {
         entity.size = field.field.offset + field.type.size;
       }
+      if (field.align > m) m = field.align;
       adt_vector_push(entity.structure.fields, field);
       ++fields;
     }
+    assert(m);
+    entity.align = m;
   }
   return entity;
 }

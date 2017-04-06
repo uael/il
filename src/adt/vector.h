@@ -70,6 +70,9 @@
       : ((adt_vector_data(v) = xrealloc(adt_vector_data(v), sizeof(*adt_vector_data(v)) * adt_vector_capacity(v))), (v)) \
   )
 
+#define adt_vector_erase(v, i) \
+  memmove(adt_vector_data(v) + i, adt_vector_data(v) + i + 1, --adt_vector_size(v) * sizeof(*adt_vector_data(v)))
+
 #define adt_vector_grow(v, i) do { \
     size_t __s = (size_t) (i); \
     if (adt_vector_capacity(v) <= __s) { \
@@ -100,7 +103,7 @@
   } while (false)
 
 #define adt_vector_shift(v) \
-  memmove(adt_vector_data(v), adt_vector_data(v) + 1, --adt_vector_size(v) * sizeof(*adt_vector_data(v)))
+  adt_vector_erase(v, 0)
 
 #define adt_vector_clear(v) do { \
     memset(adt_vector_data(v), 0, adt_vector_capacity(v)); \

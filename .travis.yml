@@ -28,7 +28,7 @@ matrix:
         - cd ..
       after_success:
         # - lcov -d build/src -c
-        - cd build && bash <(curl -s https://codecov.io/bash) -R .
+        - cd build && bash <(curl -s https://codecov.io/bash) -R . -s .
 
     - os: linux
       compiler: gcc-4.9

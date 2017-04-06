@@ -11,6 +11,25 @@ script: bin/jay test/hello.jay -ohello
 
 matrix:
   include:
+    # coverity scan
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - george-edison55-precise-backports
+          packages:
+            - cmake
+            - cmake-data
+        coverity_scan:
+          project:
+            name: "jayl/jay"
+            description: "Build submitted via Travis CI"
+          build_command_prepend: "mkdir build && cd build && cmake .."
+          build_command:   "make && cd .."
+          branch_pattern: coverity_scan
+      install: - echo "coverity scan"
+      script: - echo "coverity scan"
+
     # coverage build
     - os: linux
       distro: trusty

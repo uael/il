@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(jay)
 
-option(COVERALLS "Turn on coveralls support" ON)
+option(COVERAGE "Turn on COVERAGE support" ON)
 
-if (COVERALLS)
+if (COVERAGE)
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} --coverage")
 endif()
 

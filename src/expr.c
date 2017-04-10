@@ -72,9 +72,11 @@ static void jl_exprs_dtor(jl_exprs_t *self) {
 jl_expr_t jl_id(jl_lloc_t lloc, const char *id, jl_type_t type) {
   return (jl_expr_t) {
     .kind = JL_EXPR_ID,
-    .lloc = lloc,
-    .type = type,
-    .id.id = id
+    .id = {
+      .id = id,
+      .lloc = lloc,
+      .type = type
+    }
   };
 }
 
@@ -98,8 +100,10 @@ jl_expr_t jl_const(jl_lloc_t lloc, jl_val_t value) {
   assert(jl_defined(value.type));
   return (jl_expr_t) {
     .kind = JL_EXPR_CONST,
-    .lloc = lloc,
-    .constant.value = value
+    .constant = {
+      .value = value,
+      .lloc = lloc
+    }
   };
 }
 
@@ -110,10 +114,12 @@ static void jl_const_dtor(jl_const_t *self) {
 jl_expr_t jl_unary(jl_lloc_t op_lloc, enum jl_op_n op, jl_expr_t operand) {
   jl_expr_t expr = (jl_expr_t) {
     .kind = JL_EXPR_UNARY,
-    .lloc = jl_lloc(op_lloc, operand.lloc),
-    .type = operand.type,
-    .unary.op = op,
-    .unary.operand = xmalloc(sizeof(jl_expr_t))
+    .unary = {
+      .op = op,
+      .operand = xmalloc(sizeof(jl_expr_t)),
+      .lloc = jl_lloc(op_lloc, operand.lloc),
+      .type = operand.type
+    }
   };
 
   *expr.unary.operand = operand;
@@ -123,10 +129,12 @@ jl_expr_t jl_unary(jl_lloc_t op_lloc, enum jl_op_n op, jl_expr_t operand) {
 jl_expr_t jl_cast(jl_lloc_t type_lloc, jl_type_t type, jl_expr_t operand) {
   jl_expr_t expr = (jl_expr_t) {
     .kind = JL_EXPR_UNARY,
-    .lloc = jl_lloc(type_lloc, operand.lloc),
-    .type = type,
-    .unary.op = JL_OP_CAST,
-    .unary.operand = xmalloc(sizeof(jl_expr_t))
+    .unary = {
+      .op = JL_OP_CAST,
+      .operand = xmalloc(sizeof(jl_expr_t)),
+      .lloc = jl_lloc(type_lloc, operand.lloc),
+      .type = type
+    }
   };
 
   *expr.unary.operand = operand;
@@ -145,11 +153,13 @@ static void jl_unary_dtor(jl_unary_t *self) {
 jl_expr_t jl_binary(enum jl_op_n op, jl_expr_t lhs, jl_expr_t rhs) {
   jl_expr_t expr = (jl_expr_t) {
     .kind = JL_EXPR_BINARY,
-    .lloc = jl_lloc(lhs.lloc, rhs.lloc),
-    .type = lhs.type,
-    .binary.op = op,
-    .binary.lhs = xmalloc(sizeof(jl_expr_t)),
-    .binary.rhs = xmalloc(sizeof(jl_expr_t))
+    .binary = {
+      .op = op,
+      .lhs = xmalloc(sizeof(jl_expr_t)),
+      .rhs = xmalloc(sizeof(jl_expr_t)),
+      .lloc = jl_lloc(lhs.lloc, rhs.lloc),
+      .type = lhs.type
+    }
   };
 
   *expr.binary.lhs = lhs;
@@ -169,11 +179,13 @@ static void jl_binary_dtor(jl_binary_t *self) {
 jl_expr_t jl_ternary(jl_expr_t lhs, jl_expr_t mhs, jl_expr_t rhs) {
   jl_expr_t expr = (jl_expr_t) {
     .kind = JL_EXPR_TERNARY,
-    .lloc = jl_lloc(lhs.lloc, rhs.lloc),
-    .type = mhs.type,
-    .ternary.lhs = xmalloc(sizeof(jl_expr_t)),
-    .ternary.mhs = xmalloc(sizeof(jl_expr_t)),
-    .ternary.rhs = xmalloc(sizeof(jl_expr_t))
+    .ternary = {
+      .lhs = xmalloc(sizeof(jl_expr_t)),
+      .mhs = xmalloc(sizeof(jl_expr_t)),
+      .rhs = xmalloc(sizeof(jl_expr_t)),
+      .lloc = jl_lloc(lhs.lloc, rhs.lloc),
+      .type = mhs.type
+    }
   };
 
   *expr.ternary.lhs = lhs;
@@ -197,10 +209,12 @@ static void jl_ternary_dtor(jl_ternary_t *self) {
 jl_expr_t jl_array_read(jl_expr_t lhs, jl_lloc_t pos_lloc, jl_expr_t pos) {
   jl_expr_t expr = (jl_expr_t) {
     .kind = JL_EXPR_ARRAY_READ,
-    .lloc = jl_lloc(lhs.lloc, pos_lloc),
-    .type = jl_type_deref(lhs.type),
-    .array_read.lhs = xmalloc(sizeof(jl_expr_t)),
-    .array_read.pos = xmalloc(sizeof(jl_expr_t))
+    .array_read = {
+      .lhs = xmalloc(sizeof(jl_expr_t)),
+      .pos = xmalloc(sizeof(jl_expr_t)),
+      .lloc = jl_lloc(lhs.lloc, pos_lloc),
+      .type = jl_type_deref(lhs.type)
+    }
   };
 
   *expr.array_read.lhs = lhs;
@@ -221,17 +235,19 @@ static void jl_array_read_dtor(jl_array_read_t *self) {
 jl_expr_t jl_array_write(jl_array_read_t array_read, jl_expr_t rhs) {
   jl_expr_t expr = (jl_expr_t) {
     .kind = JL_EXPR_ARRAY_WRITE,
-    .lloc = jl_lloc(array_read.lloc, rhs.lloc),
-    .array_write.array_read = array_read,
-    .array_write.rhs = xmalloc(sizeof(jl_expr_t))
+    .array_write = {
+      .read = array_read,
+      .rhs = xmalloc(sizeof(jl_expr_t)),
+    }
   };
 
+  expr.lloc = jl_lloc(array_read.lloc, rhs.lloc);
   *expr.array_write.rhs = rhs;
   return expr;
 }
 
 static void jl_array_write_dtor(jl_array_write_t *self) {
-  jl_array_read_dtor(&self->array_read);
+  jl_array_read_dtor(&self->read);
   jl_expr_dtor(self->rhs);
   xfree(self->rhs);
   self->rhs = NULL;
@@ -241,10 +257,12 @@ jl_expr_t jl_field_read(jl_expr_t lhs, jl_id_t id) {
   jl_field_t *field = jl_field_lookup(lhs.type, id.id);
   jl_expr_t expr = (jl_expr_t) {
     .kind = JL_EXPR_FIELD_READ,
-    .lloc = jl_lloc(lhs.lloc, id.lloc),
-    .type = field ? field->type : jl_type_undefined(),
-    .field_read.lhs = xmalloc(sizeof(jl_expr_t)),
-    .field_read.id = id
+    .field_read = {
+      .lhs = xmalloc(sizeof(jl_expr_t)),
+      .id = id,
+      .lloc = jl_lloc(lhs.lloc, id.lloc),
+      .type = field ? field->type : jl_type_undefined()
+    }
   };
 
   *expr.field_read.lhs = lhs;
@@ -261,17 +279,19 @@ static void jl_field_read_dtor(jl_field_read_t *self) {
 jl_expr_t jl_field_write(jl_field_read_t field_read, jl_expr_t rhs) {
   jl_expr_t expr = (jl_expr_t) {
     .kind = JL_EXPR_FIELD_WRITE,
-    .lloc = jl_lloc(field_read.lloc, rhs.lloc),
-    .field_write.field_read = field_read,
-    .field_write.rhs = xmalloc(sizeof(jl_expr_t))
+    .field_write = {
+      .read = field_read,
+      .rhs = xmalloc(sizeof(jl_expr_t))
+    }
   };
 
+  expr.lloc = jl_lloc(field_read.lloc, rhs.lloc);
   *expr.field_write.rhs = rhs;
   return expr;
 }
 
 static void jl_field_write_dtor(jl_field_write_t *self) {
-  jl_field_read_dtor(&self->field_read);
+  jl_field_read_dtor(&self->read);
   jl_expr_dtor(self->rhs);
   xfree(self->rhs);
   self->rhs = NULL;
@@ -280,9 +300,11 @@ static void jl_field_write_dtor(jl_field_write_t *self) {
 jl_expr_t jl_call(jl_expr_t lhs, jl_lloc_t args_lloc, jl_exprs_t args) {
   jl_expr_t expr = (jl_expr_t) {
     .kind = JL_EXPR_CALL,
-    .lloc = jl_lloc(lhs.lloc, args_lloc),
-    .call.lhs = xmalloc(sizeof(jl_expr_t)),
-    .call.args = args
+    .call = {
+      .lhs = xmalloc(sizeof(jl_expr_t)),
+      .args = args,
+      .lloc = jl_lloc(lhs.lloc, args_lloc)
+    }
   };
 
   *expr.call.lhs = lhs;

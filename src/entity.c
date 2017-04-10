@@ -40,10 +40,12 @@
 jl_entity_t jl_field(const char *name, jl_type_t type) {
   return (jl_entity_t) {
     .kind = JL_ENTITY_FIELD,
-    .type = type,
-    .size = type.size,
-    .align = type.align,
-    .field.offset = type.align
+    .field = {
+      .offset = type.align,
+      .type = type,
+      .size = type.size,
+      .align = type.align
+    }
   };
 }
 
@@ -71,11 +73,13 @@ jl_entity_t jl_var(const char *name, jl_type_t type, jl_expr_t initializer) {
   }
   return (jl_entity_t) {
     .kind = JL_ENTITY_VAR,
-    .name = name,
-    .type = type,
-    .size = type.size,
-    .align = type.align,
-    .variable.initializer = initializer
+    .variable = {
+      .initializer = initializer,
+      .name = name,
+      .type = type,
+      .size = type.size,
+      .align = type.align
+    }
   };
 }
 
@@ -104,12 +108,14 @@ jl_entity_t jl_param(unsigned position, const char *name, jl_type_t type, jl_exp
   }
   return (jl_entity_t) {
     .kind = JL_ENTITY_PARAM,
-    .name = name,
-    .type = type,
-    .size = type.size,
-    .align = type.align,
-    .parameter.position = position,
-    .parameter.initializer = initializer
+    .parameter = {
+      .position = position,
+      .initializer = initializer,
+      .name = name,
+      .type = type,
+      .size = type.size,
+      .align = type.align
+    }
   };
 }
 
@@ -141,9 +147,11 @@ jl_entity_t jl_func(jl_type_t return_type, const char *name, jl_param_t *params,
   jl_param_t param;
   jl_entity_t entity = (jl_entity_t) {
     .kind = JL_ENTITY_FUNC,
-    .name = name,
-    .type = return_type,
-    .function.body = body
+    .function = {
+      .body = body,
+      .name = name,
+      .return_type = return_type
+    }
   };
   if (params) while (params->name) {
     param = *params++;
@@ -171,8 +179,10 @@ jl_entity_t jl_enum(const char *name, jl_field_t *fields) {
   jl_field_t field;
   jl_entity_t entity = (jl_entity_t) {
     .kind = JL_ENTITY_ENUM,
-    .name = name,
-    .type = jl_int()
+    .enumerable = {
+      .name = name,
+      .type = jl_int()
+    }
   };
   entity.size = entity.type.size;
   entity.align = entity.type.align;
@@ -192,7 +202,7 @@ static void jl_enum_dtor(jl_enum_t *self) {
   adt_vector_dtor(self->vars);
 }
 
-static jl_entity_t *type_add_field(jl_entity_t *self, const char *name, jl_type_t type, short width);
+static jl_entity_t *type_add_field(jl_entity_t *self, const char *name, jl_type_t type, unsigned short width);
 
 static void reset_field_alignment(jl_entity_t *self) {
   int d;
@@ -312,7 +322,7 @@ static size_t remove_anonymous_fields(jl_entity_t *self) {
   return maxalign;
 }
 
-static jl_entity_t *type_add_field(jl_entity_t *self, const char *name, jl_type_t type, short width) {
+static jl_entity_t *type_add_field(jl_entity_t *self, const char *name, jl_type_t type, unsigned short width) {
   jl_entity_t m;
   const jl_entity_t *prev;
 
@@ -387,8 +397,10 @@ void type_seal(jl_entity_t *self) {
 jl_entity_t jl_struct(const char *name, jl_field_t *fields) {
   jl_entity_t entity = (jl_entity_t) {
     .kind = JL_ENTITY_STRUCT,
-    .name = name,
-    .size = 0
+    .structure = {
+      .name = name,
+      .size = 0
+    }
   };
 
   if (fields) {
@@ -417,8 +429,10 @@ void jl_struct_dtor(jl_struct_t *self) {
 jl_entity_t jl_union(const char *name, jl_field_t *fields) {
   jl_entity_t entity = (jl_entity_t) {
     .kind = JL_ENTITY_UNION,
-    .name = name,
-    .size = 0
+    .u_structure = {
+      .name = name,
+      .size = 0
+    }
   };
 
   if (fields) {

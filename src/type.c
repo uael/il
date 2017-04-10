@@ -134,9 +134,11 @@ jl_type_t jl_long_double(void) {
 jl_type_t jl_pointer(jl_type_t of) {
   jl_type_t type = {
     .kind = JL_TYPE_POINTER,
-    .size = 8,
-    .align = 8,
-    .pointer.of = xmalloc(sizeof(jl_type_t))
+    .pointer = {
+      .size = 8,
+      .align = 8,
+      .of = xmalloc(sizeof(jl_type_t))
+    }
   };
 
   *type.pointer.of = of;
@@ -151,10 +153,12 @@ static void jl_pointer_dtor(jl_pointer_t *self) {
 jl_type_t jl_array(jl_type_t of, jl_expr_t length) {
   jl_type_t type = {
     .kind = JL_TYPE_ARRAY,
-    .size = of.size,
-    .align = of.align,
-    .array.of = xmalloc(sizeof(jl_type_t)),
-    .array.length = xmalloc(sizeof(jl_expr_t))
+    .array = {
+      .size = of.size,
+      .align = of.align,
+      .of = xmalloc(sizeof(jl_type_t)),
+      .length = xmalloc(sizeof(jl_expr_t))
+    }
   };
 
   *type.array.of = of;
@@ -175,9 +179,11 @@ static void jl_array_dtor(jl_array_t *self) {
 jl_type_t jl_compound(jl_entity_t entity) {
   jl_type_t type = {
     .kind = JL_TYPE_COMPOUND,
-    .size = entity.size,
-    .align = entity.align,
-    .compound.entity = xmalloc(sizeof(jl_entity_t))
+    .compound = {
+      .size = entity.size,
+      .align = entity.align,
+      .entity = xmalloc(sizeof(jl_entity_t))
+    }
   };
 
   *type.compound.entity = entity;

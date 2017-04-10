@@ -264,7 +264,7 @@ struct jl_array_read {
 
 struct jl_array_write {
   union {
-    jl_array_read_t array_read;
+    jl_array_read_t read;
 
     /* only accessed, array_read field must be set. */
     struct {
@@ -288,7 +288,7 @@ struct jl_field_read {
 
 struct jl_field_write {
   union {
-    jl_field_read_t field_read;
+    jl_field_read_t read;
 
     /* only accessed, field_read field must be set. */
     struct {

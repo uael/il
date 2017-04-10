@@ -487,7 +487,6 @@ struct jl_stmt {
 
 
 typedef struct jl_entity jl_entity_t;
-typedef struct jl_entity jl_entity_t;
 typedef struct jl_field jl_field_t;
 typedef struct jl_var jl_var_t;
 typedef struct jl_param jl_param_t;

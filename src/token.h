@@ -73,6 +73,9 @@ struct jl_lloc {
   size_t begin, end;
 };
 
+#define jl_lloc(b, e) ((jl_lloc_t) {b.lexer, b.begin, e.end})
+#define jl_no_lloc() ((jl_lloc_t) {NULL, 0, 0})
+
 void jl_token_dtor(jl_token_t *self);
 
 jl_lloc_t jl_lloc_begin(struct jl_lexer_t *lexer);

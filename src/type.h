@@ -41,18 +41,18 @@ enum {
   JL_TYPE_MERGE_ERROR_BOTH_LONG_LONG_AND
 };
 
-jl_type_t jl_void();
-jl_type_t jl_bool();
-jl_type_t jl_char();
-jl_type_t jl_short();
-jl_type_t jl_int();
-jl_type_t jl_uint();
-jl_type_t jl_long();
-jl_type_t jl_ulong();
-jl_type_t jl_double();
-jl_type_t jl_float();
-jl_type_t jl_long_long();
-jl_type_t jl_long_double();
+jl_type_t jl_void(void);
+jl_type_t jl_bool(void);
+jl_type_t jl_char(void);
+jl_type_t jl_short(void);
+jl_type_t jl_int(void);
+jl_type_t jl_uint(void);
+jl_type_t jl_long(void);
+jl_type_t jl_ulong(void);
+jl_type_t jl_double(void);
+jl_type_t jl_float(void);
+jl_type_t jl_long_long(void);
+jl_type_t jl_long_double(void);
 jl_type_t jl_pointer(jl_type_t of);
 jl_type_t jl_array(jl_type_t of, jl_expr_t size);
 jl_type_t jl_compound(jl_entity_t entity);

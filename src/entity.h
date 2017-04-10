@@ -28,7 +28,7 @@
 
 #include "ir.h"
 
-#define jl_entity_undefined() ((jl_entity_t) {JL_ENTITY_UNDEFINED})
+#define jl_entity_undefined() ((jl_entity_t) {.kind = JL_ENTITY_UNDEFINED})
 #define jl_entity_undef(eptr) (*(eptr) = jl_entity_undefined())
 
 jl_entity_t jl_field(const char *name, jl_type_t type);
@@ -55,7 +55,6 @@ void jl_entity_dtor(jl_entity_t *self);
 bool jl_entity_equals(jl_entity_t a, jl_entity_t b);
 jl_entity_r jl_entity_fields(jl_entity_t self);
 jl_field_t *jl_entity_field_lookup(jl_entity_t self, const char *name);
-
-void jl_entity_add_field(jl_entity_t *self, const char *name, jl_type_t type);
+jl_entity_t *jl_entity_add_field(jl_entity_t *self, const char *name, jl_type_t type, short width);
 
 #endif /* JL_ENTITY_H__ */

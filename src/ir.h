@@ -125,7 +125,11 @@ struct jl_type {
   enum jl_type_n kind;
 };
 
+struct jl_field;
+
+typedef struct jl_val jl_val_t;
 typedef struct jl_expr jl_expr_t;
+typedef struct jl_exprs jl_exprs_t;
 typedef struct jl_id jl_id_t;
 typedef struct jl_const jl_const_t;
 typedef struct jl_unary jl_unary_t;
@@ -136,12 +140,12 @@ typedef struct jl_array_write jl_array_write_t;
 typedef struct jl_field_read jl_field_read_t;
 typedef struct jl_field_write jl_field_write_t;
 typedef struct jl_call jl_call_t;
-typedef struct jl_exprs jl_exprs_t;
 
 typedef adt_vector_of(jl_expr_t) jl_expr_r;
 
 enum jl_expr_n {
   JL_EXPR_UNDEFINED = 0,
+  JL_EXPR_EXPRS,
   JL_EXPR_ID,
   JL_EXPR_CONST,
   JL_EXPR_UNARY,
@@ -151,8 +155,7 @@ enum jl_expr_n {
   JL_EXPR_ARRAY_WRITE,
   JL_EXPR_FIELD_READ,
   JL_EXPR_FIELD_WRITE,
-  JL_EXPR_CALL,
-  JL_EXPR_LIST
+  JL_EXPR_CALL
 };
 
 enum jl_op_n {
@@ -183,6 +186,24 @@ enum jl_op_n {
   JL_OP_NEG     /* l ~ r        */
 };
 
+struct jl_val {
+  jl_type_t type;
+  union {
+    const char *s;
+    float f;
+    double d;
+    long double ld;
+    unsigned long int ul;
+  };
+};
+
+struct jl_exprs {
+  jl_lloc_t lloc;
+  jl_type_t type;
+
+  jl_expr_r vector;
+};
+
 struct jl_id {
   jl_lloc_t lloc;
   jl_type_t type;
@@ -193,14 +214,21 @@ struct jl_id {
 
 struct jl_const {
   jl_lloc_t lloc;
-  jl_type_t type;
 
   union {
-    const char *s;
-    float f;
-    double d;
-    long double ld;
-    unsigned long int ul;
+    jl_val_t value;
+
+    /* only accessed, value field must be set. */
+    struct {
+      jl_type_t type;
+      union {
+        const char *s;
+        float f;
+        double d;
+        long double ld;
+        unsigned long int ul;
+      };
+    };
   };
 };
 
@@ -235,28 +263,44 @@ struct jl_array_read {
 };
 
 struct jl_array_write {
-  jl_lloc_t lloc;
-  jl_type_t type;
+  union {
+    jl_array_read_t array_read;
 
-  jl_expr_t *lhs, *pos, *rhs;
+    /* only accessed, array_read field must be set. */
+    struct {
+      jl_lloc_t lloc;
+      jl_type_t type;
+
+      jl_expr_t *lhs, *pos;
+    };
+  };
+
+  jl_expr_t *rhs;
 };
 
 struct jl_field_read {
   jl_lloc_t lloc;
   jl_type_t type;
 
-  bool ptr;
-  jl_expr_t *lhs, *field_expr;
-  struct jl_entity *field;
+  jl_expr_t *lhs;
+  jl_id_t id;
 };
 
 struct jl_field_write {
-  jl_lloc_t lloc;
-  jl_type_t type;
+  union {
+    jl_field_read_t field_read;
 
-  bool ptr;
-  jl_expr_t *lhs, *field_expr, *value;
-  struct jl_entity *field;
+    /* only accessed, field_read field must be set. */
+    struct {
+      jl_lloc_t lloc;
+      jl_type_t type;
+
+      jl_expr_t *lhs;
+      jl_id_t id;
+    };
+  };
+
+  jl_expr_t *rhs;
 };
 
 struct jl_call {
@@ -264,15 +308,7 @@ struct jl_call {
   jl_type_t type;
 
   jl_expr_t *lhs;
-  jl_expr_r args;
-  struct jl_entity *func;
-};
-
-struct jl_exprs {
-  jl_lloc_t lloc;
-  jl_type_t type;
-
-  jl_expr_r exprs;
+  jl_exprs_t args;
 };
 
 struct jl_expr {
@@ -281,6 +317,7 @@ struct jl_expr {
       jl_lloc_t lloc;
       jl_type_t type;
     };
+    jl_exprs_t exprs;
     jl_id_t id;
     jl_const_t constant;
     jl_unary_t unary;
@@ -291,11 +328,9 @@ struct jl_expr {
     jl_field_read_t field_read;
     jl_field_write_t field_write;
     jl_call_t call;
-    jl_exprs_t list;
   };
   enum jl_expr_n kind;
 };
-
 
 typedef struct jl_stmt jl_stmt_t;
 typedef struct jl_stmt_expr jl_stmt_expr_t;
@@ -483,7 +518,7 @@ struct jl_field {
   const char *name;
 
   size_t offset;
-  short field_width, field_offset;
+  unsigned short field_width, field_offset;
 };
 
 struct jl_var {

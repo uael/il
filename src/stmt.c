@@ -31,10 +31,6 @@
 #include "expr.h"
 #include "type.h"
 
-jl_stmt_t jl_stmt_undefined() {
-  return (jl_stmt_t) {JL_STMT_UNDEFINED};
-}
-
 void jl_stmt_dtor(jl_stmt_t *self) {
 
 }

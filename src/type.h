@@ -26,38 +26,44 @@
 #ifndef   JL_TYPE_H__
 # define  JL_TYPE_H__
 
-#include "entity_t.h"
-#include "expr_t.h"
-#include "stmt_t.h"
-#include "type_t.h"
+#include "ir.h"
 
+#define jl_type_undefined() ((jl_type_t) {.kind = JL_TYPE_UNDEFINED})
+#define jl_type_undef(tptr) (*(tptr) = jl_type_undefined())
+
+#define jl_type_specified(t, by) ((t).specifiers & JL_TYPE_SPECIFIER_ ## by)
+#define jl_type_qualified(t, by) ((t).qualifiers & JL_TYPE_QUALIFIER_ ## by)
+
+enum {
+  JL_TYPE_MERGE_ERROR_NONE = 0,
+  JL_TYPE_MERGE_ERROR_TWO_OR_MORE_DATA_TYPE,
+  JL_TYPE_MERGE_ERROR_BOTH_LONG_AND,
+  JL_TYPE_MERGE_ERROR_BOTH_LONG_LONG_AND
+};
+
+jl_type_t jl_void(void);
+jl_type_t jl_bool(void);
+jl_type_t jl_char(void);
+jl_type_t jl_short(void);
+jl_type_t jl_int(void);
+jl_type_t jl_uint(void);
+jl_type_t jl_long(void);
+jl_type_t jl_ulong(void);
+jl_type_t jl_double(void);
+jl_type_t jl_float(void);
+jl_type_t jl_long_long(void);
+jl_type_t jl_long_double(void);
+jl_type_t jl_pointer(jl_type_t of);
+jl_type_t jl_array(jl_type_t of, jl_expr_t size);
+jl_type_t jl_compound(jl_entity_t entity);
+
+void jl_type_dtor(jl_type_t *self);
+bool jl_type_is_ref(jl_type_t type);
+bool jl_type_is_func(jl_type_t type);
+bool jl_type_equals(jl_type_t a, jl_type_t b);
+jl_type_t jl_type_deref(jl_type_t a);
 jl_entity_r jl_type_fields(jl_type_t self);
 jl_field_t *jl_field_lookup(jl_type_t self, const char *name);
-
-struct jl_pointer_t {
-  unsigned refs;
-  jl_type_t of;
-};
-
-jl_type_t jl_pointer(jl_type_t of);
-void jl_pointer_init(jl_type_t *self, jl_type_t of);
-
-struct jl_array_t {
-  unsigned refs;
-  jl_type_t of;
-  jl_expr_t size;
-};
-
-jl_type_t jl_array(jl_type_t of);
-jl_type_t jl_narray(jl_type_t of, jl_expr_t size);
-void jl_array_init(jl_type_t *self, jl_type_t of, jl_expr_t size);
-
-struct jl_compound_t {
-  unsigned refs;
-  jl_entity_t entity;
-};
-
-jl_type_t jl_compound(jl_entity_t entity);
-void jl_compound_init(jl_type_t *self, jl_entity_t entity);
+unsigned jl_type_merge(jl_type_t *self, enum jl_type_n with);
 
 #endif /* JL_TYPE_H__ */

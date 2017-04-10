@@ -126,6 +126,7 @@ static jl_expr_t primary_expression(jl_parser_t *self, jl_program_t *out) {
   jl_sym_t *symbol;
   jl_token_t token;
   jl_expr_t r1, r2;
+  jl_lloc_t lloc = jl_lloc_begin(self->lexer);
 
   switch ((token = jl_lexer_peek(self->lexer)).type) {
     case C_TOK_IDENTIFIER:
@@ -135,12 +136,12 @@ static jl_expr_t primary_expression(jl_parser_t *self, jl_program_t *out) {
         jl_parse_err(self->compiler, token.loc, "Undefined symbol '%s'", token.value);
       }
       if (symbol->flags & C_TOKEN_FLAG_ENUMERATION_CONSTANT) {
-        return jl_u(symbol->entity, var)->initializer;
+        return symbol->entity.variable.initializer;
       }
-      return jl_id(symbol->id, jl_entity_type(symbol->entity));
+      return jl_id(jl_lloc_end(lloc), symbol->id, symbol->entity.type);
     case C_TOK_NUMBER:
       jl_lexer_next(self->lexer);
-      switch (jl_const_parse(token.value, token.length, &r2)) {
+      switch (jl_const_parse(jl_lloc_end(lloc), token.value, token.length, &r2)) {
         case ERANGE:
           jl_parse_err(self->compiler, token.loc, "Numeric literal '%s' is out of range", token.value);
         case 1:
@@ -151,20 +152,20 @@ static jl_expr_t primary_expression(jl_parser_t *self, jl_program_t *out) {
       return r2;
     case C_TOK_STRING:
       jl_lexer_next(self->lexer);
-      return jl_const_string(token.value);
+      return jl_const_string(jl_lloc_end(lloc), token.value);
     case C_TOK_FUNC_NAME:
-      if (!(symbol = self->scope->sym) || !jl_entity_is_func(symbol->entity)) {
+      if (!(symbol = self->scope->sym) || !jl_is(symbol->entity, JL_ENTITY_FUNC)) {
         jl_parse_err(self->compiler, token.loc,
           "access of __func__ outside of function"
         );
       }
       jl_lexer_next(self->lexer);
-      return jl_const_string(jl_u(symbol->entity, func)->name);
+      return jl_const_string(jl_lloc_end(lloc), symbol->entity.name);
     case '(':
       jl_lexer_next(self->lexer);
       r1 = expression(self, out);
       jl_lexer_consume(self->lexer, ')');
-      return jl_unary(JL_OP_EN, r1);
+      return jl_unary(jl_lloc_end(lloc), JL_OP_EN, r1);
     default:
       jl_parse_err(self->compiler, token.loc,
         "Unexpected '%s', not a valid primary expression",
@@ -176,9 +177,11 @@ static jl_expr_t primary_expression(jl_parser_t *self, jl_program_t *out) {
 static jl_expr_t postfix_expression(jl_parser_t *self, jl_program_t *out) {
   jl_token_t token;
   jl_expr_t r1, r2;
+  jl_lloc_t lloc;
 
   r1 = primary_expression(self, out);
   while (true) {
+    lloc = jl_lloc_begin(self->lexer);
     switch ((token = jl_lexer_peek(self->lexer)).type) {
       case '[':
         if (!jl_type_is_ref(r1.type)) {
@@ -187,7 +190,10 @@ static jl_expr_t postfix_expression(jl_parser_t *self, jl_program_t *out) {
           );
         }
         jl_lexer_next(self->lexer);
-        r1 = jl_array_read(r1, expression(self, out));
+        r2 = expression(self, out);
+        jl_lexer_consume(self->lexer, ']');
+        r1 = jl_array_read(r1, jl_lloc_end(lloc), r2);
+        break;
       case '(': {
         unsigned i;
         jl_entity_t param;
@@ -195,14 +201,14 @@ static jl_expr_t postfix_expression(jl_parser_t *self, jl_program_t *out) {
         jl_expr_r args = (jl_expr_r) {0};
         jl_type_t type = r1.type;
 
-        if (jl_type_is_pointer(type) && jl_type_is_func(jl_type_pointer(type)->of)) {
-          type = jl_type_pointer(type)->of;
+        if (jl_is(type, JL_TYPE_POINTER) && jl_type_is_func(*type.pointer.of)) {
+          type = *type.pointer.of;
         } else if (!jl_type_is_func(type)) {
           jl_parse_err(self->compiler, token.loc,
             "Expression must have type pointer to function"
           );
         }
-        func = jl_u(jl_u(type, compound)->entity, func);
+        func = &type.compound.entity->function;
         jl_lexer_next(self->lexer);
         for (i = 0; i < adt_vector_size(func->params); ++i) {
           if (jl_lexer_peek(self->lexer).type == ')') {
@@ -213,8 +219,8 @@ static jl_expr_t postfix_expression(jl_parser_t *self, jl_program_t *out) {
           }
           param = adt_vector_at(func->params, i);
           r2 = assignment_expression(self, out);
-          if (!jl_type_equals(r2.type, jl_entity_type(param))) {
-            r2 = jl_cast(jl_entity_type(param), r2);
+          if (!jl_type_equals(r2.type, param.type)) {
+            r2 = jl_cast(r2.lloc, param.type, r2);
           }
           adt_vector_push(args, r2);
           if (i < adt_vector_size(func->params) - 1) {
@@ -222,7 +228,8 @@ static jl_expr_t postfix_expression(jl_parser_t *self, jl_program_t *out) {
           }
         }
         jl_lexer_consume(self->lexer, ')');
-        r1 = jl_call(r1, args);
+        adt_vector_push(args, jl_expr_undefined());
+        r1 = jl_call(r1, jl_lloc_end(lloc), jl_exprs(args.data).exprs);
         break;
       }
       case '.': {
@@ -237,7 +244,7 @@ static jl_expr_t postfix_expression(jl_parser_t *self, jl_program_t *out) {
             token.value
           );
         }
-        r1 = jl_field_read(r1, jl_id(field->name, field->type), field->field_width, field->field_offset);
+        r1 = jl_field_read(r1, jl_id(jl_lloc_end(lloc), field->name, field->type).id);
         break;
       }
       case C_TOK_PTR_OP: {
@@ -245,7 +252,7 @@ static jl_expr_t postfix_expression(jl_parser_t *self, jl_program_t *out) {
         jl_field_t *field;
 
         jl_lexer_next(self->lexer);
-        if (!jl_type_is_pointer(type = r1.type)) {
+        if (!jl_is(type = r1.type, JL_TYPE_POINTER)) {
           jl_parse_err(self->compiler, token.loc,
             "Invalid access on non pointer element '%s'",
             token.value
@@ -259,7 +266,7 @@ static jl_expr_t postfix_expression(jl_parser_t *self, jl_program_t *out) {
             token.value
           );
         }
-        r1 = jl_field_read(r1, jl_id(field->name, field->type), field->field_width, field->field_offset);
+        r1 = jl_field_read(r1, jl_id(jl_lloc_end(lloc), field->name, field->type).id);
         break;
       }
       default:
@@ -271,6 +278,7 @@ static jl_expr_t postfix_expression(jl_parser_t *self, jl_program_t *out) {
 static jl_expr_t unary_expression(jl_parser_t *self, jl_program_t *out) {
   jl_expr_t r1;
   enum jl_op_n op;
+  jl_lloc_t lloc = jl_lloc_begin(self->lexer);
 
   switch (jl_lexer_peek(self->lexer).type) {
     case '&':
@@ -298,16 +306,18 @@ static jl_expr_t unary_expression(jl_parser_t *self, jl_program_t *out) {
       return postfix_expression(self, out);
     self_assign:
       jl_lexer_next(self->lexer);
+      lloc = jl_lloc_end(lloc);
       r1 = unary_expression(self, out);
-      return jl_unary(JL_OP_EN, jl_binary(JL_OP_ASSIGN, r1, jl_binary(op, r1, jl_const_int(1))));
+      return jl_unary(lloc, JL_OP_EN, jl_binary(JL_OP_ASSIGN, r1, jl_binary(op, r1, jl_const_int(r1.lloc, 1))));
   }
   jl_lexer_next(self->lexer);
-  return jl_unary(op, cast_expression(self, out));
+  return jl_unary(jl_lloc_end(lloc), op, cast_expression(self, out));
 }
 
 static jl_expr_t cast_expression(jl_parser_t *self, jl_program_t *out) {
   jl_type_t type;
   jl_token_t token;
+  jl_lloc_t lloc = jl_lloc_begin(self->lexer);
 
   if ((token = jl_lexer_peek(self->lexer)).type == '(') {
     jl_lexer_next(self->lexer);
@@ -316,7 +326,7 @@ static jl_expr_t cast_expression(jl_parser_t *self, jl_program_t *out) {
       return unary_expression(self, out);
     }
     jl_lexer_consume(self->lexer, ')');
-    return jl_cast(type, cast_expression(self, out));
+    return jl_cast(jl_lloc_end(lloc), type, cast_expression(self, out));
   }
 
   return unary_expression(self, out);
@@ -565,7 +575,7 @@ static jl_expr_t assignment_expression(jl_parser_t *self, jl_program_t *out) {
     default:
       return r1;
   }
-  if (jl_expr_is_binary(r1)) {
+  if (jl_is(r1, JL_EXPR_BINARY)) {
     jl_parse_err(self->compiler, jl_lexer_peek(self->lexer).loc,
       "Unexpected left assign operand"
     );
@@ -585,10 +595,10 @@ static jl_expr_t expression(jl_parser_t *self, jl_program_t *out) {
       return r1;
     }
     jl_lexer_next(self->lexer);
-    if (!jl_expr_is_list(r1)) {
+    if (!jl_is(r1, JL_EXPR_EXPRS)) {
       r1 = jl_exprs_start(r1);
     }
-    adt_vector_push(jl_u(r1, list)->exprs, assignment_expression(self, out));
+    adt_vector_push(r1.exprs.vector, assignment_expression(self, out));
   }
 }
 
@@ -671,15 +681,15 @@ static jl_type_t declaration_specifiers(jl_parser_t *self, jl_program_t *out) {
 static jl_type_t type_specifier(jl_parser_t *self, jl_program_t *out) {
   jl_token_t token;
   jl_type_t type = jl_type_undefined();
-  enum jl_type_n type_kind;
+  //enum jl_type_n type_kind;
 
   while (true) {
     switch ((token = jl_lexer_peek(self->lexer)).type) {
       case C_TOK_VOID:
-        type_kind = JL_TYPE_VOID;
+        //type_kind = JL_TYPE_VOID;
         goto dft_literal;
       case C_TOK_CHAR:
-        type_kind = JL_TYPE_CHAR;
+        //type_kind = JL_TYPE_CHAR;
         goto dft_literal;
       default:
         return type;
@@ -690,7 +700,6 @@ static jl_type_t type_specifier(jl_parser_t *self, jl_program_t *out) {
           );
         }
         jl_lexer_next(self->lexer);
-        jl_type_switch(&type, type_kind);
         break;
     }
   }

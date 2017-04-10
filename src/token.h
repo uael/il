@@ -56,16 +56,13 @@ struct jl_loc {
 };
 
 struct jl_token {
-  unsigned kind : 8;
+  unsigned int kind : 4;
   char type;
-  const char *name;
-  const char *value;
+  const char *name, *value;
   size_t cursor;
   jl_loc_t loc;
   uint32_t length, leading_ws;
 };
-
-void jl_token_dtor(jl_token_t *self);
 
 struct jl_rtoken {
   jl_token_t begin, end;
@@ -75,6 +72,11 @@ struct jl_lloc {
   struct jl_lexer_t *lexer;
   size_t begin, end;
 };
+
+#define jl_lloc(b, e) ((jl_lloc_t) {b.lexer, b.begin, e.end})
+#define jl_no_lloc() ((jl_lloc_t) {NULL, 0, 0})
+
+void jl_token_dtor(jl_token_t *self);
 
 jl_lloc_t jl_lloc_begin(struct jl_lexer_t *lexer);
 jl_lloc_t jl_lloc_end(jl_lloc_t self);

@@ -26,123 +26,34 @@
 #ifndef   JL_EXPR_H__
 # define  JL_EXPR_H__
 
-#include "entity_t.h"
-#include "expr_t.h"
-#include "stmt_t.h"
-#include "type_t.h"
+#include "ir.h"
 
-struct jl_expr_id_t {
-  unsigned refs;
-  const char *id;
-  bool is_keyword;
-};
+#define jl_expr_undefined() ((jl_expr_t) {.kind = JL_EXPR_UNDEFINED})
+#define jl_expr_undef(eptr) (*(eptr) = jl_expr_undefined())
 
-jl_expr_t jl_id(const char *id, jl_type_t type);
-void jl_id_init(jl_expr_t *self, const char *id, jl_type_t type);
+#define jl_val(vtype, val) ((jl_val_t) {.type = vtype, val})
 
-struct jl_expr_const_t {
-  unsigned refs;
-  union {
-    const char *_s;
-    float _f;
-    double _d;
-    long double _ld;
-    unsigned long int _ul;
-  } u;
-};
-
-jl_expr_t jl_const_int(int d);
-jl_expr_t jl_const_float(float f);
-jl_expr_t jl_const_string(const char *s);
-void jl_const_init(jl_expr_t *self, jl_type_t type);
-int jl_const_parse(const char *s, size_t len, jl_expr_t *out);
-
-struct jl_expr_unary_t {
-  unsigned refs;
-  enum jl_op_n op;
-  jl_expr_t operand;
-};
-
-jl_expr_t jl_unary(enum jl_op_n op, jl_expr_t operand);
-jl_expr_t jl_cast(jl_type_t type, jl_expr_t operand);
-void jl_unary_init(jl_expr_t *self, enum jl_op_n op, jl_expr_t operand);
-
-struct jl_expr_binary_t {
-  unsigned refs;
-  enum jl_op_n op;
-  jl_expr_t lhs, rhs;
-};
-
+jl_expr_t jl_exprs(jl_expr_t *exprs);
+jl_expr_t jl_exprs_start(jl_expr_t expr);
+jl_expr_t jl_id(jl_lloc_t lloc, const char *id, jl_type_t type);
+jl_expr_t jl_const_int(jl_lloc_t lloc, int d);
+jl_expr_t jl_const_float(jl_lloc_t lloc, float f);
+jl_expr_t jl_const_string(jl_lloc_t lloc, const char *s);
+jl_expr_t jl_const(jl_lloc_t lloc, jl_val_t value);
+jl_expr_t jl_unary(jl_lloc_t op_lloc, enum jl_op_n op, jl_expr_t operand);
+jl_expr_t jl_cast(jl_lloc_t type_lloc, jl_type_t type, jl_expr_t operand);
 jl_expr_t jl_binary(enum jl_op_n op, jl_expr_t lhs, jl_expr_t rhs);
-void jl_binary_init(jl_expr_t *self, enum jl_op_n op, jl_expr_t lhs, jl_expr_t rhs);
-
-struct jl_expr_ternary_t {
-  unsigned refs;
-  jl_expr_t lhs, mhs, rhs;
-};
-
 jl_expr_t jl_ternary(jl_expr_t lhs, jl_expr_t mhs, jl_expr_t rhs);
-void jl_ternary_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t mhs, jl_expr_t rhs);
+jl_expr_t jl_array_read(jl_expr_t lhs, jl_lloc_t pos_lloc, jl_expr_t pos);
+jl_expr_t jl_array_write(jl_array_read_t array_read, jl_expr_t rhs);
+jl_expr_t jl_field_read(jl_expr_t lhs, jl_id_t id);
+jl_expr_t jl_field_write(jl_field_read_t field_read, jl_expr_t rhs);
+jl_expr_t jl_call(jl_expr_t lhs, jl_lloc_t args_lloc, jl_exprs_t args);
 
-struct jl_expr_array_read_t {
-  unsigned refs;
-  jl_expr_t lhs, pos;
-};
-
-jl_expr_t jl_array_read(jl_expr_t lhs, jl_expr_t pos);
-void jl_array_read_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t pos);
-
-struct jl_expr_array_write_t {
-  unsigned refs;
-  jl_expr_t lhs, pos, rhs;
-};
-
-jl_expr_t jl_array_write(jl_expr_t lhs, jl_expr_t pos, jl_expr_t rhs);
-void jl_array_write_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t pos, jl_expr_t rhs);
-
-struct jl_expr_field_read_t {
-  unsigned refs;
-  bool ptr;
-  jl_expr_t lhs;
-  jl_expr_t field;
-  short width, offset;
-};
-
-jl_expr_t jl_field_read(jl_expr_t lhs, jl_expr_t field, short width, short offset);
-void jl_field_read_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_t field, short width, short offset);
-
-struct jl_expr_field_write_t {
-  unsigned refs;
-  bool ptr;
-  jl_expr_t lhs, rhs;
-  jl_expr_t field;
-  short width, offset;
-};
-
-jl_expr_t jl_field_write(jl_expr_t lhs, bool ptr, jl_expr_t field, jl_expr_t rhs);
-void jl_field_write_init(jl_expr_t *self, jl_expr_t lhs, bool ptr, jl_expr_t field, jl_expr_t rhs);
-
-struct jl_expr_call_t {
-  unsigned refs;
-  jl_expr_t lhs;
-  jl_expr_r args;
-};
-
-jl_expr_t jl_call(jl_expr_t lhs, jl_expr_r args);
-void jl_call_init(jl_expr_t *self, jl_expr_t lhs, jl_expr_r args);
-
-struct jl_expr_list_t {
-  unsigned refs;
-  jl_expr_r exprs;
-};
-
-jl_expr_t jl_exprs(jl_expr_r exprs);
-jl_expr_t jl_exprs_start(jl_expr_t first);
-void jl_exprs_init(jl_expr_t *self, jl_expr_r exprs);
-size_t jl_exprs_length(jl_expr_t *self);
-void jl_exprs_push(jl_expr_t *self, jl_expr_t expr);
-jl_expr_t jl_exprs_pop(jl_expr_t *self);
-void jl_exprs_unshift(jl_expr_t *self, jl_expr_t expr);
-jl_expr_t jl_exprs_shift(jl_expr_t *self);
+void jl_expr_dtor(jl_expr_t *self);
+bool jl_expr_is_constant(jl_expr_t self);
+int jl_const_parse(jl_lloc_t lloc, const char *s, size_t len, jl_expr_t *out);
+long jl_eval_long(jl_expr_t expr);
+unsigned long jl_eval_ulong(jl_expr_t expr);
 
 #endif /* JL_EXPR_H__ */

@@ -36,6 +36,7 @@ struct jl_stmt;
 struct jl_type;
 
 typedef struct jl_type jl_type_t;
+typedef struct jl_literal jl_literal_t;
 typedef struct jl_pointer jl_pointer_t;
 typedef struct jl_array jl_array_t;
 typedef struct jl_compound jl_compound_t;
@@ -81,6 +82,14 @@ enum jl_type_qualifier_n {
   JL_TYPE_QUALIFIER_ATOMIC = 1 << 3
 };
 
+struct jl_literal {
+  jl_lloc_t lloc;
+  size_t size, align;
+  jl_type_t *next;
+  enum jl_type_specifier_n specifiers;
+  enum jl_type_qualifier_n qualifiers;
+};
+
 struct jl_pointer {
   jl_lloc_t lloc;
   size_t size, align;
@@ -118,6 +127,7 @@ struct jl_type {
       enum jl_type_specifier_n specifiers;
       enum jl_type_qualifier_n qualifiers;
     };
+    jl_literal_t literal;
     jl_pointer_t pointer;
     jl_array_t array;
     jl_compound_t compound;

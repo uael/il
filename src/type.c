@@ -36,98 +36,122 @@
 jl_type_t jl_void(void) {
   return (jl_type_t) {
     .kind = JL_TYPE_VOID,
-    .size = 0,
-    .align = 0
+    .literal = {
+      .size = 0,
+      .align = 0
+    }
   };
 }
 
 jl_type_t jl_bool(void) {
   return (jl_type_t) {
     .kind = JL_TYPE_BOOL,
-    .size = 1,
-    .align = 1
+    .literal = {
+      .size = 1,
+      .align = 1
+    }
   };
 }
 
 jl_type_t jl_char(void) {
   return (jl_type_t) {
     .kind = JL_TYPE_CHAR,
-    .size = 1,
-    .align = 1
+    .literal = {
+      .size = 1,
+      .align = 1
+    }
   };
 }
 
 jl_type_t jl_short(void) {
   return (jl_type_t) {
     .kind = JL_TYPE_SHORT,
-    .size = 2,
-    .align = 2
+    .literal = {
+      .size = 2,
+      .align = 2
+    }
   };
 }
 
 jl_type_t jl_int(void) {
   return (jl_type_t) {
     .kind = JL_TYPE_INT,
-    .size = 4,
-    .align = 4
+    .literal = {
+      .size = 4,
+      .align = 4
+    }
   };
 }
 
 jl_type_t jl_uint(void) {
   return (jl_type_t) {
     .kind = JL_TYPE_INT,
-    .size = 4,
-    .align = 4,
-    .specifiers = JL_TYPE_SPECIFIER_UNSIGNED
+    .literal = {
+      .size = 4,
+      .align = 4,
+      .specifiers = JL_TYPE_SPECIFIER_UNSIGNED
+    }
   };
 }
 
 jl_type_t jl_long(void) {
   return (jl_type_t) {
     .kind = JL_TYPE_LONG,
-    .size = 8,
-    .align = 8
+    .literal = {
+      .size = 8,
+      .align = 8
+    }
   };
 }
 
 jl_type_t jl_ulong(void) {
   return (jl_type_t) {
     .kind = JL_TYPE_LONG,
-    .size = 8,
-    .align = 8,
-    .specifiers = JL_TYPE_SPECIFIER_UNSIGNED
+    .literal = {
+      .size = 8,
+      .align = 8,
+      .specifiers = JL_TYPE_SPECIFIER_UNSIGNED
+    }
   };
 }
 
 jl_type_t jl_double(void) {
   return (jl_type_t) {
     .kind = JL_TYPE_DOUBLE,
-    .size = 8,
-    .align = 8
+    .literal = {
+      .size = 8,
+      .align = 8
+    }
   };
 }
 
 jl_type_t jl_float(void) {
   return (jl_type_t) {
     .kind = JL_TYPE_FLOAT,
-    .size = 4,
-    .align = 4
+    .literal = {
+      .size = 4,
+      .align = 4
+    }
   };
 }
 
 jl_type_t jl_long_long(void) {
   return (jl_type_t) {
     .kind = JL_TYPE_LONG_LONG,
-    .size = 8,
-    .align = 8
+    .literal = {
+      .size = 8,
+      .align = 8
+    }
   };
 }
 
 jl_type_t jl_long_double(void) {
   return (jl_type_t) {
     .kind = JL_TYPE_LONG_DOUBLE,
-    .size = 16,
-    .align = 16
+    .literal = {
+      .size = 16,
+      .align = 16
+    }
   };
 }
 

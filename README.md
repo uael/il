@@ -14,7 +14,7 @@ main() : int => {
 }
 ```
 
-## Build
+### Build
 ```bash
 $ git clone --recursive https://github.com/jayl/jay.git && cd jay
 $ mkdir build && cd build

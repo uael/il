@@ -14,11 +14,6 @@ main() : int => {
 }
 ```
 
-## Deps
-```bash
-$ sudo apt install build-essential make cmake gcc
-```
-
 ## Build
 ```bash
 $ git clone --recursive https://github.com/jayl/jay.git && cd jay

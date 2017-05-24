@@ -25,7 +25,8 @@
 
 #include "token.h"
 
-#include "frontend/lexer.h"
+#include "lexer.h"
+
 
 void jl_token_dtor(jl_token_t *self) {}
 

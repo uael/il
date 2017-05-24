@@ -39,7 +39,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
-#include <adt/bool.h>
+#include "adt/bool.h"
 
 int64_t jl_fsize(const char *path);
 const char *jl_fread(const char *path, size_t *len);

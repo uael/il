@@ -29,8 +29,8 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
-#include <adt/bool.h>
-#include <adt/xmalloc.h>
+#include "adt/bool.h"
+#include "adt/xmalloc.h"
 
 #define jl_roundup32(x) \
   (--(x), (x)|=(x)>>1, (x)|=(x)>>2, (x)|=(x)>>4, (x)|=(x)>>8, (x)|=(x)>>16, ++(x))

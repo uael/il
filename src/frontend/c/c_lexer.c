@@ -787,6 +787,8 @@ static void c_lexer_enqueue(wulk_lexer_t *self, unsigned n) {
           break;
         case ' ':
           ++lws;
+          next;
+          break;
         case '\t':
         default:
           next;

@@ -30,16 +30,8 @@
 
 #include "lexer.h"
 
-struct wulk_compiler_t;
 struct wulk_scope_t;
 struct wulk_program_t;
-
-wulk_token_t wulk_lexer_peek(struct wulk_lexer_t *self);
-wulk_token_t wulk_lexer_peekn(struct wulk_lexer_t *self, unsigned n);
-wulk_token_t wulk_lexer_next(struct wulk_lexer_t *self);
-wulk_token_t wulk_lexer_consume(struct wulk_lexer_t *self, unsigned char type);
-wulk_token_t wulk_lexer_consume_id(struct wulk_lexer_t *self, const char *id);
-void wulk_lexer_undo(struct wulk_lexer_t *lexer, wulk_token_t until);
 
 typedef struct wulk_parser_t wulk_parser_t;
 

@@ -23,8 +23,8 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_VECTOR_H__
-# define  JL_VECTOR_H__
+#ifndef   WULK_VECTOR_H__
+# define  WULK_VECTOR_H__
 
 #include <stdint.h>
 #include <stddef.h>
@@ -32,7 +32,7 @@
 #include "adt/bool.h"
 #include "adt/xmalloc.h"
 
-#define jl_roundup32(x) \
+#define wulk_roundup32(x) \
   (--(x), (x)|=(x)>>1, (x)|=(x)>>2, (x)|=(x)>>4, (x)|=(x)>>8, (x)|=(x)>>16, ++(x))
 
 #define adt_vector_of(t) struct { \
@@ -77,7 +77,7 @@
     size_t __s = (size_t) (i); \
     if (adt_vector_capacity(v) <= __s) { \
       adt_vector_capacity(v) = __s + 1; \
-      jl_roundup32(adt_vector_capacity(v)); \
+      wulk_roundup32(adt_vector_capacity(v)); \
       adt_vector_data(v) = xrealloc( \
         adt_vector_data(v), sizeof(*adt_vector_data(v)) * adt_vector_capacity(v) \
       ); \
@@ -114,4 +114,4 @@
     for (size_t __k = 1, __i = 0; __k && __i != adt_vector_length(v); __k = !__k, __i++) \
       for (var = *(adt_vector_data(v)+__i); __k; __k = !__k)
 
-#endif /* JL_VECTOR_H__ */
+#endif /* WULK_VECTOR_H__ */

@@ -23,8 +23,8 @@
  * SOFTWARE.
  */
 
-#ifndef   JAYL_BOOL_H__
-# define  JAYL_BOOL_H__
+#ifndef   WULK_BOOL_H__
+# define  WULK_BOOL_H__
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
 # define bool	unsigned char
@@ -35,4 +35,4 @@
 # include <stdbool.h>
 #endif
 
-#endif /* JAYL_BOOL_H__ */
+#endif /* WULK_BOOL_H__ */

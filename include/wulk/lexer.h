@@ -23,67 +23,67 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_LEXER_H__
-# define  JL_LEXER_H__
+#ifndef   WULK_LEXER_H__
+# define  WULK_LEXER_H__
 
 #include <adt/vector.h>
 
 #include "token.h"
 
-struct jl_compiler_t;
-struct jl_parser_t;
+struct wulk_compiler_t;
+struct wulk_parser_t;
 
-typedef struct jl_lexer_t jl_lexer_t;
-typedef struct jl_lexer_event_t jl_lexer_event_t;
+typedef struct wulk_lexer_t wulk_lexer_t;
+typedef struct wulk_lexer_event_t wulk_lexer_event_t;
 
-typedef adt_vector_of(jl_lexer_t) jl_lexer_r;
-typedef adt_vector_of(jl_lexer_event_t) jl_lexer_event_r;
+typedef adt_vector_of(wulk_lexer_t) wulk_lexer_r;
+typedef adt_vector_of(wulk_lexer_event_t) wulk_lexer_event_r;
 
-enum jl_lexer_event_n {
-  JL_LEXER_EVENT_ON_PUSH = 0
+enum wulk_lexer_event_n {
+  WULK_LEXER_EVENT_ON_PUSH = 0
 };
 
-struct jl_lexer_event_t {
-  enum jl_lexer_event_n kind;
-  jl_lexer_t *lexer;
+struct wulk_lexer_event_t {
+  enum wulk_lexer_event_n kind;
+  wulk_lexer_t *lexer;
   void *data;
 
-  bool (*callback)(jl_lexer_event_t *self, void *arg);
-  void (*dtor)(jl_lexer_event_t *self);
+  bool (*callback)(wulk_lexer_event_t *self, void *arg);
+  void (*dtor)(wulk_lexer_event_t *self);
 };
 
-struct jl_lexer_t {
-  struct jl_compiler_t *compiler;
+struct wulk_lexer_t {
+  struct wulk_compiler_t *compiler;
   char *buffer;
   size_t length;
-  jl_loc_t loc;
-  jl_token_r queue;
+  wulk_loc_t loc;
+  wulk_token_r queue;
   unsigned char cap;
-  jl_lexer_event_r events;
-  jl_lexer_t *parent;
-  jl_lexer_r childs;
+  wulk_lexer_event_r events;
+  wulk_lexer_t *parent;
+  wulk_lexer_r childs;
 
-  void (*enqueue)(jl_lexer_t *self, unsigned n);
+  void (*enqueue)(wulk_lexer_t *self, unsigned n);
 };
 
-void jl_lexer_init(jl_lexer_t *self, struct jl_compiler_t *compiler, uint32_t file_id, const char *buffer, size_t length);
-void jl_lexer_init_f(jl_lexer_t *self, struct jl_parser_t *fe);
-void jl_lexer_dtor(jl_lexer_t *self, bool free_all);
-void jl_lexer_fork(jl_lexer_t *destination, jl_lexer_t *source);
-void jl_lexer_join(jl_lexer_t *fork);
-void jl_lexer_skip(jl_lexer_t *self, unsigned n);
+void wulk_lexer_init(wulk_lexer_t *self, struct wulk_compiler_t *compiler, uint32_t file_id, const char *buffer, size_t length);
+void wulk_lexer_init_f(wulk_lexer_t *self, struct wulk_parser_t *fe);
+void wulk_lexer_dtor(wulk_lexer_t *self, bool free_all);
+void wulk_lexer_fork(wulk_lexer_t *destination, wulk_lexer_t *source);
+void wulk_lexer_join(wulk_lexer_t *fork);
+void wulk_lexer_skip(wulk_lexer_t *self, unsigned n);
 
-size_t jl_lexer_length(jl_lexer_t *self);
-bool jl_lexer_push(jl_lexer_t *self, jl_token_t token);
-void jl_lexer_attach(jl_lexer_t *self, jl_lexer_event_t event);
-bool jl_lexer_is_root(jl_lexer_t *self);
+size_t wulk_lexer_length(wulk_lexer_t *self);
+bool wulk_lexer_push(wulk_lexer_t *self, wulk_token_t token);
+void wulk_lexer_attach(wulk_lexer_t *self, wulk_lexer_event_t event);
+bool wulk_lexer_is_root(wulk_lexer_t *self);
 
-jl_token_t jl_lexer_peek(jl_lexer_t *self);
-jl_token_t jl_lexer_peekn(jl_lexer_t *self, unsigned n);
-jl_token_t jl_lexer_next(jl_lexer_t *self);
-jl_token_t jl_lexer_consume(jl_lexer_t *self, unsigned char type);
-jl_token_t jl_lexer_consume_id(jl_lexer_t *self, const char *id);
-void jl_lexer_undo(jl_lexer_t *lexer, jl_token_t until);
-void jl_lexer_undon(jl_lexer_t *lexer, unsigned n);
+wulk_token_t wulk_lexer_peek(wulk_lexer_t *self);
+wulk_token_t wulk_lexer_peekn(wulk_lexer_t *self, unsigned n);
+wulk_token_t wulk_lexer_next(wulk_lexer_t *self);
+wulk_token_t wulk_lexer_consume(wulk_lexer_t *self, unsigned char type);
+wulk_token_t wulk_lexer_consume_id(wulk_lexer_t *self, const char *id);
+void wulk_lexer_undo(wulk_lexer_t *lexer, wulk_token_t until);
+void wulk_lexer_undon(wulk_lexer_t *lexer, unsigned n);
 
-#endif /* JL_LEXER_H__ */
+#endif /* WULK_LEXER_H__ */

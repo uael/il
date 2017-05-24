@@ -23,21 +23,21 @@
  * SOFTWARE.
  */
 
-#ifndef   JAYL_ATTR_H__
-# define  JAYL_ATTR_H__
+#ifndef   WULK_ATTR_H__
+# define  WULK_ATTR_H__
 
 /**
- * @def JL_NORETURN
+ * @def WULK_NORETURN
  * Attribute to mark a function which never returns.
  */
 #if defined(__GNUC__) && __GNUC__ >= 3 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 70)
-# define JL_NORETURN __attribute__((__noreturn__)) void
+# define WULK_NORETURN __attribute__((__noreturn__)) void
 #elif defined(__STDC__) && (__STDC_VERSION__ >= 201112L)
-# define JL_NORETURN _Noreturn void
+# define WULK_NORETURN _Noreturn void
 #elif defined(_MSC_VER)
-# define JL_NORETURN void __declspec(noreturn)
+# define WULK_NORETURN void __declspec(noreturn)
 #else
-# define JL_NORETURN void
+# define WULK_NORETURN void
 #endif
 
-#endif /* JAYL_ATTR_H__ */
+#endif /* WULK_ATTR_H__ */

@@ -31,6 +31,6 @@
 #include "expr.h"
 #include "type.h"
 
-void jl_stmt_dtor(jl_stmt_t *self) {
+void wulk_stmt_dtor(wulk_stmt_t *self) {
 
 }

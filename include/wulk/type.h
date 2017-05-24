@@ -23,47 +23,47 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_TYPE_H__
-# define  JL_TYPE_H__
+#ifndef   WULK_TYPE_H__
+# define  WULK_TYPE_H__
 
 #include "ir.h"
 
-#define jl_type_undefined() ((jl_type_t) {.kind = JL_TYPE_UNDEFINED})
-#define jl_type_undef(tptr) (*(tptr) = jl_type_undefined())
+#define wulk_type_undefined() ((wulk_type_t) {.kind = WULK_TYPE_UNDEFINED})
+#define wulk_type_undef(tptr) (*(tptr) = wulk_type_undefined())
 
-#define jl_type_specified(t, by) ((t).specifiers & JL_TYPE_SPECIFIER_ ## by)
-#define jl_type_qualified(t, by) ((t).qualifiers & JL_TYPE_QUALIFIER_ ## by)
+#define wulk_type_specified(t, by) ((t).specifiers & WULK_TYPE_SPECIFIER_ ## by)
+#define wulk_type_qualified(t, by) ((t).qualifiers & WULK_TYPE_QUALIFIER_ ## by)
 
 enum {
-  JL_TYPE_MERGE_ERROR_NONE = 0,
-  JL_TYPE_MERGE_ERROR_TWO_OR_MORE_DATA_TYPE,
-  JL_TYPE_MERGE_ERROR_BOTH_LONG_AND,
-  JL_TYPE_MERGE_ERROR_BOTH_LONG_LONG_AND
+  WULK_TYPE_MERGE_ERROR_NONE = 0,
+  WULK_TYPE_MERGE_ERROR_TWO_OR_MORE_DATA_TYPE,
+  WULK_TYPE_MERGE_ERROR_BOTH_LONG_AND,
+  WULK_TYPE_MERGE_ERROR_BOTH_LONG_LONG_AND
 };
 
-jl_type_t jl_void(void);
-jl_type_t jl_bool(void);
-jl_type_t jl_char(void);
-jl_type_t jl_short(void);
-jl_type_t jl_int(void);
-jl_type_t jl_uint(void);
-jl_type_t jl_long(void);
-jl_type_t jl_ulong(void);
-jl_type_t jl_double(void);
-jl_type_t jl_float(void);
-jl_type_t jl_long_long(void);
-jl_type_t jl_long_double(void);
-jl_type_t jl_pointer(jl_type_t of);
-jl_type_t jl_array(jl_type_t of, jl_expr_t size);
-jl_type_t jl_compound(jl_entity_t entity);
+wulk_type_t wulk_void(void);
+wulk_type_t wulk_bool(void);
+wulk_type_t wulk_char(void);
+wulk_type_t wulk_short(void);
+wulk_type_t wulk_int(void);
+wulk_type_t wulk_uint(void);
+wulk_type_t wulk_long(void);
+wulk_type_t wulk_ulong(void);
+wulk_type_t wulk_double(void);
+wulk_type_t wulk_float(void);
+wulk_type_t wulk_long_long(void);
+wulk_type_t wulk_long_double(void);
+wulk_type_t wulk_pointer(wulk_type_t of);
+wulk_type_t wulk_array(wulk_type_t of, wulk_expr_t size);
+wulk_type_t wulk_compound(wulk_entity_t entity);
 
-void jl_type_dtor(jl_type_t *self);
-bool jl_type_is_ref(jl_type_t type);
-bool jl_type_is_func(jl_type_t type);
-bool jl_type_equals(jl_type_t a, jl_type_t b);
-jl_type_t jl_type_deref(jl_type_t a);
-jl_entity_r jl_type_fields(jl_type_t self);
-jl_field_t *jl_field_lookup(jl_type_t self, const char *name);
-unsigned jl_type_merge(jl_type_t *self, enum jl_type_n with);
+void wulk_type_dtor(wulk_type_t *self);
+bool wulk_type_is_ref(wulk_type_t type);
+bool wulk_type_is_func(wulk_type_t type);
+bool wulk_type_equals(wulk_type_t a, wulk_type_t b);
+wulk_type_t wulk_type_deref(wulk_type_t a);
+wulk_entity_r wulk_type_fields(wulk_type_t self);
+wulk_field_t *wulk_field_lookup(wulk_type_t self, const char *name);
+unsigned wulk_type_merge(wulk_type_t *self, enum wulk_type_n with);
 
-#endif /* JL_TYPE_H__ */
+#endif /* WULK_TYPE_H__ */

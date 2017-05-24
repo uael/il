@@ -23,8 +23,8 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_COMPILER_H__
-# define  JL_COMPILER_H__
+#ifndef   WULK_COMPILER_H__
+# define  WULK_COMPILER_H__
 
 #include <adt/string.h>
 #include <adt/attr.h>
@@ -34,25 +34,25 @@
 #include "be.h"
 #include "program.h"
 
-typedef struct jl_compiler_t jl_compiler_t;
+typedef struct wulk_compiler_t wulk_compiler_t;
 
-struct jl_compiler_t {
+struct wulk_compiler_t {
   const char *program;
-  jl_opts_t opts;
-  jl_program_t ast;
-  jl_parser_t fe;
-  jl_backend_t be;
+  wulk_opts_t opts;
+  wulk_program_t ast;
+  wulk_parser_t fe;
+  wulk_backend_t be;
   string_r strtab;
 };
 
-void jl_init(jl_compiler_t *self, int argc, char **argv);
-void jl_dtor(jl_compiler_t *self);
-void jl_parse(jl_compiler_t *self);
-JL_NORETURN jl_err(jl_compiler_t *self, const char *format, ...);
-JL_NORETURN jl_fatal_err(jl_compiler_t *self, const char *format, ...);
-JL_NORETURN jl_parse_err(jl_compiler_t *self, jl_loc_t loc, const char *format, ...);
+void wulk_init(wulk_compiler_t *self, int argc, char **argv);
+void wulk_dtor(wulk_compiler_t *self);
+void wulk_parse(wulk_compiler_t *self);
+WULK_NORETURN wulk_err(wulk_compiler_t *self, const char *format, ...);
+WULK_NORETURN wulk_fatal_err(wulk_compiler_t *self, const char *format, ...);
+WULK_NORETURN wulk_parse_err(wulk_compiler_t *self, wulk_loc_t loc, const char *format, ...);
 
-const char *jl_strdup(jl_compiler_t *self, const char *str);
-const char *jl_strndup(jl_compiler_t *self, const char *str, size_t n);
+const char *wulk_strdup(wulk_compiler_t *self, const char *str);
+const char *wulk_strndup(wulk_compiler_t *self, const char *str, size_t n);
 
-#endif /* JL_COMPILER_H__ */
+#endif /* WULK_COMPILER_H__ */

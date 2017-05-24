@@ -23,11 +23,11 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_C_PARSER_H__
-# define  JL_C_PARSER_H__
+#ifndef   WULK_C_PARSER_H__
+# define  WULK_C_PARSER_H__
 
 #include "wulk/parser.h"
 
-void c_parser_parse(struct jl_parser_t *self, struct jl_program_t *out);
+void c_parser_parse(struct wulk_parser_t *self, struct wulk_program_t *out);
 
-#endif /* JL_C_PARSER_H__ */
+#endif /* WULK_C_PARSER_H__ */

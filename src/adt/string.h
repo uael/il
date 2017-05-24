@@ -23,8 +23,8 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_STRING_H__
-# define  JL_STRING_H__
+#ifndef   WULK_STRING_H__
+# define  WULK_STRING_H__
 
 #include <string.h>
 #include <stdarg.h>
@@ -66,4 +66,4 @@ int vasprintf(char **, const char *, va_list);
 
 int asprintf(char **, const char *, ...);
 
-#endif /* JL_STRING_H__ */
+#endif /* WULK_STRING_H__ */

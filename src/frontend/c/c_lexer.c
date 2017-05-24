@@ -34,26 +34,26 @@
 #include "c_pp.h"
 #include "compiler.h"
 
-static void c_lexer_enqueue(jl_lexer_t *self, unsigned n);
+static void c_lexer_enqueue(wulk_lexer_t *self, unsigned n);
 
-void c_lexer_init(jl_lexer_t *self) {
-  jl_lexer_event_t event;
+void c_lexer_init(wulk_lexer_t *self) {
+  wulk_lexer_event_t event;
 
   self->enqueue = c_lexer_enqueue;
-  event = (jl_lexer_event_t) {
-    .kind = JL_LEXER_EVENT_ON_PUSH,
+  event = (wulk_lexer_event_t) {
+    .kind = WULK_LEXER_EVENT_ON_PUSH,
     .callback = c_pp_on_push_callback,
     .dtor = c_pp_on_push_dtor,
     .data = xmalloc(sizeof(c_pp_t))
   };
   c_pp_init(event.data);
-  jl_lexer_attach(self, event);
+  wulk_lexer_attach(self, event);
 }
 
 #define EMPTY {0}
-#define SYNTX(t, s) {.type=(t), .loc={0}, .name=s, .value=s, .length=sizeof(s)-1, .kind=JL_TOKEN_SYNTAX}
-#define XSYNT(t, s, n) {.type=(t), .loc={0}, .name=n, .value=s, .length=sizeof(s)-1, .kind=JL_TOKEN_SYNTAX}
-#define KEYWD(t, s) {.type=(t), .loc={0}, .name=s, .length=sizeof(s)-1, .kind=JL_TOKEN_KEYWORD}
+#define SYNTX(t, s) {.type=(t), .loc={0}, .name=s, .value=s, .length=sizeof(s)-1, .kind=WULK_TOKEN_SYNTAX}
+#define XSYNT(t, s, n) {.type=(t), .loc={0}, .name=n, .value=s, .length=sizeof(s)-1, .kind=WULK_TOKEN_SYNTAX}
+#define KEYWD(t, s) {.type=(t), .loc={0}, .name=s, .length=sizeof(s)-1, .kind=WULK_TOKEN_KEYWORD}
 #define TOKEN(t, k, n) {.type=(t), .loc={0}, .name=n, .kind=(k)}
 
 #define peek *(self->buffer + self->loc.position)
@@ -66,10 +66,10 @@ void c_lexer_init(jl_lexer_t *self) {
     token.length = i; \
     token.loc.colno -= i; \
     token.loc.position -= i; \
-    token.value = jl_strndup(self->compiler, s, i); \
+    token.value = wulk_strndup(self->compiler, s, i); \
   } while (false)
 #define push_token do { \
-    if (jl_lexer_push(self, token)) n--; \
+    if (wulk_lexer_push(self, token)) n--; \
   } while (false)
 #define push(t) do { \
     token = tokens[t]; \
@@ -97,8 +97,8 @@ void c_lexer_init(jl_lexer_t *self) {
 #define M8(n, a, b, c, d, e, f, g, h) i == (8+n) && __M8(n, a, b, c, d, e, f, g, h)
 
 
-static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
-  static const jl_token_t tokens[] = {
+static void c_lexer_enqueue(wulk_lexer_t *self, unsigned n) {
+  static const wulk_token_t tokens[] = {
     /* 0x00 */
     XSYNT(C_TOK_END, "\0", "END"),
     KEYWD(C_TOK_AUTO, "auto"),
@@ -244,9 +244,9 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
     EMPTY,
     EMPTY,
     EMPTY,
-    TOKEN(C_TOK_NUMBER, JL_TOKEN_NUMBER, "Number"),
-    TOKEN(C_TOK_IDENTIFIER, JL_TOKEN_IDENTIFIER, "Identifier"),
-    TOKEN(C_TOK_STRING, JL_TOKEN_STRING_LITERAL, "String"),
+    TOKEN(C_TOK_NUMBER, WULK_TOKEN_NUMBER, "Number"),
+    TOKEN(C_TOK_IDENTIFIER, WULK_TOKEN_IDENTIFIER, "Identifier"),
+    TOKEN(C_TOK_STRING, WULK_TOKEN_STRING_LITERAL, "String"),
     EMPTY,
 
     /* 0x78 */
@@ -260,7 +260,7 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
     EMPTY
   };
   char s[256];
-  jl_token_t token;
+  wulk_token_t token;
   unsigned i;
   uint32_t lws = 0;
 

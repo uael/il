@@ -23,8 +23,8 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_IO_H__
-# define  JL_IO_H__
+#ifndef   WULK_IO_H__
+# define  WULK_IO_H__
 
 #define RESET   "\033[0m"
 #define BLACK   "\033[30m"
@@ -41,10 +41,10 @@
 #include <stddef.h>
 #include "adt/bool.h"
 
-int64_t jl_fsize(const char *path);
-const char *jl_fread(const char *path, size_t *len);
-bool jl_fexists(const char *path);
-bool jl_fwrite(const char *path, const char *buffer, size_t len);
+int64_t wulk_fsize(const char *path);
+const char *wulk_fread(const char *path, size_t *len);
+bool wulk_fexists(const char *path);
+bool wulk_fwrite(const char *path, const char *buffer, size_t len);
 
 #if defined(_WIN32)
 # include <windows.h>
@@ -54,8 +54,8 @@ bool jl_fwrite(const char *path, const char *buffer, size_t len);
 # define DIRREF DIR*
 #endif
 
-bool jl_is_dir(const char *path);
-DIRREF jl_dir_init(const char *path);
-const char *jl_dread(DIRREF ref);
+bool wulk_is_dir(const char *path);
+DIRREF wulk_dir_init(const char *path);
+const char *wulk_dread(DIRREF ref);
 
-#endif /* JL_IO_H__ */
+#endif /* WULK_IO_H__ */

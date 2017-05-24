@@ -23,181 +23,181 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_IR_H__
-# define  JL_IR_H__
+#ifndef   WULK_IR_H__
+# define  WULK_IR_H__
 
 #include <adt/vector.h>
 
 #include "token.h"
 
-struct jl_entity;
-struct jl_expr;
-struct jl_stmt;
-struct jl_type;
+struct wulk_entity;
+struct wulk_expr;
+struct wulk_stmt;
+struct wulk_type;
 
-typedef struct jl_type jl_type_t;
-typedef struct jl_literal jl_literal_t;
-typedef struct jl_pointer jl_pointer_t;
-typedef struct jl_array jl_array_t;
-typedef struct jl_compound jl_compound_t;
+typedef struct wulk_type wulk_type_t;
+typedef struct wulk_literal wulk_literal_t;
+typedef struct wulk_pointer wulk_pointer_t;
+typedef struct wulk_array wulk_array_t;
+typedef struct wulk_compound wulk_compound_t;
 
-enum jl_type_n {
-  JL_TYPE_UNDEFINED = 0,
-  JL_TYPE_VOID,
-  JL_TYPE_POINTER,
-  JL_TYPE_ARRAY,
-  JL_TYPE_COMPOUND,
-  JL_TYPE_BOOL,
-  JL_TYPE_CHAR,
-  JL_TYPE_SHORT,
-  JL_TYPE_INT,
-  JL_TYPE_LONG,
-  JL_TYPE_FLOAT,
-  JL_TYPE_DOUBLE,
-  JL_TYPE_LONG_LONG,
-  JL_TYPE_LONG_DOUBLE
+enum wulk_type_n {
+  WULK_TYPE_UNDEFINED = 0,
+  WULK_TYPE_VOID,
+  WULK_TYPE_POINTER,
+  WULK_TYPE_ARRAY,
+  WULK_TYPE_COMPOUND,
+  WULK_TYPE_BOOL,
+  WULK_TYPE_CHAR,
+  WULK_TYPE_SHORT,
+  WULK_TYPE_INT,
+  WULK_TYPE_LONG,
+  WULK_TYPE_FLOAT,
+  WULK_TYPE_DOUBLE,
+  WULK_TYPE_LONG_LONG,
+  WULK_TYPE_LONG_DOUBLE
 };
 
-enum jl_type_specifier_n {
-  JL_TYPE_SPECIFIER_NONE = 0,
-  JL_TYPE_SPECIFIER_SIGNED = 1 << 0,
-  JL_TYPE_SPECIFIER_UNSIGNED = 1 << 1,
-  JL_TYPE_SPECIFIER_COMPLEX = 1 << 2,
-  JL_TYPE_SPECIFIER_IMAGINARY = 1 << 3,
-  JL_TYPE_SPECIFIER_TYPEDEF = 1 << 4,
-  JL_TYPE_SPECIFIER_EXTERN = 1 << 5,
-  JL_TYPE_SPECIFIER_STATIC = 1 << 6,
-  JL_TYPE_SPECIFIER_THREAD_LOCAL = 1 << 7,
-  JL_TYPE_SPECIFIER_AUTO = 1 << 8,
-  JL_TYPE_SPECIFIER_REGISTER = 1 << 9,
-  JL_FUNC_SPECIFIER_INLINE = 1 << 10,
-  JL_FUNC_SPECIFIER_NORETURN = 1 << 11
+enum wulk_type_specifier_n {
+  WULK_TYPE_SPECIFIER_NONE = 0,
+  WULK_TYPE_SPECIFIER_SIGNED = 1 << 0,
+  WULK_TYPE_SPECIFIER_UNSIGNED = 1 << 1,
+  WULK_TYPE_SPECIFIER_COMPLEX = 1 << 2,
+  WULK_TYPE_SPECIFIER_IMAGINARY = 1 << 3,
+  WULK_TYPE_SPECIFIER_TYPEDEF = 1 << 4,
+  WULK_TYPE_SPECIFIER_EXTERN = 1 << 5,
+  WULK_TYPE_SPECIFIER_STATIC = 1 << 6,
+  WULK_TYPE_SPECIFIER_THREAD_LOCAL = 1 << 7,
+  WULK_TYPE_SPECIFIER_AUTO = 1 << 8,
+  WULK_TYPE_SPECIFIER_REGISTER = 1 << 9,
+  WULK_FUNC_SPECIFIER_INLINE = 1 << 10,
+  WULK_FUNC_SPECIFIER_NORETURN = 1 << 11
 };
 
-enum jl_type_qualifier_n {
-  JL_TYPE_QUALIFIER_NONE = 0,
-  JL_TYPE_QUALIFIER_CONST = 1 << 0,
-  JL_TYPE_QUALIFIER_VOLATILE = 1 << 1,
-  JL_TYPE_QUALIFIER_RESTRICT = 1 << 2,
-  JL_TYPE_QUALIFIER_ATOMIC = 1 << 3
+enum wulk_type_qualifier_n {
+  WULK_TYPE_QUALIFIER_NONE = 0,
+  WULK_TYPE_QUALIFIER_CONST = 1 << 0,
+  WULK_TYPE_QUALIFIER_VOLATILE = 1 << 1,
+  WULK_TYPE_QUALIFIER_RESTRICT = 1 << 2,
+  WULK_TYPE_QUALIFIER_ATOMIC = 1 << 3
 };
 
-struct jl_literal {
-  jl_lloc_t lloc;
+struct wulk_literal {
+  wulk_lloc_t lloc;
   size_t size, align;
-  jl_type_t *next;
-  enum jl_type_specifier_n specifiers;
-  enum jl_type_qualifier_n qualifiers;
+  wulk_type_t *next;
+  enum wulk_type_specifier_n specifiers;
+  enum wulk_type_qualifier_n qualifiers;
 };
 
-struct jl_pointer {
-  jl_lloc_t lloc;
+struct wulk_pointer {
+  wulk_lloc_t lloc;
   size_t size, align;
-  jl_type_t *of;
-  enum jl_type_specifier_n specifiers;
-  enum jl_type_qualifier_n qualifiers;
+  wulk_type_t *of;
+  enum wulk_type_specifier_n specifiers;
+  enum wulk_type_qualifier_n qualifiers;
 };
 
-struct jl_array {
-  jl_lloc_t lloc;
+struct wulk_array {
+  wulk_lloc_t lloc;
   size_t size, align;
-  jl_type_t *of;
-  enum jl_type_specifier_n specifiers;
-  enum jl_type_qualifier_n qualifiers;
+  wulk_type_t *of;
+  enum wulk_type_specifier_n specifiers;
+  enum wulk_type_qualifier_n qualifiers;
 
-  struct jl_expr *length;
+  struct wulk_expr *length;
 };
 
-struct jl_compound {
-  jl_lloc_t lloc;
+struct wulk_compound {
+  wulk_lloc_t lloc;
   size_t size, align;
-  jl_type_t *next;
-  enum jl_type_specifier_n specifiers;
-  enum jl_type_qualifier_n qualifiers;
+  wulk_type_t *next;
+  enum wulk_type_specifier_n specifiers;
+  enum wulk_type_qualifier_n qualifiers;
 
-  struct jl_entity *entity;
+  struct wulk_entity *entity;
 };
 
-struct jl_type {
+struct wulk_type {
   union {
     struct {
-      jl_lloc_t lloc;
+      wulk_lloc_t lloc;
       size_t size, align;
-      jl_type_t *next;
-      enum jl_type_specifier_n specifiers;
-      enum jl_type_qualifier_n qualifiers;
+      wulk_type_t *next;
+      enum wulk_type_specifier_n specifiers;
+      enum wulk_type_qualifier_n qualifiers;
     };
-    jl_literal_t literal;
-    jl_pointer_t pointer;
-    jl_array_t array;
-    jl_compound_t compound;
+    wulk_literal_t literal;
+    wulk_pointer_t pointer;
+    wulk_array_t array;
+    wulk_compound_t compound;
   };
-  enum jl_type_n kind;
+  enum wulk_type_n kind;
 };
 
-struct jl_field;
+struct wulk_field;
 
-typedef struct jl_val jl_val_t;
-typedef struct jl_expr jl_expr_t;
-typedef struct jl_exprs jl_exprs_t;
-typedef struct jl_id jl_id_t;
-typedef struct jl_const jl_const_t;
-typedef struct jl_unary jl_unary_t;
-typedef struct jl_binary jl_binary_t;
-typedef struct jl_ternary jl_ternary_t;
-typedef struct jl_array_read jl_array_read_t;
-typedef struct jl_array_write jl_array_write_t;
-typedef struct jl_field_read jl_field_read_t;
-typedef struct jl_field_write jl_field_write_t;
-typedef struct jl_call jl_call_t;
+typedef struct wulk_val wulk_val_t;
+typedef struct wulk_expr wulk_expr_t;
+typedef struct wulk_exprs wulk_exprs_t;
+typedef struct wulk_id wulk_id_t;
+typedef struct wulk_const wulk_const_t;
+typedef struct wulk_unary wulk_unary_t;
+typedef struct wulk_binary wulk_binary_t;
+typedef struct wulk_ternary wulk_ternary_t;
+typedef struct wulk_array_read wulk_array_read_t;
+typedef struct wulk_array_write wulk_array_write_t;
+typedef struct wulk_field_read wulk_field_read_t;
+typedef struct wulk_field_write wulk_field_write_t;
+typedef struct wulk_call wulk_call_t;
 
-typedef adt_vector_of(jl_expr_t) jl_expr_r;
+typedef adt_vector_of(wulk_expr_t) wulk_expr_r;
 
-enum jl_expr_n {
-  JL_EXPR_UNDEFINED = 0,
-  JL_EXPR_EXPRS,
-  JL_EXPR_ID,
-  JL_EXPR_CONST,
-  JL_EXPR_UNARY,
-  JL_EXPR_BINARY,
-  JL_EXPR_TERNARY,
-  JL_EXPR_ARRAY_READ,
-  JL_EXPR_ARRAY_WRITE,
-  JL_EXPR_FIELD_READ,
-  JL_EXPR_FIELD_WRITE,
-  JL_EXPR_CALL
+enum wulk_expr_n {
+  WULK_EXPR_UNDEFINED = 0,
+  WULK_EXPR_EXPRS,
+  WULK_EXPR_ID,
+  WULK_EXPR_CONST,
+  WULK_EXPR_UNARY,
+  WULK_EXPR_BINARY,
+  WULK_EXPR_TERNARY,
+  WULK_EXPR_ARRAY_READ,
+  WULK_EXPR_ARRAY_WRITE,
+  WULK_EXPR_FIELD_READ,
+  WULK_EXPR_FIELD_WRITE,
+  WULK_EXPR_CALL
 };
 
-enum jl_op_n {
-  JL_OP_CAST,   /* (T) l        */
-  JL_OP_EN,     /* (l)          */
-  JL_OP_CALL,   /* l()          */
-  JL_OP_VA_ARG, /* va_arg(l, T) */
-  JL_OP_NOT,    /* !l           */
-  JL_OP_ASSIGN, /* l = r        */
-  JL_OP_ADD,    /* l + r        */
-  JL_OP_SUB,    /* l - r        */
-  JL_OP_MUL,    /* l * r        */
-  JL_OP_DIV,    /* l / r        */
-  JL_OP_MOD,    /* l % r        */
-  JL_OP_AND,    /* l & r        */
-  JL_OP_LAND,    /* l && r        */
-  JL_OP_OR,     /* l | r        */
-  JL_OP_LOR,     /* l || r        */
-  JL_OP_XOR,    /* l ^ r        */
-  JL_OP_SHL,    /* l << r       */
-  JL_OP_SHR,    /* l >> r       */
-  JL_OP_EQ,     /* l == r       */
-  JL_OP_NE,     /* l != r       */
-  JL_OP_GE,     /* l >= r       */
-  JL_OP_GT,     /* l > r        */
-  JL_OP_LE,     /* l <= r       */
-  JL_OP_LT,     /* l < r        */
-  JL_OP_NEG     /* l ~ r        */
+enum wulk_op_n {
+  WULK_OP_CAST,   /* (T) l        */
+  WULK_OP_EN,     /* (l)          */
+  WULK_OP_CALL,   /* l()          */
+  WULK_OP_VA_ARG, /* va_arg(l, T) */
+  WULK_OP_NOT,    /* !l           */
+  WULK_OP_ASSIGN, /* l = r        */
+  WULK_OP_ADD,    /* l + r        */
+  WULK_OP_SUB,    /* l - r        */
+  WULK_OP_MUL,    /* l * r        */
+  WULK_OP_DIV,    /* l / r        */
+  WULK_OP_MOD,    /* l % r        */
+  WULK_OP_AND,    /* l & r        */
+  WULK_OP_LAND,    /* l && r        */
+  WULK_OP_OR,     /* l | r        */
+  WULK_OP_LOR,     /* l || r        */
+  WULK_OP_XOR,    /* l ^ r        */
+  WULK_OP_SHL,    /* l << r       */
+  WULK_OP_SHR,    /* l >> r       */
+  WULK_OP_EQ,     /* l == r       */
+  WULK_OP_NE,     /* l != r       */
+  WULK_OP_GE,     /* l >= r       */
+  WULK_OP_GT,     /* l > r        */
+  WULK_OP_LE,     /* l <= r       */
+  WULK_OP_LT,     /* l < r        */
+  WULK_OP_NEG     /* l ~ r        */
 };
 
-struct jl_val {
-  jl_type_t type;
+struct wulk_val {
+  wulk_type_t type;
   union {
     const char *s;
     float f;
@@ -207,30 +207,30 @@ struct jl_val {
   };
 };
 
-struct jl_exprs {
-  jl_lloc_t lloc;
-  jl_type_t type;
+struct wulk_exprs {
+  wulk_lloc_t lloc;
+  wulk_type_t type;
 
-  jl_expr_r vector;
+  wulk_expr_r vector;
 };
 
-struct jl_id {
-  jl_lloc_t lloc;
-  jl_type_t type;
+struct wulk_id {
+  wulk_lloc_t lloc;
+  wulk_type_t type;
 
   const char *id;
   bool is_keyword;
 };
 
-struct jl_const {
-  jl_lloc_t lloc;
+struct wulk_const {
+  wulk_lloc_t lloc;
 
   union {
-    jl_val_t value;
+    wulk_val_t value;
 
     /* only accessed, value field must be set. */
     struct {
-      jl_type_t type;
+      wulk_type_t type;
       union {
         const char *s;
         float f;
@@ -242,399 +242,399 @@ struct jl_const {
   };
 };
 
-struct jl_unary {
-  jl_lloc_t lloc;
-  jl_type_t type;
+struct wulk_unary {
+  wulk_lloc_t lloc;
+  wulk_type_t type;
 
-  enum jl_op_n op;
-  jl_expr_t *operand;
+  enum wulk_op_n op;
+  wulk_expr_t *operand;
 };
 
-struct jl_binary {
-  jl_lloc_t lloc;
-  jl_type_t type;
+struct wulk_binary {
+  wulk_lloc_t lloc;
+  wulk_type_t type;
 
-  enum jl_op_n op;
-  jl_expr_t *lhs, *rhs;
+  enum wulk_op_n op;
+  wulk_expr_t *lhs, *rhs;
 };
 
-struct jl_ternary {
-  jl_lloc_t lloc;
-  jl_type_t type;
+struct wulk_ternary {
+  wulk_lloc_t lloc;
+  wulk_type_t type;
 
-  jl_expr_t *lhs, *mhs, *rhs;
+  wulk_expr_t *lhs, *mhs, *rhs;
 };
 
-struct jl_array_read {
-  jl_lloc_t lloc;
-  jl_type_t type;
+struct wulk_array_read {
+  wulk_lloc_t lloc;
+  wulk_type_t type;
 
-  jl_expr_t *lhs, *pos;
+  wulk_expr_t *lhs, *pos;
 };
 
-struct jl_array_write {
+struct wulk_array_write {
   union {
-    jl_array_read_t read;
+    wulk_array_read_t read;
 
     /* only accessed, array_read field must be set. */
     struct {
-      jl_lloc_t lloc;
-      jl_type_t type;
+      wulk_lloc_t lloc;
+      wulk_type_t type;
 
-      jl_expr_t *lhs, *pos;
+      wulk_expr_t *lhs, *pos;
     };
   };
 
-  jl_expr_t *rhs;
+  wulk_expr_t *rhs;
 };
 
-struct jl_field_read {
-  jl_lloc_t lloc;
-  jl_type_t type;
+struct wulk_field_read {
+  wulk_lloc_t lloc;
+  wulk_type_t type;
 
-  jl_expr_t *lhs;
-  jl_id_t id;
+  wulk_expr_t *lhs;
+  wulk_id_t id;
 };
 
-struct jl_field_write {
+struct wulk_field_write {
   union {
-    jl_field_read_t read;
+    wulk_field_read_t read;
 
     /* only accessed, field_read field must be set. */
     struct {
-      jl_lloc_t lloc;
-      jl_type_t type;
+      wulk_lloc_t lloc;
+      wulk_type_t type;
 
-      jl_expr_t *lhs;
-      jl_id_t id;
+      wulk_expr_t *lhs;
+      wulk_id_t id;
     };
   };
 
-  jl_expr_t *rhs;
+  wulk_expr_t *rhs;
 };
 
-struct jl_call {
-  jl_lloc_t lloc;
-  jl_type_t type;
+struct wulk_call {
+  wulk_lloc_t lloc;
+  wulk_type_t type;
 
-  jl_expr_t *lhs;
-  jl_exprs_t args;
+  wulk_expr_t *lhs;
+  wulk_exprs_t args;
 };
 
-struct jl_expr {
+struct wulk_expr {
   union {
     struct {
-      jl_lloc_t lloc;
-      jl_type_t type;
+      wulk_lloc_t lloc;
+      wulk_type_t type;
     };
-    jl_exprs_t exprs;
-    jl_id_t id;
-    jl_const_t constant;
-    jl_unary_t unary;
-    jl_binary_t binary;
-    jl_ternary_t ternary;
-    jl_array_read_t array_read;
-    jl_array_write_t array_write;
-    jl_field_read_t field_read;
-    jl_field_write_t field_write;
-    jl_call_t call;
+    wulk_exprs_t exprs;
+    wulk_id_t id;
+    wulk_const_t constant;
+    wulk_unary_t unary;
+    wulk_binary_t binary;
+    wulk_ternary_t ternary;
+    wulk_array_read_t array_read;
+    wulk_array_write_t array_write;
+    wulk_field_read_t field_read;
+    wulk_field_write_t field_write;
+    wulk_call_t call;
   };
-  enum jl_expr_n kind;
+  enum wulk_expr_n kind;
 };
 
-typedef struct jl_stmt jl_stmt_t;
-typedef struct jl_stmt_expr jl_stmt_expr_t;
-typedef struct jl_stmt_label jl_stmt_label_t;
-typedef struct jl_stmt_case jl_stmt_case_t;
-typedef struct jl_stmt_default jl_stmt_default_t;
-typedef struct jl_stmt_compound jl_stmt_compound_t;
-typedef struct jl_stmt_if jl_stmt_if_t;
-typedef struct jl_stmt_switch jl_stmt_switch_t;
-typedef struct jl_stmt_while jl_stmt_while_t;
-typedef struct jl_stmt_do jl_stmt_do_t;
-typedef struct jl_stmt_for jl_stmt_for_t;
-typedef struct jl_stmt_goto jl_stmt_goto_t;
-typedef struct jl_stmt_break jl_stmt_break_t;
-typedef struct jl_stmt_continue jl_stmt_continue_t;
-typedef struct jl_stmt_return jl_stmt_return_t;
-typedef struct jl_stmt_decl jl_stmt_decl_t;
+typedef struct wulk_stmt wulk_stmt_t;
+typedef struct wulk_stmt_expr wulk_stmt_expr_t;
+typedef struct wulk_stmt_label wulk_stmt_label_t;
+typedef struct wulk_stmt_case wulk_stmt_case_t;
+typedef struct wulk_stmt_default wulk_stmt_default_t;
+typedef struct wulk_stmt_compound wulk_stmt_compound_t;
+typedef struct wulk_stmt_if wulk_stmt_if_t;
+typedef struct wulk_stmt_switch wulk_stmt_switch_t;
+typedef struct wulk_stmt_while wulk_stmt_while_t;
+typedef struct wulk_stmt_do wulk_stmt_do_t;
+typedef struct wulk_stmt_for wulk_stmt_for_t;
+typedef struct wulk_stmt_goto wulk_stmt_goto_t;
+typedef struct wulk_stmt_break wulk_stmt_break_t;
+typedef struct wulk_stmt_continue wulk_stmt_continue_t;
+typedef struct wulk_stmt_return wulk_stmt_return_t;
+typedef struct wulk_stmt_decl wulk_stmt_decl_t;
 
-typedef adt_vector_of(jl_stmt_t) jl_stmt_r;
+typedef adt_vector_of(wulk_stmt_t) wulk_stmt_r;
 
-enum jl_stmt_n {
-  JL_STMT_UNDEFINED = 0,
-  JL_STMT_EXPR,
-  JL_STMT_LABEL,
-  JL_STMT_CASE,
-  JL_STMT_DEFAULT,
-  JL_STMT_COMPOUND,
-  JL_STMT_IF,
-  JL_STMT_SWITCH,
-  JL_STMT_WHILE,
-  JL_STMT_DO,
-  JL_STMT_FOR,
-  JL_STMT_GOTO,
-  JL_STMT_BREAK,
-  JL_STMT_CONTINUE,
-  JL_STMT_RETURN,
-  JL_STMT_DECL
+enum wulk_stmt_n {
+  WULK_STMT_UNDEFINED = 0,
+  WULK_STMT_EXPR,
+  WULK_STMT_LABEL,
+  WULK_STMT_CASE,
+  WULK_STMT_DEFAULT,
+  WULK_STMT_COMPOUND,
+  WULK_STMT_IF,
+  WULK_STMT_SWITCH,
+  WULK_STMT_WHILE,
+  WULK_STMT_DO,
+  WULK_STMT_FOR,
+  WULK_STMT_GOTO,
+  WULK_STMT_BREAK,
+  WULK_STMT_CONTINUE,
+  WULK_STMT_RETURN,
+  WULK_STMT_DECL
 };
 
-struct jl_stmt_expr {
-  jl_lloc_t lloc;
+struct wulk_stmt_expr {
+  wulk_lloc_t lloc;
 
-  jl_expr_t expr;
+  wulk_expr_t expr;
 };
 
-struct jl_stmt_label {
-  jl_lloc_t lloc;
+struct wulk_stmt_label {
+  wulk_lloc_t lloc;
 
   const char *name;
 };
 
-struct jl_stmt_case {
-  jl_lloc_t lloc;
+struct wulk_stmt_case {
+  wulk_lloc_t lloc;
 
-  jl_expr_t cond;
-  jl_stmt_t *body;
+  wulk_expr_t cond;
+  wulk_stmt_t *body;
 };
 
-struct jl_stmt_default {
-  jl_lloc_t lloc;
+struct wulk_stmt_default {
+  wulk_lloc_t lloc;
 
-  jl_stmt_t *body;
+  wulk_stmt_t *body;
 };
 
-struct jl_stmt_compound {
-  jl_lloc_t lloc;
+struct wulk_stmt_compound {
+  wulk_lloc_t lloc;
 
-  jl_stmt_r stmts;
+  wulk_stmt_r stmts;
 };
 
-struct jl_stmt_if {
-  jl_lloc_t lloc;
+struct wulk_stmt_if {
+  wulk_lloc_t lloc;
 
-  jl_expr_t cond;
-  jl_stmt_t *then_body, *else_body;
+  wulk_expr_t cond;
+  wulk_stmt_t *then_body, *else_body;
 };
 
-struct jl_stmt_switch {
-  jl_lloc_t lloc;
+struct wulk_stmt_switch {
+  wulk_lloc_t lloc;
 
-  jl_expr_t cond;
-  jl_stmt_t *body;
+  wulk_expr_t cond;
+  wulk_stmt_t *body;
 };
 
-struct jl_stmt_while {
-  jl_lloc_t lloc;
+struct wulk_stmt_while {
+  wulk_lloc_t lloc;
 
-  jl_expr_t cond;
-  jl_stmt_t *body;
+  wulk_expr_t cond;
+  wulk_stmt_t *body;
 };
 
-struct jl_stmt_do {
-  jl_lloc_t lloc;
+struct wulk_stmt_do {
+  wulk_lloc_t lloc;
 
-  jl_expr_t cond;
-  jl_stmt_t *body;
+  wulk_expr_t cond;
+  wulk_stmt_t *body;
 };
 
-struct jl_stmt_for {
-  jl_lloc_t lloc;
+struct wulk_stmt_for {
+  wulk_lloc_t lloc;
 
-  jl_stmt_expr_t lhs, mhs;
-  jl_expr_t rhs;
-  jl_stmt_t *body;
+  wulk_stmt_expr_t lhs, mhs;
+  wulk_expr_t rhs;
+  wulk_stmt_t *body;
 };
 
-struct jl_stmt_goto {
-  jl_lloc_t lloc;
+struct wulk_stmt_goto {
+  wulk_lloc_t lloc;
 
   const char *label;
 };
 
-struct jl_stmt_break {
-  jl_lloc_t lloc;
+struct wulk_stmt_break {
+  wulk_lloc_t lloc;
 };
 
-struct jl_stmt_continue {
-  jl_lloc_t lloc;
+struct wulk_stmt_continue {
+  wulk_lloc_t lloc;
 };
 
-struct jl_stmt_return {
-  jl_lloc_t lloc;
+struct wulk_stmt_return {
+  wulk_lloc_t lloc;
 
-  jl_expr_t expr;
+  wulk_expr_t expr;
 };
 
-struct jl_stmt_decl {
-  jl_lloc_t lloc;
+struct wulk_stmt_decl {
+  wulk_lloc_t lloc;
 
-  struct jl_entity *entity;
+  struct wulk_entity *entity;
 };
 
-struct jl_stmt {
+struct wulk_stmt {
   union {
-    jl_lloc_t lloc;
-    jl_stmt_expr_t expr;
-    jl_stmt_label_t label;
-    jl_stmt_case_t case_stmt;
-    jl_stmt_default_t default_stmt;
-    jl_stmt_compound_t compound;
-    jl_stmt_if_t if_stmt;
-    jl_stmt_switch_t switch_stmt;
-    jl_stmt_while_t while_stmt;
-    jl_stmt_do_t do_stmt;
-    jl_stmt_for_t for_stmt;
-    jl_stmt_goto_t goto_stmt;
-    jl_stmt_break_t break_stmt;
-    jl_stmt_continue_t continue_stmt;
-    jl_stmt_return_t return_stmt;
-    jl_stmt_decl_t decl;
+    wulk_lloc_t lloc;
+    wulk_stmt_expr_t expr;
+    wulk_stmt_label_t label;
+    wulk_stmt_case_t case_stmt;
+    wulk_stmt_default_t default_stmt;
+    wulk_stmt_compound_t compound;
+    wulk_stmt_if_t if_stmt;
+    wulk_stmt_switch_t switch_stmt;
+    wulk_stmt_while_t while_stmt;
+    wulk_stmt_do_t do_stmt;
+    wulk_stmt_for_t for_stmt;
+    wulk_stmt_goto_t goto_stmt;
+    wulk_stmt_break_t break_stmt;
+    wulk_stmt_continue_t continue_stmt;
+    wulk_stmt_return_t return_stmt;
+    wulk_stmt_decl_t decl;
   };
-  enum jl_stmt_n kind;
+  enum wulk_stmt_n kind;
 };
 
 
-typedef struct jl_entity jl_entity_t;
-typedef struct jl_field jl_field_t;
-typedef struct jl_var jl_var_t;
-typedef struct jl_param jl_param_t;
-typedef struct jl_func jl_func_t;
-typedef struct jl_enum jl_enum_t;
-typedef struct jl_struct jl_struct_t;
-typedef struct jl_union jl_union_t;
-typedef struct jl_label jl_label_t;
+typedef struct wulk_entity wulk_entity_t;
+typedef struct wulk_field wulk_field_t;
+typedef struct wulk_var wulk_var_t;
+typedef struct wulk_param wulk_param_t;
+typedef struct wulk_func wulk_func_t;
+typedef struct wulk_enum wulk_enum_t;
+typedef struct wulk_struct wulk_struct_t;
+typedef struct wulk_union wulk_union_t;
+typedef struct wulk_label wulk_label_t;
 
-typedef adt_vector_of(jl_entity_t) jl_entity_r;
+typedef adt_vector_of(wulk_entity_t) wulk_entity_r;
 
-enum jl_entity_n {
-  JL_ENTITY_UNDEFINED = 0,
-  JL_ENTITY_FIELD,
-  JL_ENTITY_VAR,
-  JL_ENTITY_PARAM,
-  JL_ENTITY_FUNC,
-  JL_ENTITY_ENUM,
-  JL_ENTITY_STRUCT,
-  JL_ENTITY_UNION,
-  JL_ENTITY_LABEL
+enum wulk_entity_n {
+  WULK_ENTITY_UNDEFINED = 0,
+  WULK_ENTITY_FIELD,
+  WULK_ENTITY_VAR,
+  WULK_ENTITY_PARAM,
+  WULK_ENTITY_FUNC,
+  WULK_ENTITY_ENUM,
+  WULK_ENTITY_STRUCT,
+  WULK_ENTITY_UNION,
+  WULK_ENTITY_LABEL
 };
 
-struct jl_field {
-  jl_lloc_t lloc;
+struct wulk_field {
+  wulk_lloc_t lloc;
   size_t size, align;
-  jl_type_t type;
+  wulk_type_t type;
   const char *name;
 
   size_t offset;
   unsigned short field_width, field_offset;
 };
 
-struct jl_var {
-  jl_lloc_t lloc;
+struct wulk_var {
+  wulk_lloc_t lloc;
   size_t size, align;
-  jl_type_t type;
+  wulk_type_t type;
   const char *name;
 
-  jl_expr_t initializer;
+  wulk_expr_t initializer;
 };
 
-struct jl_param {
-  jl_lloc_t lloc;
+struct wulk_param {
+  wulk_lloc_t lloc;
   size_t size, align;
-  jl_type_t type;
+  wulk_type_t type;
   const char *name;
 
   unsigned position;
-  jl_expr_t initializer;
+  wulk_expr_t initializer;
 };
 
-struct jl_func {
-  jl_lloc_t lloc;
+struct wulk_func {
+  wulk_lloc_t lloc;
   size_t size, align;
-  jl_type_t return_type;
+  wulk_type_t return_type;
   const char *name;
 
-  jl_entity_r params;
-  jl_stmt_t body;
+  wulk_entity_r params;
+  wulk_stmt_t body;
 };
 
-struct jl_enum {
-  jl_lloc_t lloc;
+struct wulk_enum {
+  wulk_lloc_t lloc;
   size_t size, align;
-  jl_type_t type;
+  wulk_type_t type;
   const char *name;
 
-  jl_entity_r vars;
+  wulk_entity_r vars;
 };
 
-struct jl_struct {
-  jl_lloc_t lloc;
+struct wulk_struct {
+  wulk_lloc_t lloc;
   size_t size, align;
-  jl_type_t type;
+  wulk_type_t type;
   const char *name;
 
-  jl_entity_r fields;
+  wulk_entity_r fields;
 };
 
-struct jl_union {
-  jl_lloc_t lloc;
+struct wulk_union {
+  wulk_lloc_t lloc;
   size_t size, align;
-  jl_type_t type;
+  wulk_type_t type;
   const char *name;
 
-  jl_entity_r fields;
+  wulk_entity_r fields;
 };
 
-struct jl_label {
-  jl_lloc_t lloc;
+struct wulk_label {
+  wulk_lloc_t lloc;
   size_t size, align;
-  jl_type_t type;
+  wulk_type_t type;
   const char *name;
 
-  jl_stmt_t next;
+  wulk_stmt_t next;
 };
 
-struct jl_entity {
+struct wulk_entity {
   union {
     struct {
-      jl_lloc_t lloc;
+      wulk_lloc_t lloc;
       size_t size, align;
-      jl_type_t type;
+      wulk_type_t type;
       const char *name;
     };
-    jl_field_t field;
-    jl_var_t variable;
-    jl_param_t parameter;
-    jl_func_t function;
-    jl_enum_t enumerable;
-    jl_struct_t structure;
-    jl_union_t u_structure;
-    jl_label_t label;
+    wulk_field_t field;
+    wulk_var_t variable;
+    wulk_param_t parameter;
+    wulk_func_t function;
+    wulk_enum_t enumerable;
+    wulk_struct_t structure;
+    wulk_union_t u_structure;
+    wulk_label_t label;
   };
-  enum jl_entity_n kind;
+  enum wulk_entity_n kind;
 };
 
 
-typedef struct jl_node jl_node_t;
+typedef struct wulk_node wulk_node_t;
 
-enum jl_node_n {
-  JL_NODE_UNDEFINED = 0,
-  JL_NODE_ENTITY,
-  JL_NODE_EXPR,
-  JL_NODE_STMT,
-  JL_NODE_TYPE
+enum wulk_node_n {
+  WULK_NODE_UNDEFINED = 0,
+  WULK_NODE_ENTITY,
+  WULK_NODE_EXPR,
+  WULK_NODE_STMT,
+  WULK_NODE_TYPE
 };
 
-struct jl_node {
+struct wulk_node {
   union {
-    jl_lloc_t lloc;
-    jl_entity_t entity;
-    jl_expr_t expr;
-    jl_stmt_t stmt;
-    jl_type_t type;
+    wulk_lloc_t lloc;
+    wulk_entity_t entity;
+    wulk_expr_t expr;
+    wulk_stmt_t stmt;
+    wulk_type_t type;
   };
-  enum jl_node_n kind;
+  enum wulk_node_n kind;
 };
 
-#endif /* JL_IR_H__ */
+#endif /* WULK_IR_H__ */

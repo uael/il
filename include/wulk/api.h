@@ -23,13 +23,13 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_API_H__
-# define  JL_API_H__
+#ifndef   WULK_API_H__
+# define  WULK_API_H__
 
-#define jl_defined(e) ((e).kind != 0)
-#define jl_pdefined(e) ((e)->kind != 0)
+#define wulk_defined(e) ((e).kind != 0)
+#define wulk_pdefined(e) ((e)->kind != 0)
 
-#define jl_is(e, a) ((e).kind == (a))
-#define jl_pis(e, a) ((e)->kind == (a))
+#define wulk_is(e, a) ((e).kind == (a))
+#define wulk_pis(e, a) ((e)->kind == (a))
 
-#endif /* JL_API_H__ */
+#endif /* WULK_API_H__ */

@@ -23,47 +23,47 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_PARSER_H__
-# define  JL_PARSER_H__
+#ifndef   WULK_PARSER_H__
+# define  WULK_PARSER_H__
 
 #include <adt/deque.h>
 
 #include "lexer.h"
 
-struct jl_compiler_t;
-struct jl_scope_t;
-struct jl_program_t;
+struct wulk_compiler_t;
+struct wulk_scope_t;
+struct wulk_program_t;
 
-jl_token_t jl_lexer_peek(struct jl_lexer_t *self);
-jl_token_t jl_lexer_peekn(struct jl_lexer_t *self, unsigned n);
-jl_token_t jl_lexer_next(struct jl_lexer_t *self);
-jl_token_t jl_lexer_consume(struct jl_lexer_t *self, unsigned char type);
-jl_token_t jl_lexer_consume_id(struct jl_lexer_t *self, const char *id);
-void jl_lexer_undo(struct jl_lexer_t *lexer, jl_token_t until);
+wulk_token_t wulk_lexer_peek(struct wulk_lexer_t *self);
+wulk_token_t wulk_lexer_peekn(struct wulk_lexer_t *self, unsigned n);
+wulk_token_t wulk_lexer_next(struct wulk_lexer_t *self);
+wulk_token_t wulk_lexer_consume(struct wulk_lexer_t *self, unsigned char type);
+wulk_token_t wulk_lexer_consume_id(struct wulk_lexer_t *self, const char *id);
+void wulk_lexer_undo(struct wulk_lexer_t *lexer, wulk_token_t until);
 
-typedef struct jl_parser_t jl_parser_t;
+typedef struct wulk_parser_t wulk_parser_t;
 
-enum jl_parser_n {
-  JL_PARSER_UNDEFINED = 0,
-  JL_PARSER_C,
-  JL_PARSER_JAY
+enum wulk_parser_n {
+  WULK_PARSER_UNDEFINED = 0,
+  WULK_PARSER_C,
+  WULK_PARSER_JAY
 };
 
-struct jl_parser_t {
-  enum jl_parser_n kind;
-  struct jl_compiler_t *compiler;
-  struct jl_scope_t *scope;
-  jl_lexer_t *lexer;
+struct wulk_parser_t {
+  enum wulk_parser_n kind;
+  struct wulk_compiler_t *compiler;
+  struct wulk_scope_t *scope;
+  wulk_lexer_t *lexer;
   adt_deque_of(const char *) sources;
 
-  void (*parse)(jl_parser_t *self, struct jl_program_t *out);
+  void (*parse)(wulk_parser_t *self, struct wulk_program_t *out);
 };
 
-void jl_fe_init(jl_parser_t *self, enum jl_parser_n kind, struct jl_compiler_t *compiler);
-void jl_fe_dtor(jl_parser_t *self);
-void jl_fe_parse(jl_parser_t *self, jl_lexer_t *lexer, struct jl_program_t *out);
-void jl_fe_push_src(jl_parser_t *self, const char *src);
-void jl_fe_scope(jl_parser_t *self);
-void jl_fe_unscope(jl_parser_t *self);
+void wulk_fe_init(wulk_parser_t *self, enum wulk_parser_n kind, struct wulk_compiler_t *compiler);
+void wulk_fe_dtor(wulk_parser_t *self);
+void wulk_fe_parse(wulk_parser_t *self, wulk_lexer_t *lexer, struct wulk_program_t *out);
+void wulk_fe_push_src(wulk_parser_t *self, const char *src);
+void wulk_fe_scope(wulk_parser_t *self);
+void wulk_fe_unscope(wulk_parser_t *self);
 
-#endif /* JL_PARSER_H__ */
+#endif /* WULK_PARSER_H__ */

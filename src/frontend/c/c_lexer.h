@@ -23,8 +23,8 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_C_LEXER_H__
-# define  JL_C_LEXER_H__
+#ifndef   WULK_C_LEXER_H__
+# define  WULK_C_LEXER_H__
 
 #include "lexer.h"
 
@@ -137,6 +137,6 @@ enum {
   C_TOK_STRING
 };
 
-void c_lexer_init(jl_lexer_t *self);
+void c_lexer_init(wulk_lexer_t *self);
 
-#endif /* JL_C_LEXER_H__ */
+#endif /* WULK_C_LEXER_H__ */

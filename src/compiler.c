@@ -31,35 +31,35 @@
 
 #include "util/io.h"
 
-void jl_init(jl_compiler_t *self, int argc, char **argv) {
+void wulk_init(wulk_compiler_t *self, int argc, char **argv) {
   char *sep;
 
   if ((sep = strrchr(argv[0], '/'))) {
     argv[0] = ++sep;
   }
-  *self = (jl_compiler_t) {
+  *self = (wulk_compiler_t) {
     .program = argv[0]
   };
-  if (!jl_opts_init(&self->opts, argc, argv)) {
-    jl_opts_dtor(&self->opts);
+  if (!wulk_opts_init(&self->opts, argc, argv)) {
+    wulk_opts_dtor(&self->opts);
     exit(EXIT_SUCCESS);
   }
   if (!self->opts.in) {
-    jl_fatal_err(self, "no input file");
+    wulk_fatal_err(self, "no input file");
   }
   if (adt_vector_size(self->opts.opts_errs)) {
-    jl_err(self, adt_vector_front(self->opts.opts_errs));
+    wulk_err(self, adt_vector_front(self->opts.opts_errs));
   }
-  jl_fe_init(&self->fe, JL_PARSER_C, self);
-  jl_fe_push_src(&self->fe, self->opts.in);
+  wulk_fe_init(&self->fe, WULK_PARSER_C, self);
+  wulk_fe_push_src(&self->fe, self->opts.in);
 }
 
-void jl_dtor(jl_compiler_t *self) {
+void wulk_dtor(wulk_compiler_t *self) {
   const char *str;
 
-  jl_opts_dtor(&self->opts);
-  if (jl_defined(self->fe)) {
-    jl_fe_dtor(&self->fe);
+  wulk_opts_dtor(&self->opts);
+  if (wulk_defined(self->fe)) {
+    wulk_fe_dtor(&self->fe);
   }
   adt_vector_foreach(self->strtab, str) {
     xfree((void *) str);
@@ -67,11 +67,11 @@ void jl_dtor(jl_compiler_t *self) {
   adt_vector_dtor(self->strtab);
 }
 
-void jl_parse(jl_compiler_t *self) {
-  jl_fe_parse(&self->fe, NULL, &self->ast);
+void wulk_parse(wulk_compiler_t *self) {
+  wulk_fe_parse(&self->fe, NULL, &self->ast);
 }
 
-JL_NORETURN jl_err(jl_compiler_t *self, const char *format, ...) {
+WULK_NORETURN wulk_err(wulk_compiler_t *self, const char *format, ...) {
   va_list args;
 
   if (self) {
@@ -85,12 +85,12 @@ JL_NORETURN jl_err(jl_compiler_t *self, const char *format, ...) {
   putc('\n', stdout);
 
   if (self) {
-    jl_dtor(self);
+    wulk_dtor(self);
   }
   exit(EXIT_FAILURE);
 }
 
-JL_NORETURN jl_fatal_err(jl_compiler_t *self, const char *format, ...) {
+WULK_NORETURN wulk_fatal_err(wulk_compiler_t *self, const char *format, ...) {
   va_list args;
 
   if (self) {
@@ -104,23 +104,23 @@ JL_NORETURN jl_fatal_err(jl_compiler_t *self, const char *format, ...) {
   putc('\n', stdout);
 
   if (self) {
-    jl_dtor(self);
+    wulk_dtor(self);
   }
   exit(EXIT_FAILURE);
 }
 
-JL_NORETURN jl_parse_err(jl_compiler_t *self, jl_loc_t loc, const char *format, ...) {
+WULK_NORETURN wulk_parse_err(wulk_compiler_t *self, wulk_loc_t loc, const char *format, ...) {
   size_t begin = loc.position - loc.colno;
   const char *ptr, *file;
-  jl_lexer_t lexer = (jl_lexer_t) {0};
-  jl_token_t eol;
+  wulk_lexer_t lexer = (wulk_lexer_t) {0};
+  wulk_token_t eol;
   va_list args;
 
   file = adt_vector_at(self->fe.sources, loc.file_id);
-  jl_lexer_fork(&lexer, self->fe.lexer);
+  wulk_lexer_fork(&lexer, self->fe.lexer);
   lexer.loc = loc;
   ptr = lexer.buffer + begin;
-  while ((eol = jl_lexer_next(&lexer)).type != '\n' && eol.type != '\0');
+  while ((eol = wulk_lexer_next(&lexer)).type != '\n' && eol.type != '\0');
   printf(BOLD "%s:" RESET " In function ‘" BOLD "syntax_error" RESET "’:\n", file);
   printf(BOLD "%s:%d:%d: " BOLD RED "error: " RESET, file, loc.colno + 1, loc.lineno + 1);
   va_start(args, format);
@@ -132,16 +132,16 @@ JL_NORETURN jl_parse_err(jl_compiler_t *self, jl_loc_t loc, const char *format, 
   }
   fputs(BOLD YELLOW "^\n" RESET, stdout);
 
-  jl_lexer_dtor(&lexer, true);
-  jl_dtor(self);
+  wulk_lexer_dtor(&lexer, true);
+  wulk_dtor(self);
   exit(EXIT_FAILURE);
 }
 
-const char *jl_strdup(jl_compiler_t *self, const char *str) {
-  return jl_strndup(self, str, strlen(str));
+const char *wulk_strdup(wulk_compiler_t *self, const char *str) {
+  return wulk_strndup(self, str, strlen(str));
 }
 
-const char *jl_strndup(jl_compiler_t *self, const char *str, size_t n) {
+const char *wulk_strndup(wulk_compiler_t *self, const char *str, size_t n) {
   adt_vector_push(self->strtab, "");
   adt_vector_back(self->strtab) = xmalloc(n + 1);
   strncpy((char *) adt_vector_back(self->strtab), str, n + 1);

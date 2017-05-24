@@ -23,8 +23,8 @@
  * SOFTWARE.
  */
 
-#ifndef   JAYL_XMALLOC_H__
-# define  JAYL_XMALLOC_H__
+#ifndef   WULK_XMALLOC_H__
+# define  WULK_XMALLOC_H__
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -62,4 +62,4 @@ void *xcalloc(size_t num, size_t size);
 
 void xfree(void *ptr);
 
-#endif /* JAYL_XMALLOC_H__ */
+#endif /* WULK_XMALLOC_H__ */

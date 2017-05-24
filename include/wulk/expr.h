@@ -23,37 +23,37 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_EXPR_H__
-# define  JL_EXPR_H__
+#ifndef   WULK_EXPR_H__
+# define  WULK_EXPR_H__
 
 #include "ir.h"
 
-#define jl_expr_undefined() ((jl_expr_t) {.kind = JL_EXPR_UNDEFINED})
-#define jl_expr_undef(eptr) (*(eptr) = jl_expr_undefined())
+#define wulk_expr_undefined() ((wulk_expr_t) {.kind = WULK_EXPR_UNDEFINED})
+#define wulk_expr_undef(eptr) (*(eptr) = wulk_expr_undefined())
 
-#define jl_val(vtype, val) ((jl_val_t) {.type = vtype, val})
+#define wulk_val(vtype, val) ((wulk_val_t) {.type = vtype, val})
 
-jl_expr_t jl_exprs(jl_expr_t *exprs);
-jl_expr_t jl_exprs_start(jl_expr_t expr);
-jl_expr_t jl_id(jl_lloc_t lloc, const char *id, jl_type_t type);
-jl_expr_t jl_const_int(jl_lloc_t lloc, int d);
-jl_expr_t jl_const_float(jl_lloc_t lloc, float f);
-jl_expr_t jl_const_string(jl_lloc_t lloc, const char *s);
-jl_expr_t jl_const(jl_lloc_t lloc, jl_val_t value);
-jl_expr_t jl_unary(jl_lloc_t op_lloc, enum jl_op_n op, jl_expr_t operand);
-jl_expr_t jl_cast(jl_lloc_t type_lloc, jl_type_t type, jl_expr_t operand);
-jl_expr_t jl_binary(enum jl_op_n op, jl_expr_t lhs, jl_expr_t rhs);
-jl_expr_t jl_ternary(jl_expr_t lhs, jl_expr_t mhs, jl_expr_t rhs);
-jl_expr_t jl_array_read(jl_expr_t lhs, jl_lloc_t pos_lloc, jl_expr_t pos);
-jl_expr_t jl_array_write(jl_array_read_t array_read, jl_expr_t rhs);
-jl_expr_t jl_field_read(jl_expr_t lhs, jl_id_t id);
-jl_expr_t jl_field_write(jl_field_read_t field_read, jl_expr_t rhs);
-jl_expr_t jl_call(jl_expr_t lhs, jl_lloc_t args_lloc, jl_exprs_t args);
+wulk_expr_t wulk_exprs(wulk_expr_t *exprs);
+wulk_expr_t wulk_exprs_start(wulk_expr_t expr);
+wulk_expr_t wulk_id(wulk_lloc_t lloc, const char *id, wulk_type_t type);
+wulk_expr_t wulk_const_int(wulk_lloc_t lloc, int d);
+wulk_expr_t wulk_const_float(wulk_lloc_t lloc, float f);
+wulk_expr_t wulk_const_string(wulk_lloc_t lloc, const char *s);
+wulk_expr_t wulk_const(wulk_lloc_t lloc, wulk_val_t value);
+wulk_expr_t wulk_unary(wulk_lloc_t op_lloc, enum wulk_op_n op, wulk_expr_t operand);
+wulk_expr_t wulk_cast(wulk_lloc_t type_lloc, wulk_type_t type, wulk_expr_t operand);
+wulk_expr_t wulk_binary(enum wulk_op_n op, wulk_expr_t lhs, wulk_expr_t rhs);
+wulk_expr_t wulk_ternary(wulk_expr_t lhs, wulk_expr_t mhs, wulk_expr_t rhs);
+wulk_expr_t wulk_array_read(wulk_expr_t lhs, wulk_lloc_t pos_lloc, wulk_expr_t pos);
+wulk_expr_t wulk_array_write(wulk_array_read_t array_read, wulk_expr_t rhs);
+wulk_expr_t wulk_field_read(wulk_expr_t lhs, wulk_id_t id);
+wulk_expr_t wulk_field_write(wulk_field_read_t field_read, wulk_expr_t rhs);
+wulk_expr_t wulk_call(wulk_expr_t lhs, wulk_lloc_t args_lloc, wulk_exprs_t args);
 
-void jl_expr_dtor(jl_expr_t *self);
-bool jl_expr_is_constant(jl_expr_t self);
-int jl_const_parse(jl_lloc_t lloc, const char *s, size_t len, jl_expr_t *out);
-long jl_eval_long(jl_expr_t expr);
-unsigned long jl_eval_ulong(jl_expr_t expr);
+void wulk_expr_dtor(wulk_expr_t *self);
+bool wulk_expr_is_constant(wulk_expr_t self);
+int wulk_const_parse(wulk_lloc_t lloc, const char *s, size_t len, wulk_expr_t *out);
+long wulk_eval_long(wulk_expr_t expr);
+unsigned long wulk_eval_ulong(wulk_expr_t expr);
 
-#endif /* JL_EXPR_H__ */
+#endif /* WULK_EXPR_H__ */

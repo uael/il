@@ -33,26 +33,26 @@
 
 #include "c/c_parser.h"
 
-void jl_fe_init(jl_parser_t *self, enum jl_parser_n kind, jl_compiler_t *compiler) {
-  *self = (jl_parser_t) {
+void wulk_fe_init(wulk_parser_t *self, enum wulk_parser_n kind, wulk_compiler_t *compiler) {
+  *self = (wulk_parser_t) {
     .compiler = compiler,
     .kind = kind,
-    .scope = xmalloc(sizeof(jl_scope_t))
+    .scope = xmalloc(sizeof(wulk_scope_t))
   };
-  *self->scope = (jl_scope_t) {0};
+  *self->scope = (wulk_scope_t) {0};
 
   switch (self->kind) {
-    case JL_PARSER_C:
+    case WULK_PARSER_C:
       self->parse = c_parser_parse;
       break;
-    case JL_PARSER_JAY:
+    case WULK_PARSER_JAY:
       break;
     default:
       break;
   }
 }
 
-void jl_fe_dtor(jl_parser_t *self) {
+void wulk_fe_dtor(wulk_parser_t *self) {
   const char *src;
 
   adt_vector_foreach(self->sources, src) {
@@ -63,31 +63,31 @@ void jl_fe_dtor(jl_parser_t *self) {
   while (self->scope->parent) {
     self->scope = self->scope->parent;
   }
-  jl_scope_dtor(self->scope);
+  wulk_scope_dtor(self->scope);
   xfree(self->scope);
   self->scope = NULL;
   if (self->lexer) {
-    jl_lexer_dtor(self->lexer, true);
+    wulk_lexer_dtor(self->lexer, true);
     self->lexer = NULL;
   }
 }
 
-void jl_fe_parse(jl_parser_t *self, jl_lexer_t *lexer, struct jl_program_t *out) {
-  jl_lexer_t l = (jl_lexer_t) {0};
+void wulk_fe_parse(wulk_parser_t *self, wulk_lexer_t *lexer, struct wulk_program_t *out) {
+  wulk_lexer_t l = (wulk_lexer_t) {0};
 
   if (!lexer) {
-    jl_lexer_init_f(&l, self);
+    wulk_lexer_init_f(&l, self);
     self->lexer = &l;
   }
-  jl_program_init(out);
+  wulk_program_init(out);
   self->parse(self, out);
   if (!lexer) {
-    jl_lexer_dtor(&l, true);
+    wulk_lexer_dtor(&l, true);
     self->lexer = NULL;
   }
 }
 
-void jl_fe_push_src(jl_parser_t *self, const char *src) {
+void wulk_fe_push_src(wulk_parser_t *self, const char *src) {
   const char *file;
 
 #ifdef _MSC_VER
@@ -100,16 +100,16 @@ void jl_fe_push_src(jl_parser_t *self, const char *src) {
   adt_deque_push(self->sources, file);
 }
 
-void jl_fe_scope(jl_parser_t *self) {
-  jl_scope_t *parent;
+void wulk_fe_scope(wulk_parser_t *self) {
+  wulk_scope_t *parent;
 
   parent = self->scope;
-  self->scope = xmalloc(sizeof(jl_scope_t));
-  *self->scope = (jl_scope_t) {0};
+  self->scope = xmalloc(sizeof(wulk_scope_t));
+  *self->scope = (wulk_scope_t) {0};
   self->scope->parent = parent;
   adt_vector_push(parent->childs, self->scope);
 }
 
-void jl_fe_unscope(jl_parser_t *self) {
+void wulk_fe_unscope(wulk_parser_t *self) {
   self->scope = self->scope->parent;
 }

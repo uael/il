@@ -34,7 +34,7 @@
 #include "ltalloc.h"
 #endif
 
-static JL_NORETURN xnomem(void) {
+static WULK_NORETURN xnomem(void) {
   fputs("out of memory", stderr);
   abort();
 }

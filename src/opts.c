@@ -86,7 +86,7 @@ typedef unsigned __int64  uint64_t;
 
 #include "util/io.h"
 
-bool jl_opts_init(jl_opts_t *self, int argc, char **argv) {
+bool wulk_opts_init(wulk_opts_t *self, int argc, char **argv) {
   char err[256], *sep, *arg;
   int value;
   static const char *usage =
@@ -101,10 +101,10 @@ bool jl_opts_init(jl_opts_t *self, int argc, char **argv) {
     "  -O [ --optimize ] arg (=2) optimization level 0..5 (default: 2)\n"
     "  -o [ --output ] arg        output file name\n";
 
-  *self = (jl_opts_t) {
+  *self = (wulk_opts_t) {
     .out = "a.out",
     .optimize_lvl = 2,
-    .target = JL_BACKEND_FIRM_IA32
+    .target = WULK_BACKEND_FIRM_IA32
   };
 
   for (int i = 1; i < argc; ++i) {
@@ -314,12 +314,12 @@ bool jl_opts_init(jl_opts_t *self, int argc, char **argv) {
   if (self->in && (sep = strrchr(self->in, '/'))) {
     memcpy(self->src_dir, self->in, (size_t) (sep - self->in));
   } else {
-    (void) getcwd(self->src_dir, JL_SRC_DIR_MSIZE);
+    (void) getcwd(self->src_dir, WULK_SRC_DIR_MSIZE);
   }
   return true;
 }
 
-void jl_opts_dtor(jl_opts_t *self) {
+void wulk_opts_dtor(wulk_opts_t *self) {
   char *sep;
 
   adt_vector_foreach(self->opts_errs, sep) {

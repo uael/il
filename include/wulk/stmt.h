@@ -23,13 +23,13 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_STMT_H__
-# define  JL_STMT_H__
+#ifndef   WULK_STMT_H__
+# define  WULK_STMT_H__
 
 #include "ir.h"
 
-void jl_stmt_dtor(jl_stmt_t *self);
+void wulk_stmt_dtor(wulk_stmt_t *self);
 
-#define jl_stmt_undefined() ((jl_stmt_t) {.kind = JL_STMT_UNDEFINED})
+#define wulk_stmt_undefined() ((wulk_stmt_t) {.kind = WULK_STMT_UNDEFINED})
 
-#endif /* JL_STMT_H__ */
+#endif /* WULK_STMT_H__ */

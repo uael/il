@@ -27,15 +27,15 @@
 
 #include "entity.h"
 
-void jl_program_init(jl_program_t *self) {
-  *self = (jl_program_t) {{0}};
+void wulk_program_init(wulk_program_t *self) {
+  *self = (wulk_program_t) {{0}};
 }
 
-void jl_program_dtor(jl_program_t *self) {
-  jl_entity_t entity;
+void wulk_program_dtor(wulk_program_t *self) {
+  wulk_entity_t entity;
 
   adt_vector_foreach(self->entities, entity) {
-    jl_entity_dtor(&entity);
+    wulk_entity_dtor(&entity);
   }
   adt_vector_dtor(self->entities);
 }

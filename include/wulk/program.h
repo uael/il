@@ -23,21 +23,21 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_PROGRAM_H__
-# define  JL_PROGRAM_H__
+#ifndef   WULK_PROGRAM_H__
+# define  WULK_PROGRAM_H__
 
 #include <adt/hash.h>
 
 #include "symbol.h"
 
-typedef struct jl_program_t jl_program_t;
+typedef struct wulk_program_t wulk_program_t;
 
-struct jl_program_t {
-  jl_entity_r entities;
-  jl_symtab_t symtab;
+struct wulk_program_t {
+  wulk_entity_r entities;
+  wulk_symtab_t symtab;
 };
 
-void jl_program_init(jl_program_t *self);
-void jl_program_dtor(jl_program_t *self);
+void wulk_program_init(wulk_program_t *self);
+void wulk_program_dtor(wulk_program_t *self);
 
-#endif /* JL_PROGRAM_H__ */
+#endif /* WULK_PROGRAM_H__ */

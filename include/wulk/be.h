@@ -23,11 +23,11 @@
  * SOFTWARE.
  */
 
-#ifndef   JL_BE_H__
-# define  JL_BE_H__
+#ifndef   WULK_BE_H__
+# define  WULK_BE_H__
 
-typedef struct jl_backend_t {
+typedef struct wulk_backend_t {
   int tmp;
-} jl_backend_t;
+} wulk_backend_t;
 
-#endif /* JL_BE_H__ */
+#endif /* WULK_BE_H__ */

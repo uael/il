@@ -25,30 +25,30 @@
 
 #include "node.h"
 
-jl_node_t jl_entity(jl_entity_t entity) {
-  return (jl_node_t) {
-    .kind = JL_NODE_ENTITY,
+wulk_node_t wulk_entity(wulk_entity_t entity) {
+  return (wulk_node_t) {
+    .kind = WULK_NODE_ENTITY,
     .entity = entity
   };
 }
 
-jl_node_t jl_expr(jl_expr_t expr) {
-  return (jl_node_t) {
-    .kind = JL_NODE_EXPR,
+wulk_node_t wulk_expr(wulk_expr_t expr) {
+  return (wulk_node_t) {
+    .kind = WULK_NODE_EXPR,
     .expr = expr
   };
 }
 
-jl_node_t jl_stmt(jl_stmt_t stmt) {
-  return (jl_node_t) {
-    .kind = JL_NODE_STMT,
+wulk_node_t wulk_stmt(wulk_stmt_t stmt) {
+  return (wulk_node_t) {
+    .kind = WULK_NODE_STMT,
     .stmt = stmt
   };
 }
 
-jl_node_t jl_type(jl_type_t type) {
-  return (jl_node_t) {
-    .kind = JL_NODE_TYPE,
+wulk_node_t wulk_type(wulk_type_t type) {
+  return (wulk_node_t) {
+    .kind = WULK_NODE_TYPE,
     .type = type
   };
 }

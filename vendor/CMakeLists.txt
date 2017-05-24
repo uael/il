@@ -29,6 +29,12 @@ if(LTALLOC)
     set(jayl_DEFS ${jayl_DEFS} -DWITH_LTALLOC)
 endif()
 
+add_subdirectory(mu)
+
+set(jayl_DEPS ${jayl_DEPS} u)
+set(jayl_LDADD ${jayl_LDADD} u)
+set(jayl_INCLUDES ${jayl_INCLUDES} ${CMAKE_CURRENT_LIST_DIR}/mu/include)
+
 set(jayl_DEPS ${jayl_DEPS} PARENT_SCOPE)
 set(jayl_LDADD ${jayl_LDADD} PARENT_SCOPE)
 set(jayl_INCLUDES ${jayl_INCLUDES} PARENT_SCOPE)

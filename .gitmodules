@@ -1,3 +1,6 @@
 [submodule "vendor/mu"]
 	path = vendor/mu
 	url = https://www.github.com/uael/mu.git
+[submodule "vendor/cute"]
+	path = vendor/cute
+	url = https://github.com/uael/cute.git

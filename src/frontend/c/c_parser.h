@@ -26,7 +26,7 @@
 #ifndef   JL_C_PARSER_H__
 # define  JL_C_PARSER_H__
 
-#include "parser.h"
+#include "wulk/parser.h"
 
 void c_parser_parse(struct jl_parser_t *self, struct jl_program_t *out);
 

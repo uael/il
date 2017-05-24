@@ -26,8 +26,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#include <adt/xmalloc.h>
-#include <adt/string.h>
+#include "adt/xmalloc.h"
+#include "adt/string.h"
 
 #include "c_lexer.h"
 

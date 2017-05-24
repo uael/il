@@ -26,7 +26,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <adt/string.h>
+#include "adt/string.h"
 
 #include "lexer.h"
 

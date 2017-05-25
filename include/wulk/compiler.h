@@ -20,7 +20,7 @@
 # define  WULK_COMPILER_H__
 
 #include <adt/string.h>
-#include <adt/attr.h>
+#include <u/compiler.h>
 
 #include "opts.h"
 #include "parser.h"
@@ -41,9 +41,9 @@ struct wulk_compiler_t {
 void wulk_init(wulk_compiler_t *self, int argc, char **argv);
 void wulk_dtor(wulk_compiler_t *self);
 void wulk_parse(wulk_compiler_t *self);
-WULK_NORETURN wulk_err(wulk_compiler_t *self, const char *format, ...);
-WULK_NORETURN wulk_fatal_err(wulk_compiler_t *self, const char *format, ...);
-WULK_NORETURN wulk_parse_err(wulk_compiler_t *self, wulk_loc_t loc, const char *format, ...);
+NORETURN void wulk_err(wulk_compiler_t *self, const char *format, ...);
+NORETURN void wulk_fatal_err(wulk_compiler_t *self, const char *format, ...);
+NORETURN void wulk_parse_err(wulk_compiler_t *self, wulk_loc_t loc, const char *format, ...);
 
 const char *wulk_strdup(wulk_compiler_t *self, const char *str);
 const char *wulk_strndup(wulk_compiler_t *self, const char *str, size_t n);

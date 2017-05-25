@@ -63,7 +63,7 @@ void wulk_parse(wulk_compiler_t *self) {
   wulk_fe_parse(&self->fe, NULL, &self->ast);
 }
 
-WULK_NORETURN wulk_err(wulk_compiler_t *self, const char *format, ...) {
+NORETURN void wulk_err(wulk_compiler_t *self, const char *format, ...) {
   va_list args;
 
   if (self) {
@@ -82,7 +82,7 @@ WULK_NORETURN wulk_err(wulk_compiler_t *self, const char *format, ...) {
   exit(EXIT_FAILURE);
 }
 
-WULK_NORETURN wulk_fatal_err(wulk_compiler_t *self, const char *format, ...) {
+NORETURN void wulk_fatal_err(wulk_compiler_t *self, const char *format, ...) {
   va_list args;
 
   if (self) {
@@ -101,7 +101,7 @@ WULK_NORETURN wulk_fatal_err(wulk_compiler_t *self, const char *format, ...) {
   exit(EXIT_FAILURE);
 }
 
-WULK_NORETURN wulk_parse_err(wulk_compiler_t *self, wulk_loc_t loc, const char *format, ...) {
+NORETURN void wulk_parse_err(wulk_compiler_t *self, wulk_loc_t loc, const char *format, ...) {
   size_t begin = loc.position - loc.colno;
   const char *ptr, *file;
   wulk_lexer_t lexer = (wulk_lexer_t) {0};

@@ -18,16 +18,15 @@
 
 #include <stdio.h>
 #include <assert.h>
+#include <u/compiler.h>
 
 #include "xmalloc.h"
-
-#include "attr.h"
 
 #ifdef WITH_LTALLOC
 #include "ltalloc.h"
 #endif
 
-static WULK_NORETURN xnomem(void) {
+static NORETURN void xnomem(void) {
   fputs("out of memory", stderr);
   abort();
 }

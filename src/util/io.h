@@ -32,7 +32,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
-#include "adt/bool.h"
+#include <u/stdbool.h>
 
 int64_t wulk_fsize(const char *path);
 const char *wulk_fread(const char *path, size_t *len);

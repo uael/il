@@ -19,7 +19,7 @@
 #ifndef   WULK_OPTS_H__
 # define  WULK_OPTS_H__
 
-#include <adt/bool.h>
+#include <u/stdbool.h>
 
 #define WULK_SRC_DIR_MSIZE 256
 

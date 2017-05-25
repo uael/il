@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
-#include <adt/bool.h>
+#include <u/stdbool.h>
 #include <adt/xmalloc.h>
 
 #define wulk_roundup32(x) \

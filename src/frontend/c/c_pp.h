@@ -19,7 +19,7 @@
 #ifndef   WULK_C_PP_H__
 # define  WULK_C_PP_H__
 
-#include "adt/bool.h"
+#include <u/stdbool.h>
 #include "adt/hash.h"
 
 #include "c_lexer.h"

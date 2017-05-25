@@ -1,54 +1,47 @@
 /*
- * MIT License
+ * Wulk - Wu uniform language kit
+ * Copyright (C) 2016-2017 Lucas Abel <www.github.com/uael>
  *
- * Copyright (c) 2016-2017 uael <www.github.com/uael>
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * The above copyright notice and this permission notice shall be included in
- * all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
 #include "node.h"
 
-jl_node_t jl_entity(jl_entity_t entity) {
-  return (jl_node_t) {
-    .kind = JL_NODE_ENTITY,
+wulk_node_t wulk_entity(wulk_entity_t entity) {
+  return (wulk_node_t) {
+    .kind = WULK_NODE_ENTITY,
     .entity = entity
   };
 }
 
-jl_node_t jl_expr(jl_expr_t expr) {
-  return (jl_node_t) {
-    .kind = JL_NODE_EXPR,
+wulk_node_t wulk_expr(wulk_expr_t expr) {
+  return (wulk_node_t) {
+    .kind = WULK_NODE_EXPR,
     .expr = expr
   };
 }
 
-jl_node_t jl_stmt(jl_stmt_t stmt) {
-  return (jl_node_t) {
-    .kind = JL_NODE_STMT,
+wulk_node_t wulk_stmt(wulk_stmt_t stmt) {
+  return (wulk_node_t) {
+    .kind = WULK_NODE_STMT,
     .stmt = stmt
   };
 }
 
-jl_node_t jl_type(jl_type_t type) {
-  return (jl_node_t) {
-    .kind = JL_NODE_TYPE,
+wulk_node_t wulk_type(wulk_type_t type) {
+  return (wulk_node_t) {
+    .kind = WULK_NODE_TYPE,
     .type = type
   };
 }

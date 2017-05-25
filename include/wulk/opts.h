@@ -16,11 +16,37 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#ifndef   WULK_C_PARSER_H__
-# define  WULK_C_PARSER_H__
+#ifndef   WULK_OPTS_H__
+# define  WULK_OPTS_H__
 
-#include "wulk/parser.h"
+#include <u/stdbool.h>
 
-void c_parser_parse(struct wulk_parser_t *self, struct wulk_program_t *out);
+#define WULK_SRC_DIR_MSIZE 256
 
-#endif /* WULK_C_PARSER_H__ */
+typedef struct wulk_opts_t wulk_opts_t;
+
+enum wulk_backend_n {
+  WULK_BACKEND_NONE = 0,
+  WULK_BACKEND_DOT,
+  WULK_BACKEND_PPRINT,
+  WULK_BACKEND_FIRM_ASM,
+  WULK_BACKEND_FIRM_AMD64,
+  WULK_BACKEND_FIRM_ARM,
+  WULK_BACKEND_FIRM_IA32,
+  WULK_BACKEND_FIRM_MIPS,
+  WULK_BACKEND_FIRM_SPARC
+};
+
+struct wulk_opts_t {
+  const char *in, *out;
+  char src_dir[WULK_SRC_DIR_MSIZE];
+  bool echo, firm_graph, verbose, output_asm;
+  int optimize_lvl;
+  enum wulk_backend_n target;
+  adt_vector_of(char *) opts_errs;
+};
+
+bool wulk_opts_init(wulk_opts_t *self, int argc, char **argv);
+void wulk_opts_dtor(wulk_opts_t *self);
+
+#endif /* WULK_OPTS_H__ */

@@ -16,11 +16,21 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#ifndef   WULK_C_PARSER_H__
-# define  WULK_C_PARSER_H__
+#ifndef   WULK_PROGRAM_H__
+# define  WULK_PROGRAM_H__
 
-#include "wulk/parser.h"
+#include <adt/hash.h>
 
-void c_parser_parse(struct wulk_parser_t *self, struct wulk_program_t *out);
+#include "symbol.h"
 
-#endif /* WULK_C_PARSER_H__ */
+typedef struct wulk_program_t wulk_program_t;
+
+struct wulk_program_t {
+  wulk_entity_r entities;
+  wulk_symtab_t symtab;
+};
+
+void wulk_program_init(wulk_program_t *self);
+void wulk_program_dtor(wulk_program_t *self);
+
+#endif /* WULK_PROGRAM_H__ */

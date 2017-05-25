@@ -1,32 +1,25 @@
 /*
- * MIT License
+ * Wulk - Wu uniform language kit
+ * Copyright (C) 2016-2017 Lucas Abel <www.github.com/uael>
  *
- * Copyright (c) 2016-2017 uael <www.github.com/uael>
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * The above copyright notice and this permission notice shall be included in
- * all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <adt/string.h>
+#include "adt/string.h"
 
 #include "lexer.h"
 
@@ -34,10 +27,10 @@
 #include "compiler.h"
 #include "c/c_lexer.h"
 
-void jl_lexer_init(jl_lexer_t *self, jl_compiler_t *compiler, uint32_t file_id, const char *buffer, size_t length) {
-  *self = (jl_lexer_t) {
+void wulk_lexer_init(wulk_lexer_t *self, wulk_compiler_t *compiler, uint32_t file_id, const char *buffer, size_t length) {
+  *self = (wulk_lexer_t) {
     .compiler = compiler,
-    .loc = (jl_loc_t) {
+    .loc = (wulk_loc_t) {
       .file_id = file_id
     },
     .buffer = buffer ? xstrndup(buffer, length) : NULL,
@@ -49,50 +42,50 @@ void jl_lexer_init(jl_lexer_t *self, jl_compiler_t *compiler, uint32_t file_id, 
     self->buffer[length] = '\0';
   }
   switch (compiler->fe.kind) {
-    case JL_PARSER_C:
+    case WULK_PARSER_C:
       c_lexer_init(self);
       break;
-    case JL_PARSER_JAY:
+    case WULK_PARSER_JAY:
       break;
     default:
       break;
   }
 }
 
-void jl_lexer_init_f(jl_lexer_t *self, jl_parser_t *fe) {
+void wulk_lexer_init_f(wulk_lexer_t *self, wulk_parser_t *fe) {
   size_t len;
   uint32_t file_id;
   const char *filename, *buffer;
 
   if (!adt_deque_length(fe->sources)) {
-    jl_fatal_err(fe->compiler, "No input files");
+    wulk_fatal_err(fe->compiler, "No input files");
   }
 
   file_id = (uint32_t) adt_deque_cursor(fe->sources);
   filename = adt_deque_shift(fe->sources);
-  if (!jl_fexists(filename)) {
-    jl_fatal_err(fe->compiler, "Input file does not exists '%s'", filename);
+  if (!wulk_fexists(filename)) {
+    wulk_fatal_err(fe->compiler, "Input file does not exists '%s'", filename);
   }
-  buffer = jl_fread(filename, &len);
+  buffer = wulk_fread(filename, &len);
   if (!buffer) {
-    jl_fatal_err(fe->compiler, "Unable to read input file '%s'", filename);
+    wulk_fatal_err(fe->compiler, "Unable to read input file '%s'", filename);
   }
 
-  jl_lexer_init(self,  fe->compiler, file_id, buffer, len);
+  wulk_lexer_init(self,  fe->compiler, file_id, buffer, len);
   xfree((char *) buffer);
 }
 
-void jl_lexer_dtor(jl_lexer_t *self, bool free_all) {
-  jl_token_t token;
-  jl_lexer_event_t event;
-  jl_lexer_t child;
+void wulk_lexer_dtor(wulk_lexer_t *self, bool free_all) {
+  wulk_token_t token;
+  wulk_lexer_event_t event;
+  wulk_lexer_t child;
 
-  if (self->buffer && jl_lexer_is_root(self)) {
+  if (self->buffer && wulk_lexer_is_root(self)) {
     xfree(self->buffer);
   }
   self->queue.cursor = 0;
   adt_deque_foreach(self->queue, token) {
-    jl_token_dtor(&token);
+    wulk_token_dtor(&token);
   }
   adt_vector_foreach(self->events, event) {
     if (event.dtor) {
@@ -100,7 +93,7 @@ void jl_lexer_dtor(jl_lexer_t *self, bool free_all) {
     }
   }
   adt_vector_foreach(self->childs, child) {
-    jl_lexer_dtor(&child, true);
+    wulk_lexer_dtor(&child, true);
   }
   if (free_all) {
     adt_vector_dtor(self->childs);
@@ -113,7 +106,7 @@ void jl_lexer_dtor(jl_lexer_t *self, bool free_all) {
   }
 }
 
-void jl_lexer_fork(jl_lexer_t *destination, jl_lexer_t *source) {
+void wulk_lexer_fork(wulk_lexer_t *destination, wulk_lexer_t *source) {
   destination->parent = source;
   destination->compiler = source->compiler;
   destination->loc = source->loc;
@@ -123,42 +116,42 @@ void jl_lexer_fork(jl_lexer_t *destination, jl_lexer_t *source) {
   destination->cap = 1;
 }
 
-void jl_lexer_join(jl_lexer_t *fork) {
+void wulk_lexer_join(wulk_lexer_t *fork) {
   if (adt_deque_size(fork->queue)) {
     fork->parent->loc = fork->loc;
   }
   adt_deque_clear(fork->queue);
 }
 
-void jl_lexer_skip(jl_lexer_t *self, unsigned n) {
+void wulk_lexer_skip(wulk_lexer_t *self, unsigned n) {
   self->loc.position += n;
 }
 
-size_t jl_lexer_length(jl_lexer_t *self) {
+size_t wulk_lexer_length(wulk_lexer_t *self) {
   return adt_deque_length(self->queue);
 }
 
-bool jl_lexer_push(jl_lexer_t *self, jl_token_t token) {
-  jl_lexer_event_t event;
+bool wulk_lexer_push(wulk_lexer_t *self, wulk_token_t token) {
+  wulk_lexer_event_t event;
   unsigned i;
 
   adt_vector_foreach(self->events, event) {
-    if (event.kind == JL_LEXER_EVENT_ON_PUSH) {
+    if (event.kind == WULK_LEXER_EVENT_ON_PUSH) {
       if (!event.callback(&event, &token)) {
-        jl_token_dtor(&token);
+        wulk_token_dtor(&token);
         return false;
       }
     }
   }
   token.cursor = adt_deque_size(self->queue);
   adt_deque_push(self->queue, token);
-  if (jl_lexer_is_root(self) && self->compiler->opts.echo) {
+  if (wulk_lexer_is_root(self) && self->compiler->opts.echo) {
     for (i = 0; i<token.leading_ws; ++i) {
       putc(' ', stdout);
     }
     switch (token.kind) {
-      case JL_TOKEN_IDENTIFIER:
-      case JL_TOKEN_NUMBER:
+      case WULK_TOKEN_IDENTIFIER:
+      case WULK_TOKEN_NUMBER:
         fputs(token.value, stdout);
         break;
       default:
@@ -169,63 +162,63 @@ bool jl_lexer_push(jl_lexer_t *self, jl_token_t token) {
   return true;
 }
 
-void jl_lexer_attach(jl_lexer_t *self, jl_lexer_event_t event) {
+void wulk_lexer_attach(wulk_lexer_t *self, wulk_lexer_event_t event) {
   event.lexer = self;
   adt_vector_push(self->events, event);
 }
 
-bool jl_lexer_is_root(jl_lexer_t *self) {
+bool wulk_lexer_is_root(wulk_lexer_t *self) {
   return self->parent == NULL;
 }
 
-void jl_lexer_next_src(jl_lexer_t *self, jl_parser_t *fe) {
-  jl_lexer_dtor(self, false);
-  jl_lexer_init_f(self, fe);
+void wulk_lexer_next_src(wulk_lexer_t *self, wulk_parser_t *fe) {
+  wulk_lexer_dtor(self, false);
+  wulk_lexer_init_f(self, fe);
   self->compiler = fe->compiler;
 }
 
-void jl_lexer_enqueue(jl_lexer_t *self, unsigned n) {
+void wulk_lexer_enqueue(wulk_lexer_t *self, unsigned n) {
   if (adt_vector_size(self->childs)) {
-    jl_lexer_enqueue(&adt_vector_back(self->childs), n);
+    wulk_lexer_enqueue(&adt_vector_back(self->childs), n);
   } else if (self->loc.position < self->length) {
     self->enqueue(self, n);
-  } else if (!jl_lexer_is_root(self)) {
+  } else if (!wulk_lexer_is_root(self)) {
     (void) adt_vector_pop(self->parent->childs);
-  } else if (!jl_lexer_length(self)) {
+  } else if (!wulk_lexer_length(self)) {
     if (adt_deque_length(self->compiler->fe.sources)) {
-      jl_lexer_next_src(self, &self->compiler->fe);
+      wulk_lexer_next_src(self, &self->compiler->fe);
     } else {
-      jl_token_t token = {'\0'};
-      jl_lexer_push(self, token);
+      wulk_token_t token = {'\0'};
+      wulk_lexer_push(self, token);
     }
   }
 }
 
-jl_token_t jl_lexer_peek(jl_lexer_t *self) {
-  if (jl_lexer_length(self) < 1) {
-    jl_lexer_enqueue(self, self->cap);
+wulk_token_t wulk_lexer_peek(wulk_lexer_t *self) {
+  if (wulk_lexer_length(self) < 1) {
+    wulk_lexer_enqueue(self, self->cap);
   }
   return adt_deque_front(self->queue);
 }
 
-jl_token_t jl_lexer_peekn(jl_lexer_t *self, unsigned n) {
+wulk_token_t wulk_lexer_peekn(wulk_lexer_t *self, unsigned n) {
   n++;
-  if (jl_lexer_length(self) <= n) {
-    jl_lexer_enqueue(self, n < self->cap ? self->cap : n);
+  if (wulk_lexer_length(self) <= n) {
+    wulk_lexer_enqueue(self, n < self->cap ? self->cap : n);
   }
   return adt_deque_at(
     self->queue,
-    (jl_lexer_length(self) < n ? jl_lexer_length(self) : n)-1
+    (wulk_lexer_length(self) < n ? wulk_lexer_length(self) : n)-1
   );
 }
 
-jl_token_t jl_lexer_next(jl_lexer_t *self) {
-  jl_token_t result;
+wulk_token_t wulk_lexer_next(wulk_lexer_t *self) {
+  wulk_token_t result;
 
-  if (jl_lexer_length(self) < 1) {
-    jl_lexer_enqueue(self, self->cap);
+  if (wulk_lexer_length(self) < 1) {
+    wulk_lexer_enqueue(self, self->cap);
   }
-  if (jl_lexer_length(self) && adt_deque_front(self->queue).type != 0) {
+  if (wulk_lexer_length(self) && adt_deque_front(self->queue).type != 0) {
     result = adt_deque_shift(self->queue);
   } else {
     result = adt_deque_front(self->queue);
@@ -233,50 +226,50 @@ jl_token_t jl_lexer_next(jl_lexer_t *self) {
   return result;
 }
 
-jl_token_t jl_lexer_consume(jl_lexer_t *self, unsigned char type) {
-  jl_token_t result;
+wulk_token_t wulk_lexer_consume(wulk_lexer_t *self, unsigned char type) {
+  wulk_token_t result;
 
   if (type != '\n') {
-    while (jl_lexer_peek(self).type == '\n') {
-      jl_lexer_next(self);
+    while (wulk_lexer_peek(self).type == '\n') {
+      wulk_lexer_next(self);
     }
   }
 
-  if ((result = jl_lexer_peek(self)).type != type) {
-    jl_parse_err(self->compiler, result.loc,
+  if ((result = wulk_lexer_peek(self)).type != type) {
+    wulk_parse_err(self->compiler, result.loc,
       "Unexpected token '" BOLD "%c" RESET "' expected '" BOLD "%c" "'" RESET,
       result.type,
       type
     );
   }
-  jl_lexer_next(self);
+  wulk_lexer_next(self);
   return result;
 }
 
-jl_token_t jl_lexer_consume_id(jl_lexer_t *self, const char *id) {
-  jl_token_t result;
-  if ((result = jl_lexer_peek(self)).kind != JL_TOKEN_IDENTIFIER) {
-    jl_parse_err(self->compiler, result.loc,
+wulk_token_t wulk_lexer_consume_id(wulk_lexer_t *self, const char *id) {
+  wulk_token_t result;
+  if ((result = wulk_lexer_peek(self)).kind != WULK_TOKEN_IDENTIFIER) {
+    wulk_parse_err(self->compiler, result.loc,
       "Unexpected token '" BOLD "%c" RESET "' expected identifier '" BOLD "%s" "'" RESET,
       result.type,
       id
     );
   }
   if (id && strcmp(id, result.value) != 0) {
-    jl_parse_err(self->compiler, result.loc,
+    wulk_parse_err(self->compiler, result.loc,
       "Unexpected identifier '" BOLD "%s" RESET "' expected '" BOLD "%s" "'" RESET,
       result.value,
       id
     );
   }
-  jl_lexer_next(self);
+  wulk_lexer_next(self);
   return result;
 }
 
-void jl_lexer_undo(jl_lexer_t *lexer, jl_token_t until) {
+void wulk_lexer_undo(wulk_lexer_t *lexer, wulk_token_t until) {
   while (adt_deque_cursor(lexer->queue) > until.cursor) --adt_deque_cursor(lexer->queue);
 }
 
-void jl_lexer_undon(jl_lexer_t *lexer, unsigned n) {
+void wulk_lexer_undon(wulk_lexer_t *lexer, unsigned n) {
   adt_deque_cursor(lexer->queue) -= n;
 }

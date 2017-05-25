@@ -1,26 +1,19 @@
 /*
- * MIT License
+ * Wulk - Wu uniform language kit
+ * Copyright (C) 2016-2017 Lucas Abel <www.github.com/uael>
  *
- * Copyright (c) 2016-2017 Abel Lucas <www.github.com/uael>
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * The above copyright notice and this permission notice shall be included in
- * all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
 #include <ctype.h>
@@ -86,7 +79,7 @@ typedef unsigned __int64  uint64_t;
 
 #include "util/io.h"
 
-bool jl_opts_init(jl_opts_t *self, int argc, char **argv) {
+bool wulk_opts_init(wulk_opts_t *self, int argc, char **argv) {
   char err[256], *sep, *arg;
   int value;
   static const char *usage =
@@ -101,10 +94,10 @@ bool jl_opts_init(jl_opts_t *self, int argc, char **argv) {
     "  -O [ --optimize ] arg (=2) optimization level 0..5 (default: 2)\n"
     "  -o [ --output ] arg        output file name\n";
 
-  *self = (jl_opts_t) {
+  *self = (wulk_opts_t) {
     .out = "a.out",
     .optimize_lvl = 2,
-    .target = JL_BACKEND_FIRM_IA32
+    .target = WULK_BACKEND_FIRM_IA32
   };
 
   for (int i = 1; i < argc; ++i) {
@@ -314,12 +307,12 @@ bool jl_opts_init(jl_opts_t *self, int argc, char **argv) {
   if (self->in && (sep = strrchr(self->in, '/'))) {
     memcpy(self->src_dir, self->in, (size_t) (sep - self->in));
   } else {
-    (void) getcwd(self->src_dir, JL_SRC_DIR_MSIZE);
+    (void) getcwd(self->src_dir, WULK_SRC_DIR_MSIZE);
   }
   return true;
 }
 
-void jl_opts_dtor(jl_opts_t *self) {
+void wulk_opts_dtor(wulk_opts_t *self) {
   char *sep;
 
   adt_vector_foreach(self->opts_errs, sep) {

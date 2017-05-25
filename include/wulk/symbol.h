@@ -16,19 +16,38 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#include "program.h"
+#ifndef   WULK_SYMBOL_H__
+# define  WULK_SYMBOL_H__
+
+#include <adt/hash.h>
+#include <adt/vector.h>
 
 #include "entity.h"
 
-void wulk_program_init(wulk_program_t *self) {
-  *self = (wulk_program_t) {{0}};
-}
+typedef struct wulk_sym_t wulk_sym_t;
+typedef struct wulk_scope_t wulk_scope_t;
+typedef adt_vector_of(wulk_scope_t *) wulk_scope_r;
 
-void wulk_program_dtor(wulk_program_t *self) {
+KHASH_DECLARE(wulk_symtab, const char *, wulk_sym_t)
+
+struct wulk_sym_t {
+  const char *id;
+  unsigned flags;
+  wulk_scope_t *scope;
   wulk_entity_t entity;
+};
 
-  adt_vector_foreach(self->entities, entity) {
-    wulk_entity_dtor(&entity);
-  }
-  adt_vector_dtor(self->entities);
-}
+struct wulk_scope_t {
+  wulk_scope_t *parent;
+  wulk_sym_t *sym;
+  wulk_symtab_t symtab;
+  wulk_scope_r childs;
+};
+
+void wulk_sym_dtor(wulk_sym_t *self);
+void wulk_scope_dtor(wulk_scope_t *self);
+bool wulk_sym_has_flag(wulk_sym_t *self, unsigned flag);
+wulk_sym_t *wulk_sym_put(wulk_scope_t *scope, const char *id, int *r);
+wulk_sym_t *wulk_sym_get(wulk_scope_t *scope, const char *id, int *r);
+
+#endif /* WULK_SYMBOL_H__ */

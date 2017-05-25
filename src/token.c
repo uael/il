@@ -1,52 +1,46 @@
 /*
- * MIT License
+ * Wulk - Wu uniform language kit
+ * Copyright (C) 2016-2017 Lucas Abel <www.github.com/uael>
  *
- * Copyright (c) 2016-2017 Abel Lucas <www.github.com/uael>
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * The above copyright notice and this permission notice shall be included in
- * all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
 #include "token.h"
 
-#include "frontend/lexer.h"
+#include "lexer.h"
 
-void jl_token_dtor(jl_token_t *self) {}
 
-jl_lloc_t jl_lloc_begin(jl_lexer_t *lexer) {
-  return (jl_lloc_t) {
+void wulk_token_dtor(wulk_token_t *self) {}
+
+wulk_lloc_t wulk_lloc_begin(wulk_lexer_t *lexer) {
+  return (wulk_lloc_t) {
     .lexer = lexer,
-    .begin = jl_lexer_peek(lexer).cursor
+    .begin = wulk_lexer_peek(lexer).cursor
   };
 }
 
-jl_lloc_t jl_lloc_end(jl_lloc_t self){
-  self.end = jl_lexer_peek(self.lexer).cursor;
+wulk_lloc_t wulk_lloc_end(wulk_lloc_t self){
+  self.end = wulk_lexer_peek(self.lexer).cursor;
   return self;
 }
 
-jl_rtoken_t jl_llocate(jl_lloc_t lloc) {
+wulk_rtoken_t wulk_llocate(wulk_lloc_t lloc) {
   if (lloc.lexer) {
-    return (jl_rtoken_t) {
+    return (wulk_rtoken_t) {
       adt_vector_at(lloc.lexer->queue, lloc.begin),
       adt_vector_at(lloc.lexer->queue, lloc.end)
     };
   }
-  return (jl_rtoken_t) {{0}, {0}};
+  return (wulk_rtoken_t) {{0}, {0}};
 }

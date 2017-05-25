@@ -1,27 +1,19 @@
 /*
- * MIT License
+ * Wulk - Wu uniform language kit
+ * Copyright (C) 2016-2017 Lucas Abel <www.github.com/uael>
  *
- * Copyright (c) 2014 CreoLabs
- * Copyright (c) 2016-2017 Abel Lucas <www.github.com/uael>
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * The above copyright notice and this permission notice shall be included in
- * all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
 #include "io.h"
@@ -93,7 +85,7 @@ typedef unsigned __int64  uint64_t;
 
 #include <adt/xmalloc.h>
 
-int64_t jl_fsize(const char *path) {
+int64_t wulk_fsize(const char *path) {
 #ifdef WIN32
   WIN32_FILE_ATTRIBUTE_DATA   fileInfo;
   if (GetFileAttributesExA(path, GetFileExInfoStandard, (void*)&fileInfo) == 0) return -1;
@@ -105,13 +97,13 @@ int64_t jl_fsize(const char *path) {
 #endif
 }
 
-const char *jl_fread(const char *path, size_t *len) {
+const char *wulk_fread(const char *path, size_t *len) {
   int fd = 0;
   off_t fsize = 0;
   ssize_t fsize2 = 0;
   char *buffer = NULL;
 
-  fsize = (size_t) jl_fsize(path);
+  fsize = (size_t) wulk_fsize(path);
   if (fsize < 0) goto abort_read;
 
   fd = open(path, O_RDONLY);
@@ -134,7 +126,7 @@ const char *jl_fread(const char *path, size_t *len) {
   return NULL;
 }
 
-bool jl_fexists(const char *path) {
+bool wulk_fexists(const char *path) {
 #ifdef WIN32
   BOOL isDirectory;
   DWORD attributes = GetFileAttributesA(path);
@@ -158,7 +150,7 @@ bool jl_fexists(const char *path) {
   return false;
 }
 
-bool jl_fwrite(const char *path, const char *buffer, size_t len) {
+bool wulk_fwrite(const char *path, const char *buffer, size_t len) {
   // RW for owner, R for group, R for others
 #ifdef _WIN32
   unsigned mode = _S_IWRITE;
@@ -176,7 +168,7 @@ bool jl_fwrite(const char *path, const char *buffer, size_t len) {
 }
 
 
-bool jl_is_dir(const char *path) {
+bool wulk_is_dir(const char *path) {
 #ifdef WIN32
   DWORD dwAttrs;
 
@@ -193,7 +185,7 @@ bool jl_is_dir(const char *path) {
   return false;
 }
 
-DIRREF jl_dir_init(const char *dirpath) {
+DIRREF wulk_dir_init(const char *dirpath) {
 #ifdef WIN32
   WIN32_FIND_DATA findData;
   WCHAR			path[MAX_PATH];
@@ -215,7 +207,7 @@ DIRREF jl_dir_init(const char *dirpath) {
 #endif
 }
 
-const char *jl_dread(DIRREF ref) {
+const char *wulk_dread(DIRREF ref) {
   if (ref == NULL) return NULL;
 
   while (1) {

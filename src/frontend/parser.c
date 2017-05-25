@@ -1,26 +1,19 @@
 /*
- * MIT License
+ * Wulk - Wu uniform language kit
+ * Copyright (C) 2016-2017 Lucas Abel <www.github.com/uael>
  *
- * Copyright (c) 2016-2017 Abel Lucas <www.github.com/uael>
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * The above copyright notice and this permission notice shall be included in
- * all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
 #include <stdio.h>
@@ -33,26 +26,26 @@
 
 #include "c/c_parser.h"
 
-void jl_fe_init(jl_parser_t *self, enum jl_parser_n kind, jl_compiler_t *compiler) {
-  *self = (jl_parser_t) {
+void wulk_fe_init(wulk_parser_t *self, enum wulk_parser_n kind, wulk_compiler_t *compiler) {
+  *self = (wulk_parser_t) {
     .compiler = compiler,
     .kind = kind,
-    .scope = xmalloc(sizeof(jl_scope_t))
+    .scope = xmalloc(sizeof(wulk_scope_t))
   };
-  *self->scope = (jl_scope_t) {0};
+  *self->scope = (wulk_scope_t) {0};
 
   switch (self->kind) {
-    case JL_PARSER_C:
+    case WULK_PARSER_C:
       self->parse = c_parser_parse;
       break;
-    case JL_PARSER_JAY:
+    case WULK_PARSER_JAY:
       break;
     default:
       break;
   }
 }
 
-void jl_fe_dtor(jl_parser_t *self) {
+void wulk_fe_dtor(wulk_parser_t *self) {
   const char *src;
 
   adt_vector_foreach(self->sources, src) {
@@ -63,31 +56,31 @@ void jl_fe_dtor(jl_parser_t *self) {
   while (self->scope->parent) {
     self->scope = self->scope->parent;
   }
-  jl_scope_dtor(self->scope);
+  wulk_scope_dtor(self->scope);
   xfree(self->scope);
   self->scope = NULL;
   if (self->lexer) {
-    jl_lexer_dtor(self->lexer, true);
+    wulk_lexer_dtor(self->lexer, true);
     self->lexer = NULL;
   }
 }
 
-void jl_fe_parse(jl_parser_t *self, jl_lexer_t *lexer, struct jl_program_t *out) {
-  jl_lexer_t l = (jl_lexer_t) {0};
+void wulk_fe_parse(wulk_parser_t *self, wulk_lexer_t *lexer, struct wulk_program_t *out) {
+  wulk_lexer_t l = (wulk_lexer_t) {0};
 
   if (!lexer) {
-    jl_lexer_init_f(&l, self);
+    wulk_lexer_init_f(&l, self);
     self->lexer = &l;
   }
-  jl_program_init(out);
+  wulk_program_init(out);
   self->parse(self, out);
   if (!lexer) {
-    jl_lexer_dtor(&l, true);
+    wulk_lexer_dtor(&l, true);
     self->lexer = NULL;
   }
 }
 
-void jl_fe_push_src(jl_parser_t *self, const char *src) {
+void wulk_fe_push_src(wulk_parser_t *self, const char *src) {
   const char *file;
 
 #ifdef _MSC_VER
@@ -100,16 +93,16 @@ void jl_fe_push_src(jl_parser_t *self, const char *src) {
   adt_deque_push(self->sources, file);
 }
 
-void jl_fe_scope(jl_parser_t *self) {
-  jl_scope_t *parent;
+void wulk_fe_scope(wulk_parser_t *self) {
+  wulk_scope_t *parent;
 
   parent = self->scope;
-  self->scope = xmalloc(sizeof(jl_scope_t));
-  *self->scope = (jl_scope_t) {0};
+  self->scope = xmalloc(sizeof(wulk_scope_t));
+  *self->scope = (wulk_scope_t) {0};
   self->scope->parent = parent;
   adt_vector_push(parent->childs, self->scope);
 }
 
-void jl_fe_unscope(jl_parser_t *self) {
+void wulk_fe_unscope(wulk_parser_t *self) {
   self->scope = self->scope->parent;
 }

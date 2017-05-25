@@ -16,11 +16,16 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#ifndef   WULK_C_PARSER_H__
-# define  WULK_C_PARSER_H__
+#ifndef   WULK_NODE_H__
+# define  WULK_NODE_H__
 
-#include "wulk/parser.h"
+#include "ir.h"
 
-void c_parser_parse(struct wulk_parser_t *self, struct wulk_program_t *out);
+wulk_node_t wulk_entity(wulk_entity_t entity);
+wulk_node_t wulk_expr(wulk_expr_t expr);
+wulk_node_t wulk_stmt(wulk_stmt_t stmt);
+wulk_node_t wulk_type(wulk_type_t type);
 
-#endif /* WULK_C_PARSER_H__ */
+#define wulk_node_undefined() ((wulk_node_t) {.kind = WULK_NODE_UNDEFINED})
+
+#endif /* WULK_NODE_H__ */

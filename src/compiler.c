@@ -1,27 +1,19 @@
 /*
- * MIT License
+ * Wulk - Wu uniform language kit
+ * Copyright (C) 2016-2017 Lucas Abel <www.github.com/uael>
  *
- * Copyright (c) 2014 CreoLabs. All rights reserved.
- * Copyright (c) 2016-2017 Abel Lucas <www.github.com/uael>
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * The above copyright notice and this permission notice shall be included in
- * all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
 #include <stdarg.h>
@@ -31,35 +23,35 @@
 
 #include "util/io.h"
 
-void jl_init(jl_compiler_t *self, int argc, char **argv) {
+void wulk_init(wulk_compiler_t *self, int argc, char **argv) {
   char *sep;
 
   if ((sep = strrchr(argv[0], '/'))) {
     argv[0] = ++sep;
   }
-  *self = (jl_compiler_t) {
+  *self = (wulk_compiler_t) {
     .program = argv[0]
   };
-  if (!jl_opts_init(&self->opts, argc, argv)) {
-    jl_opts_dtor(&self->opts);
+  if (!wulk_opts_init(&self->opts, argc, argv)) {
+    wulk_opts_dtor(&self->opts);
     exit(EXIT_SUCCESS);
   }
   if (!self->opts.in) {
-    jl_fatal_err(self, "no input file");
+    wulk_fatal_err(self, "no input file");
   }
   if (adt_vector_size(self->opts.opts_errs)) {
-    jl_err(self, adt_vector_front(self->opts.opts_errs));
+    wulk_err(self, adt_vector_front(self->opts.opts_errs));
   }
-  jl_fe_init(&self->fe, JL_PARSER_C, self);
-  jl_fe_push_src(&self->fe, self->opts.in);
+  wulk_fe_init(&self->fe, WULK_PARSER_C, self);
+  wulk_fe_push_src(&self->fe, self->opts.in);
 }
 
-void jl_dtor(jl_compiler_t *self) {
+void wulk_dtor(wulk_compiler_t *self) {
   const char *str;
 
-  jl_opts_dtor(&self->opts);
-  if (jl_defined(self->fe)) {
-    jl_fe_dtor(&self->fe);
+  wulk_opts_dtor(&self->opts);
+  if (wulk_defined(self->fe)) {
+    wulk_fe_dtor(&self->fe);
   }
   adt_vector_foreach(self->strtab, str) {
     xfree((void *) str);
@@ -67,11 +59,11 @@ void jl_dtor(jl_compiler_t *self) {
   adt_vector_dtor(self->strtab);
 }
 
-void jl_parse(jl_compiler_t *self) {
-  jl_fe_parse(&self->fe, NULL, &self->ast);
+void wulk_parse(wulk_compiler_t *self) {
+  wulk_fe_parse(&self->fe, NULL, &self->ast);
 }
 
-JL_NORETURN jl_err(jl_compiler_t *self, const char *format, ...) {
+NORETURN void wulk_err(wulk_compiler_t *self, const char *format, ...) {
   va_list args;
 
   if (self) {
@@ -85,12 +77,12 @@ JL_NORETURN jl_err(jl_compiler_t *self, const char *format, ...) {
   putc('\n', stdout);
 
   if (self) {
-    jl_dtor(self);
+    wulk_dtor(self);
   }
   exit(EXIT_FAILURE);
 }
 
-JL_NORETURN jl_fatal_err(jl_compiler_t *self, const char *format, ...) {
+NORETURN void wulk_fatal_err(wulk_compiler_t *self, const char *format, ...) {
   va_list args;
 
   if (self) {
@@ -104,23 +96,23 @@ JL_NORETURN jl_fatal_err(jl_compiler_t *self, const char *format, ...) {
   putc('\n', stdout);
 
   if (self) {
-    jl_dtor(self);
+    wulk_dtor(self);
   }
   exit(EXIT_FAILURE);
 }
 
-JL_NORETURN jl_parse_err(jl_compiler_t *self, jl_loc_t loc, const char *format, ...) {
+NORETURN void wulk_parse_err(wulk_compiler_t *self, wulk_loc_t loc, const char *format, ...) {
   size_t begin = loc.position - loc.colno;
   const char *ptr, *file;
-  jl_lexer_t lexer = (jl_lexer_t) {0};
-  jl_token_t eol;
+  wulk_lexer_t lexer = (wulk_lexer_t) {0};
+  wulk_token_t eol;
   va_list args;
 
   file = adt_vector_at(self->fe.sources, loc.file_id);
-  jl_lexer_fork(&lexer, self->fe.lexer);
+  wulk_lexer_fork(&lexer, self->fe.lexer);
   lexer.loc = loc;
   ptr = lexer.buffer + begin;
-  while ((eol = jl_lexer_next(&lexer)).type != '\n' && eol.type != '\0');
+  while ((eol = wulk_lexer_next(&lexer)).type != '\n' && eol.type != '\0');
   printf(BOLD "%s:" RESET " In function ‘" BOLD "syntax_error" RESET "’:\n", file);
   printf(BOLD "%s:%d:%d: " BOLD RED "error: " RESET, file, loc.colno + 1, loc.lineno + 1);
   va_start(args, format);
@@ -132,16 +124,16 @@ JL_NORETURN jl_parse_err(jl_compiler_t *self, jl_loc_t loc, const char *format, 
   }
   fputs(BOLD YELLOW "^\n" RESET, stdout);
 
-  jl_lexer_dtor(&lexer, true);
-  jl_dtor(self);
+  wulk_lexer_dtor(&lexer, true);
+  wulk_dtor(self);
   exit(EXIT_FAILURE);
 }
 
-const char *jl_strdup(jl_compiler_t *self, const char *str) {
-  return jl_strndup(self, str, strlen(str));
+const char *wulk_strdup(wulk_compiler_t *self, const char *str) {
+  return wulk_strndup(self, str, strlen(str));
 }
 
-const char *jl_strndup(jl_compiler_t *self, const char *str, size_t n) {
+const char *wulk_strndup(wulk_compiler_t *self, const char *str, size_t n) {
   adt_vector_push(self->strtab, "");
   adt_vector_back(self->strtab) = xmalloc(n + 1);
   strncpy((char *) adt_vector_back(self->strtab), str, n + 1);

@@ -1,30 +1,23 @@
 /*
- * MIT License
+ * Wulk - Wu uniform language kit
+ * Copyright (C) 2016-2017 Lucas Abel <www.github.com/uael>
  *
- * Copyright (c) 2016-2017 Abel Lucas <www.github.com/uael>
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * The above copyright notice and this permission notice shall be included in
- * all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#ifndef   JL_IO_H__
-# define  JL_IO_H__
+#ifndef   WULK_IO_H__
+# define  WULK_IO_H__
 
 #define RESET   "\033[0m"
 #define BLACK   "\033[30m"
@@ -39,12 +32,12 @@
 
 #include <stdint.h>
 #include <stddef.h>
-#include <adt/bool.h>
+#include <u/stdbool.h>
 
-int64_t jl_fsize(const char *path);
-const char *jl_fread(const char *path, size_t *len);
-bool jl_fexists(const char *path);
-bool jl_fwrite(const char *path, const char *buffer, size_t len);
+int64_t wulk_fsize(const char *path);
+const char *wulk_fread(const char *path, size_t *len);
+bool wulk_fexists(const char *path);
+bool wulk_fwrite(const char *path, const char *buffer, size_t len);
 
 #if defined(_WIN32)
 # include <windows.h>
@@ -54,8 +47,8 @@ bool jl_fwrite(const char *path, const char *buffer, size_t len);
 # define DIRREF DIR*
 #endif
 
-bool jl_is_dir(const char *path);
-DIRREF jl_dir_init(const char *path);
-const char *jl_dread(DIRREF ref);
+bool wulk_is_dir(const char *path);
+DIRREF wulk_dir_init(const char *path);
+const char *wulk_dread(DIRREF ref);
 
-#endif /* JL_IO_H__ */
+#endif /* WULK_IO_H__ */

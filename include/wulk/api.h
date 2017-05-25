@@ -16,11 +16,13 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#ifndef   WULK_C_PARSER_H__
-# define  WULK_C_PARSER_H__
+#ifndef   WULK_API_H__
+# define  WULK_API_H__
 
-#include "wulk/parser.h"
+#define wulk_defined(e) ((e).kind != 0)
+#define wulk_pdefined(e) ((e)->kind != 0)
 
-void c_parser_parse(struct wulk_parser_t *self, struct wulk_program_t *out);
+#define wulk_is(e, a) ((e).kind == (a))
+#define wulk_pis(e, a) ((e)->kind == (a))
 
-#endif /* WULK_C_PARSER_H__ */
+#endif /* WULK_API_H__ */

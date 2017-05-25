@@ -1,4 +1,4 @@
-version: "{build}"
+version: "0.0.1.{build}"
 
 platform:
   - Win32
@@ -18,25 +18,28 @@ init:
   - cmd: cmake --version
   - cmd: msbuild /version
 
-clone_folder: C:\projects\jay
+clone_folder: C:\projects\wulk
 
 branches:
   only:
     - master
+    - dev
 
 install:
   - git submodule update --init --recursive
 
 before_build:
-  - cmd: cd C:\projects\jay
+  - cmd: cd C:\projects\wulk
   - cmd: md build
   - cmd: cd build
   - cmd: if "%platform%"=="Win32" set CMAKE_GENERATOR_NAME=%msvc%
   - cmd: if "%platform%"=="x64"   set CMAKE_GENERATOR_NAME=%msvc% Win64
-  - cmd: cmake -G "%CMAKE_GENERATOR_NAME%" ..
+  - cmd: cmake -G "%CMAKE_GENERATOR_NAME%" -DCMAKE_BUILD_TYPE=%configuration% ..
 
 build:
-  project: C:\projects\jay\build\jay.sln
+  project: C:\projects\wulk\build\wulk.sln
   verbosity: quiet
 
-test: off
+test_script:
+  - ps: cd C:\projects\wulk\build
+  - cmd: ctest -VV

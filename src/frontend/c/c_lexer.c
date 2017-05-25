@@ -1,59 +1,52 @@
 /*
- * MIT License
+ * Wulk - Wu uniform language kit
+ * Copyright (C) 2016-2017 Lucas Abel <www.github.com/uael>
  *
- * Copyright (c) 2016-2017 uael <www.github.com/uael>
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * The above copyright notice and this permission notice shall be included in
- * all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
 #include <stdlib.h>
 #include <ctype.h>
 
-#include <adt/xmalloc.h>
-#include <adt/string.h>
+#include "adt/xmalloc.h"
+#include "adt/string.h"
 
 #include "c_lexer.h"
 
 #include "c_pp.h"
 #include "compiler.h"
 
-static void c_lexer_enqueue(jl_lexer_t *self, unsigned n);
+static void c_lexer_enqueue(wulk_lexer_t *self, unsigned n);
 
-void c_lexer_init(jl_lexer_t *self) {
-  jl_lexer_event_t event;
+void c_lexer_init(wulk_lexer_t *self) {
+  wulk_lexer_event_t event;
 
   self->enqueue = c_lexer_enqueue;
-  event = (jl_lexer_event_t) {
-    .kind = JL_LEXER_EVENT_ON_PUSH,
+  event = (wulk_lexer_event_t) {
+    .kind = WULK_LEXER_EVENT_ON_PUSH,
     .callback = c_pp_on_push_callback,
     .dtor = c_pp_on_push_dtor,
     .data = xmalloc(sizeof(c_pp_t))
   };
   c_pp_init(event.data);
-  jl_lexer_attach(self, event);
+  wulk_lexer_attach(self, event);
 }
 
 #define EMPTY {0}
-#define SYNTX(t, s) {.type=(t), .loc={0}, .name=s, .value=s, .length=sizeof(s)-1, .kind=JL_TOKEN_SYNTAX}
-#define XSYNT(t, s, n) {.type=(t), .loc={0}, .name=n, .value=s, .length=sizeof(s)-1, .kind=JL_TOKEN_SYNTAX}
-#define KEYWD(t, s) {.type=(t), .loc={0}, .name=s, .length=sizeof(s)-1, .kind=JL_TOKEN_KEYWORD}
+#define SYNTX(t, s) {.type=(t), .loc={0}, .name=s, .value=s, .length=sizeof(s)-1, .kind=WULK_TOKEN_SYNTAX}
+#define XSYNT(t, s, n) {.type=(t), .loc={0}, .name=n, .value=s, .length=sizeof(s)-1, .kind=WULK_TOKEN_SYNTAX}
+#define KEYWD(t, s) {.type=(t), .loc={0}, .name=s, .length=sizeof(s)-1, .kind=WULK_TOKEN_KEYWORD}
 #define TOKEN(t, k, n) {.type=(t), .loc={0}, .name=n, .kind=(k)}
 
 #define peek *(self->buffer + self->loc.position)
@@ -66,10 +59,10 @@ void c_lexer_init(jl_lexer_t *self) {
     token.length = i; \
     token.loc.colno -= i; \
     token.loc.position -= i; \
-    token.value = jl_strndup(self->compiler, s, i); \
+    token.value = wulk_strndup(self->compiler, s, i); \
   } while (false)
 #define push_token do { \
-    if (jl_lexer_push(self, token)) n--; \
+    if (wulk_lexer_push(self, token)) n--; \
   } while (false)
 #define push(t) do { \
     token = tokens[t]; \
@@ -97,8 +90,8 @@ void c_lexer_init(jl_lexer_t *self) {
 #define M8(n, a, b, c, d, e, f, g, h) i == (8+n) && __M8(n, a, b, c, d, e, f, g, h)
 
 
-static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
-  static const jl_token_t tokens[] = {
+static void c_lexer_enqueue(wulk_lexer_t *self, unsigned n) {
+  static const wulk_token_t tokens[] = {
     /* 0x00 */
     XSYNT(C_TOK_END, "\0", "END"),
     KEYWD(C_TOK_AUTO, "auto"),
@@ -244,9 +237,9 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
     EMPTY,
     EMPTY,
     EMPTY,
-    TOKEN(C_TOK_NUMBER, JL_TOKEN_NUMBER, "Number"),
-    TOKEN(C_TOK_IDENTIFIER, JL_TOKEN_IDENTIFIER, "Identifier"),
-    TOKEN(C_TOK_STRING, JL_TOKEN_STRING_LITERAL, "String"),
+    TOKEN(C_TOK_NUMBER, WULK_TOKEN_NUMBER, "Number"),
+    TOKEN(C_TOK_IDENTIFIER, WULK_TOKEN_IDENTIFIER, "Identifier"),
+    TOKEN(C_TOK_STRING, WULK_TOKEN_STRING_LITERAL, "String"),
     EMPTY,
 
     /* 0x78 */
@@ -260,7 +253,7 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
     EMPTY
   };
   char s[256];
-  jl_token_t token;
+  wulk_token_t token;
   unsigned i;
   uint32_t lws = 0;
 
@@ -787,6 +780,8 @@ static void c_lexer_enqueue(jl_lexer_t *self, unsigned n) {
           break;
         case ' ':
           ++lws;
+          next;
+          break;
         case '\t':
         default:
           next;

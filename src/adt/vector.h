@@ -1,38 +1,31 @@
 /*
- * MIT License
+ * Wulk - Wu uniform language kit
+ * Copyright (C) 2016-2017 Lucas Abel <www.github.com/uael>
  *
- * Copyright (c) 2016-2017 Abel Lucas <www.github.com/uael>
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * The above copyright notice and this permission notice shall be included in
- * all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#ifndef   JL_VECTOR_H__
-# define  JL_VECTOR_H__
+#ifndef   WULK_VECTOR_H__
+# define  WULK_VECTOR_H__
 
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
-#include <adt/bool.h>
-#include <adt/xmalloc.h>
+#include <u/stdbool.h>
+#include "adt/xmalloc.h"
 
-#define jl_roundup32(x) \
+#define wulk_roundup32(x) \
   (--(x), (x)|=(x)>>1, (x)|=(x)>>2, (x)|=(x)>>4, (x)|=(x)>>8, (x)|=(x)>>16, ++(x))
 
 #define adt_vector_of(t) struct { \
@@ -77,7 +70,7 @@
     size_t __s = (size_t) (i); \
     if (adt_vector_capacity(v) <= __s) { \
       adt_vector_capacity(v) = __s + 1; \
-      jl_roundup32(adt_vector_capacity(v)); \
+      wulk_roundup32(adt_vector_capacity(v)); \
       adt_vector_data(v) = xrealloc( \
         adt_vector_data(v), sizeof(*adt_vector_data(v)) * adt_vector_capacity(v) \
       ); \
@@ -114,4 +107,4 @@
     for (size_t __k = 1, __i = 0; __k && __i != adt_vector_length(v); __k = !__k, __i++) \
       for (var = *(adt_vector_data(v)+__i); __k; __k = !__k)
 
-#endif /* JL_VECTOR_H__ */
+#endif /* WULK_VECTOR_H__ */

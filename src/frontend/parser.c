@@ -88,7 +88,7 @@ void il_fe_push_src(il_parser_t *self, const char *src) {
   file = xstrdup(src);
 #else
   file = xmalloc(FILENAME_MAX + 1);
-  realpath(src, (char *) file);
+  (void) realpath(src, (char *) file);
 #endif
   adt_deque_push(self->sources, file);
 }

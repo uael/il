@@ -548,7 +548,6 @@ il_field_t *il_entity_field_lookup(il_entity_t self, const char *name) {
       break;
     default:
       break;
-      return NULL;
   }
   return NULL;
 }

@@ -1,11 +1,7 @@
-cmake_minimum_required(VERSION 2.8.11 FATAL_ERROR)
+cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 project(u)
 
 option(COVERAGE "Turn on COVERAGE support" OFF)
-
-if(COVERAGE AND NOT MSVC)
-    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} --coverage")
-endif()
 
 if(CMAKE_VERSION VERSION_LESS "3.1")
     if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
@@ -15,9 +11,35 @@ else()
     set(CMAKE_C_STANDARD 99)
 endif()
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror -Wextra")
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -g3 -DDEBUG")
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3")
+if(COVERAGE AND NOT MSVC)
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} --coverage")
+endif()
+
+set(u_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/include)
+set(u_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
+set(u_TEST_DIR ${CMAKE_CURRENT_LIST_DIR}/test)
+set(u_VENDOR_DIR ${CMAKE_CURRENT_LIST_DIR}/vendor)
+
+file(GLOB_RECURSE u_HEADERS ${u_HEADERS} ${u_INCLUDE_DIR}/${PROJECT_NAME}/*.h)
+file(GLOB_RECURSE u_SOURCES ${u_SOURCES} ${u_SOURCE_DIR}/*.c)
+
+add_library(${PROJECT_NAME} STATIC ${u_SOURCES} ${u_HEADERS})
+set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${u_HEADERS}")
+target_include_directories(${PROJECT_NAME} PUBLIC ${u_INCLUDE_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE ${u_SOURCE_DIR})
+
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
+if(NOT MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE -Werror -Wextra)
+endif()
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DDEBUG")
+    if(NOT MSVC)
+        target_compile_options(${PROJECT_NAME} PRIVATE -O0 -g3)
+    endif()
+elseif(NOT MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE -O3)
+endif()
 
 if(MSVC)
     set(CMAKE_FLAGS
@@ -33,19 +55,6 @@ if(MSVC)
         string(REPLACE "/MDd" "/MTd" ${CMAKE_FLAG} "${${CMAKE_FLAG}}")
     endforeach()
 endif()
-
-set(u_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/include)
-set(u_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
-set(u_TEST_DIR ${CMAKE_CURRENT_LIST_DIR}/test)
-set(u_VENDOR_DIR ${CMAKE_CURRENT_LIST_DIR}/vendor)
-
-file(GLOB_RECURSE u_HEADERS ${u_HEADERS} ${u_INCLUDE_DIR}/${PROJECT_NAME}/*.h)
-file(GLOB_RECURSE u_SOURCES ${u_SOURCES} ${u_SOURCE_DIR}/*.c)
-
-add_library(${PROJECT_NAME} STATIC ${u_SOURCES} ${u_HEADERS})
-set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${u_HEADERS}")
-target_include_directories(${PROJECT_NAME} PUBLIC ${u_INCLUDE_DIR})
-target_include_directories(${PROJECT_NAME} PRIVATE ${u_SOURCE_DIR})
 
 if(EXISTS ${u_TEST_DIR})
     enable_testing()

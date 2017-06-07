@@ -67,7 +67,7 @@ set(il_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
 set(il_TEST_DIR ${CMAKE_CURRENT_LIST_DIR}/test)
 set(il_VENDOR_DIR ${CMAKE_CURRENT_LIST_DIR}/vendor)
 
-file(GLOB_RECURSE il_HEADERS ${il_HEADERS} ${il_INCLUDE_DIR}/*.h)
+file(GLOB_RECURSE il_HEADERS ${il_HEADERS} ${il_INCLUDE_DIR}/${PROJECT_NAME}/*.h)
 file(GLOB_RECURSE il_SOURCES ${il_SOURCES} ${il_SOURCE_DIR}/*.c)
 
 add_library(${PROJECT_NAME} STATIC ${il_SOURCES} ${il_HEADERS})
@@ -87,6 +87,7 @@ endif()
 add_subdirectory(${il_VENDOR_DIR})
 if(EXISTS ${il_TEST_DIR})
     enable_testing()
+    add_subdirectory(${il_VENDOR_DIR}/cute)
     add_subdirectory(${il_TEST_DIR})
 endif()
 
@@ -95,3 +96,7 @@ install(TARGETS ${PROJECT_NAME}
     ARCHIVE DESTINATION lib
     PUBLIC_HEADER DESTINATION include/${PROJECT_NAME}
 )
+install(FILES ${il_INCLUDE_DIR}/${PROJECT_NAME}.h
+    DESTINATION include
+)
+

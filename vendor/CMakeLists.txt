@@ -16,5 +16,4 @@
 # along with this library; if not, see <http://www.gnu.org/licenses/>
 #
 
-add_subdirectory(cute)
 add_subdirectory(mu)

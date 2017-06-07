@@ -28,85 +28,85 @@
 #include "stmt.h"
 #include "type.h"
 
-static wulk_expr_t primary_expression(wulk_parser_t *self, wulk_program_t *out);
-static wulk_expr_t postfix_expression(wulk_parser_t *self, wulk_program_t *out);
-static wulk_expr_t unary_expression(wulk_parser_t *self, wulk_program_t *out);
-static wulk_expr_t cast_expression(wulk_parser_t *self, wulk_program_t *out);
-static wulk_expr_t multiplicative_expression(wulk_parser_t *self, wulk_program_t *out);
-static wulk_expr_t additive_expression(wulk_parser_t *self, wulk_program_t *out);
-static wulk_expr_t shift_expression(wulk_parser_t *self, wulk_program_t *out);
-static wulk_expr_t relational_expression(wulk_parser_t *self, wulk_program_t *out);
-static wulk_expr_t equality_expression(wulk_parser_t *self, wulk_program_t *out);
-static wulk_expr_t and_expression(wulk_parser_t *self, wulk_program_t *out);
-static wulk_expr_t exclusive_or_expression(wulk_parser_t *self, wulk_program_t *out);
-static wulk_expr_t inclusive_or_expression(wulk_parser_t *self, wulk_program_t *out);
-static wulk_expr_t logical_and_expression(wulk_parser_t *self, wulk_program_t *out);
-static wulk_expr_t logical_or_expression(wulk_parser_t *self, wulk_program_t *out);
-static wulk_expr_t conditional_expression(wulk_parser_t *self, wulk_program_t *out);
-static wulk_expr_t assignment_expression(wulk_parser_t *self, wulk_program_t *out);
-static wulk_expr_t expression(wulk_parser_t *self, wulk_program_t *out);
-static wulk_expr_t constant_expression(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t declaration(wulk_parser_t *self, wulk_program_t *out);
-static wulk_type_t declaration_specifiers(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t init_declarator_list(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t init_declarator(wulk_parser_t *self, wulk_program_t *out);
-static wulk_type_t type_specifier(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t struct_or_union_specifier(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t struct_or_union(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t struct_declaration_list(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t struct_declaration(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t specifier_qualifier_list(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t struct_declarator_list(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t struct_declarator(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t enum_specifier(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t enumerator_list(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t enumerator(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t atomic_type_specifier(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t type_qualifier(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t function_specifier(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t alignment_specifier(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t declarator(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t direct_declarator(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t pointer(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t type_qualifier_list(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t parameter_type_list(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t parameter_list(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t parameter_declaration(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t identifier_list(wulk_parser_t *self, wulk_program_t *out);
-static wulk_type_t type_name(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t abstract_declarator(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t direct_abstract_declarator(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t initializer(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t initializer_list(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t designation(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t designator_list(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t designator(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t static_assert_declaration(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t statement(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t labeled_statement(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t compound_statement(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t block_item_list(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t block_item(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t expression_statement(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t selection_statement(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t iteration_statement(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t jump_statement(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t translation_unit(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t external_declaration(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t function_definition(wulk_parser_t *self, wulk_program_t *out);
-static wulk_entity_t declaration_list(wulk_parser_t *self, wulk_program_t *out);
+static il_expr_t primary_expression(il_parser_t *self, il_program_t *out);
+static il_expr_t postfix_expression(il_parser_t *self, il_program_t *out);
+static il_expr_t unary_expression(il_parser_t *self, il_program_t *out);
+static il_expr_t cast_expression(il_parser_t *self, il_program_t *out);
+static il_expr_t multiplicative_expression(il_parser_t *self, il_program_t *out);
+static il_expr_t additive_expression(il_parser_t *self, il_program_t *out);
+static il_expr_t shift_expression(il_parser_t *self, il_program_t *out);
+static il_expr_t relational_expression(il_parser_t *self, il_program_t *out);
+static il_expr_t equality_expression(il_parser_t *self, il_program_t *out);
+static il_expr_t and_expression(il_parser_t *self, il_program_t *out);
+static il_expr_t exclusive_or_expression(il_parser_t *self, il_program_t *out);
+static il_expr_t inclusive_or_expression(il_parser_t *self, il_program_t *out);
+static il_expr_t logical_and_expression(il_parser_t *self, il_program_t *out);
+static il_expr_t logical_or_expression(il_parser_t *self, il_program_t *out);
+static il_expr_t conditional_expression(il_parser_t *self, il_program_t *out);
+static il_expr_t assignment_expression(il_parser_t *self, il_program_t *out);
+static il_expr_t expression(il_parser_t *self, il_program_t *out);
+static il_expr_t constant_expression(il_parser_t *self, il_program_t *out);
+static il_entity_t declaration(il_parser_t *self, il_program_t *out);
+static il_type_t declaration_specifiers(il_parser_t *self, il_program_t *out);
+static il_entity_t init_declarator_list(il_parser_t *self, il_program_t *out);
+static il_entity_t init_declarator(il_parser_t *self, il_program_t *out);
+static il_type_t type_specifier(il_parser_t *self, il_program_t *out);
+static il_entity_t struct_or_union_specifier(il_parser_t *self, il_program_t *out);
+static il_entity_t struct_or_union(il_parser_t *self, il_program_t *out);
+static il_entity_t struct_declaration_list(il_parser_t *self, il_program_t *out);
+static il_entity_t struct_declaration(il_parser_t *self, il_program_t *out);
+static il_entity_t specifier_qualifier_list(il_parser_t *self, il_program_t *out);
+static il_entity_t struct_declarator_list(il_parser_t *self, il_program_t *out);
+static il_entity_t struct_declarator(il_parser_t *self, il_program_t *out);
+static il_entity_t enum_specifier(il_parser_t *self, il_program_t *out);
+static il_entity_t enumerator_list(il_parser_t *self, il_program_t *out);
+static il_entity_t enumerator(il_parser_t *self, il_program_t *out);
+static il_entity_t atomic_type_specifier(il_parser_t *self, il_program_t *out);
+static il_entity_t type_qualifier(il_parser_t *self, il_program_t *out);
+static il_entity_t function_specifier(il_parser_t *self, il_program_t *out);
+static il_entity_t alignment_specifier(il_parser_t *self, il_program_t *out);
+static il_entity_t declarator(il_parser_t *self, il_program_t *out);
+static il_entity_t direct_declarator(il_parser_t *self, il_program_t *out);
+static il_entity_t pointer(il_parser_t *self, il_program_t *out);
+static il_entity_t type_qualifier_list(il_parser_t *self, il_program_t *out);
+static il_entity_t parameter_type_list(il_parser_t *self, il_program_t *out);
+static il_entity_t parameter_list(il_parser_t *self, il_program_t *out);
+static il_entity_t parameter_declaration(il_parser_t *self, il_program_t *out);
+static il_entity_t identifier_list(il_parser_t *self, il_program_t *out);
+static il_type_t type_name(il_parser_t *self, il_program_t *out);
+static il_entity_t abstract_declarator(il_parser_t *self, il_program_t *out);
+static il_entity_t direct_abstract_declarator(il_parser_t *self, il_program_t *out);
+static il_entity_t initializer(il_parser_t *self, il_program_t *out);
+static il_entity_t initializer_list(il_parser_t *self, il_program_t *out);
+static il_entity_t designation(il_parser_t *self, il_program_t *out);
+static il_entity_t designator_list(il_parser_t *self, il_program_t *out);
+static il_entity_t designator(il_parser_t *self, il_program_t *out);
+static il_entity_t static_assert_declaration(il_parser_t *self, il_program_t *out);
+static il_entity_t statement(il_parser_t *self, il_program_t *out);
+static il_entity_t labeled_statement(il_parser_t *self, il_program_t *out);
+static il_entity_t compound_statement(il_parser_t *self, il_program_t *out);
+static il_entity_t block_item_list(il_parser_t *self, il_program_t *out);
+static il_entity_t block_item(il_parser_t *self, il_program_t *out);
+static il_entity_t expression_statement(il_parser_t *self, il_program_t *out);
+static il_entity_t selection_statement(il_parser_t *self, il_program_t *out);
+static il_entity_t iteration_statement(il_parser_t *self, il_program_t *out);
+static il_entity_t jump_statement(il_parser_t *self, il_program_t *out);
+static il_entity_t translation_unit(il_parser_t *self, il_program_t *out);
+static il_entity_t external_declaration(il_parser_t *self, il_program_t *out);
+static il_entity_t function_definition(il_parser_t *self, il_program_t *out);
+static il_entity_t declaration_list(il_parser_t *self, il_program_t *out);
 
-void c_parser_parse(wulk_parser_t *self, wulk_program_t *out) {
+void c_parser_parse(il_parser_t *self, il_program_t *out) {
   int r;
 
-  wulk_fe_scope(self);
-  self->scope->sym = wulk_sym_put(self->scope, "foo", &r);
-  wulk_fe_unscope(self);
+  il_fe_scope(self);
+  self->scope->sym = il_sym_put(self->scope, "foo", &r);
+  il_fe_unscope(self);
 
-  wulk_expr_t expr = expression(self, out);
-  wulk_expr_dtor(&expr);
+  il_expr_t expr = expression(self, out);
+  il_expr_dtor(&expr);
 
-  while (wulk_lexer_next(self->lexer).type != 0);
+  while (il_lexer_next(self->lexer).type != 0);
 }
 
 enum {
@@ -114,152 +114,152 @@ enum {
   C_TOKEN_FLAG_ENUMERATION_CONSTANT = 1 << 0
 };
 
-static wulk_expr_t primary_expression(wulk_parser_t *self, wulk_program_t *out) {
+static il_expr_t primary_expression(il_parser_t *self, il_program_t *out) {
   int r;
-  wulk_sym_t *symbol;
-  wulk_token_t token;
-  wulk_expr_t r1, r2;
-  wulk_lloc_t lloc = wulk_lloc_begin(self->lexer);
+  il_sym_t *symbol;
+  il_token_t token;
+  il_expr_t r1, r2;
+  il_lloc_t lloc = il_lloc_begin(self->lexer);
 
-  switch ((token = wulk_lexer_peek(self->lexer)).type) {
+  switch ((token = il_lexer_peek(self->lexer)).type) {
     case C_TOK_IDENTIFIER:
-      wulk_lexer_next(self->lexer);
-      symbol = wulk_sym_get(self->scope, token.value, &r);
+      il_lexer_next(self->lexer);
+      symbol = il_sym_get(self->scope, token.value, &r);
       if (r) {
-        wulk_parse_err(self->compiler, token.loc, "Undefined symbol '%s'", token.value);
+        il_parse_err(self->compiler, token.loc, "Undefined symbol '%s'", token.value);
       }
       if (symbol->flags & C_TOKEN_FLAG_ENUMERATION_CONSTANT) {
         return symbol->entity.variable.initializer;
       }
-      return wulk_id(wulk_lloc_end(lloc), symbol->id, symbol->entity.type);
+      return il_id(il_lloc_end(lloc), symbol->id, symbol->entity.type);
     case C_TOK_NUMBER:
-      wulk_lexer_next(self->lexer);
-      switch (wulk_const_parse(wulk_lloc_end(lloc), token.value, token.length, &r2)) {
+      il_lexer_next(self->lexer);
+      switch (il_const_parse(il_lloc_end(lloc), token.value, token.length, &r2)) {
         case ERANGE:
-          wulk_parse_err(self->compiler, token.loc, "Numeric literal '%s' is out of range", token.value);
+          il_parse_err(self->compiler, token.loc, "Numeric literal '%s' is out of range", token.value);
         case 1:
-          wulk_parse_err(self->compiler, token.loc, "Invalid numeric literal '%s'", token.value);
+          il_parse_err(self->compiler, token.loc, "Invalid numeric literal '%s'", token.value);
         default:
           break;
       }
       return r2;
     case C_TOK_STRING:
-      wulk_lexer_next(self->lexer);
-      return wulk_const_string(wulk_lloc_end(lloc), token.value);
+      il_lexer_next(self->lexer);
+      return il_const_string(il_lloc_end(lloc), token.value);
     case C_TOK_FUNC_NAME:
-      if (!(symbol = self->scope->sym) || !wulk_is(symbol->entity, WULK_ENTITY_FUNC)) {
-        wulk_parse_err(self->compiler, token.loc,
+      if (!(symbol = self->scope->sym) || !il_is(symbol->entity, IL_ENTITY_FUNC)) {
+        il_parse_err(self->compiler, token.loc,
           "access of __func__ outside of function"
         );
       }
-      wulk_lexer_next(self->lexer);
-      return wulk_const_string(wulk_lloc_end(lloc), symbol->entity.name);
+      il_lexer_next(self->lexer);
+      return il_const_string(il_lloc_end(lloc), symbol->entity.name);
     case '(':
-      wulk_lexer_next(self->lexer);
+      il_lexer_next(self->lexer);
       r1 = expression(self, out);
-      wulk_lexer_consume(self->lexer, ')');
-      return wulk_unary(wulk_lloc_end(lloc), WULK_OP_EN, r1);
+      il_lexer_consume(self->lexer, ')');
+      return il_unary(il_lloc_end(lloc), IL_OP_EN, r1);
     default:
-      wulk_parse_err(self->compiler, token.loc,
+      il_parse_err(self->compiler, token.loc,
         "Unexpected '%s', not a valid primary expression",
         token.value ? token.value : token.name
       );
   }
 }
 
-static wulk_expr_t postfix_expression(wulk_parser_t *self, wulk_program_t *out) {
-  wulk_token_t token;
-  wulk_expr_t r1, r2;
-  wulk_lloc_t lloc;
+static il_expr_t postfix_expression(il_parser_t *self, il_program_t *out) {
+  il_token_t token;
+  il_expr_t r1, r2;
+  il_lloc_t lloc;
 
   r1 = primary_expression(self, out);
   while (true) {
-    lloc = wulk_lloc_begin(self->lexer);
-    switch ((token = wulk_lexer_peek(self->lexer)).type) {
+    lloc = il_lloc_begin(self->lexer);
+    switch ((token = il_lexer_peek(self->lexer)).type) {
       case '[':
-        if (!wulk_type_is_ref(r1.type)) {
-          wulk_parse_err(self->compiler, token.loc,
+        if (!il_type_is_ref(r1.type)) {
+          il_parse_err(self->compiler, token.loc,
             "Array access on non array element"
           );
         }
-        wulk_lexer_next(self->lexer);
+        il_lexer_next(self->lexer);
         r2 = expression(self, out);
-        wulk_lexer_consume(self->lexer, ']');
-        r1 = wulk_array_read(r1, wulk_lloc_end(lloc), r2);
+        il_lexer_consume(self->lexer, ']');
+        r1 = il_array_read(r1, il_lloc_end(lloc), r2);
         break;
       case '(': {
         unsigned i;
-        wulk_entity_t param;
-        wulk_func_t *func;
-        wulk_expr_r args = (wulk_expr_r) {0};
-        wulk_type_t type = r1.type;
+        il_entity_t param;
+        il_func_t *func;
+        il_expr_r args = (il_expr_r) {0};
+        il_type_t type = r1.type;
 
-        if (wulk_is(type, WULK_TYPE_POINTER) && wulk_type_is_func(*type.pointer.of)) {
+        if (il_is(type, IL_TYPE_POINTER) && il_type_is_func(*type.pointer.of)) {
           type = *type.pointer.of;
-        } else if (!wulk_type_is_func(type)) {
-          wulk_parse_err(self->compiler, token.loc,
+        } else if (!il_type_is_func(type)) {
+          il_parse_err(self->compiler, token.loc,
             "Expression must have type pointer to function"
           );
         }
         func = &type.compound.entity->function;
-        wulk_lexer_next(self->lexer);
+        il_lexer_next(self->lexer);
         for (i = 0; i < adt_vector_size(func->params); ++i) {
-          if (wulk_lexer_peek(self->lexer).type == ')') {
-            wulk_parse_err(self->compiler, token.loc,
+          if (il_lexer_peek(self->lexer).type == ')') {
+            il_parse_err(self->compiler, token.loc,
               "Too few arguments, expected %zu but got %d",
               adt_vector_size(func->params), i
             );
           }
           param = adt_vector_at(func->params, i);
           r2 = assignment_expression(self, out);
-          if (!wulk_type_equals(r2.type, param.type)) {
-            r2 = wulk_cast(r2.lloc, param.type, r2);
+          if (!il_type_equals(r2.type, param.type)) {
+            r2 = il_cast(r2.lloc, param.type, r2);
           }
           adt_vector_push(args, r2);
           if (i < adt_vector_size(func->params) - 1) {
-            wulk_lexer_consume(self->lexer, ',');
+            il_lexer_consume(self->lexer, ',');
           }
         }
-        wulk_lexer_consume(self->lexer, ')');
-        adt_vector_push(args, wulk_expr_undefined());
-        r1 = wulk_call(r1, wulk_lloc_end(lloc), wulk_exprs(args.data).exprs);
+        il_lexer_consume(self->lexer, ')');
+        adt_vector_push(args, il_expr_undefined());
+        r1 = il_call(r1, il_lloc_end(lloc), il_exprs(args.data).exprs);
         break;
       }
       case '.': {
-        wulk_field_t *field;
+        il_field_t *field;
 
-        wulk_lexer_next(self->lexer);
-        token = wulk_lexer_consume(self->lexer, C_TOK_IDENTIFIER);
-        field = wulk_field_lookup(r1.type, token.value);
+        il_lexer_next(self->lexer);
+        token = il_lexer_consume(self->lexer, C_TOK_IDENTIFIER);
+        field = il_field_lookup(r1.type, token.value);
         if (!field) {
-          wulk_parse_err(self->compiler, token.loc,
+          il_parse_err(self->compiler, token.loc,
             "Invalid access, no member named '%s'",
             token.value
           );
         }
-        r1 = wulk_field_read(r1, wulk_id(wulk_lloc_end(lloc), field->name, field->type).id);
+        r1 = il_field_read(r1, il_id(il_lloc_end(lloc), field->name, field->type).id);
         break;
       }
       case C_TOK_PTR_OP: {
-        wulk_type_t type;
-        wulk_field_t *field;
+        il_type_t type;
+        il_field_t *field;
 
-        wulk_lexer_next(self->lexer);
-        if (!wulk_is(type = r1.type, WULK_TYPE_POINTER)) {
-          wulk_parse_err(self->compiler, token.loc,
+        il_lexer_next(self->lexer);
+        if (!il_is(type = r1.type, IL_TYPE_POINTER)) {
+          il_parse_err(self->compiler, token.loc,
             "Invalid access on non pointer element '%s'",
             token.value
           );
         }
-        token = wulk_lexer_consume(self->lexer, C_TOK_IDENTIFIER);
-        field = wulk_field_lookup(wulk_type_deref(type), token.value);
+        token = il_lexer_consume(self->lexer, C_TOK_IDENTIFIER);
+        field = il_field_lookup(il_type_deref(type), token.value);
         if (!field) {
-          wulk_parse_err(self->compiler, token.loc,
+          il_parse_err(self->compiler, token.loc,
             "Invalid access, no member named '%s'",
             token.value
           );
         }
-        r1 = wulk_field_read(r1, wulk_id(wulk_lloc_end(lloc), field->name, field->type).id);
+        r1 = il_field_read(r1, il_id(il_lloc_end(lloc), field->name, field->type).id);
         break;
       }
       default:
@@ -268,80 +268,80 @@ static wulk_expr_t postfix_expression(wulk_parser_t *self, wulk_program_t *out) 
   }
 }
 
-static wulk_expr_t unary_expression(wulk_parser_t *self, wulk_program_t *out) {
-  wulk_expr_t r1;
-  enum wulk_op_n op;
-  wulk_lloc_t lloc = wulk_lloc_begin(self->lexer);
+static il_expr_t unary_expression(il_parser_t *self, il_program_t *out) {
+  il_expr_t r1;
+  enum il_op_n op;
+  il_lloc_t lloc = il_lloc_begin(self->lexer);
 
-  switch (wulk_lexer_peek(self->lexer).type) {
+  switch (il_lexer_peek(self->lexer).type) {
     case '&':
-      op = WULK_OP_AND;
+      op = IL_OP_AND;
       break;
     case '*':
-      op = WULK_OP_AND;
+      op = IL_OP_AND;
       break;
     case '-':
-      op = WULK_OP_SUB;
+      op = IL_OP_SUB;
       break;
     case '~':
-      op = WULK_OP_NEG;
+      op = IL_OP_NEG;
       break;
     case '!':
-      op = WULK_OP_NOT;
+      op = IL_OP_NOT;
       break;
     case C_TOK_INCREMENT:
-      op = WULK_OP_ADD;
+      op = IL_OP_ADD;
       goto self_assign;
     case C_TOK_DECREMENT:
-      op = WULK_OP_SUB;
+      op = IL_OP_SUB;
       goto self_assign;
     default:
       return postfix_expression(self, out);
     self_assign:
-      wulk_lexer_next(self->lexer);
-      lloc = wulk_lloc_end(lloc);
+      il_lexer_next(self->lexer);
+      lloc = il_lloc_end(lloc);
       r1 = unary_expression(self, out);
-      return wulk_unary(lloc, WULK_OP_EN, wulk_binary(WULK_OP_ASSIGN, r1, wulk_binary(op, r1, wulk_const_int(r1.lloc, 1))));
+      return il_unary(lloc, IL_OP_EN, il_binary(IL_OP_ASSIGN, r1, il_binary(op, r1, il_const_int(r1.lloc, 1))));
   }
-  wulk_lexer_next(self->lexer);
-  return wulk_unary(wulk_lloc_end(lloc), op, cast_expression(self, out));
+  il_lexer_next(self->lexer);
+  return il_unary(il_lloc_end(lloc), op, cast_expression(self, out));
 }
 
-static wulk_expr_t cast_expression(wulk_parser_t *self, wulk_program_t *out) {
-  wulk_type_t type;
-  wulk_token_t token;
-  wulk_lloc_t lloc = wulk_lloc_begin(self->lexer);
+static il_expr_t cast_expression(il_parser_t *self, il_program_t *out) {
+  il_type_t type;
+  il_token_t token;
+  il_lloc_t lloc = il_lloc_begin(self->lexer);
 
-  if ((token = wulk_lexer_peek(self->lexer)).type == '(') {
-    wulk_lexer_next(self->lexer);
-    if (!wulk_defined(type = type_name(self, out))) {
-      wulk_lexer_undo(self->lexer, token);
+  if ((token = il_lexer_peek(self->lexer)).type == '(') {
+    il_lexer_next(self->lexer);
+    if (!il_defined(type = type_name(self, out))) {
+      il_lexer_undo(self->lexer, token);
       return unary_expression(self, out);
     }
-    wulk_lexer_consume(self->lexer, ')');
-    return wulk_cast(wulk_lloc_end(lloc), type, cast_expression(self, out));
+    il_lexer_consume(self->lexer, ')');
+    return il_cast(il_lloc_end(lloc), type, cast_expression(self, out));
   }
 
   return unary_expression(self, out);
 }
 
-static wulk_expr_t multiplicative_expression(wulk_parser_t *self, wulk_program_t *out) {
-  wulk_expr_t r1;
+static il_expr_t multiplicative_expression(il_parser_t *self, il_program_t *out) {
+  il_expr_t r1;
 
   r1 = cast_expression(self, out);
   while (true) {
-    switch (wulk_lexer_peek(self->lexer).type) {
+    switch (il_lexer_peek(self->lexer).type) {
       case '*':
-        wulk_lexer_next(self->lexer);
-        r1 = wulk_binary(WULK_OP_MUL, r1, cast_expression(self, out));
+        il_lexer_next(self->lexer);
+        r1 = il_binary(IL_OP_MUL, r1, cast_expression(self, out));
         break;
       case '/':
-        wulk_lexer_next(self->lexer);
-        r1 = wulk_binary(WULK_OP_DIV, r1, cast_expression(self, out));
+        il_lexer_next(self->lexer);
+        r1 = il_binary(IL_OP_DIV, r1, cast_expression(self, out));
         break;
       case '%':
-        wulk_lexer_next(self->lexer);
-        r1 = wulk_binary(WULK_OP_MOD, r1, cast_expression(self, out));
+        il_lexer_next(self->lexer);
+        r1 = il_binary(IL_OP_MOD, r1, cast_expression(self, out));
         break;
       default:
         return r1;
@@ -349,19 +349,19 @@ static wulk_expr_t multiplicative_expression(wulk_parser_t *self, wulk_program_t
   }
 }
 
-static wulk_expr_t additive_expression(wulk_parser_t *self, wulk_program_t *out) {
-  wulk_expr_t r1;
+static il_expr_t additive_expression(il_parser_t *self, il_program_t *out) {
+  il_expr_t r1;
 
   r1 = multiplicative_expression(self, out);
   while (true) {
-    switch (wulk_lexer_peek(self->lexer).type) {
+    switch (il_lexer_peek(self->lexer).type) {
       case '+':
-        wulk_lexer_next(self->lexer);
-        r1 = wulk_binary(WULK_OP_ADD, r1, multiplicative_expression(self, out));
+        il_lexer_next(self->lexer);
+        r1 = il_binary(IL_OP_ADD, r1, multiplicative_expression(self, out));
         break;
       case '-':
-        wulk_lexer_next(self->lexer);
-        r1 = wulk_binary(WULK_OP_SUB, r1, multiplicative_expression(self, out));
+        il_lexer_next(self->lexer);
+        r1 = il_binary(IL_OP_SUB, r1, multiplicative_expression(self, out));
         break;
       default:
         return r1;
@@ -369,19 +369,19 @@ static wulk_expr_t additive_expression(wulk_parser_t *self, wulk_program_t *out)
   }
 }
 
-static wulk_expr_t shift_expression(wulk_parser_t *self, wulk_program_t *out) {
-  wulk_expr_t r1;
+static il_expr_t shift_expression(il_parser_t *self, il_program_t *out) {
+  il_expr_t r1;
 
   r1 = additive_expression(self, out);
   while (true) {
-    switch (wulk_lexer_peek(self->lexer).type) {
+    switch (il_lexer_peek(self->lexer).type) {
       case C_TOK_LEFT_OP:
-        wulk_lexer_next(self->lexer);
-        r1 = wulk_binary(WULK_OP_SHL, r1, additive_expression(self, out));
+        il_lexer_next(self->lexer);
+        r1 = il_binary(IL_OP_SHL, r1, additive_expression(self, out));
         break;
       case C_TOK_RIGHT_OP:
-        wulk_lexer_next(self->lexer);
-        r1 = wulk_binary(WULK_OP_SHR, r1, additive_expression(self, out));
+        il_lexer_next(self->lexer);
+        r1 = il_binary(IL_OP_SHR, r1, additive_expression(self, out));
         break;
       default:
         return r1;
@@ -389,27 +389,27 @@ static wulk_expr_t shift_expression(wulk_parser_t *self, wulk_program_t *out) {
   }
 }
 
-static wulk_expr_t relational_expression(wulk_parser_t *self, wulk_program_t *out) {
-  wulk_expr_t r1;
+static il_expr_t relational_expression(il_parser_t *self, il_program_t *out) {
+  il_expr_t r1;
 
   r1 = shift_expression(self, out);
   while (true) {
-    switch (wulk_lexer_peek(self->lexer).type) {
+    switch (il_lexer_peek(self->lexer).type) {
       case '<':
-        wulk_lexer_next(self->lexer);
-        r1 = wulk_binary(WULK_OP_LT, r1, shift_expression(self, out));
+        il_lexer_next(self->lexer);
+        r1 = il_binary(IL_OP_LT, r1, shift_expression(self, out));
         break;
       case C_TOK_LE_OP:
-        wulk_lexer_next(self->lexer);
-        r1 = wulk_binary(WULK_OP_LE, r1, shift_expression(self, out));
+        il_lexer_next(self->lexer);
+        r1 = il_binary(IL_OP_LE, r1, shift_expression(self, out));
         break;
       case '>':
-        wulk_lexer_next(self->lexer);
-        r1 = wulk_binary(WULK_OP_GT, r1, shift_expression(self, out));
+        il_lexer_next(self->lexer);
+        r1 = il_binary(IL_OP_GT, r1, shift_expression(self, out));
         break;
       case C_TOK_GE_OP:
-        wulk_lexer_next(self->lexer);
-        r1 = wulk_binary(WULK_OP_GE, r1, shift_expression(self, out));
+        il_lexer_next(self->lexer);
+        r1 = il_binary(IL_OP_GE, r1, shift_expression(self, out));
         break;
       default:
         return r1;
@@ -417,19 +417,19 @@ static wulk_expr_t relational_expression(wulk_parser_t *self, wulk_program_t *ou
   }
 }
 
-static wulk_expr_t equality_expression(wulk_parser_t *self, wulk_program_t *out) {
-  wulk_expr_t r1;
+static il_expr_t equality_expression(il_parser_t *self, il_program_t *out) {
+  il_expr_t r1;
 
   r1 = relational_expression(self, out);
   while (true) {
-    switch (wulk_lexer_peek(self->lexer).type) {
+    switch (il_lexer_peek(self->lexer).type) {
       case C_TOK_EQ_OP:
-        wulk_lexer_next(self->lexer);
-        r1 = wulk_binary(WULK_OP_EQ, r1, relational_expression(self, out));
+        il_lexer_next(self->lexer);
+        r1 = il_binary(IL_OP_EQ, r1, relational_expression(self, out));
         break;
       case C_TOK_NE_OP:
-        wulk_lexer_next(self->lexer);
-        r1 = wulk_binary(WULK_OP_NE, r1, relational_expression(self, out));
+        il_lexer_next(self->lexer);
+        r1 = il_binary(IL_OP_NE, r1, relational_expression(self, out));
         break;
       default:
         return r1;
@@ -437,232 +437,232 @@ static wulk_expr_t equality_expression(wulk_parser_t *self, wulk_program_t *out)
   }
 }
 
-static wulk_expr_t and_expression(wulk_parser_t *self, wulk_program_t *out) {
-  wulk_expr_t r1;
+static il_expr_t and_expression(il_parser_t *self, il_program_t *out) {
+  il_expr_t r1;
 
   r1 = equality_expression(self, out);
   while (true) {
-    if (wulk_lexer_peek(self->lexer).type != '&') {
+    if (il_lexer_peek(self->lexer).type != '&') {
       return r1;
     }
-    wulk_lexer_next(self->lexer);
-    r1 = wulk_binary(WULK_OP_AND, r1, equality_expression(self, out));
+    il_lexer_next(self->lexer);
+    r1 = il_binary(IL_OP_AND, r1, equality_expression(self, out));
   }
 }
 
-static wulk_expr_t exclusive_or_expression(wulk_parser_t *self, wulk_program_t *out) {
-  wulk_expr_t r1;
+static il_expr_t exclusive_or_expression(il_parser_t *self, il_program_t *out) {
+  il_expr_t r1;
 
   r1 = and_expression(self, out);
   while (true) {
-    if (wulk_lexer_peek(self->lexer).type != '^') {
+    if (il_lexer_peek(self->lexer).type != '^') {
       return r1;
     }
-    wulk_lexer_next(self->lexer);
-    r1 = wulk_binary(WULK_OP_XOR, r1, and_expression(self, out));
+    il_lexer_next(self->lexer);
+    r1 = il_binary(IL_OP_XOR, r1, and_expression(self, out));
   }
 }
 
-static wulk_expr_t inclusive_or_expression(wulk_parser_t *self, wulk_program_t *out) {
-  wulk_expr_t r1;
+static il_expr_t inclusive_or_expression(il_parser_t *self, il_program_t *out) {
+  il_expr_t r1;
 
   r1 = exclusive_or_expression(self, out);
   while (true) {
-    if (wulk_lexer_peek(self->lexer).type != '|') {
+    if (il_lexer_peek(self->lexer).type != '|') {
       return r1;
     }
-    wulk_lexer_next(self->lexer);
-    r1 = wulk_binary(WULK_OP_OR, r1, exclusive_or_expression(self, out));
+    il_lexer_next(self->lexer);
+    r1 = il_binary(IL_OP_OR, r1, exclusive_or_expression(self, out));
   }
 }
 
-static wulk_expr_t logical_and_expression(wulk_parser_t *self, wulk_program_t *out) {
-  wulk_expr_t r1;
+static il_expr_t logical_and_expression(il_parser_t *self, il_program_t *out) {
+  il_expr_t r1;
 
   r1 = inclusive_or_expression(self, out);
   while (true) {
-    if (wulk_lexer_peek(self->lexer).type != C_TOK_LOGICAL_AND) {
+    if (il_lexer_peek(self->lexer).type != C_TOK_LOGICAL_AND) {
       return r1;
     }
-    wulk_lexer_next(self->lexer);
-    r1 = wulk_binary(WULK_OP_LAND, r1, inclusive_or_expression(self, out));
+    il_lexer_next(self->lexer);
+    r1 = il_binary(IL_OP_LAND, r1, inclusive_or_expression(self, out));
   }
 }
 
-static wulk_expr_t logical_or_expression(wulk_parser_t *self, wulk_program_t *out) {
-  wulk_expr_t r1;
+static il_expr_t logical_or_expression(il_parser_t *self, il_program_t *out) {
+  il_expr_t r1;
 
   r1 = logical_and_expression(self, out);
   while (true) {
-    if (wulk_lexer_peek(self->lexer).type != C_TOK_LOGICAL_OR) {
+    if (il_lexer_peek(self->lexer).type != C_TOK_LOGICAL_OR) {
       return r1;
     }
-    wulk_lexer_next(self->lexer);
-    r1 = wulk_binary(WULK_OP_LOR, r1, logical_and_expression(self, out));
+    il_lexer_next(self->lexer);
+    r1 = il_binary(IL_OP_LOR, r1, logical_and_expression(self, out));
   }
 }
 
-static wulk_expr_t conditional_expression(wulk_parser_t *self, wulk_program_t *out) {
-  wulk_expr_t r1, r2;
+static il_expr_t conditional_expression(il_parser_t *self, il_program_t *out) {
+  il_expr_t r1, r2;
 
   r1 = logical_or_expression(self, out);
-  if (wulk_lexer_peek(self->lexer).type != '?') {
+  if (il_lexer_peek(self->lexer).type != '?') {
     return r1;
   }
-  wulk_lexer_next(self->lexer);
+  il_lexer_next(self->lexer);
   r2 = expression(self, out);
-  wulk_lexer_consume(self->lexer, ':');
-  return wulk_ternary(r1, r2, conditional_expression(self, out));
+  il_lexer_consume(self->lexer, ':');
+  return il_ternary(r1, r2, conditional_expression(self, out));
 }
 
-static wulk_expr_t assignment_expression(wulk_parser_t *self, wulk_program_t *out) {
-  wulk_expr_t r1;
-  enum wulk_op_n op;
+static il_expr_t assignment_expression(il_parser_t *self, il_program_t *out) {
+  il_expr_t r1;
+  enum il_op_n op;
 
   r1 = conditional_expression(self, out);
-  switch (wulk_lexer_peek(self->lexer).type) {
+  switch (il_lexer_peek(self->lexer).type) {
     case C_TOK_ASSIGN:
-      wulk_lexer_next(self->lexer);
-      op = WULK_OP_ASSIGN;
+      il_lexer_next(self->lexer);
+      op = IL_OP_ASSIGN;
       break;
     case C_TOK_MUL_ASSIGN:
-      wulk_lexer_next(self->lexer);
-      op = WULK_OP_MUL;
+      il_lexer_next(self->lexer);
+      op = IL_OP_MUL;
       break;
     case C_TOK_DIV_ASSIGN:
-      wulk_lexer_next(self->lexer);
-      op = WULK_OP_DIV;
+      il_lexer_next(self->lexer);
+      op = IL_OP_DIV;
       break;
     case C_TOK_MOD_ASSIGN:
-      wulk_lexer_next(self->lexer);
-      op = WULK_OP_MOD;
+      il_lexer_next(self->lexer);
+      op = IL_OP_MOD;
       break;
     case C_TOK_PLUS_ASSIGN:
-      wulk_lexer_next(self->lexer);
-      op = WULK_OP_ADD;
+      il_lexer_next(self->lexer);
+      op = IL_OP_ADD;
       break;
     case C_TOK_MINUS_ASSIGN:
-      wulk_lexer_next(self->lexer);
-      op = WULK_OP_SUB;
+      il_lexer_next(self->lexer);
+      op = IL_OP_SUB;
       break;
     case C_TOK_AND_ASSIGN:
-      wulk_lexer_next(self->lexer);
-      op = WULK_OP_AND;
+      il_lexer_next(self->lexer);
+      op = IL_OP_AND;
       break;
     case C_TOK_OR_ASSIGN:
-      wulk_lexer_next(self->lexer);
-      op = WULK_OP_OR;
+      il_lexer_next(self->lexer);
+      op = IL_OP_OR;
       break;
     case C_TOK_XOR_ASSIGN:
-      wulk_lexer_next(self->lexer);
-      op = WULK_OP_XOR;
+      il_lexer_next(self->lexer);
+      op = IL_OP_XOR;
       break;
     case C_TOK_RSHIFT_ASSIGN:
-      wulk_lexer_next(self->lexer);
-      op = WULK_OP_SHR;
+      il_lexer_next(self->lexer);
+      op = IL_OP_SHR;
       break;
     case C_TOK_LSHIFT_ASSIGN:
-      wulk_lexer_next(self->lexer);
-      op = WULK_OP_SHL;
+      il_lexer_next(self->lexer);
+      op = IL_OP_SHL;
       break;
     default:
       return r1;
   }
-  if (wulk_is(r1, WULK_EXPR_BINARY)) {
-    wulk_parse_err(self->compiler, wulk_lexer_peek(self->lexer).loc,
+  if (il_is(r1, IL_EXPR_BINARY)) {
+    il_parse_err(self->compiler, il_lexer_peek(self->lexer).loc,
       "Unexpected left assign operand"
     );
   }
-  return wulk_binary(WULK_OP_ASSIGN, r1, op != WULK_OP_ASSIGN
-    ? wulk_binary(op, r1, assignment_expression(self, out))
+  return il_binary(IL_OP_ASSIGN, r1, op != IL_OP_ASSIGN
+    ? il_binary(op, r1, assignment_expression(self, out))
     : assignment_expression(self, out)
   );
 }
 
-static wulk_expr_t expression(wulk_parser_t *self, wulk_program_t *out) {
-  wulk_expr_t r1;
+static il_expr_t expression(il_parser_t *self, il_program_t *out) {
+  il_expr_t r1;
 
   r1 = assignment_expression(self, out);
   while (true) {
-    if (wulk_lexer_peek(self->lexer).type != ',') {
+    if (il_lexer_peek(self->lexer).type != ',') {
       return r1;
     }
-    wulk_lexer_next(self->lexer);
-    if (!wulk_is(r1, WULK_EXPR_EXPRS)) {
-      r1 = wulk_exprs_start(r1);
+    il_lexer_next(self->lexer);
+    if (!il_is(r1, IL_EXPR_EXPRS)) {
+      r1 = il_exprs_start(r1);
     }
     adt_vector_push(r1.exprs.vector, assignment_expression(self, out));
   }
 }
 
-static wulk_expr_t constant_expression(wulk_parser_t *self, wulk_program_t *out) {
-  wulk_expr_t r1;
+static il_expr_t constant_expression(il_parser_t *self, il_program_t *out) {
+  il_expr_t r1;
 
   r1 = conditional_expression(self, out);
-  if (!wulk_expr_is_constant(r1)) {
-    wulk_parse_err(self->compiler, wulk_lexer_peek(self->lexer).loc,
+  if (!il_expr_is_constant(r1)) {
+    il_parse_err(self->compiler, il_lexer_peek(self->lexer).loc,
       "Constant expression must be computable at compile time"
     );
   }
   return r1;
 }
 
-static wulk_type_t declaration_specifiers(wulk_parser_t *self, wulk_program_t *out) {
-  wulk_token_t token;
-  wulk_type_t type = wulk_type_undefined();
+static il_type_t declaration_specifiers(il_parser_t *self, il_program_t *out) {
+  il_token_t token;
+  il_type_t type = il_type_undefined();
 
   while (true) {
-    switch ((token = wulk_lexer_peek(self->lexer)).type) {
+    switch ((token = il_lexer_peek(self->lexer)).type) {
       case C_TOK_TYPEDEF:
-        wulk_lexer_next(self->lexer);
-        type.specifiers |= WULK_TYPE_SPECIFIER_TYPEDEF;
+        il_lexer_next(self->lexer);
+        type.specifiers |= IL_TYPE_SPECIFIER_TYPEDEF;
         break;
       case C_TOK_EXTERN:
-        wulk_lexer_next(self->lexer);
-        type.specifiers |= WULK_TYPE_SPECIFIER_EXTERN;
+        il_lexer_next(self->lexer);
+        type.specifiers |= IL_TYPE_SPECIFIER_EXTERN;
         break;
       case C_TOK_STATIC:
-        wulk_lexer_next(self->lexer);
-        type.specifiers |= WULK_TYPE_SPECIFIER_STATIC;
+        il_lexer_next(self->lexer);
+        type.specifiers |= IL_TYPE_SPECIFIER_STATIC;
         break;
       case C_TOK_THREAD_LOCAL:
-        wulk_lexer_next(self->lexer);
-        type.specifiers |= WULK_TYPE_SPECIFIER_THREAD_LOCAL;
+        il_lexer_next(self->lexer);
+        type.specifiers |= IL_TYPE_SPECIFIER_THREAD_LOCAL;
         break;
       case C_TOK_AUTO:
-        wulk_lexer_next(self->lexer);
-        type.specifiers |= WULK_TYPE_SPECIFIER_AUTO;
+        il_lexer_next(self->lexer);
+        type.specifiers |= IL_TYPE_SPECIFIER_AUTO;
         break;
       case C_TOK_REGISTER:
-        wulk_lexer_next(self->lexer);
-        type.specifiers |= WULK_TYPE_SPECIFIER_REGISTER;
+        il_lexer_next(self->lexer);
+        type.specifiers |= IL_TYPE_SPECIFIER_REGISTER;
         break;
       case C_TOK_INLINE:
-        wulk_lexer_next(self->lexer);
-        type.specifiers |= WULK_FUNC_SPECIFIER_INLINE;
+        il_lexer_next(self->lexer);
+        type.specifiers |= IL_FUNC_SPECIFIER_INLINE;
         break;
       case C_TOK_NORETURN:
-        wulk_lexer_next(self->lexer);
-        type.specifiers |= WULK_FUNC_SPECIFIER_NORETURN;
+        il_lexer_next(self->lexer);
+        type.specifiers |= IL_FUNC_SPECIFIER_NORETURN;
         break;
       case C_TOK_CONST:
-        wulk_lexer_next(self->lexer);
-        type.qualifiers |= WULK_TYPE_QUALIFIER_CONST;
+        il_lexer_next(self->lexer);
+        type.qualifiers |= IL_TYPE_QUALIFIER_CONST;
         break;
       case C_TOK_RESTRICT:
-        wulk_lexer_next(self->lexer);
-        type.qualifiers |= WULK_TYPE_QUALIFIER_RESTRICT;
+        il_lexer_next(self->lexer);
+        type.qualifiers |= IL_TYPE_QUALIFIER_RESTRICT;
         break;
       case C_TOK_VOLATILE:
-        wulk_lexer_next(self->lexer);
-        type.qualifiers |= WULK_TYPE_QUALIFIER_VOLATILE;
+        il_lexer_next(self->lexer);
+        type.qualifiers |= IL_TYPE_QUALIFIER_VOLATILE;
         break;
       case C_TOK_ATOMIC:
-        wulk_lexer_next(self->lexer);
-        type.qualifiers |= WULK_TYPE_QUALIFIER_ATOMIC;
+        il_lexer_next(self->lexer);
+        type.qualifiers |= IL_TYPE_QUALIFIER_ATOMIC;
         break;
       case C_TOK_ALIGNAS:
-        wulk_parse_err(self->compiler, token.loc,
+        il_parse_err(self->compiler, token.loc,
           "_Alignas still unsupported"
         );
       default:
@@ -671,33 +671,33 @@ static wulk_type_t declaration_specifiers(wulk_parser_t *self, wulk_program_t *o
   }
 }
 
-static wulk_type_t type_specifier(wulk_parser_t *self, wulk_program_t *out) {
-  wulk_token_t token;
-  wulk_type_t type = wulk_type_undefined();
-  //enum wulk_type_n type_kind;
+static il_type_t type_specifier(il_parser_t *self, il_program_t *out) {
+  il_token_t token;
+  il_type_t type = il_type_undefined();
+  //enum il_type_n type_kind;
 
   while (true) {
-    switch ((token = wulk_lexer_peek(self->lexer)).type) {
+    switch ((token = il_lexer_peek(self->lexer)).type) {
       case C_TOK_VOID:
-        //type_kind = WULK_TYPE_VOID;
+        //type_kind = IL_TYPE_VOID;
         goto dft_literal;
       case C_TOK_CHAR:
-        //type_kind = WULK_TYPE_CHAR;
+        //type_kind = IL_TYPE_CHAR;
         goto dft_literal;
       default:
         return type;
       dft_literal:
-        if (wulk_defined(type)) {
-          wulk_parse_err(self->compiler, token.loc,
+        if (il_defined(type)) {
+          il_parse_err(self->compiler, token.loc,
             "Two or more data types in declaration specifiers"
           );
         }
-        wulk_lexer_next(self->lexer);
+        il_lexer_next(self->lexer);
         break;
     }
   }
 }
 
-static wulk_type_t type_name(wulk_parser_t *self, wulk_program_t *out) {
-  return wulk_type_undefined();
+static il_type_t type_name(il_parser_t *self, il_program_t *out) {
+  return il_type_undefined();
 }

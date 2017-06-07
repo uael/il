@@ -18,30 +18,30 @@
 
 #include "node.h"
 
-wulk_node_t wulk_entity(wulk_entity_t entity) {
-  return (wulk_node_t) {
-    .kind = WULK_NODE_ENTITY,
+il_node_t il_entity(il_entity_t entity) {
+  return (il_node_t) {
+    .kind = IL_NODE_ENTITY,
     .entity = entity
   };
 }
 
-wulk_node_t wulk_expr(wulk_expr_t expr) {
-  return (wulk_node_t) {
-    .kind = WULK_NODE_EXPR,
+il_node_t il_expr(il_expr_t expr) {
+  return (il_node_t) {
+    .kind = IL_NODE_EXPR,
     .expr = expr
   };
 }
 
-wulk_node_t wulk_stmt(wulk_stmt_t stmt) {
-  return (wulk_node_t) {
-    .kind = WULK_NODE_STMT,
+il_node_t il_stmt(il_stmt_t stmt) {
+  return (il_node_t) {
+    .kind = IL_NODE_STMT,
     .stmt = stmt
   };
 }
 
-wulk_node_t wulk_type(wulk_type_t type) {
-  return (wulk_node_t) {
-    .kind = WULK_NODE_TYPE,
+il_node_t il_type(il_type_t type) {
+  return (il_node_t) {
+    .kind = IL_NODE_TYPE,
     .type = type
   };
 }

@@ -85,7 +85,7 @@ typedef unsigned __int64  uint64_t;
 
 #include <adt/xmalloc.h>
 
-int64_t wulk_fsize(const char *path) {
+int64_t il_fsize(const char *path) {
 #ifdef WIN32
   WIN32_FILE_ATTRIBUTE_DATA   fileInfo;
   if (GetFileAttributesExA(path, GetFileExInfoStandard, (void*)&fileInfo) == 0) return -1;
@@ -97,13 +97,13 @@ int64_t wulk_fsize(const char *path) {
 #endif
 }
 
-const char *wulk_fread(const char *path, size_t *len) {
+const char *il_fread(const char *path, size_t *len) {
   int fd = 0;
   off_t fsize = 0;
   ssize_t fsize2 = 0;
   char *buffer = NULL;
 
-  fsize = (size_t) wulk_fsize(path);
+  fsize = (size_t) il_fsize(path);
   if (fsize < 0) goto abort_read;
 
   fd = open(path, O_RDONLY);
@@ -126,7 +126,7 @@ const char *wulk_fread(const char *path, size_t *len) {
   return NULL;
 }
 
-bool wulk_fexists(const char *path) {
+bool il_fexists(const char *path) {
 #ifdef WIN32
   BOOL isDirectory;
   DWORD attributes = GetFileAttributesA(path);
@@ -150,7 +150,7 @@ bool wulk_fexists(const char *path) {
   return false;
 }
 
-bool wulk_fwrite(const char *path, const char *buffer, size_t len) {
+bool il_fwrite(const char *path, const char *buffer, size_t len) {
   // RW for owner, R for group, R for others
 #ifdef _WIN32
   unsigned mode = _S_IWRITE;
@@ -168,7 +168,7 @@ bool wulk_fwrite(const char *path, const char *buffer, size_t len) {
 }
 
 
-bool wulk_is_dir(const char *path) {
+bool il_is_dir(const char *path) {
 #ifdef WIN32
   DWORD dwAttrs;
 
@@ -185,7 +185,7 @@ bool wulk_is_dir(const char *path) {
   return false;
 }
 
-DIRREF wulk_dir_init(const char *dirpath) {
+DIRREF il_dir_init(const char *dirpath) {
 #ifdef WIN32
   WIN32_FIND_DATA findData;
   WCHAR			path[MAX_PATH];
@@ -207,7 +207,7 @@ DIRREF wulk_dir_init(const char *dirpath) {
 #endif
 }
 
-const char *wulk_dread(DIRREF ref) {
+const char *il_dread(DIRREF ref) {
   if (ref == NULL) return NULL;
 
   while (1) {

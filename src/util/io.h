@@ -16,8 +16,8 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#ifndef   WULK_IO_H__
-# define  WULK_IO_H__
+#ifndef   IL_IO_H__
+# define  IL_IO_H__
 
 #define RESET   "\033[0m"
 #define BLACK   "\033[30m"
@@ -34,10 +34,10 @@
 #include <stddef.h>
 #include <u/stdbool.h>
 
-int64_t wulk_fsize(const char *path);
-const char *wulk_fread(const char *path, size_t *len);
-bool wulk_fexists(const char *path);
-bool wulk_fwrite(const char *path, const char *buffer, size_t len);
+int64_t il_fsize(const char *path);
+const char *il_fread(const char *path, size_t *len);
+bool il_fexists(const char *path);
+bool il_fwrite(const char *path, const char *buffer, size_t len);
 
 #if defined(_WIN32)
 # include <windows.h>
@@ -47,8 +47,8 @@ bool wulk_fwrite(const char *path, const char *buffer, size_t len);
 # define DIRREF DIR*
 #endif
 
-bool wulk_is_dir(const char *path);
-DIRREF wulk_dir_init(const char *path);
-const char *wulk_dread(DIRREF ref);
+bool il_is_dir(const char *path);
+DIRREF il_dir_init(const char *path);
+const char *il_dread(DIRREF ref);
 
-#endif /* WULK_IO_H__ */
+#endif /* IL_IO_H__ */

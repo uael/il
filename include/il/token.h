@@ -16,63 +16,63 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#ifndef   WULK_TOKEN_H__
-# define  WULK_TOKEN_H__
+#ifndef   IL_TOKEN_H__
+# define  IL_TOKEN_H__
 
 #include <adt/deque.h>
 
 #include "api.h"
 
-struct wulk_lexer_t;
+struct il_lexer_t;
 
-typedef struct wulk_loc wulk_loc_t;
-typedef struct wulk_token wulk_token_t;
-typedef struct wulk_rtoken wulk_rtoken_t;
-typedef struct wulk_lloc wulk_lloc_t;
+typedef struct il_loc il_loc_t;
+typedef struct il_token il_token_t;
+typedef struct il_rtoken il_rtoken_t;
+typedef struct il_lloc il_lloc_t;
 
-typedef adt_deque_of(wulk_token_t) wulk_token_r;
+typedef adt_deque_of(il_token_t) il_token_r;
 
 enum {
-  WULK_TOKEN_UNDEFINED = 0,
-  WULK_TOKEN_KEYWORD,
-  WULK_TOKEN_SYNTAX,
-  WULK_TOKEN_NUMBER,
-  WULK_TOKEN_IDENTIFIER,
-  WULK_TOKEN_STRING_LITERAL
+  IL_TOKEN_UNDEFINED = 0,
+  IL_TOKEN_KEYWORD,
+  IL_TOKEN_SYNTAX,
+  IL_TOKEN_NUMBER,
+  IL_TOKEN_IDENTIFIER,
+  IL_TOKEN_STRING_LITERAL
 };
 
-struct wulk_loc {
+struct il_loc {
   uint32_t lineno;
   uint32_t colno;
   uint32_t position;
   uint32_t file_id;
 };
 
-struct wulk_token {
+struct il_token {
   unsigned int kind : 4;
   char type;
   const char *name, *value;
   size_t cursor;
-  wulk_loc_t loc;
+  il_loc_t loc;
   uint32_t length, leading_ws;
 };
 
-struct wulk_rtoken {
-  wulk_token_t begin, end;
+struct il_rtoken {
+  il_token_t begin, end;
 };
 
-struct wulk_lloc {
-  struct wulk_lexer_t *lexer;
+struct il_lloc {
+  struct il_lexer_t *lexer;
   size_t begin, end;
 };
 
-#define wulk_lloc(b, e) ((wulk_lloc_t) {b.lexer, b.begin, e.end})
-#define wulk_no_lloc() ((wulk_lloc_t) {NULL, 0, 0})
+#define il_lloc(b, e) ((il_lloc_t) {b.lexer, b.begin, e.end})
+#define il_no_lloc() ((il_lloc_t) {NULL, 0, 0})
 
-void wulk_token_dtor(wulk_token_t *self);
+void il_token_dtor(il_token_t *self);
 
-wulk_lloc_t wulk_lloc_begin(struct wulk_lexer_t *lexer);
-wulk_lloc_t wulk_lloc_end(wulk_lloc_t self);
-wulk_rtoken_t wulk_llocate(wulk_lloc_t lloc);
+il_lloc_t il_lloc_begin(struct il_lexer_t *lexer);
+il_lloc_t il_lloc_end(il_lloc_t self);
+il_rtoken_t il_llocate(il_lloc_t lloc);
 
-#endif /* WULK_TOKEN_H__ */
+#endif /* IL_TOKEN_H__ */

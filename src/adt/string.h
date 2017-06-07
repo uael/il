@@ -16,8 +16,8 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#ifndef   WULK_STRING_H__
-# define  WULK_STRING_H__
+#ifndef   IL_STRING_H__
+# define  IL_STRING_H__
 
 #include <string.h>
 #include <stdarg.h>
@@ -59,4 +59,4 @@ int vasprintf(char **, const char *, va_list);
 
 int asprintf(char **, const char *, ...);
 
-#endif /* WULK_STRING_H__ */
+#endif /* IL_STRING_H__ */

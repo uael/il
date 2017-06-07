@@ -16,8 +16,8 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#ifndef   WULK_DEQUE_H__
-# define  WULK_DEQUE_H__
+#ifndef   IL_DEQUE_H__
+# define  IL_DEQUE_H__
 
 #include <stdint.h>
 #include <stddef.h>
@@ -25,7 +25,7 @@
 #include <u/stdbool.h>
 #include <adt/xmalloc.h>
 
-#define wulk_roundup32(x) \
+#define il_roundup32(x) \
   (--(x), (x)|=(x)>>1, (x)|=(x)>>2, (x)|=(x)>>4, (x)|=(x)>>8, (x)|=(x)>>16, ++(x))
 
 #define adt_deque_of(t) struct { \
@@ -69,7 +69,7 @@
     size_t __s = (size_t) (i); \
     if (adt_deque_capacity(v) <= __s) { \
       adt_deque_capacity(v) = __s + 1; \
-      wulk_roundup32(adt_deque_capacity(v)); \
+      il_roundup32(adt_deque_capacity(v)); \
       adt_deque_data(v) = xrealloc( \
         adt_deque_data(v), sizeof(*adt_deque_data(v)) * adt_deque_capacity(v) \
       ); \
@@ -105,4 +105,4 @@
     for (size_t __k = 1, __i = 0; __k && __i != adt_deque_length(v); __k = !__k, __i++) \
       for (var = *(adt_deque_data(v)+__i+adt_deque_cursor(v)); __k; __k = !__k)
 
-#endif /* WULK_DEQUE_H__ */
+#endif /* IL_DEQUE_H__ */

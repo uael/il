@@ -20,33 +20,33 @@
 
 #include "symbol.h"
 
-void wulk_sym_dtor(wulk_sym_t *self) {}
+void il_sym_dtor(il_sym_t *self) {}
 
-void wulk_scope_dtor(wulk_scope_t *self) {
-  wulk_sym_t sym;
-  wulk_scope_t *scope;
+void il_scope_dtor(il_scope_t *self) {
+  il_sym_t sym;
+  il_scope_t *scope;
 
   kh_foreach_value(&self->symtab, sym, {
-    wulk_sym_dtor(&sym);
+    il_sym_dtor(&sym);
   });
-  wulk_symtab_dtor(&self->symtab);
+  il_symtab_dtor(&self->symtab);
   adt_vector_foreach(self->childs, scope) {
-    wulk_scope_dtor(scope);
+    il_scope_dtor(scope);
     xfree(scope);
     scope = NULL;
   }
   adt_vector_dtor(self->childs);
 }
 
-bool wulk_sym_has_flag(wulk_sym_t *self, unsigned flag) {
+bool il_sym_has_flag(il_sym_t *self, unsigned flag) {
   return (bool) (self->flags & flag);
 }
 
-wulk_sym_t *wulk_sym_put(wulk_scope_t *scope, const char *id, int *r) {
-  wulk_sym_t *sym;
+il_sym_t *il_sym_put(il_scope_t *scope, const char *id, int *r) {
+  il_sym_t *sym;
   unsigned it;
 
-  it = kh_put(wulk_symtab, &scope->symtab, id, r);
+  it = kh_put(il_symtab, &scope->symtab, id, r);
   if (r == 0) {
     return NULL;
   }
@@ -55,10 +55,10 @@ wulk_sym_t *wulk_sym_put(wulk_scope_t *scope, const char *id, int *r) {
   return sym;
 }
 
-wulk_sym_t *wulk_sym_get(wulk_scope_t *scope, const char *id, int *r) {
+il_sym_t *il_sym_get(il_scope_t *scope, const char *id, int *r) {
   unsigned it;
 
-  it = kh_get(wulk_symtab, &scope->symtab, id);
+  it = kh_get(il_symtab, &scope->symtab, id);
   if (it == kh_end(&scope->symtab)) {
     *r = 1;
     return NULL;
@@ -67,4 +67,4 @@ wulk_sym_t *wulk_sym_get(wulk_scope_t *scope, const char *id, int *r) {
   return &kh_value(&scope->symtab, it);
 }
 
-KHASH_MAP_IMPL_STR(wulk_symtab, wulk_sym_t)
+KHASH_MAP_IMPL_STR(il_symtab, il_sym_t)

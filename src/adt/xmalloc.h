@@ -16,8 +16,8 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#ifndef   WULK_XMALLOC_H__
-# define  WULK_XMALLOC_H__
+#ifndef   IL_XMALLOC_H__
+# define  IL_XMALLOC_H__
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -55,4 +55,4 @@ void *xcalloc(size_t num, size_t size);
 
 void xfree(void *ptr);
 
-#endif /* WULK_XMALLOC_H__ */
+#endif /* IL_XMALLOC_H__ */

@@ -16,8 +16,8 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#ifndef   WULK_VECTOR_H__
-# define  WULK_VECTOR_H__
+#ifndef   IL_VECTOR_H__
+# define  IL_VECTOR_H__
 
 #include <stdint.h>
 #include <stddef.h>
@@ -25,7 +25,7 @@
 #include <u/stdbool.h>
 #include "adt/xmalloc.h"
 
-#define wulk_roundup32(x) \
+#define il_roundup32(x) \
   (--(x), (x)|=(x)>>1, (x)|=(x)>>2, (x)|=(x)>>4, (x)|=(x)>>8, (x)|=(x)>>16, ++(x))
 
 #define adt_vector_of(t) struct { \
@@ -70,7 +70,7 @@
     size_t __s = (size_t) (i); \
     if (adt_vector_capacity(v) <= __s) { \
       adt_vector_capacity(v) = __s + 1; \
-      wulk_roundup32(adt_vector_capacity(v)); \
+      il_roundup32(adt_vector_capacity(v)); \
       adt_vector_data(v) = xrealloc( \
         adt_vector_data(v), sizeof(*adt_vector_data(v)) * adt_vector_capacity(v) \
       ); \
@@ -107,4 +107,4 @@
     for (size_t __k = 1, __i = 0; __k && __i != adt_vector_length(v); __k = !__k, __i++) \
       for (var = *(adt_vector_data(v)+__i); __k; __k = !__k)
 
-#endif /* WULK_VECTOR_H__ */
+#endif /* IL_VECTOR_H__ */

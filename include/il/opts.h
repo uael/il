@@ -16,16 +16,37 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#ifndef   WULK_NODE_H__
-# define  WULK_NODE_H__
+#ifndef   IL_OPTS_H__
+# define  IL_OPTS_H__
 
-#include "ir.h"
+#include <u/stdbool.h>
 
-wulk_node_t wulk_entity(wulk_entity_t entity);
-wulk_node_t wulk_expr(wulk_expr_t expr);
-wulk_node_t wulk_stmt(wulk_stmt_t stmt);
-wulk_node_t wulk_type(wulk_type_t type);
+#define IL_SRC_DIR_MSIZE 256
 
-#define wulk_node_undefined() ((wulk_node_t) {.kind = WULK_NODE_UNDEFINED})
+typedef struct il_opts_t il_opts_t;
 
-#endif /* WULK_NODE_H__ */
+enum il_backend_n {
+  IL_BACKEND_NONE = 0,
+  IL_BACKEND_DOT,
+  IL_BACKEND_PPRINT,
+  IL_BACKEND_FIRM_ASM,
+  IL_BACKEND_FIRM_AMD64,
+  IL_BACKEND_FIRM_ARM,
+  IL_BACKEND_FIRM_IA32,
+  IL_BACKEND_FIRM_MIPS,
+  IL_BACKEND_FIRM_SPARC
+};
+
+struct il_opts_t {
+  const char *in, *out;
+  char src_dir[IL_SRC_DIR_MSIZE];
+  bool echo, firm_graph, verbose, output_asm;
+  int optimize_lvl;
+  enum il_backend_n target;
+  adt_vector_of(char *) opts_errs;
+};
+
+bool il_opts_init(il_opts_t *self, int argc, char **argv);
+void il_opts_dtor(il_opts_t *self);
+
+#endif /* IL_OPTS_H__ */

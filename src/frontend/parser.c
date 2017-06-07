@@ -26,26 +26,26 @@
 
 #include "c/c_parser.h"
 
-void wulk_fe_init(wulk_parser_t *self, enum wulk_parser_n kind, wulk_compiler_t *compiler) {
-  *self = (wulk_parser_t) {
+void il_fe_init(il_parser_t *self, enum il_parser_n kind, il_compiler_t *compiler) {
+  *self = (il_parser_t) {
     .compiler = compiler,
     .kind = kind,
-    .scope = xmalloc(sizeof(wulk_scope_t))
+    .scope = xmalloc(sizeof(il_scope_t))
   };
-  *self->scope = (wulk_scope_t) {0};
+  *self->scope = (il_scope_t) {0};
 
   switch (self->kind) {
-    case WULK_PARSER_C:
+    case IL_PARSER_C:
       self->parse = c_parser_parse;
       break;
-    case WULK_PARSER_JAY:
+    case IL_PARSER_JAY:
       break;
     default:
       break;
   }
 }
 
-void wulk_fe_dtor(wulk_parser_t *self) {
+void il_fe_dtor(il_parser_t *self) {
   const char *src;
 
   adt_vector_foreach(self->sources, src) {
@@ -56,31 +56,31 @@ void wulk_fe_dtor(wulk_parser_t *self) {
   while (self->scope->parent) {
     self->scope = self->scope->parent;
   }
-  wulk_scope_dtor(self->scope);
+  il_scope_dtor(self->scope);
   xfree(self->scope);
   self->scope = NULL;
   if (self->lexer) {
-    wulk_lexer_dtor(self->lexer, true);
+    il_lexer_dtor(self->lexer, true);
     self->lexer = NULL;
   }
 }
 
-void wulk_fe_parse(wulk_parser_t *self, wulk_lexer_t *lexer, struct wulk_program_t *out) {
-  wulk_lexer_t l = (wulk_lexer_t) {0};
+void il_fe_parse(il_parser_t *self, il_lexer_t *lexer, struct il_program_t *out) {
+  il_lexer_t l = (il_lexer_t) {0};
 
   if (!lexer) {
-    wulk_lexer_init_f(&l, self);
+    il_lexer_init_f(&l, self);
     self->lexer = &l;
   }
-  wulk_program_init(out);
+  il_program_init(out);
   self->parse(self, out);
   if (!lexer) {
-    wulk_lexer_dtor(&l, true);
+    il_lexer_dtor(&l, true);
     self->lexer = NULL;
   }
 }
 
-void wulk_fe_push_src(wulk_parser_t *self, const char *src) {
+void il_fe_push_src(il_parser_t *self, const char *src) {
   const char *file;
 
 #ifdef _MSC_VER
@@ -93,16 +93,16 @@ void wulk_fe_push_src(wulk_parser_t *self, const char *src) {
   adt_deque_push(self->sources, file);
 }
 
-void wulk_fe_scope(wulk_parser_t *self) {
-  wulk_scope_t *parent;
+void il_fe_scope(il_parser_t *self) {
+  il_scope_t *parent;
 
   parent = self->scope;
-  self->scope = xmalloc(sizeof(wulk_scope_t));
-  *self->scope = (wulk_scope_t) {0};
+  self->scope = xmalloc(sizeof(il_scope_t));
+  *self->scope = (il_scope_t) {0};
   self->scope->parent = parent;
   adt_vector_push(parent->childs, self->scope);
 }
 
-void wulk_fe_unscope(wulk_parser_t *self) {
+void il_fe_unscope(il_parser_t *self) {
   self->scope = self->scope->parent;
 }

@@ -17,7 +17,7 @@
 #
 
 cmake_minimum_required(VERSION 2.8.11 FATAL_ERROR)
-project(wulk)
+project(il)
 
 option(COVERAGE "Turn on COVERAGE support" OFF)
 
@@ -62,18 +62,18 @@ if(MSVC)
     endforeach()
 endif()
 
-set(wulk_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/include)
-set(wulk_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
-set(wulk_TEST_DIR ${CMAKE_CURRENT_LIST_DIR}/test)
-set(wulk_VENDOR_DIR ${CMAKE_CURRENT_LIST_DIR}/vendor)
+set(il_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/include)
+set(il_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
+set(il_TEST_DIR ${CMAKE_CURRENT_LIST_DIR}/test)
+set(il_VENDOR_DIR ${CMAKE_CURRENT_LIST_DIR}/vendor)
 
-file(GLOB_RECURSE wulk_HEADERS ${wulk_HEADERS} ${wulk_INCLUDE_DIR}/*.h)
-file(GLOB_RECURSE wulk_SOURCES ${wulk_SOURCES} ${wulk_SOURCE_DIR}/*.c)
+file(GLOB_RECURSE il_HEADERS ${il_HEADERS} ${il_INCLUDE_DIR}/*.h)
+file(GLOB_RECURSE il_SOURCES ${il_SOURCES} ${il_SOURCE_DIR}/*.c)
 
-add_library(${PROJECT_NAME} STATIC ${wulk_SOURCES} ${wulk_HEADERS})
-set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${wulk_HEADERS}")
-target_include_directories(${PROJECT_NAME} PUBLIC ${wulk_INCLUDE_DIR})
-target_include_directories(${PROJECT_NAME} PRIVATE ${wulk_INCLUDE_DIR}/${PROJECT_NAME} ${wulk_SOURCE_DIR})
+add_library(${PROJECT_NAME} STATIC ${il_SOURCES} ${il_HEADERS})
+set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${il_HEADERS}")
+target_include_directories(${PROJECT_NAME} PUBLIC ${il_INCLUDE_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE ${il_INCLUDE_DIR}/${PROJECT_NAME} ${il_SOURCE_DIR})
 
 target_link_libraries(${PROJECT_NAME} LINK_PUBLIC u)
 add_dependencies(${PROJECT_NAME} u)
@@ -84,10 +84,10 @@ else()
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC m)
 endif()
 
-add_subdirectory(${wulk_VENDOR_DIR})
-if(EXISTS ${wulk_TEST_DIR})
+add_subdirectory(${il_VENDOR_DIR})
+if(EXISTS ${il_TEST_DIR})
     enable_testing()
-    add_subdirectory(${wulk_TEST_DIR})
+    add_subdirectory(${il_TEST_DIR})
 endif()
 
 install(TARGETS ${PROJECT_NAME}

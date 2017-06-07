@@ -30,9 +30,9 @@
 #include "type.h"
 #include "compiler.h"
 
-wulk_entity_t wulk_field(const char *name, wulk_type_t type) {
-  return (wulk_entity_t) {
-    .kind = WULK_ENTITY_FIELD,
+il_entity_t il_field(const char *name, il_type_t type) {
+  return (il_entity_t) {
+    .kind = IL_ENTITY_FIELD,
     .field = {
       .offset = type.align,
       .type = type,
@@ -42,30 +42,30 @@ wulk_entity_t wulk_field(const char *name, wulk_type_t type) {
   };
 }
 
-static void wulk_field_dtor(wulk_field_t *self) {
-  wulk_type_dtor(&self->type);
+static void il_field_dtor(il_field_t *self) {
+  il_type_dtor(&self->type);
 }
 
-wulk_entity_t wulk_var_int(const char *name, int d) {
-  return wulk_var(name, wulk_type_undefined(), wulk_const_int(wulk_no_lloc(), d));
+il_entity_t il_var_int(const char *name, int d) {
+  return il_var(name, il_type_undefined(), il_const_int(il_no_lloc(), d));
 }
 
-wulk_entity_t wulk_var_float(const char *name, float f) {
-  return wulk_var(name, wulk_type_undefined(), wulk_const_float(wulk_no_lloc(), f));
+il_entity_t il_var_float(const char *name, float f) {
+  return il_var(name, il_type_undefined(), il_const_float(il_no_lloc(), f));
 }
 
-wulk_entity_t wulk_var_string(const char *name, const char *s) {
-  return wulk_var(name, wulk_type_undefined(), wulk_const_string(wulk_no_lloc(), s));
+il_entity_t il_var_string(const char *name, const char *s) {
+  return il_var(name, il_type_undefined(), il_const_string(il_no_lloc(), s));
 }
 
-wulk_entity_t wulk_var(const char *name, wulk_type_t type, wulk_expr_t initializer) {
-  if (!wulk_defined(type)) {
+il_entity_t il_var(const char *name, il_type_t type, il_expr_t initializer) {
+  if (!il_defined(type)) {
     type = initializer.type;
-  } else if (!wulk_type_equals(type, initializer.type)) {
-    initializer = wulk_cast(wulk_no_lloc(), type, initializer);
+  } else if (!il_type_equals(type, initializer.type)) {
+    initializer = il_cast(il_no_lloc(), type, initializer);
   }
-  return (wulk_entity_t) {
-    .kind = WULK_ENTITY_VAR,
+  return (il_entity_t) {
+    .kind = IL_ENTITY_VAR,
     .variable = {
       .initializer = initializer,
       .name = name,
@@ -76,31 +76,31 @@ wulk_entity_t wulk_var(const char *name, wulk_type_t type, wulk_expr_t initializ
   };
 }
 
-static void wulk_var_dtor(wulk_var_t *self) {
-  wulk_type_dtor(&self->type);
-  wulk_expr_dtor(&self->initializer);
+static void il_var_dtor(il_var_t *self) {
+  il_type_dtor(&self->type);
+  il_expr_dtor(&self->initializer);
 }
 
-wulk_entity_t wulk_param_int(unsigned position, const char *name, int d) {
-  return wulk_param(position, name, wulk_type_undefined(), wulk_const_int(wulk_no_lloc(), d));
+il_entity_t il_param_int(unsigned position, const char *name, int d) {
+  return il_param(position, name, il_type_undefined(), il_const_int(il_no_lloc(), d));
 }
 
-wulk_entity_t wulk_param_float(unsigned position, const char *name, float f) {
-  return wulk_param(position, name, wulk_type_undefined(), wulk_const_float(wulk_no_lloc(), f));
+il_entity_t il_param_float(unsigned position, const char *name, float f) {
+  return il_param(position, name, il_type_undefined(), il_const_float(il_no_lloc(), f));
 }
 
-wulk_entity_t wulk_param_string(unsigned position, const char *name, const char *s) {
-  return wulk_param(position, name, wulk_type_undefined(), wulk_const_string(wulk_no_lloc(), s));
+il_entity_t il_param_string(unsigned position, const char *name, const char *s) {
+  return il_param(position, name, il_type_undefined(), il_const_string(il_no_lloc(), s));
 }
 
-wulk_entity_t wulk_param(unsigned position, const char *name, wulk_type_t type, wulk_expr_t initializer) {
-  if (!wulk_defined(type)) {
+il_entity_t il_param(unsigned position, const char *name, il_type_t type, il_expr_t initializer) {
+  if (!il_defined(type)) {
     type = initializer.type;
-  } else if (!wulk_type_equals(type, initializer.type)) {
-    initializer = wulk_cast(wulk_no_lloc(), type, initializer);
+  } else if (!il_type_equals(type, initializer.type)) {
+    initializer = il_cast(il_no_lloc(), type, initializer);
   }
-  return (wulk_entity_t) {
-    .kind = WULK_ENTITY_PARAM,
+  return (il_entity_t) {
+    .kind = IL_ENTITY_PARAM,
     .parameter = {
       .position = position,
       .initializer = initializer,
@@ -112,22 +112,22 @@ wulk_entity_t wulk_param(unsigned position, const char *name, wulk_type_t type, 
   };
 }
 
-static void wulk_param_dtor(wulk_param_t *self) {
-  wulk_type_dtor(&self->type);
-  wulk_expr_dtor(&self->initializer);
+static void il_param_dtor(il_param_t *self) {
+  il_type_dtor(&self->type);
+  il_expr_dtor(&self->initializer);
 }
 
-wulk_entity_t wulk_func_decl(wulk_type_t return_type, const char *name, wulk_param_t *params) {
-  return wulk_func(return_type, name, params, wulk_stmt_undefined());
+il_entity_t il_func_decl(il_type_t return_type, const char *name, il_param_t *params) {
+  return il_func(return_type, name, params, il_stmt_undefined());
 }
 
-wulk_entity_t wulk_proc_decl(const char *name, wulk_param_t *params) {
-  return wulk_func(wulk_void(), name, params, wulk_stmt_undefined());
+il_entity_t il_proc_decl(const char *name, il_param_t *params) {
+  return il_func(il_void(), name, params, il_stmt_undefined());
 }
 
-wulk_entity_t wulk_func_def(wulk_func_t prototype, wulk_stmt_t body) {
-  wulk_entity_t param,
-    entity = wulk_func(prototype.return_type, prototype.name, NULL, body);
+il_entity_t il_func_def(il_func_t prototype, il_stmt_t body) {
+  il_entity_t param,
+    entity = il_func(prototype.return_type, prototype.name, NULL, body);
   
   adt_vector_foreach(prototype.params, param) {
     adt_vector_push(entity.function.params, param);
@@ -135,11 +135,11 @@ wulk_entity_t wulk_func_def(wulk_func_t prototype, wulk_stmt_t body) {
   return entity;
 }
 
-wulk_entity_t wulk_func(wulk_type_t return_type, const char *name, wulk_param_t *params, wulk_stmt_t body) {
+il_entity_t il_func(il_type_t return_type, const char *name, il_param_t *params, il_stmt_t body) {
   unsigned count = 0;
-  wulk_param_t param;
-  wulk_entity_t entity = (wulk_entity_t) {
-    .kind = WULK_ENTITY_FUNC,
+  il_param_t param;
+  il_entity_t entity = (il_entity_t) {
+    .kind = IL_ENTITY_FUNC,
     .function = {
       .body = body,
       .name = name,
@@ -148,68 +148,68 @@ wulk_entity_t wulk_func(wulk_type_t return_type, const char *name, wulk_param_t 
   };
   if (params) while (params->name) {
     param = *params++;
-    adt_vector_push(entity.function.params, wulk_param(count++, param.name, param.type, param.initializer));
+    adt_vector_push(entity.function.params, il_param(count++, param.name, param.type, param.initializer));
   }
   return entity;
 }
 
-static void wulk_func_dtor(wulk_func_t *self) {
-  wulk_entity_t param;
+static void il_func_dtor(il_func_t *self) {
+  il_entity_t param;
 
   adt_vector_foreach(self->params, param) {
-    wulk_entity_dtor(&param);
+    il_entity_dtor(&param);
   }
   adt_vector_dtor(self->params);
-  wulk_type_dtor(&self->return_type);
-  wulk_stmt_dtor(&self->body);
+  il_type_dtor(&self->return_type);
+  il_stmt_dtor(&self->body);
 }
 
-wulk_entity_t wulk_enum_anonymous(wulk_field_t *fields) {
-  return wulk_enum(NULL, fields);
+il_entity_t il_enum_anonymous(il_field_t *fields) {
+  return il_enum(NULL, fields);
 }
 
-wulk_entity_t wulk_enum(const char *name, wulk_field_t *fields) {
-  wulk_field_t field;
-  wulk_entity_t entity = (wulk_entity_t) {
-    .kind = WULK_ENTITY_ENUM,
+il_entity_t il_enum(const char *name, il_field_t *fields) {
+  il_field_t field;
+  il_entity_t entity = (il_entity_t) {
+    .kind = IL_ENTITY_ENUM,
     .enumerable = {
       .name = name,
-      .type = wulk_int()
+      .type = il_int()
     }
   };
   entity.size = entity.type.size;
   entity.align = entity.type.align;
   if (fields) while (fields->name) {
     field = *fields++;
-    adt_vector_push(entity.enumerable.vars, wulk_field(field.name, field.type));
+    adt_vector_push(entity.enumerable.vars, il_field(field.name, field.type));
   }
   return entity;
 }
 
-static void wulk_enum_dtor(wulk_enum_t *self) {
-  wulk_entity_t field;
+static void il_enum_dtor(il_enum_t *self) {
+  il_entity_t field;
 
   adt_vector_foreach(self->vars, field) {
-    wulk_entity_dtor(&field);
+    il_entity_dtor(&field);
   }
   adt_vector_dtor(self->vars);
 }
 
-static wulk_entity_t *type_add_field(wulk_entity_t *self, const char *name, wulk_type_t type, unsigned short width);
+static il_entity_t *type_add_field(il_entity_t *self, const char *name, il_type_t type, unsigned short width);
 
-static void reset_field_alignment(wulk_entity_t *self) {
+static void reset_field_alignment(il_entity_t *self) {
   int d;
   size_t n;
-  const wulk_entity_t *m;
+  const il_entity_t *m;
 
-  assert(wulk_pis(self, WULK_ENTITY_STRUCT));
+  assert(il_pis(self, IL_ENTITY_STRUCT));
   n = adt_vector_length(self->structure.fields);
   if (n) {
     m = &adt_vector_at(self->structure.fields, n - 1);
     if (m->field.field_width) {
       d = m->field.field_offset + m->field.field_width;
       if (d < 32) {
-        type_add_field(self, NULL, wulk_int(), (short) (32 - d));
+        type_add_field(self, NULL, il_int(), (short) (32 - d));
       }
     } else if (self->size % 4 != 0) {
       self->size += self->size % 4;
@@ -217,10 +217,10 @@ static void reset_field_alignment(wulk_entity_t *self) {
   }
 }
 
-static size_t adjust_member_alignment(wulk_entity_t *self, wulk_type_t type) {
+static size_t adjust_member_alignment(il_entity_t *self, il_type_t type) {
   size_t align = 0;
 
-  if (wulk_pis(self, WULK_ENTITY_STRUCT)) {
+  if (il_pis(self, IL_ENTITY_STRUCT)) {
     align = type.align;
     if (self->size % align) {
       self->size += align - (self->size % align);
@@ -232,22 +232,22 @@ static size_t adjust_member_alignment(wulk_entity_t *self, wulk_type_t type) {
   return align;
 }
 
-static wulk_entity_t *add_member(wulk_entity_t *self, wulk_entity_t m) {
-  wulk_entity_r entities;
-  wulk_entity_t *member = NULL;
+static il_entity_t *add_member(il_entity_t *self, il_entity_t m) {
+  il_entity_r entities;
+  il_entity_t *member = NULL;
 
   if (m.name && strcmp(m.name, "...") == 0) {
     // TODO: va_args
     exit(1);
   } else {
-    if (m.name && wulk_entity_field_lookup(*self, m.name)) {
-      wulk_fatal_err(NULL, "Member '%s' already exists.", m.name);
+    if (m.name && il_entity_field_lookup(*self, m.name)) {
+      il_fatal_err(NULL, "Member '%s' already exists.", m.name);
     }
     switch (self->kind) {
-      case WULK_ENTITY_STRUCT:
+      case IL_ENTITY_STRUCT:
         entities = self->structure.fields;
         break;
-      case WULK_ENTITY_UNION:
+      case IL_ENTITY_UNION:
         entities = self->u_structure.fields;
         break;
       default:
@@ -256,10 +256,10 @@ static wulk_entity_t *add_member(wulk_entity_t *self, wulk_entity_t m) {
     adt_vector_push(entities, m);
     member = &adt_vector_back(entities);
     if (m.type.size == 0) {
-      wulk_fatal_err(NULL, "Member '%s' has incomplete type.", m.name);
+      il_fatal_err(NULL, "Member '%s' has incomplete type.", m.name);
     }
     if (LONG_MAX - m.field.offset < m.type.size) {
-      wulk_fatal_err(NULL, "Object is too large.");
+      il_fatal_err(NULL, "Object is too large.");
     }
     if (self->size < m.field.offset + m.type.size) {
       self->size = m.field.offset + m.type.size;
@@ -268,7 +268,7 @@ static wulk_entity_t *add_member(wulk_entity_t *self, wulk_entity_t m) {
   return member;
 }
 
-static int pack_field(const wulk_entity_t *prev, wulk_entity_t *m) {
+static int pack_field(const il_entity_t *prev, il_entity_t *m) {
   unsigned short bits;
 
   assert(prev);
@@ -281,17 +281,17 @@ static int pack_field(const wulk_entity_t *prev, wulk_entity_t *m) {
   return 0;
 }
 
-static size_t remove_anonymous_fields(wulk_entity_t *self) {
+static size_t remove_anonymous_fields(il_entity_t *self) {
   int i;
   size_t align, maxalign;
-  wulk_field_t *m;
-  wulk_entity_r entities;
+  il_field_t *m;
+  il_entity_r entities;
 
   switch (self->kind) {
-    case WULK_ENTITY_STRUCT:
+    case IL_ENTITY_STRUCT:
       entities = self->structure.fields;
       break;
-    case WULK_ENTITY_UNION:
+    case IL_ENTITY_UNION:
       entities = self->u_structure.fields;
       break;
     default:
@@ -302,7 +302,7 @@ static size_t remove_anonymous_fields(wulk_entity_t *self) {
   for (i = (int) (adt_vector_length(entities) - 1); i >= 0; --i) {
     m = &adt_vector_at(entities, i).field;
     if (!m->name) {
-      wulk_entity_dtor(&adt_vector_at(entities, i));
+      il_entity_dtor(&adt_vector_at(entities, i));
       adt_vector_erase(entities, i);
     } else {
       align = m->align;
@@ -315,13 +315,13 @@ static size_t remove_anonymous_fields(wulk_entity_t *self) {
   return maxalign;
 }
 
-static wulk_entity_t *type_add_field(wulk_entity_t *self, const char *name, wulk_type_t type, unsigned short width) {
-  wulk_entity_t m;
-  const wulk_entity_t *prev;
+static il_entity_t *type_add_field(il_entity_t *self, const char *name, il_type_t type, unsigned short width) {
+  il_entity_t m;
+  const il_entity_t *prev;
 
-  m = wulk_field(name, type);
+  m = il_field(name, type);
   m.field.field_width = width;
-  if (wulk_pis(self, WULK_ENTITY_STRUCT)) {
+  if (il_pis(self, IL_ENTITY_STRUCT)) {
     prev = &adt_vector_back(self->structure.fields);
     if (!prev || !pack_field(prev, &m)) {
       m.field.field_offset = 0;
@@ -331,36 +331,36 @@ static wulk_entity_t *type_add_field(wulk_entity_t *self, const char *name, wulk
   return add_member(self, m);
 }
 
-static wulk_entity_t *type_add_anonymous_member(wulk_entity_t *self, wulk_type_t type) {
+static il_entity_t *type_add_anonymous_member(il_entity_t *self, il_type_t type) {
   unsigned i;
   size_t offset;
-  wulk_entity_t m;
-  wulk_entity_t *member;
-  wulk_entity_r entities;
+  il_entity_t m;
+  il_entity_t *member;
+  il_entity_r entities;
 
-  if (!wulk_is(type, WULK_TYPE_COMPOUND)) {
+  if (!il_is(type, IL_TYPE_COMPOUND)) {
     // TODO: handle error
     exit(1);
   }
   member = type.compound.entity;
   switch (member->kind) {
-    case WULK_ENTITY_STRUCT:
+    case IL_ENTITY_STRUCT:
       entities = member->structure.fields;
       break;
-    case WULK_ENTITY_UNION:
+    case IL_ENTITY_UNION:
       entities = member->u_structure.fields;
       break;
     default:
       return NULL;
   }
-  if (wulk_pis(self, WULK_ENTITY_STRUCT) && wulk_pis(member, WULK_ENTITY_UNION)) {
+  if (il_pis(self, IL_ENTITY_STRUCT) && il_pis(member, IL_ENTITY_UNION)) {
     offset = adjust_member_alignment(self, type);
     for (i = 0; i < adt_vector_size(entities); ++i) {
       m = adt_vector_at(entities, i);
       m.field.offset += offset;
       add_member(self, m);
     }
-  } else if (wulk_pis(self, WULK_ENTITY_UNION) && wulk_pis(member, WULK_ENTITY_STRUCT)) {
+  } else if (il_pis(self, IL_ENTITY_UNION) && il_pis(member, IL_ENTITY_STRUCT)) {
     for (i = 0; i < adt_vector_size(entities); ++i) {
       m = adt_vector_at(entities, i);
       add_member(self, m);
@@ -368,13 +368,13 @@ static wulk_entity_t *type_add_anonymous_member(wulk_entity_t *self, wulk_type_t
   } else {
     for (i = 0; i < adt_vector_size(entities); ++i) {
       m = adt_vector_at(entities, i);
-      wulk_entity_add_field(self, m.name, m.type, 0);
+      il_entity_add_field(self, m.name, m.type, 0);
     }
   }
   return NULL;
 }
 
-void type_seal(wulk_entity_t *self) {
+void type_seal(il_entity_t *self) {
   size_t align;
 
   align = remove_anonymous_fields(self);
@@ -387,9 +387,9 @@ void type_seal(wulk_entity_t *self) {
   }
 }
 
-wulk_entity_t wulk_struct(const char *name, wulk_field_t *fields) {
-  wulk_entity_t entity = (wulk_entity_t) {
-    .kind = WULK_ENTITY_STRUCT,
+il_entity_t il_struct(const char *name, il_field_t *fields) {
+  il_entity_t entity = (il_entity_t) {
+    .kind = IL_ENTITY_STRUCT,
     .structure = {
       .name = name,
       .size = 0
@@ -398,7 +398,7 @@ wulk_entity_t wulk_struct(const char *name, wulk_field_t *fields) {
 
   if (fields) {
     while (fields->name) {
-      wulk_entity_add_field(&entity, fields->name, fields->type, fields->field_width);
+      il_entity_add_field(&entity, fields->name, fields->type, fields->field_width);
       ++fields;
     }
     type_seal(&entity);
@@ -406,22 +406,22 @@ wulk_entity_t wulk_struct(const char *name, wulk_field_t *fields) {
   return entity;
 }
 
-wulk_entity_t wulk_struct_anonymous(wulk_field_t *fields) {
-  return wulk_struct(NULL, fields);
+il_entity_t il_struct_anonymous(il_field_t *fields) {
+  return il_struct(NULL, fields);
 }
 
-void wulk_struct_dtor(wulk_struct_t *self) {
-  wulk_entity_t field;
+void il_struct_dtor(il_struct_t *self) {
+  il_entity_t field;
 
   adt_vector_foreach(self->fields, field) {
-    wulk_entity_dtor(&field);
+    il_entity_dtor(&field);
   }
   adt_vector_dtor(self->fields);
 }
 
-wulk_entity_t wulk_union(const char *name, wulk_field_t *fields) {
-  wulk_entity_t entity = (wulk_entity_t) {
-    .kind = WULK_ENTITY_UNION,
+il_entity_t il_union(const char *name, il_field_t *fields) {
+  il_entity_t entity = (il_entity_t) {
+    .kind = IL_ENTITY_UNION,
     .u_structure = {
       .name = name,
       .size = 0
@@ -430,7 +430,7 @@ wulk_entity_t wulk_union(const char *name, wulk_field_t *fields) {
 
   if (fields) {
     while (fields->name) {
-      wulk_entity_add_field(&entity, fields->name, fields->type, fields->field_width);
+      il_entity_add_field(&entity, fields->name, fields->type, fields->field_width);
       ++fields;
     }
     type_seal(&entity);
@@ -438,99 +438,99 @@ wulk_entity_t wulk_union(const char *name, wulk_field_t *fields) {
   return entity;
 }
 
-wulk_entity_t wulk_union_anonymous(wulk_field_t *fields) {
-  return wulk_union(NULL, fields);
+il_entity_t il_union_anonymous(il_field_t *fields) {
+  return il_union(NULL, fields);
 }
 
-static void wulk_union_dtor(wulk_union_t *self) {
-  wulk_entity_t field;
+static void il_union_dtor(il_union_t *self) {
+  il_entity_t field;
 
   adt_vector_foreach(self->fields, field) {
-    wulk_entity_dtor(&field);
+    il_entity_dtor(&field);
   }
   adt_vector_dtor(self->fields);
 }
 
-void wulk_label_dtor(wulk_label_t *self) {}
+void il_label_dtor(il_label_t *self) {}
 
-void wulk_entity_dtor(wulk_entity_t *self) {
+void il_entity_dtor(il_entity_t *self) {
   switch (self->kind) {
-    case WULK_ENTITY_UNDEFINED:
+    case IL_ENTITY_UNDEFINED:
       return;
-    case WULK_ENTITY_FIELD:
-      wulk_field_dtor(&self->field);
+    case IL_ENTITY_FIELD:
+      il_field_dtor(&self->field);
       break;
-    case WULK_ENTITY_VAR:
-      wulk_var_dtor(&self->variable);
+    case IL_ENTITY_VAR:
+      il_var_dtor(&self->variable);
       break;
-    case WULK_ENTITY_PARAM:
-      wulk_param_dtor(&self->parameter);
+    case IL_ENTITY_PARAM:
+      il_param_dtor(&self->parameter);
       break;
-    case WULK_ENTITY_FUNC:
-      wulk_func_dtor(&self->function);
+    case IL_ENTITY_FUNC:
+      il_func_dtor(&self->function);
       break;
-    case WULK_ENTITY_ENUM:
-      wulk_enum_dtor(&self->enumerable);
+    case IL_ENTITY_ENUM:
+      il_enum_dtor(&self->enumerable);
       break;
-    case WULK_ENTITY_STRUCT:
-      wulk_struct_dtor(&self->structure);
+    case IL_ENTITY_STRUCT:
+      il_struct_dtor(&self->structure);
       break;
-    case WULK_ENTITY_UNION:
-      wulk_union_dtor(&self->u_structure);
+    case IL_ENTITY_UNION:
+      il_union_dtor(&self->u_structure);
       break;
-    case WULK_ENTITY_LABEL:
-      wulk_label_dtor(&self->label);
+    case IL_ENTITY_LABEL:
+      il_label_dtor(&self->label);
       break;
     default:
       break;
   }
-  wulk_entity_undef(self);
+  il_entity_undef(self);
 }
 
-bool wulk_entity_equals(wulk_entity_t a, wulk_entity_t b) {
+bool il_entity_equals(il_entity_t a, il_entity_t b) {
   unsigned i;
-  wulk_entity_r a_fields, b_fields;
+  il_entity_r a_fields, b_fields;
 
   if (a.kind != b.kind) {
     return false;
   }
-  if (!wulk_type_specified(a.type, UNSIGNED)) {
-    return wulk_type_equals(a.type, b.type);
+  if (!il_type_specified(a.type, UNSIGNED)) {
+    return il_type_equals(a.type, b.type);
   }
-  a_fields = wulk_entity_fields(a);
-  b_fields = wulk_entity_fields(b);
+  a_fields = il_entity_fields(a);
+  b_fields = il_entity_fields(b);
   if (adt_vector_size(a_fields) != adt_vector_size(b_fields)) {
     return false;
   }
   for (i = 0; i < adt_vector_size(a_fields); ++i) {
-    if (!wulk_entity_equals(adt_vector_at(a_fields, i), adt_vector_at(b_fields, i))) {
+    if (!il_entity_equals(adt_vector_at(a_fields, i), adt_vector_at(b_fields, i))) {
       return false;
     }
   }
   return true;
 }
 
-wulk_entity_r wulk_entity_fields(wulk_entity_t self) {
+il_entity_r il_entity_fields(il_entity_t self) {
   switch (self.kind) {
-    case WULK_ENTITY_FUNC:
+    case IL_ENTITY_FUNC:
       return self.function.params;
-    case WULK_ENTITY_ENUM:
+    case IL_ENTITY_ENUM:
       return self.enumerable.vars;
-    case WULK_ENTITY_STRUCT:
+    case IL_ENTITY_STRUCT:
       return self.structure.fields;
-    case WULK_ENTITY_UNION:
+    case IL_ENTITY_UNION:
       return self.u_structure.fields;
     default:
-      return (wulk_entity_r) {0};
+      return (il_entity_r) {0};
   }
 }
 
-wulk_field_t *wulk_entity_field_lookup(wulk_entity_t self, const char *name) {
-  wulk_entity_r fields;
-  wulk_entity_t entity;
+il_field_t *il_entity_field_lookup(il_entity_t self, const char *name) {
+  il_entity_r fields;
+  il_entity_t entity;
 
   switch (self.kind) {
-    case WULK_ENTITY_STRUCT:
+    case IL_ENTITY_STRUCT:
       fields = self.structure.fields;
       adt_vector_foreach(fields, entity) {
           if (strcmp(name, entity.name) == 0) {
@@ -538,7 +538,7 @@ wulk_field_t *wulk_entity_field_lookup(wulk_entity_t self, const char *name) {
           }
         }
       break;
-    case WULK_ENTITY_UNION:
+    case IL_ENTITY_UNION:
       fields = self.u_structure.fields;
       adt_vector_foreach(fields, entity) {
           if (strcmp(name, entity.name) == 0) {
@@ -553,8 +553,8 @@ wulk_field_t *wulk_entity_field_lookup(wulk_entity_t self, const char *name) {
   return NULL;
 }
 
-wulk_entity_t *wulk_entity_add_field(wulk_entity_t *self, const char *name, wulk_type_t type, short width) {
-  wulk_entity_t m;
+il_entity_t *il_entity_add_field(il_entity_t *self, const char *name, il_type_t type, short width) {
+  il_entity_t m;
 
   if (width) {
     return type_add_field(self, name, type, width);
@@ -562,7 +562,7 @@ wulk_entity_t *wulk_entity_add_field(wulk_entity_t *self, const char *name, wulk
   if (!name) {
     return type_add_anonymous_member(self, type);
   }
-  m = wulk_field(name, type);
+  m = il_field(name, type);
   m.field.offset = adjust_member_alignment(self, type);
   m.name = name;
   m.type = type;

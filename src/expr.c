@@ -30,9 +30,9 @@
 #include "stmt.h"
 #include "type.h"
 
-wulk_expr_t wulk_exprs(wulk_expr_t *exprs) {
-  wulk_expr_t expr = (wulk_expr_t) {
-    .kind = WULK_EXPR_EXPRS
+il_expr_t il_exprs(il_expr_t *exprs) {
+  il_expr_t expr = (il_expr_t) {
+    .kind = IL_EXPR_EXPRS
   };
 
   if (exprs) {
@@ -44,27 +44,27 @@ wulk_expr_t wulk_exprs(wulk_expr_t *exprs) {
   return expr;
 }
 
-wulk_expr_t wulk_exprs_start(wulk_expr_t expr) {
-  wulk_expr_t exprs = (wulk_expr_t) {
-    .kind = WULK_EXPR_EXPRS
+il_expr_t il_exprs_start(il_expr_t expr) {
+  il_expr_t exprs = (il_expr_t) {
+    .kind = IL_EXPR_EXPRS
   };
 
   adt_vector_push(exprs.exprs.vector, expr);
   return exprs;
 }
 
-static void wulk_exprs_dtor(wulk_exprs_t *self) {
-  wulk_expr_t expr;
+static void il_exprs_dtor(il_exprs_t *self) {
+  il_expr_t expr;
 
   adt_vector_foreach(self->vector, expr) {
-    wulk_expr_dtor(&expr);
+    il_expr_dtor(&expr);
   }
   adt_vector_dtor(self->vector);
 }
 
-wulk_expr_t wulk_id(wulk_lloc_t lloc, const char *id, wulk_type_t type) {
-  return (wulk_expr_t) {
-    .kind = WULK_EXPR_ID,
+il_expr_t il_id(il_lloc_t lloc, const char *id, il_type_t type) {
+  return (il_expr_t) {
+    .kind = IL_EXPR_ID,
     .id = {
       .id = id,
       .lloc = lloc,
@@ -73,26 +73,26 @@ wulk_expr_t wulk_id(wulk_lloc_t lloc, const char *id, wulk_type_t type) {
   };
 }
 
-static void wulk_id_dtor(wulk_id_t *self) {
-  wulk_type_dtor(&self->type);
+static void il_id_dtor(il_id_t *self) {
+  il_type_dtor(&self->type);
 }
 
-wulk_expr_t wulk_const_int(wulk_lloc_t lloc, int d) {
-  return wulk_const(lloc, wulk_val(wulk_int(), .ul = (unsigned long) d));
+il_expr_t il_const_int(il_lloc_t lloc, int d) {
+  return il_const(lloc, il_val(il_int(), .ul = (unsigned long) d));
 }
 
-wulk_expr_t wulk_const_float(wulk_lloc_t lloc, float f) {
-  return wulk_const(lloc, wulk_val(wulk_float(), .f = f));
+il_expr_t il_const_float(il_lloc_t lloc, float f) {
+  return il_const(lloc, il_val(il_float(), .f = f));
 }
 
-wulk_expr_t wulk_const_string(wulk_lloc_t lloc, const char *s) {
-  return wulk_const(lloc, wulk_val(wulk_pointer(wulk_char()), .s = s));
+il_expr_t il_const_string(il_lloc_t lloc, const char *s) {
+  return il_const(lloc, il_val(il_pointer(il_char()), .s = s));
 }
 
-wulk_expr_t wulk_const(wulk_lloc_t lloc, wulk_val_t value) {
-  assert(wulk_defined(value.type));
-  return (wulk_expr_t) {
-    .kind = WULK_EXPR_CONST,
+il_expr_t il_const(il_lloc_t lloc, il_val_t value) {
+  assert(il_defined(value.type));
+  return (il_expr_t) {
+    .kind = IL_EXPR_CONST,
     .constant = {
       .value = value,
       .lloc = lloc
@@ -100,17 +100,17 @@ wulk_expr_t wulk_const(wulk_lloc_t lloc, wulk_val_t value) {
   };
 }
 
-static void wulk_const_dtor(wulk_const_t *self) {
-  wulk_type_dtor(&self->type);
+static void il_const_dtor(il_const_t *self) {
+  il_type_dtor(&self->type);
 }
 
-wulk_expr_t wulk_unary(wulk_lloc_t op_lloc, enum wulk_op_n op, wulk_expr_t operand) {
-  wulk_expr_t expr = (wulk_expr_t) {
-    .kind = WULK_EXPR_UNARY,
+il_expr_t il_unary(il_lloc_t op_lloc, enum il_op_n op, il_expr_t operand) {
+  il_expr_t expr = (il_expr_t) {
+    .kind = IL_EXPR_UNARY,
     .unary = {
       .op = op,
-      .operand = xmalloc(sizeof(wulk_expr_t)),
-      .lloc = wulk_lloc(op_lloc, operand.lloc),
+      .operand = xmalloc(sizeof(il_expr_t)),
+      .lloc = il_lloc(op_lloc, operand.lloc),
       .type = operand.type
     }
   };
@@ -119,13 +119,13 @@ wulk_expr_t wulk_unary(wulk_lloc_t op_lloc, enum wulk_op_n op, wulk_expr_t opera
   return expr;
 }
 
-wulk_expr_t wulk_cast(wulk_lloc_t type_lloc, wulk_type_t type, wulk_expr_t operand) {
-  wulk_expr_t expr = (wulk_expr_t) {
-    .kind = WULK_EXPR_UNARY,
+il_expr_t il_cast(il_lloc_t type_lloc, il_type_t type, il_expr_t operand) {
+  il_expr_t expr = (il_expr_t) {
+    .kind = IL_EXPR_UNARY,
     .unary = {
-      .op = WULK_OP_CAST,
-      .operand = xmalloc(sizeof(wulk_expr_t)),
-      .lloc = wulk_lloc(type_lloc, operand.lloc),
+      .op = IL_OP_CAST,
+      .operand = xmalloc(sizeof(il_expr_t)),
+      .lloc = il_lloc(type_lloc, operand.lloc),
       .type = type
     }
   };
@@ -134,23 +134,23 @@ wulk_expr_t wulk_cast(wulk_lloc_t type_lloc, wulk_type_t type, wulk_expr_t opera
   return expr;
 }
 
-static void wulk_unary_dtor(wulk_unary_t *self) {
-  if (self->op == WULK_OP_CAST) {
-    wulk_type_dtor(&self->type);
+static void il_unary_dtor(il_unary_t *self) {
+  if (self->op == IL_OP_CAST) {
+    il_type_dtor(&self->type);
   }
-  wulk_expr_dtor(self->operand);
+  il_expr_dtor(self->operand);
   xfree(self->operand);
   self->operand = NULL;
 }
 
-wulk_expr_t wulk_binary(enum wulk_op_n op, wulk_expr_t lhs, wulk_expr_t rhs) {
-  wulk_expr_t expr = (wulk_expr_t) {
-    .kind = WULK_EXPR_BINARY,
+il_expr_t il_binary(enum il_op_n op, il_expr_t lhs, il_expr_t rhs) {
+  il_expr_t expr = (il_expr_t) {
+    .kind = IL_EXPR_BINARY,
     .binary = {
       .op = op,
-      .lhs = xmalloc(sizeof(wulk_expr_t)),
-      .rhs = xmalloc(sizeof(wulk_expr_t)),
-      .lloc = wulk_lloc(lhs.lloc, rhs.lloc),
+      .lhs = xmalloc(sizeof(il_expr_t)),
+      .rhs = xmalloc(sizeof(il_expr_t)),
+      .lloc = il_lloc(lhs.lloc, rhs.lloc),
       .type = lhs.type
     }
   };
@@ -160,23 +160,23 @@ wulk_expr_t wulk_binary(enum wulk_op_n op, wulk_expr_t lhs, wulk_expr_t rhs) {
   return expr;
 }
 
-static void wulk_binary_dtor(wulk_binary_t *self) {
-  wulk_expr_dtor(self->lhs);
+static void il_binary_dtor(il_binary_t *self) {
+  il_expr_dtor(self->lhs);
   xfree(self->lhs);
   self->lhs = NULL;
-  wulk_expr_dtor(self->rhs);
+  il_expr_dtor(self->rhs);
   xfree(self->rhs);
   self->rhs = NULL;
 }
 
-wulk_expr_t wulk_ternary(wulk_expr_t lhs, wulk_expr_t mhs, wulk_expr_t rhs) {
-  wulk_expr_t expr = (wulk_expr_t) {
-    .kind = WULK_EXPR_TERNARY,
+il_expr_t il_ternary(il_expr_t lhs, il_expr_t mhs, il_expr_t rhs) {
+  il_expr_t expr = (il_expr_t) {
+    .kind = IL_EXPR_TERNARY,
     .ternary = {
-      .lhs = xmalloc(sizeof(wulk_expr_t)),
-      .mhs = xmalloc(sizeof(wulk_expr_t)),
-      .rhs = xmalloc(sizeof(wulk_expr_t)),
-      .lloc = wulk_lloc(lhs.lloc, rhs.lloc),
+      .lhs = xmalloc(sizeof(il_expr_t)),
+      .mhs = xmalloc(sizeof(il_expr_t)),
+      .rhs = xmalloc(sizeof(il_expr_t)),
+      .lloc = il_lloc(lhs.lloc, rhs.lloc),
       .type = mhs.type
     }
   };
@@ -187,26 +187,26 @@ wulk_expr_t wulk_ternary(wulk_expr_t lhs, wulk_expr_t mhs, wulk_expr_t rhs) {
   return expr;
 }
 
-static void wulk_ternary_dtor(wulk_ternary_t *self) {
-  wulk_expr_dtor(self->lhs);
+static void il_ternary_dtor(il_ternary_t *self) {
+  il_expr_dtor(self->lhs);
   xfree(self->lhs);
   self->lhs = NULL;
-  wulk_expr_dtor(self->mhs);
+  il_expr_dtor(self->mhs);
   xfree(self->mhs);
   self->mhs = NULL;
-  wulk_expr_dtor(self->rhs);
+  il_expr_dtor(self->rhs);
   xfree(self->rhs);
   self->rhs = NULL;
 }
 
-wulk_expr_t wulk_array_read(wulk_expr_t lhs, wulk_lloc_t pos_lloc, wulk_expr_t pos) {
-  wulk_expr_t expr = (wulk_expr_t) {
-    .kind = WULK_EXPR_ARRAY_READ,
+il_expr_t il_array_read(il_expr_t lhs, il_lloc_t pos_lloc, il_expr_t pos) {
+  il_expr_t expr = (il_expr_t) {
+    .kind = IL_EXPR_ARRAY_READ,
     .array_read = {
-      .lhs = xmalloc(sizeof(wulk_expr_t)),
-      .pos = xmalloc(sizeof(wulk_expr_t)),
-      .lloc = wulk_lloc(lhs.lloc, pos_lloc),
-      .type = wulk_type_deref(lhs.type)
+      .lhs = xmalloc(sizeof(il_expr_t)),
+      .pos = xmalloc(sizeof(il_expr_t)),
+      .lloc = il_lloc(lhs.lloc, pos_lloc),
+      .type = il_type_deref(lhs.type)
     }
   };
 
@@ -215,46 +215,46 @@ wulk_expr_t wulk_array_read(wulk_expr_t lhs, wulk_lloc_t pos_lloc, wulk_expr_t p
   return expr;
 }
 
-static void wulk_array_read_dtor(wulk_array_read_t *self) {
-  wulk_type_dtor(&self->type);
-  wulk_expr_dtor(self->lhs);
+static void il_array_read_dtor(il_array_read_t *self) {
+  il_type_dtor(&self->type);
+  il_expr_dtor(self->lhs);
   xfree(self->lhs);
   self->lhs = NULL;
-  wulk_expr_dtor(self->pos);
+  il_expr_dtor(self->pos);
   xfree(self->pos);
   self->pos = NULL;
 }
 
-wulk_expr_t wulk_array_write(wulk_array_read_t array_read, wulk_expr_t rhs) {
-  wulk_expr_t expr = (wulk_expr_t) {
-    .kind = WULK_EXPR_ARRAY_WRITE,
+il_expr_t il_array_write(il_array_read_t array_read, il_expr_t rhs) {
+  il_expr_t expr = (il_expr_t) {
+    .kind = IL_EXPR_ARRAY_WRITE,
     .array_write = {
       .read = array_read,
-      .rhs = xmalloc(sizeof(wulk_expr_t)),
+      .rhs = xmalloc(sizeof(il_expr_t)),
     }
   };
 
-  expr.lloc = wulk_lloc(array_read.lloc, rhs.lloc);
+  expr.lloc = il_lloc(array_read.lloc, rhs.lloc);
   *expr.array_write.rhs = rhs;
   return expr;
 }
 
-static void wulk_array_write_dtor(wulk_array_write_t *self) {
-  wulk_array_read_dtor(&self->read);
-  wulk_expr_dtor(self->rhs);
+static void il_array_write_dtor(il_array_write_t *self) {
+  il_array_read_dtor(&self->read);
+  il_expr_dtor(self->rhs);
   xfree(self->rhs);
   self->rhs = NULL;
 }
 
-wulk_expr_t wulk_field_read(wulk_expr_t lhs, wulk_id_t id) {
-  wulk_field_t *field = wulk_field_lookup(lhs.type, id.id);
-  wulk_expr_t expr = (wulk_expr_t) {
-    .kind = WULK_EXPR_FIELD_READ,
+il_expr_t il_field_read(il_expr_t lhs, il_id_t id) {
+  il_field_t *field = il_field_lookup(lhs.type, id.id);
+  il_expr_t expr = (il_expr_t) {
+    .kind = IL_EXPR_FIELD_READ,
     .field_read = {
-      .lhs = xmalloc(sizeof(wulk_expr_t)),
+      .lhs = xmalloc(sizeof(il_expr_t)),
       .id = id,
-      .lloc = wulk_lloc(lhs.lloc, id.lloc),
-      .type = field ? field->type : wulk_type_undefined()
+      .lloc = il_lloc(lhs.lloc, id.lloc),
+      .type = field ? field->type : il_type_undefined()
     }
   };
 
@@ -262,41 +262,41 @@ wulk_expr_t wulk_field_read(wulk_expr_t lhs, wulk_id_t id) {
   return expr;
 }
 
-static void wulk_field_read_dtor(wulk_field_read_t *self) {
-  wulk_id_dtor(&self->id);
-  wulk_expr_dtor(self->lhs);
+static void il_field_read_dtor(il_field_read_t *self) {
+  il_id_dtor(&self->id);
+  il_expr_dtor(self->lhs);
   xfree(self->lhs);
   self->lhs = NULL;
 }
 
-wulk_expr_t wulk_field_write(wulk_field_read_t field_read, wulk_expr_t rhs) {
-  wulk_expr_t expr = (wulk_expr_t) {
-    .kind = WULK_EXPR_FIELD_WRITE,
+il_expr_t il_field_write(il_field_read_t field_read, il_expr_t rhs) {
+  il_expr_t expr = (il_expr_t) {
+    .kind = IL_EXPR_FIELD_WRITE,
     .field_write = {
       .read = field_read,
-      .rhs = xmalloc(sizeof(wulk_expr_t))
+      .rhs = xmalloc(sizeof(il_expr_t))
     }
   };
 
-  expr.lloc = wulk_lloc(field_read.lloc, rhs.lloc);
+  expr.lloc = il_lloc(field_read.lloc, rhs.lloc);
   *expr.field_write.rhs = rhs;
   return expr;
 }
 
-static void wulk_field_write_dtor(wulk_field_write_t *self) {
-  wulk_field_read_dtor(&self->read);
-  wulk_expr_dtor(self->rhs);
+static void il_field_write_dtor(il_field_write_t *self) {
+  il_field_read_dtor(&self->read);
+  il_expr_dtor(self->rhs);
   xfree(self->rhs);
   self->rhs = NULL;
 }
 
-wulk_expr_t wulk_call(wulk_expr_t lhs, wulk_lloc_t args_lloc, wulk_exprs_t args) {
-  wulk_expr_t expr = (wulk_expr_t) {
-    .kind = WULK_EXPR_CALL,
+il_expr_t il_call(il_expr_t lhs, il_lloc_t args_lloc, il_exprs_t args) {
+  il_expr_t expr = (il_expr_t) {
+    .kind = IL_EXPR_CALL,
     .call = {
-      .lhs = xmalloc(sizeof(wulk_expr_t)),
+      .lhs = xmalloc(sizeof(il_expr_t)),
       .args = args,
-      .lloc = wulk_lloc(lhs.lloc, args_lloc)
+      .lloc = il_lloc(lhs.lloc, args_lloc)
     }
   };
 
@@ -304,67 +304,67 @@ wulk_expr_t wulk_call(wulk_expr_t lhs, wulk_lloc_t args_lloc, wulk_exprs_t args)
   return expr;
 }
 
-static void wulk_call_dtor(wulk_call_t *self) {
-  wulk_expr_dtor(self->lhs);
+static void il_call_dtor(il_call_t *self) {
+  il_expr_dtor(self->lhs);
   xfree(self->lhs);
   self->lhs = NULL;
-  wulk_exprs_dtor(&self->args);
+  il_exprs_dtor(&self->args);
 }
 
-void wulk_expr_dtor(wulk_expr_t *self) {
+void il_expr_dtor(il_expr_t *self) {
   switch (self->kind) {
-    case WULK_EXPR_UNDEFINED:
+    case IL_EXPR_UNDEFINED:
       break;
-    case WULK_EXPR_EXPRS:
-      wulk_exprs_dtor(&self->exprs);
+    case IL_EXPR_EXPRS:
+      il_exprs_dtor(&self->exprs);
       break;
-    case WULK_EXPR_ID:
-      wulk_id_dtor(&self->id);
+    case IL_EXPR_ID:
+      il_id_dtor(&self->id);
       break;
-    case WULK_EXPR_CONST:
-      wulk_const_dtor(&self->constant);
+    case IL_EXPR_CONST:
+      il_const_dtor(&self->constant);
       break;
-    case WULK_EXPR_UNARY:
-      wulk_unary_dtor(&self->unary);
+    case IL_EXPR_UNARY:
+      il_unary_dtor(&self->unary);
       break;
-    case WULK_EXPR_BINARY:
-      wulk_binary_dtor(&self->binary);
+    case IL_EXPR_BINARY:
+      il_binary_dtor(&self->binary);
       break;
-    case WULK_EXPR_TERNARY:
-      wulk_ternary_dtor(&self->ternary);
+    case IL_EXPR_TERNARY:
+      il_ternary_dtor(&self->ternary);
       break;
-    case WULK_EXPR_ARRAY_READ:
-      wulk_array_read_dtor(&self->array_read);
+    case IL_EXPR_ARRAY_READ:
+      il_array_read_dtor(&self->array_read);
       break;
-    case WULK_EXPR_ARRAY_WRITE:
-      wulk_array_write_dtor(&self->array_write);
+    case IL_EXPR_ARRAY_WRITE:
+      il_array_write_dtor(&self->array_write);
       break;
-    case WULK_EXPR_FIELD_READ:
-      wulk_field_read_dtor(&self->field_read);
+    case IL_EXPR_FIELD_READ:
+      il_field_read_dtor(&self->field_read);
       break;
-    case WULK_EXPR_FIELD_WRITE:
-      wulk_field_write_dtor(&self->field_write);
+    case IL_EXPR_FIELD_WRITE:
+      il_field_write_dtor(&self->field_write);
       break;
-    case WULK_EXPR_CALL:
-      wulk_call_dtor(&self->call);
+    case IL_EXPR_CALL:
+      il_call_dtor(&self->call);
       break;
     default:
       break;
   }
-  *self = wulk_expr_undefined();
+  *self = il_expr_undefined();
 }
 
-bool wulk_expr_is_constant(wulk_expr_t self) {
+bool il_expr_is_constant(il_expr_t self) {
   switch (self.kind) {
-    case WULK_EXPR_CONST:
+    case IL_EXPR_CONST:
       return true;
-    case WULK_EXPR_UNARY:
-      return wulk_expr_is_constant(*self.unary.operand);
-    case WULK_EXPR_BINARY:
-      return wulk_expr_is_constant(*self.binary.lhs) && wulk_expr_is_constant(*self.binary.rhs);
-    case WULK_EXPR_TERNARY:
-      return wulk_expr_is_constant(*self.ternary.lhs) && wulk_expr_is_constant(*self.ternary.mhs)
-             && wulk_expr_is_constant(*self.ternary.rhs);
+    case IL_EXPR_UNARY:
+      return il_expr_is_constant(*self.unary.operand);
+    case IL_EXPR_BINARY:
+      return il_expr_is_constant(*self.binary.lhs) && il_expr_is_constant(*self.binary.rhs);
+    case IL_EXPR_TERNARY:
+      return il_expr_is_constant(*self.ternary.lhs) && il_expr_is_constant(*self.ternary.mhs)
+             && il_expr_is_constant(*self.ternary.rhs);
     default:
       return false;
   }
@@ -403,45 +403,45 @@ static enum suffix read_integer_suffix(char *ptr, char **endptr) {
   return s;
 }
 
-static wulk_type_t constant_integer_type(unsigned long int value, enum suffix suffix, int is_decimal) {
+static il_type_t constant_integer_type(unsigned long int value, enum suffix suffix, int is_decimal) {
   switch (suffix) {
     case SUFFIX_U:
       if (value <= UINT_MAX) {
-        return wulk_uint();
+        return il_uint();
       } else {
-        return wulk_ulong();
+        return il_ulong();
       }
     case SUFFIX_L:
     case SUFFIX_LL:
       if (value <= LONG_MAX) {
-        return wulk_long();
+        return il_long();
       } else {
         if (is_decimal) {
           puts("Conversion of decimal constant to unsigned.");
         }
-        return wulk_ulong();
+        return il_ulong();
       }
     case SUFFIX_UL:
     case SUFFIX_ULL:
-      return wulk_ulong();
+      return il_ulong();
     case SUFFIX_NONE:
     default:
       if (value <= INT_MAX) {
-        return wulk_int();
+        return il_int();
       } else if (!is_decimal && value <= UINT_MAX) {
-        return wulk_uint();
+        return il_uint();
       } else if (value <= LONG_MAX) {
-        return wulk_long();
+        return il_long();
       } else {
         if (is_decimal) {
           puts("Conversion of decimal constant to unsigned.");
         }
-        return wulk_ulong();
+        return il_ulong();
       }
   }
 }
 
-int wulk_const_parse(wulk_lloc_t lloc, const char *s, size_t len, wulk_expr_t *out) {
+int il_const_parse(il_lloc_t lloc, const char *s, size_t len, il_expr_t *out) {
   const char *str;
   char *endptr;
   enum suffix suffix;
@@ -452,7 +452,7 @@ int wulk_const_parse(wulk_lloc_t lloc, const char *s, size_t len, wulk_expr_t *o
    * permutations of upper- and lower case.
    */
   errno = 0;
-  *out = (wulk_expr_t) {.kind = WULK_EXPR_CONST, .lloc = lloc};
+  *out = (il_expr_t) {.kind = IL_EXPR_CONST, .lloc = lloc};
   out->constant.ul = strtoul(str, &endptr, 0);
   suffix = read_integer_suffix(endptr, &endptr);
   if ((size_t) (endptr - str) == len) {
@@ -471,17 +471,17 @@ int wulk_const_parse(wulk_lloc_t lloc, const char *s, size_t len, wulk_expr_t *o
     if ((size_t) (endptr - str) < len) {
       if (*endptr == 'f' || *endptr == 'F') {
         out->constant.f = (float) out->constant.d;
-        out->type = wulk_float();
+        out->type = il_float();
         endptr++;
       } else if (*endptr == 'l' || *endptr == 'L') {
         out->constant.ld = out->constant.d;
-        out->type = wulk_long_double();
+        out->type = il_long_double();
         endptr++;
       } else {
-        out->type = wulk_double();
+        out->type = il_double();
       }
     } else {
-      out->type = wulk_double();
+      out->type = il_double();
     }
   }
   if (errno || ((size_t) (endptr - str) != len)) {
@@ -494,10 +494,10 @@ int wulk_const_parse(wulk_lloc_t lloc, const char *s, size_t len, wulk_expr_t *o
   return 0;
 }
 
-long wulk_eval_long(wulk_expr_t expr) {
+long il_eval_long(il_expr_t expr) {
   return 0;
 }
 
-unsigned long wulk_eval_ulong(wulk_expr_t expr) {
+unsigned long il_eval_ulong(il_expr_t expr) {
   return 0;
 }

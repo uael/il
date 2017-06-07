@@ -20,15 +20,15 @@
 
 #include "entity.h"
 
-void wulk_program_init(wulk_program_t *self) {
-  *self = (wulk_program_t) {{0}};
+void il_program_init(il_program_t *self) {
+  *self = (il_program_t) {{0}};
 }
 
-void wulk_program_dtor(wulk_program_t *self) {
-  wulk_entity_t entity;
+void il_program_dtor(il_program_t *self) {
+  il_entity_t entity;
 
   adt_vector_foreach(self->entities, entity) {
-    wulk_entity_dtor(&entity);
+    il_entity_dtor(&entity);
   }
   adt_vector_dtor(self->entities);
 }

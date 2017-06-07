@@ -16,8 +16,8 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#ifndef   WULK_COMPILER_H__
-# define  WULK_COMPILER_H__
+#ifndef   IL_COMPILER_H__
+# define  IL_COMPILER_H__
 
 #include <adt/string.h>
 #include <u/compiler.h>
@@ -27,25 +27,25 @@
 #include "be.h"
 #include "program.h"
 
-typedef struct wulk_compiler_t wulk_compiler_t;
+typedef struct il_compiler_t il_compiler_t;
 
-struct wulk_compiler_t {
+struct il_compiler_t {
   const char *program;
-  wulk_opts_t opts;
-  wulk_program_t ast;
-  wulk_parser_t fe;
-  wulk_backend_t be;
+  il_opts_t opts;
+  il_program_t ast;
+  il_parser_t fe;
+  il_backend_t be;
   string_r strtab;
 };
 
-void wulk_init(wulk_compiler_t *self, int argc, char **argv);
-void wulk_dtor(wulk_compiler_t *self);
-void wulk_parse(wulk_compiler_t *self);
-NORETURN void wulk_err(wulk_compiler_t *self, const char *format, ...);
-NORETURN void wulk_fatal_err(wulk_compiler_t *self, const char *format, ...);
-NORETURN void wulk_parse_err(wulk_compiler_t *self, wulk_loc_t loc, const char *format, ...);
+void il_init(il_compiler_t *self, int argc, char **argv);
+void il_dtor(il_compiler_t *self);
+void il_parse(il_compiler_t *self);
+NORETURN void il_err(il_compiler_t *self, const char *format, ...);
+NORETURN void il_fatal_err(il_compiler_t *self, const char *format, ...);
+NORETURN void il_parse_err(il_compiler_t *self, il_loc_t loc, const char *format, ...);
 
-const char *wulk_strdup(wulk_compiler_t *self, const char *str);
-const char *wulk_strndup(wulk_compiler_t *self, const char *str, size_t n);
+const char *il_strdup(il_compiler_t *self, const char *str);
+const char *il_strndup(il_compiler_t *self, const char *str, size_t n);
 
-#endif /* WULK_COMPILER_H__ */
+#endif /* IL_COMPILER_H__ */

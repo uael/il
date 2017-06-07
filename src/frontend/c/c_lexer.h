@@ -16,8 +16,8 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#ifndef   WULK_C_LEXER_H__
-# define  WULK_C_LEXER_H__
+#ifndef   IL_C_LEXER_H__
+# define  IL_C_LEXER_H__
 
 #include "lexer.h"
 
@@ -130,6 +130,6 @@ enum {
   C_TOK_STRING
 };
 
-void c_lexer_init(wulk_lexer_t *self);
+void c_lexer_init(il_lexer_t *self);
 
-#endif /* WULK_C_LEXER_H__ */
+#endif /* IL_C_LEXER_H__ */

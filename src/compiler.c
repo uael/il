@@ -23,35 +23,35 @@
 
 #include "util/io.h"
 
-void wulk_init(wulk_compiler_t *self, int argc, char **argv) {
+void il_init(il_compiler_t *self, int argc, char **argv) {
   char *sep;
 
   if ((sep = strrchr(argv[0], '/'))) {
     argv[0] = ++sep;
   }
-  *self = (wulk_compiler_t) {
+  *self = (il_compiler_t) {
     .program = argv[0]
   };
-  if (!wulk_opts_init(&self->opts, argc, argv)) {
-    wulk_opts_dtor(&self->opts);
+  if (!il_opts_init(&self->opts, argc, argv)) {
+    il_opts_dtor(&self->opts);
     exit(EXIT_SUCCESS);
   }
   if (!self->opts.in) {
-    wulk_fatal_err(self, "no input file");
+    il_fatal_err(self, "no input file");
   }
   if (adt_vector_size(self->opts.opts_errs)) {
-    wulk_err(self, adt_vector_front(self->opts.opts_errs));
+    il_err(self, adt_vector_front(self->opts.opts_errs));
   }
-  wulk_fe_init(&self->fe, WULK_PARSER_C, self);
-  wulk_fe_push_src(&self->fe, self->opts.in);
+  il_fe_init(&self->fe, IL_PARSER_C, self);
+  il_fe_push_src(&self->fe, self->opts.in);
 }
 
-void wulk_dtor(wulk_compiler_t *self) {
+void il_dtor(il_compiler_t *self) {
   const char *str;
 
-  wulk_opts_dtor(&self->opts);
-  if (wulk_defined(self->fe)) {
-    wulk_fe_dtor(&self->fe);
+  il_opts_dtor(&self->opts);
+  if (il_defined(self->fe)) {
+    il_fe_dtor(&self->fe);
   }
   adt_vector_foreach(self->strtab, str) {
     xfree((void *) str);
@@ -59,11 +59,11 @@ void wulk_dtor(wulk_compiler_t *self) {
   adt_vector_dtor(self->strtab);
 }
 
-void wulk_parse(wulk_compiler_t *self) {
-  wulk_fe_parse(&self->fe, NULL, &self->ast);
+void il_parse(il_compiler_t *self) {
+  il_fe_parse(&self->fe, NULL, &self->ast);
 }
 
-NORETURN void wulk_err(wulk_compiler_t *self, const char *format, ...) {
+NORETURN void il_err(il_compiler_t *self, const char *format, ...) {
   va_list args;
 
   if (self) {
@@ -77,12 +77,12 @@ NORETURN void wulk_err(wulk_compiler_t *self, const char *format, ...) {
   putc('\n', stdout);
 
   if (self) {
-    wulk_dtor(self);
+    il_dtor(self);
   }
   exit(EXIT_FAILURE);
 }
 
-NORETURN void wulk_fatal_err(wulk_compiler_t *self, const char *format, ...) {
+NORETURN void il_fatal_err(il_compiler_t *self, const char *format, ...) {
   va_list args;
 
   if (self) {
@@ -96,23 +96,23 @@ NORETURN void wulk_fatal_err(wulk_compiler_t *self, const char *format, ...) {
   putc('\n', stdout);
 
   if (self) {
-    wulk_dtor(self);
+    il_dtor(self);
   }
   exit(EXIT_FAILURE);
 }
 
-NORETURN void wulk_parse_err(wulk_compiler_t *self, wulk_loc_t loc, const char *format, ...) {
+NORETURN void il_parse_err(il_compiler_t *self, il_loc_t loc, const char *format, ...) {
   size_t begin = loc.position - loc.colno;
   const char *ptr, *file;
-  wulk_lexer_t lexer = (wulk_lexer_t) {0};
-  wulk_token_t eol;
+  il_lexer_t lexer = (il_lexer_t) {0};
+  il_token_t eol;
   va_list args;
 
   file = adt_vector_at(self->fe.sources, loc.file_id);
-  wulk_lexer_fork(&lexer, self->fe.lexer);
+  il_lexer_fork(&lexer, self->fe.lexer);
   lexer.loc = loc;
   ptr = lexer.buffer + begin;
-  while ((eol = wulk_lexer_next(&lexer)).type != '\n' && eol.type != '\0');
+  while ((eol = il_lexer_next(&lexer)).type != '\n' && eol.type != '\0');
   printf(BOLD "%s:" RESET " In function ‘" BOLD "syntax_error" RESET "’:\n", file);
   printf(BOLD "%s:%d:%d: " BOLD RED "error: " RESET, file, loc.colno + 1, loc.lineno + 1);
   va_start(args, format);
@@ -124,16 +124,16 @@ NORETURN void wulk_parse_err(wulk_compiler_t *self, wulk_loc_t loc, const char *
   }
   fputs(BOLD YELLOW "^\n" RESET, stdout);
 
-  wulk_lexer_dtor(&lexer, true);
-  wulk_dtor(self);
+  il_lexer_dtor(&lexer, true);
+  il_dtor(self);
   exit(EXIT_FAILURE);
 }
 
-const char *wulk_strdup(wulk_compiler_t *self, const char *str) {
-  return wulk_strndup(self, str, strlen(str));
+const char *il_strdup(il_compiler_t *self, const char *str) {
+  return il_strndup(self, str, strlen(str));
 }
 
-const char *wulk_strndup(wulk_compiler_t *self, const char *str, size_t n) {
+const char *il_strndup(il_compiler_t *self, const char *str, size_t n) {
   adt_vector_push(self->strtab, "");
   adt_vector_back(self->strtab) = xmalloc(n + 1);
   strncpy((char *) adt_vector_back(self->strtab), str, n + 1);

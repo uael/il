@@ -29,13 +29,13 @@ void c_macro_dtor(c_macro_t *self) {
   adt_vector_dtor(self->replacement);
 }
 
-void c_macro_expand(c_macro_t *self, c_pp_t *pp, wulk_lexer_t *into) {
-  wulk_token_t t;
+void c_macro_expand(c_macro_t *self, c_pp_t *pp, il_lexer_t *into) {
+  il_token_t t;
   unsigned it;
   c_macro_t macro;
 
   adt_vector_foreach(self->replacement, t) {
-    if (t.kind == WULK_TOKEN_IDENTIFIER) {
+    if (t.kind == IL_TOKEN_IDENTIFIER) {
       it = kh_get(c_macro_ht, &pp->macros, t.value);
       if (it != kh_end(&pp->macros)) {
         macro = kh_value(&pp->macros, it);
@@ -45,7 +45,7 @@ void c_macro_expand(c_macro_t *self, c_pp_t *pp, wulk_lexer_t *into) {
         }
       }
     }
-    wulk_lexer_push(into, t);
+    il_lexer_push(into, t);
   }
 }
 
@@ -61,38 +61,38 @@ void c_pp_dtor(c_pp_t *self) {
     c_macro_dtor(&macro);
   });
   c_macro_ht_dtor(&self->macros);
-  wulk_lexer_dtor(&self->lexer, true);
+  il_lexer_dtor(&self->lexer, true);
 }
 
-void c_pp_parse_define(c_pp_t *self, wulk_lexer_t *lexer) {
-  wulk_token_t t, pt;
+void c_pp_parse_define(c_pp_t *self, il_lexer_t *lexer) {
+  il_token_t t, pt;
   c_macro_t macro;
   int out;
   unsigned it;
-  wulk_lexer_consume_id(lexer, "define");
-  t = wulk_lexer_consume(lexer, C_TOK_IDENTIFIER);
+  il_lexer_consume_id(lexer, "define");
+  t = il_lexer_consume(lexer, C_TOK_IDENTIFIER);
   c_macro_init(&macro);
   macro.name = t.value;
 
-  if (wulk_lexer_peek(lexer).type == '(') {
+  if (il_lexer_peek(lexer).type == '(') {
     macro.kind = C_MACRO_FUNC;
     lbl_parse_arg:
-    adt_vector_push(macro.params, wulk_lexer_consume(lexer, C_TOK_IDENTIFIER));
-    if (wulk_lexer_peek(lexer).type == ',') {
-      wulk_lexer_consume(lexer, ',');
+    adt_vector_push(macro.params, il_lexer_consume(lexer, C_TOK_IDENTIFIER));
+    if (il_lexer_peek(lexer).type == ',') {
+      il_lexer_consume(lexer, ',');
       goto lbl_parse_arg;
     }
-    wulk_lexer_consume(lexer, ')');
+    il_lexer_consume(lexer, ')');
   } else {
     macro.kind = C_MACRO_OBJECT;
   }
 
-  while ((t = wulk_lexer_next(lexer)).type != 0) {
+  while ((t = il_lexer_next(lexer)).type != 0) {
     if (t.type == '\n') {
       if (pt.type != '\\') break;
       else {
-        wulk_token_dtor(&pt);
-        wulk_token_dtor(&t);
+        il_token_dtor(&pt);
+        il_token_dtor(&t);
         continue;
       }
     } else if (t.type != '\\') {
@@ -105,46 +105,46 @@ void c_pp_parse_define(c_pp_t *self, wulk_lexer_t *lexer) {
     puts("macro redefined");
   }
   kh_value(&self->macros, it) = macro;
-  wulk_token_dtor(&t);
+  il_token_dtor(&t);
 }
 
-void c_pp_parse_undef(c_pp_t *self, wulk_lexer_t *lexer) {
-  wulk_token_t t;
+void c_pp_parse_undef(c_pp_t *self, il_lexer_t *lexer) {
+  il_token_t t;
   unsigned it;
 
-  wulk_lexer_consume_id(lexer, "undef");
-  t = wulk_lexer_consume(lexer, C_TOK_IDENTIFIER);
+  il_lexer_consume_id(lexer, "undef");
+  t = il_lexer_consume(lexer, C_TOK_IDENTIFIER);
   it = kh_get(c_macro_ht, &self->macros, t.value);
   if (it != kh_end(&self->macros)) {
     kh_del(c_macro_ht, &self->macros, it);
   }
-  wulk_token_dtor(&t);
+  il_token_dtor(&t);
 }
 
 
-bool c_pp_on_push_callback(wulk_lexer_event_t *self, void *arg) {
-  wulk_token_t *token, t;
+bool c_pp_on_push_callback(il_lexer_event_t *self, void *arg) {
+  il_token_t *token, t;
   c_pp_t *pp;
   unsigned it;
 
-  token = (wulk_token_t *) arg;
+  token = (il_token_t *) arg;
   pp = (c_pp_t *) self->data;
 
   if (token->type == '#') {
-    wulk_lexer_fork(&pp->lexer, self->lexer);
-    if ((t = wulk_lexer_peek(&pp->lexer)).kind == WULK_TOKEN_IDENTIFIER) {
+    il_lexer_fork(&pp->lexer, self->lexer);
+    if ((t = il_lexer_peek(&pp->lexer)).kind == IL_TOKEN_IDENTIFIER) {
       if (strcmp("define", t.value) == 0) {
         c_pp_parse_define(pp, &pp->lexer);
-        wulk_lexer_join(&pp->lexer);
+        il_lexer_join(&pp->lexer);
         return false;
       } else if (strcmp("undef", t.value) == 0) {
         c_pp_parse_undef(pp, &pp->lexer);
-        wulk_lexer_join(&pp->lexer);
+        il_lexer_join(&pp->lexer);
 
         return false;
       }
     }
-  } else if (token->kind == WULK_TOKEN_IDENTIFIER) {
+  } else if (token->kind == IL_TOKEN_IDENTIFIER) {
     it = kh_get(c_macro_ht, &pp->macros, token->value);
     if (it != kh_end(&pp->macros)) {
       c_macro_expand(&kh_value(&pp->macros, it), pp, self->lexer);
@@ -155,7 +155,7 @@ bool c_pp_on_push_callback(wulk_lexer_event_t *self, void *arg) {
   return true;
 }
 
-void c_pp_on_push_dtor(wulk_lexer_event_t *self) {
+void c_pp_on_push_dtor(il_lexer_event_t *self) {
   if (self->data) {
     c_pp_dtor(self->data);
     xfree(self->data);

@@ -16,39 +16,39 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#ifndef   WULK_PARSER_H__
-# define  WULK_PARSER_H__
+#ifndef   IL_PARSER_H__
+# define  IL_PARSER_H__
 
 #include <adt/deque.h>
 
 #include "lexer.h"
 
-struct wulk_scope_t;
-struct wulk_program_t;
+struct il_scope_t;
+struct il_program_t;
 
-typedef struct wulk_parser_t wulk_parser_t;
+typedef struct il_parser_t il_parser_t;
 
-enum wulk_parser_n {
-  WULK_PARSER_UNDEFINED = 0,
-  WULK_PARSER_C,
-  WULK_PARSER_JAY
+enum il_parser_n {
+  IL_PARSER_UNDEFINED = 0,
+  IL_PARSER_C,
+  IL_PARSER_JAY
 };
 
-struct wulk_parser_t {
-  enum wulk_parser_n kind;
-  struct wulk_compiler_t *compiler;
-  struct wulk_scope_t *scope;
-  wulk_lexer_t *lexer;
+struct il_parser_t {
+  enum il_parser_n kind;
+  struct il_compiler_t *compiler;
+  struct il_scope_t *scope;
+  il_lexer_t *lexer;
   adt_deque_of(const char *) sources;
 
-  void (*parse)(wulk_parser_t *self, struct wulk_program_t *out);
+  void (*parse)(il_parser_t *self, struct il_program_t *out);
 };
 
-void wulk_fe_init(wulk_parser_t *self, enum wulk_parser_n kind, struct wulk_compiler_t *compiler);
-void wulk_fe_dtor(wulk_parser_t *self);
-void wulk_fe_parse(wulk_parser_t *self, wulk_lexer_t *lexer, struct wulk_program_t *out);
-void wulk_fe_push_src(wulk_parser_t *self, const char *src);
-void wulk_fe_scope(wulk_parser_t *self);
-void wulk_fe_unscope(wulk_parser_t *self);
+void il_fe_init(il_parser_t *self, enum il_parser_n kind, struct il_compiler_t *compiler);
+void il_fe_dtor(il_parser_t *self);
+void il_fe_parse(il_parser_t *self, il_lexer_t *lexer, struct il_program_t *out);
+void il_fe_push_src(il_parser_t *self, const char *src);
+void il_fe_scope(il_parser_t *self);
+void il_fe_unscope(il_parser_t *self);
 
-#endif /* WULK_PARSER_H__ */
+#endif /* IL_PARSER_H__ */

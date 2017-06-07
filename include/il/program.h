@@ -16,13 +16,21 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#ifndef   WULK_STMT_H__
-# define  WULK_STMT_H__
+#ifndef   IL_PROGRAM_H__
+# define  IL_PROGRAM_H__
 
-#include "ir.h"
+#include <adt/hash.h>
 
-void wulk_stmt_dtor(wulk_stmt_t *self);
+#include "symbol.h"
 
-#define wulk_stmt_undefined() ((wulk_stmt_t) {.kind = WULK_STMT_UNDEFINED})
+typedef struct il_program_t il_program_t;
 
-#endif /* WULK_STMT_H__ */
+struct il_program_t {
+  il_entity_r entities;
+  il_symtab_t symtab;
+};
+
+void il_program_init(il_program_t *self);
+void il_program_dtor(il_program_t *self);
+
+#endif /* IL_PROGRAM_H__ */

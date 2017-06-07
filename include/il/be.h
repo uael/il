@@ -16,11 +16,11 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#ifndef   WULK_BE_H__
-# define  WULK_BE_H__
+#ifndef   IL_BE_H__
+# define  IL_BE_H__
 
-typedef struct wulk_backend_t {
+typedef struct il_backend_t {
   int tmp;
-} wulk_backend_t;
+} il_backend_t;
 
-#endif /* WULK_BE_H__ */
+#endif /* IL_BE_H__ */

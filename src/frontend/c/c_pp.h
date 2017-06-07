@@ -16,8 +16,8 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#ifndef   WULK_C_PP_H__
-# define  WULK_C_PP_H__
+#ifndef   IL_C_PP_H__
+# define  IL_C_PP_H__
 
 #include <u/stdbool.h>
 #include "adt/hash.h"
@@ -42,25 +42,25 @@ struct c_macro_t {
   bool is__line__;
   bool is__file__;
   bool is_vararg;
-  wulk_token_r params;
-  wulk_token_r replacement;
+  il_token_r params;
+  il_token_r replacement;
 };
 
 void c_macro_init(c_macro_t *self);
 void c_macro_dtor(c_macro_t *self);
-void c_macro_expand(c_macro_t *self, c_pp_t *pp, wulk_lexer_t *into);
+void c_macro_expand(c_macro_t *self, c_pp_t *pp, il_lexer_t *into);
 
 struct c_pp_t {
   c_macro_ht_t macros;
-  wulk_lexer_t lexer;
+  il_lexer_t lexer;
 };
 
 void c_pp_init(c_pp_t *self);
 void c_pp_dtor(c_pp_t *self);
-void c_pp_parse_define(c_pp_t *self, wulk_lexer_t *lexer);
-void c_pp_parse_undef(c_pp_t *self, wulk_lexer_t *lexer);
+void c_pp_parse_define(c_pp_t *self, il_lexer_t *lexer);
+void c_pp_parse_undef(c_pp_t *self, il_lexer_t *lexer);
 
-bool c_pp_on_push_callback(wulk_lexer_event_t *self, void *arg);
-void c_pp_on_push_dtor(wulk_lexer_event_t *self);
+bool c_pp_on_push_callback(il_lexer_event_t *self, void *arg);
+void c_pp_on_push_dtor(il_lexer_event_t *self);
 
-#endif /* WULK_C_PP_H__ */
+#endif /* IL_C_PP_H__ */

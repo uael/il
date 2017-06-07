@@ -21,26 +21,26 @@
 #include "lexer.h"
 
 
-void wulk_token_dtor(wulk_token_t *self) {}
+void il_token_dtor(il_token_t *self) {}
 
-wulk_lloc_t wulk_lloc_begin(wulk_lexer_t *lexer) {
-  return (wulk_lloc_t) {
+il_lloc_t il_lloc_begin(il_lexer_t *lexer) {
+  return (il_lloc_t) {
     .lexer = lexer,
-    .begin = wulk_lexer_peek(lexer).cursor
+    .begin = il_lexer_peek(lexer).cursor
   };
 }
 
-wulk_lloc_t wulk_lloc_end(wulk_lloc_t self){
-  self.end = wulk_lexer_peek(self.lexer).cursor;
+il_lloc_t il_lloc_end(il_lloc_t self){
+  self.end = il_lexer_peek(self.lexer).cursor;
   return self;
 }
 
-wulk_rtoken_t wulk_llocate(wulk_lloc_t lloc) {
+il_rtoken_t il_llocate(il_lloc_t lloc) {
   if (lloc.lexer) {
-    return (wulk_rtoken_t) {
+    return (il_rtoken_t) {
       adt_vector_at(lloc.lexer->queue, lloc.begin),
       adt_vector_at(lloc.lexer->queue, lloc.end)
     };
   }
-  return (wulk_rtoken_t) {{0}, {0}};
+  return (il_rtoken_t) {{0}, {0}};
 }

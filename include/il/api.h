@@ -16,13 +16,13 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#ifndef   WULK_API_H__
-# define  WULK_API_H__
+#ifndef   IL_API_H__
+# define  IL_API_H__
 
-#define wulk_defined(e) ((e).kind != 0)
-#define wulk_pdefined(e) ((e)->kind != 0)
+#define il_defined(e) ((e).kind != 0)
+#define il_pdefined(e) ((e)->kind != 0)
 
-#define wulk_is(e, a) ((e).kind == (a))
-#define wulk_pis(e, a) ((e)->kind == (a))
+#define il_is(e, a) ((e).kind == (a))
+#define il_pis(e, a) ((e)->kind == (a))
 
-#endif /* WULK_API_H__ */
+#endif /* IL_API_H__ */

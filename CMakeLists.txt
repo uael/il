@@ -1,5 +1,5 @@
 #
-# Wulk - Wu uniform language kit
+# libil - Intermediate Language cross-platform c library
 # Copyright (C) 2016-2017 Lucas Abel <www.github.com/uael>
 #
 # This library is free software; you can redistribute it and/or

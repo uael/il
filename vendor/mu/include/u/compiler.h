@@ -402,7 +402,7 @@
 #elif defined(__LCLINT__)
 # define UNUSED /*@unused@*/
 #else
-# define UNUSED x
+# define UNUSED
 #endif
 
 #if COMPILER_CLANG

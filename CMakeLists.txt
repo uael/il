@@ -84,9 +84,11 @@ else()
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC m)
 endif()
 
-enable_testing()
-add_subdirectory(${wulk_TEST_DIR})
 add_subdirectory(${wulk_VENDOR_DIR})
+if(EXISTS ${wulk_TEST_DIR})
+    enable_testing()
+    add_subdirectory(${wulk_TEST_DIR})
+endif()
 
 install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION bin

@@ -46,12 +46,12 @@ static il_expr_t conditional_expression(il_parser_t *self, il_program_t *out);
 static il_expr_t assignment_expression(il_parser_t *self, il_program_t *out);
 static il_expr_t expression(il_parser_t *self, il_program_t *out);
 static il_expr_t constant_expression(il_parser_t *self, il_program_t *out);
-static il_entity_t declaration(il_parser_t *self, il_program_t *out);
+//static il_entity_t declaration(il_parser_t *self, il_program_t *out);
 static il_type_t declaration_specifiers(il_parser_t *self, il_program_t *out);
-static il_entity_t init_declarator_list(il_parser_t *self, il_program_t *out);
-static il_entity_t init_declarator(il_parser_t *self, il_program_t *out);
+/*static il_entity_t init_declarator_list(il_parser_t *self, il_program_t *out);
+static il_entity_t init_declarator(il_parser_t *self, il_program_t *out);*/
 static il_type_t type_specifier(il_parser_t *self, il_program_t *out);
-static il_entity_t struct_or_union_specifier(il_parser_t *self, il_program_t *out);
+/*static il_entity_t struct_or_union_specifier(il_parser_t *self, il_program_t *out);
 static il_entity_t struct_or_union(il_parser_t *self, il_program_t *out);
 static il_entity_t struct_declaration_list(il_parser_t *self, il_program_t *out);
 static il_entity_t struct_declaration(il_parser_t *self, il_program_t *out);
@@ -72,9 +72,9 @@ static il_entity_t type_qualifier_list(il_parser_t *self, il_program_t *out);
 static il_entity_t parameter_type_list(il_parser_t *self, il_program_t *out);
 static il_entity_t parameter_list(il_parser_t *self, il_program_t *out);
 static il_entity_t parameter_declaration(il_parser_t *self, il_program_t *out);
-static il_entity_t identifier_list(il_parser_t *self, il_program_t *out);
+static il_entity_t identifier_list(il_parser_t *self, il_program_t *out);*/
 static il_type_t type_name(il_parser_t *self, il_program_t *out);
-static il_entity_t abstract_declarator(il_parser_t *self, il_program_t *out);
+/*static il_entity_t abstract_declarator(il_parser_t *self, il_program_t *out);
 static il_entity_t direct_abstract_declarator(il_parser_t *self, il_program_t *out);
 static il_entity_t initializer(il_parser_t *self, il_program_t *out);
 static il_entity_t initializer_list(il_parser_t *self, il_program_t *out);
@@ -94,7 +94,7 @@ static il_entity_t jump_statement(il_parser_t *self, il_program_t *out);
 static il_entity_t translation_unit(il_parser_t *self, il_program_t *out);
 static il_entity_t external_declaration(il_parser_t *self, il_program_t *out);
 static il_entity_t function_definition(il_parser_t *self, il_program_t *out);
-static il_entity_t declaration_list(il_parser_t *self, il_program_t *out);
+static il_entity_t declaration_list(il_parser_t *self, il_program_t *out);*/
 
 void c_parser_parse(il_parser_t *self, il_program_t *out) {
   int r;
@@ -595,7 +595,7 @@ static il_expr_t expression(il_parser_t *self, il_program_t *out) {
   }
 }
 
-static il_expr_t constant_expression(il_parser_t *self, il_program_t *out) {
+static UNUSED il_expr_t constant_expression(il_parser_t *self, il_program_t *out) {
   il_expr_t r1;
 
   r1 = conditional_expression(self, out);
@@ -607,7 +607,7 @@ static il_expr_t constant_expression(il_parser_t *self, il_program_t *out) {
   return r1;
 }
 
-static il_type_t declaration_specifiers(il_parser_t *self, il_program_t *out) {
+static UNUSED il_type_t declaration_specifiers(il_parser_t *self, UNUSED il_program_t *out) {
   il_token_t token;
   il_type_t type = il_type_undefined();
 
@@ -671,7 +671,7 @@ static il_type_t declaration_specifiers(il_parser_t *self, il_program_t *out) {
   }
 }
 
-static il_type_t type_specifier(il_parser_t *self, il_program_t *out) {
+static UNUSED il_type_t type_specifier(il_parser_t *self, UNUSED il_program_t *out) {
   il_token_t token;
   il_type_t type = il_type_undefined();
   //enum il_type_n type_kind;
@@ -698,6 +698,6 @@ static il_type_t type_specifier(il_parser_t *self, il_program_t *out) {
   }
 }
 
-static il_type_t type_name(il_parser_t *self, il_program_t *out) {
+static il_type_t type_name(UNUSED il_parser_t *self, UNUSED il_program_t *out) {
   return il_type_undefined();
 }

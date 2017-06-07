@@ -494,10 +494,10 @@ int il_const_parse(il_lloc_t lloc, const char *s, size_t len, il_expr_t *out) {
   return 0;
 }
 
-long il_eval_long(il_expr_t expr) {
+long il_eval_long(UNUSED il_expr_t expr) {
   return 0;
 }
 
-unsigned long il_eval_ulong(il_expr_t expr) {
+unsigned long il_eval_ulong(UNUSED il_expr_t expr) {
   return 0;
 }

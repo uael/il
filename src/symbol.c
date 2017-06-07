@@ -20,7 +20,7 @@
 
 #include "symbol.h"
 
-void il_sym_dtor(il_sym_t *self) {}
+void il_sym_dtor(UNUSED il_sym_t *self) {}
 
 void il_scope_dtor(il_scope_t *self) {
   il_sym_t sym;

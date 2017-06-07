@@ -24,6 +24,6 @@
 #include "expr.h"
 #include "type.h"
 
-void il_stmt_dtor(il_stmt_t *self) {
+void il_stmt_dtor(UNUSED il_stmt_t *self) {
 
 }

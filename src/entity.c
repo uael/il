@@ -30,7 +30,7 @@
 #include "type.h"
 #include "compiler.h"
 
-il_entity_t il_field(const char *name, il_type_t type) {
+il_entity_t il_field(UNUSED const char *name, il_type_t type) {
   return (il_entity_t) {
     .kind = IL_ENTITY_FIELD,
     .field = {
@@ -197,7 +197,7 @@ static void il_enum_dtor(il_enum_t *self) {
 
 static il_entity_t *type_add_field(il_entity_t *self, const char *name, il_type_t type, unsigned short width);
 
-static void reset_field_alignment(il_entity_t *self) {
+static UNUSED void reset_field_alignment(il_entity_t *self) {
   int d;
   size_t n;
   const il_entity_t *m;
@@ -451,7 +451,7 @@ static void il_union_dtor(il_union_t *self) {
   adt_vector_dtor(self->fields);
 }
 
-void il_label_dtor(il_label_t *self) {}
+void il_label_dtor(UNUSED il_label_t *self) {}
 
 void il_entity_dtor(il_entity_t *self) {
   switch (self->kind) {

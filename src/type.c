@@ -278,6 +278,6 @@ il_field_t *il_field_lookup(il_type_t self, const char *name) {
   return il_entity_field_lookup(*self.compound.entity, name);
 }
 
-unsigned il_type_merge(il_type_t *self, enum il_type_n with) {
+unsigned il_type_merge(UNUSED il_type_t *self, UNUSED enum il_type_n with) {
   return IL_TYPE_MERGE_ERROR_NONE;
 }

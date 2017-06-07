@@ -21,7 +21,7 @@
 #include "lexer.h"
 
 
-void il_token_dtor(il_token_t *self) {}
+void il_token_dtor(UNUSED il_token_t *self) {}
 
 il_lloc_t il_lloc_begin(il_lexer_t *lexer) {
   return (il_lloc_t) {

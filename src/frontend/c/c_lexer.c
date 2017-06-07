@@ -67,7 +67,7 @@ void c_lexer_init(il_lexer_t *self) {
 #define push(t) do { \
     token = tokens[t]; \
     set_loc; \
-    nextn(token.length); \
+    (void) nextn(token.length); \
     push_token; \
   } while (false)
 
@@ -544,7 +544,7 @@ static void c_lexer_enqueue(il_lexer_t *self, unsigned n) {
           if ((tolower(peek) == 'e' || (tolower(peek) == 'p'))
             && (peekn(1) == '+' || peekn(1) == '-')) {
             s[++i] = peek;
-            next;
+            (void) next;
           }
           s[++i] = peek;
         } else {
@@ -645,7 +645,7 @@ static void c_lexer_enqueue(il_lexer_t *self, unsigned n) {
               if (peek == '*') {
                 while (next == '*');
                 if (peek == '/') {
-                  next;
+                  (void) next;
                   break;
                 }
               } else if (peekn(1) == 0) {
@@ -655,7 +655,7 @@ static void c_lexer_enqueue(il_lexer_t *self, unsigned n) {
                 switch (peek) {
                   case '\r':
                     if (peekn(1) == '\n') {
-                      next;
+                      (void) next;
                     }
                     push('\n');
                     ++self->loc.lineno;
@@ -765,7 +765,7 @@ static void c_lexer_enqueue(il_lexer_t *self, unsigned n) {
           break;
         case '\r':
           if (peekn(1) == '\n') {
-            next;
+            (void) next;
           }
           push('\n');
           ++self->loc.lineno;
@@ -780,11 +780,11 @@ static void c_lexer_enqueue(il_lexer_t *self, unsigned n) {
           break;
         case ' ':
           ++lws;
-          next;
+          (void) next;
           break;
         case '\t':
         default:
-          next;
+          (void) next;
           break;
       }
     }

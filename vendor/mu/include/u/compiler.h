@@ -397,9 +397,7 @@
 # define UNUSED_RESULT
 #endif
 
-#ifdef __cplusplus
-# define UNUSED [[unused]]
-#elif COMPILER_GCC || HAS_ATTRIBUTE(unused)
+#if COMPILER_GCC || HAS_ATTRIBUTE(unused)
 # define UNUSED __attribute__((unused))
 #elif defined(__LCLINT__)
 # define UNUSED /*@unused@*/

@@ -1,1 +1,1 @@
-# Wulk - Wu uniform language kit
+# libil - Intermediate Language cross-platform c library

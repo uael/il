@@ -46,11 +46,11 @@ FORCEINLINE CONSTCALL bool ispow2(const long n) {
 FORCEINLINE CONSTCALL size_t roundup32(size_t n) {
   size_t j;
   return ISPOW2(n) ? n : (
-    ((j = n & 0xFFFF0000) || (j = n)),
-    ((n = j & 0xFF00FF00) || (n = j)),
-    ((j = n & 0xF0F0F0F0) || (j = n)),
-    ((n = j & 0xCCCCCCCC) || (n = j)),
-    ((j = n & 0xAAAAAAAA) || (j = n)),
+    (void) ((j = n & 0xFFFF0000) || (j = n)),
+    (void) ((n = j & 0xFF00FF00) || (n = j)),
+    (void) ((j = n & 0xF0F0F0F0) || (j = n)),
+    (void) ((n = j & 0xCCCCCCCC) || (n = j)),
+    (void) ((j = n & 0xAAAAAAAA) || (j = n)),
     j << 1
   );
 }

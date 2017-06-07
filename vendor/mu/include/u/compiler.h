@@ -391,8 +391,20 @@
 
 #if HAS_ATTRIBUTE(warn_unused_result)
 # define UNUSED_RESULT __attribute__((__warn_unused_result__))
+#elif COMPILER_MSVC && COMPILER_VERSION >= 1700
+# define UNUSED_RESULT _Check_return_
 #else
 # define UNUSED_RESULT
+#endif
+
+#ifdef __cplusplus
+# define UNUSED [[unused]]
+#elif COMPILER_GCC || HAS_ATTRIBUTE(unused)
+# define UNUSED __attribute__((unused))
+#elif defined(__LCLINT__)
+# define UNUSED /*@unused@*/
+#else
+# define UNUSED x
 #endif
 
 #if COMPILER_CLANG
@@ -403,6 +415,8 @@
 # define PACKED(declaration) declaration __attribute__((__packed__))
 # define LIKELY(x) __builtin_expect(!!(x), 1)
 # define UNLIKELY(x) __builtin_expect(!!(x), 0)
+# pragma clang diagnostic ignored "-Wmissing-field-initializers"
+# pragma clang diagnostic ignored "-Wmissing-braces"
 # if PLATFORM_WINDOWS
 #   if (CLANG_VERSION < 30800)
 #     error CLang 3.8 or later is required
@@ -478,6 +492,8 @@
 # define PACKED(declaration) declaration __attribute__((__packed__))
 # define LIKELY(x) __builtin_expect(!!(x), 1)
 # define UNLIKELY(x) __builtin_expect(!!(x), 0)
+# pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+# pragma GCC diagnostic ignored "-Wmissing-braces"
 # if COMPILER_VERSION >= 40600UL
 #   define static_assert _Static_assert
 # endif

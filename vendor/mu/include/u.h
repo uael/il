@@ -30,8 +30,8 @@
 #ifndef   U_H__
 # define  U_H__
 
-#include "platform.h"
-#include "compiler.h"
-#include "ds.h"
+#include "u/platform.h"
+#include "u/compiler.h"
+#include "u/ds.h"
 
 #endif /* U_H__ */

@@ -15,19 +15,9 @@ else()
     set(CMAKE_C_STANDARD 99)
 endif()
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
-if(MSVC)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W3")
-else()
-    if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g3 -DDEBUG")
-    else()
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3")
-    endif()
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra -Werror -fomit-frame-pointer")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-missing-field-initializers -Wno-unused-parameter -Wno-unused-function")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-variable -Wno-unused-value -Wno-unused-result -Wno-missing-braces")
-endif()
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror -Wextra")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -g3 -DDEBUG")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3")
 
 if(MSVC)
     set(CMAKE_FLAGS
@@ -47,8 +37,9 @@ endif()
 set(u_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/include)
 set(u_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
 set(u_TEST_DIR ${CMAKE_CURRENT_LIST_DIR}/test)
+set(u_VENDOR_DIR ${CMAKE_CURRENT_LIST_DIR}/vendor)
 
-file(GLOB_RECURSE u_HEADERS ${u_HEADERS} ${u_INCLUDE_DIR}/*.h)
+file(GLOB_RECURSE u_HEADERS ${u_HEADERS} ${u_INCLUDE_DIR}/${PROJECT_NAME}/*.h)
 file(GLOB_RECURSE u_SOURCES ${u_SOURCES} ${u_SOURCE_DIR}/*.c)
 
 add_library(${PROJECT_NAME} STATIC ${u_SOURCES} ${u_HEADERS})
@@ -58,6 +49,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${u_SOURCE_DIR})
 
 if(EXISTS ${u_TEST_DIR})
     enable_testing()
+    add_subdirectory(${u_VENDOR_DIR}/cute)
     add_subdirectory(${u_TEST_DIR})
 endif()
 
@@ -65,4 +57,7 @@ install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION bin
     ARCHIVE DESTINATION lib
     PUBLIC_HEADER DESTINATION include/${PROJECT_NAME}
+)
+install(FILES ${u_INCLUDE_DIR}/${PROJECT_NAME}.h
+    DESTINATION include
 )

@@ -16,14 +16,10 @@
 # along with this library; if not, see <http://www.gnu.org/licenses/>
 #
 
-cmake_minimum_required(VERSION 2.8.11 FATAL_ERROR)
+cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 project(il)
 
 option(COVERAGE "Turn on COVERAGE support" OFF)
-
-if(COVERAGE AND NOT MSVC)
-    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} --coverage")
-endif()
 
 if(CMAKE_VERSION VERSION_LESS "3.1")
     if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
@@ -33,23 +29,8 @@ else()
     set(CMAKE_C_STANDARD 99)
 endif()
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror -Wextra")
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -g3 -DDEBUG")
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3")
-
-if(MSVC)
-    set(CMAKE_FLAGS
-        CMAKE_CXX_FLAGS
-        CMAKE_CXX_FLAGS_DEBUG
-        CMAKE_CXX_FLAGS_RELEASE
-        CMAKE_C_FLAGS
-        CMAKE_C_FLAGS_DEBUG
-        CMAKE_C_FLAGS_RELEASE
-    )
-    foreach(CMAKE_FLAG ${CMAKE_FLAGS})
-        string(REPLACE "/MD" "/MT" ${CMAKE_FLAG} "${${CMAKE_FLAG}}")
-        string(REPLACE "/MDd" "/MTd" ${CMAKE_FLAG} "${${CMAKE_FLAG}}")
-    endforeach()
+if(COVERAGE AND NOT MSVC)
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} --coverage")
 endif()
 
 set(il_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/include)
@@ -72,6 +53,34 @@ if(WIN32)
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC winmm)
 else()
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC m)
+endif()
+
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
+if(NOT MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE -Werror -Wextra)
+endif()
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DDEBUG")
+    if(NOT MSVC)
+        target_compile_options(${PROJECT_NAME} PRIVATE -O0 -g3)
+    endif()
+elseif(NOT MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE -O3)
+endif()
+
+if(MSVC)
+    set(CMAKE_FLAGS
+            CMAKE_CXX_FLAGS
+            CMAKE_CXX_FLAGS_DEBUG
+            CMAKE_CXX_FLAGS_RELEASE
+            CMAKE_C_FLAGS
+            CMAKE_C_FLAGS_DEBUG
+            CMAKE_C_FLAGS_RELEASE
+            )
+    foreach(CMAKE_FLAG ${CMAKE_FLAGS})
+        string(REPLACE "/MD" "/MT" ${CMAKE_FLAG} "${${CMAKE_FLAG}}")
+        string(REPLACE "/MDd" "/MTd" ${CMAKE_FLAG} "${${CMAKE_FLAG}}")
+    endforeach()
 endif()
 
 add_subdirectory(${il_VENDOR_DIR})

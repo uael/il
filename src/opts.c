@@ -307,7 +307,7 @@ bool il_opts_init(il_opts_t *self, int argc, char **argv) {
   if (self->in && (sep = strrchr(self->in, '/'))) {
     memcpy(self->src_dir, self->in, (size_t) (sep - self->in));
   } else {
-    (void) getcwd(self->src_dir, IL_SRC_DIR_MSIZE);
+    UNUSED char *file = getcwd(self->src_dir, IL_SRC_DIR_MSIZE);
   }
   return true;
 }

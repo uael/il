@@ -75,7 +75,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${wulk_HEADERS}"
 target_include_directories(${PROJECT_NAME} PUBLIC ${wulk_INCLUDE_DIR})
 target_include_directories(${PROJECT_NAME} PRIVATE ${wulk_INCLUDE_DIR}/${PROJECT_NAME} ${wulk_SOURCE_DIR})
 
-target_link_libraries(${PROJECT_NAME} u)
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC u)
 add_dependencies(${PROJECT_NAME} u)
 
 if(WIN32)

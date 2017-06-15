@@ -23,12 +23,12 @@
 
 #include "adt/xmalloc.h"
 
-#include "entity.h"
+#include "il/entity.h"
 
-#include "expr.h"
-#include "stmt.h"
-#include "type.h"
-#include "compiler.h"
+#include "il/expr.h"
+#include "il/stmt.h"
+#include "il/type.h"
+#include "il/compiler.h"
 
 il_entity_t il_field(UNUSED const char *name, il_type_t type) {
   return (il_entity_t) {

@@ -1,101 +1,142 @@
-#
-# libil - Intermediate Language cross-platform c library
-# Copyright (C) 2016-2017 Lucas Abel <www.github.com/uael>
-#
-# This library is free software; you can redistribute it and/or
-# modify it under the terms of the GNU Lesser General Public
-# License as published by the Free Software Foundation; either
-# version 2.1 of the License, or any later version.
-#
-# This library is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-# Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with this library; if not, see <http://www.gnu.org/licenses/>
-#
-
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 project(il)
 
+cmake_policy(SET CMP0054 OLD)
+cmake_policy(SET CMP0045 OLD)
+
+option(${PROJECT_NAME}_DEVEL "Build as development environment" ON)
 option(COVERAGE "Turn on COVERAGE support" OFF)
 
-if(CMAKE_VERSION VERSION_LESS "3.1")
-    if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-        set(CMAKE_C_FLAGS "-std=c99 ${CMAKE_C_FLAGS}")
-    endif()
-else()
-    set(CMAKE_C_STANDARD 99)
-endif()
+if (NOT COMMAND add_vendor)
+  function(add_vendor)
+    include(CMakeParseArguments)
+    cmake_parse_arguments(DL_ARGS "" "PROJ" "" ${ARGN})
+    set(DL_ARGS_BUILD_DIR "${CMAKE_BINARY_DIR}/vendor/${DL_ARGS_PROJ}")
+    set(DL_ARGS_SOURCE_DIR "${CMAKE_SOURCE_DIR}/vendor/${DL_ARGS_PROJ}")
+    file(WRITE "${DL_ARGS_BUILD_DIR}/CMakeLists.txt"
+      "cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)\n"
+      "project(vendor-${DL_ARGS_PROJ} NONE)\n"
+      "include(ExternalProject)\n"
+      "ExternalProject_Add(vendor-${DL_ARGS_PROJ}\n"
+      "${DL_ARGS_UNPARSED_ARGUMENTS}\nSOURCE_DIR \"${DL_ARGS_SOURCE_DIR}\"\n"
+      "CONFIGURE_COMMAND \"\"\nBUILD_COMMAND \"\"\nINSTALL_COMMAND \"\"\nTEST_COMMAND \"\")")
+    execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}"
+      -D "CMAKE_MAKE_PROGRAM:FILE=${CMAKE_MAKE_PROGRAM}" .
+      RESULT_VARIABLE result OUTPUT_QUIET
+      WORKING_DIRECTORY "${DL_ARGS_BUILD_DIR}")
+    if (result)
+      message(FATAL_ERROR "Config step for ${DL_ARGS_PROJ} failed: ${result}")
+    endif ()
+    execute_process(COMMAND ${CMAKE_COMMAND} --build .
+      RESULT_VARIABLE result OUTPUT_QUIET
+      WORKING_DIRECTORY "${DL_ARGS_BUILD_DIR}")
+    if (result)
+      message(FATAL_ERROR "Build step for ${DL_ARGS_PROJ} failed: ${result}")
+    endif ()
+    set(${DL_ARGS_PROJ}_DEVEL OFF)
+    add_subdirectory(${DL_ARGS_SOURCE_DIR})
+  endfunction()
+endif ()
 
-if(COVERAGE AND NOT MSVC)
-    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} --coverage")
-endif()
+if ("${CMAKE_C_COMPILER_ID}" MATCHES "Clang")
+  set(CLANG TRUE)
+elseif ("${CMAKE_C_COMPILER_ID}" MATCHES "GNU")
+  set(GCC TRUE)
+elseif ("${CMAKE_C_COMPILER_ID}" MATCHES "Intel")
+  set(ICC TRUE)
+elseif (NOT MSVC)
+  message(FATAL_ERROR "Unknown compiler")
+endif ()
 
-set(il_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/include)
-set(il_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
-set(il_TEST_DIR ${CMAKE_CURRENT_LIST_DIR}/test)
-set(il_VENDOR_DIR ${CMAKE_CURRENT_LIST_DIR}/vendor)
+if (CMAKE_VERSION VERSION_LESS "3.1")
+  if (GCC)
+    set(CMAKE_C_FLAGS "-std=c99 ${CMAKE_C_FLAGS}")
+  endif ()
+else ()
+  set(CMAKE_C_STANDARD 99)
+endif ()
 
-file(GLOB_RECURSE il_HEADERS ${il_HEADERS} ${il_INCLUDE_DIR}/${PROJECT_NAME}/*.h)
-file(GLOB_RECURSE il_SOURCES ${il_SOURCES} ${il_SOURCE_DIR}/*.c)
+if (COVERAGE AND NOT MSVC)
+  set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} --coverage")
+endif ()
 
-add_library(${PROJECT_NAME} STATIC ${il_SOURCES} ${il_HEADERS})
-set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${il_HEADERS}")
-target_include_directories(${PROJECT_NAME} PUBLIC ${il_INCLUDE_DIR})
-target_include_directories(${PROJECT_NAME} PRIVATE ${il_INCLUDE_DIR}/${PROJECT_NAME} ${il_SOURCE_DIR})
+set(${PROJECT_NAME}_HEADERS)
+set(${PROJECT_NAME}_SOURCES)
+set(${PROJECT_NAME}_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/include)
+set(${PROJECT_NAME}_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
+set(${PROJECT_NAME}_TEST_DIR ${CMAKE_CURRENT_LIST_DIR}/test)
+set(${PROJECT_NAME}_VENDOR_DIR ${CMAKE_CURRENT_LIST_DIR}/vendor)
 
-target_link_libraries(${PROJECT_NAME} LINK_PUBLIC u)
+if (EXISTS ${${PROJECT_NAME}_INCLUDE_DIR})
+  file(GLOB_RECURSE ${PROJECT_NAME}_HEADERS ${${PROJECT_NAME}_HEADERS} ${${PROJECT_NAME}_INCLUDE_DIR}/${PROJECT_NAME}/*.h)
+endif ()
+if (EXISTS ${${PROJECT_NAME}_SOURCE_DIR})
+  file(GLOB_RECURSE ${PROJECT_NAME}_SOURCES ${${PROJECT_NAME}_SOURCES} ${${PROJECT_NAME}_SOURCE_DIR}/*.c)
+endif ()
+
+if (EXISTS ${${PROJECT_NAME}_VENDOR_DIR}/CMakeLists.txt)
+  add_subdirectory(${${PROJECT_NAME}_VENDOR_DIR})
+endif ()
+if (EXISTS ${${PROJECT_NAME}_SOURCE_DIR}/CMakeLists.txt)
+  add_subdirectory(${${PROJECT_NAME}_SOURCE_DIR})
+endif ()
+
+add_library(${PROJECT_NAME} STATIC ${${PROJECT_NAME}_SOURCES} ${${PROJECT_NAME}_HEADERS})
+set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${${PROJECT_NAME}_HEADERS}")
+
 add_dependencies(${PROJECT_NAME} u)
+target_link_libraries(${PROJECT_NAME} u)
 
-if(WIN32)
-    target_link_libraries(${PROJECT_NAME} LINK_PUBLIC winmm)
-else()
-    target_link_libraries(${PROJECT_NAME} LINK_PUBLIC m)
-endif()
+if (EXISTS ${${PROJECT_NAME}_INCLUDE_DIR})
+  target_include_directories(${PROJECT_NAME} PUBLIC ${${PROJECT_NAME}_INCLUDE_DIR})
+endif ()
+if (EXISTS ${${PROJECT_NAME}_SOURCE_DIR})
+  target_include_directories(${PROJECT_NAME} PRIVATE ${${PROJECT_NAME}_SOURCE_DIR})
+endif ()
 
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall)
-if(NOT MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE -Werror -Wextra)
-endif()
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DDEBUG")
-    if(NOT MSVC)
-        target_compile_options(${PROJECT_NAME} PRIVATE -O0 -g3)
-    endif()
-elseif(NOT MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE -O3)
-endif()
+if (MSVC)
+  target_compile_options(${PROJECT_NAME}
+    PRIVATE /Oy
+    PRIVATE /O$<$<CONFIG:Debug>:d>$<$<CONFIG:Release>:x>)
+else ()
+  target_compile_options(${PROJECT_NAME}
+    PRIVATE -Wall -Werror -Wextra -fomit-frame-pointer
+    PRIVATE -O$<$<CONFIG:Debug>:0 -g3>$<$<CONFIG:Release>:3>)
+endif ()
 
-if(MSVC)
-    set(CMAKE_FLAGS
-        CMAKE_CXX_FLAGS
-        CMAKE_CXX_FLAGS_DEBUG
-        CMAKE_CXX_FLAGS_RELEASE
-        CMAKE_C_FLAGS
-        CMAKE_C_FLAGS_DEBUG
-        CMAKE_C_FLAGS_RELEASE
-    )
-    foreach(CMAKE_FLAG ${CMAKE_FLAGS})
-        string(REPLACE "/MD" "/MT" ${CMAKE_FLAG} "${${CMAKE_FLAG}}")
-        string(REPLACE "/MDd" "/MTd" ${CMAKE_FLAG} "${${CMAKE_FLAG}}")
-    endforeach()
-endif()
+if (MSVC)
+  set(CMAKE_FLAGS
+    CMAKE_C_FLAGS CMAKE_CXX_FLAGS
+    CMAKE_C_FLAGS_DEBUG CMAKE_CXX_FLAGS_DEBUG
+    CMAKE_C_FLAGS_RELEASE CMAKE_CXX_FLAGS_RELEASE)
+  foreach (CMAKE_FLAG ${CMAKE_FLAGS})
+    string(REPLACE "/MD" "/MT" ${CMAKE_FLAG} "${${CMAKE_FLAG}}")
+    string(REPLACE "/MDd" "/MTd" ${CMAKE_FLAG} "${${CMAKE_FLAG}}")
+  endforeach ()
+endif ()
 
-add_subdirectory(${il_VENDOR_DIR})
-if(EXISTS ${il_TEST_DIR})
+if (${PROJECT_NAME}_DEVEL)
+  if (EXISTS ${${PROJECT_NAME}_TEST_DIR}/CMakeLists.txt)
     enable_testing()
-    add_subdirectory(${il_VENDOR_DIR}/cute)
-    add_subdirectory(${il_TEST_DIR})
-endif()
+    add_vendor(PROJ cute
+      GIT_REPOSITORY https://github.com/uael/cute.git
+      GIT_TAG master)
+    add_subdirectory(${${PROJECT_NAME}_TEST_DIR})
+  endif ()
 
-install(TARGETS ${PROJECT_NAME}
+  install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION bin
     ARCHIVE DESTINATION lib
-    PUBLIC_HEADER DESTINATION include/${PROJECT_NAME}
-)
-install(FILES ${il_INCLUDE_DIR}/${PROJECT_NAME}.h
-    DESTINATION include
-)
-
+    PUBLIC_HEADER DESTINATION include/${PROJECT_NAME})
+  if (EXISTS ${${PROJECT_NAME}_INCLUDE_DIR}/${PROJECT_NAME}.h)
+    install(FILES ${${PROJECT_NAME}_INCLUDE_DIR}/${PROJECT_NAME}.h
+      DESTINATION include)
+  endif ()
+else ()
+  set(${PROJECT_NAME}_HEADERS ${PROJECT_NAME}_HEADERS PARENT_SCOPE)
+  set(${PROJECT_NAME}_SOURCES ${PROJECT_NAME}_SOURCES PARENT_SCOPE)
+  set(${PROJECT_NAME}_INCLUDE_DIR ${PROJECT_NAME}_INCLUDE_DIR PARENT_SCOPE)
+  set(${PROJECT_NAME}_SOURCE_DIR ${PROJECT_NAME}_SOURCE_DIR PARENT_SCOPE)
+  set(${PROJECT_NAME}_TEST_DIR ${PROJECT_NAME}_TEST_DIR PARENT_SCOPE)
+  set(${PROJECT_NAME}_VENDOR_DIR ${PROJECT_NAME}_VENDOR_DIR PARENT_SCOPE)
+endif ()

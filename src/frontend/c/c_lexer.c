@@ -25,7 +25,7 @@
 #include "c_lexer.h"
 
 #include "c_pp.h"
-#include "compiler.h"
+#include "il/compiler.h"
 
 static void c_lexer_enqueue(il_lexer_t *self, unsigned n);
 

@@ -16,9 +16,9 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#include "program.h"
+#include "il/program.h"
 
-#include "entity.h"
+#include "il/entity.h"
 
 void il_program_init(il_program_t *self) {
   *self = (il_program_t) {{0}};

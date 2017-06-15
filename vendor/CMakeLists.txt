@@ -16,4 +16,6 @@
 # along with this library; if not, see <http://www.gnu.org/licenses/>
 #
 
-add_subdirectory(mu)
+add_vendor(PROJ u
+  GIT_REPOSITORY https://github.com/uael/mu.git
+  GIT_TAG master)

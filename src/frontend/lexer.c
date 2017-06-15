@@ -21,10 +21,10 @@
 
 #include "adt/string.h"
 
-#include "lexer.h"
+#include "il/lexer.h"
 
 #include "util/io.h"
-#include "compiler.h"
+#include "il/compiler.h"
 #include "c/c_lexer.h"
 
 void il_lexer_init(il_lexer_t *self, il_compiler_t *compiler, uint32_t file_id, const char *buffer, size_t length) {

@@ -16,9 +16,9 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#include "token.h"
+#include "il/token.h"
 
-#include "lexer.h"
+#include "il/lexer.h"
 
 
 void il_token_dtor(UNUSED il_token_t *self) {}

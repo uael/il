@@ -20,11 +20,11 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include "type.h"
+#include "il/type.h"
 
-#include "entity.h"
-#include "expr.h"
-#include "stmt.h"
+#include "il/entity.h"
+#include "il/expr.h"
+#include "il/stmt.h"
 
 il_type_t il_void(void) {
   return (il_type_t) {

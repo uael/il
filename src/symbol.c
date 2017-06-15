@@ -18,7 +18,7 @@
 
 #include <stdio.h>
 
-#include "symbol.h"
+#include "il/symbol.h"
 
 void il_sym_dtor(UNUSED il_sym_t *self) {}
 

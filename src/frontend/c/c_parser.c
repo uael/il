@@ -22,11 +22,11 @@
 #include "c_parser.h"
 
 #include "c_lexer.h"
-#include "compiler.h"
-#include "entity.h"
-#include "expr.h"
-#include "stmt.h"
-#include "type.h"
+#include "il/compiler.h"
+#include "il/entity.h"
+#include "il/expr.h"
+#include "il/stmt.h"
+#include "il/type.h"
 
 static il_expr_t primary_expression(il_parser_t *self, il_program_t *out);
 static il_expr_t postfix_expression(il_parser_t *self, il_program_t *out);

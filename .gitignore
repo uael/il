@@ -25,6 +25,9 @@ Makefile
 # binary
 test/hello
 
+# cmake vendor
+/vendor/*/
+
 # Clion
 /cmake-build-debug/
 .idea/

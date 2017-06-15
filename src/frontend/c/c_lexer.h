@@ -19,7 +19,7 @@
 #ifndef   IL_C_LEXER_H__
 # define  IL_C_LEXER_H__
 
-#include "lexer.h"
+#include "il/lexer.h"
 
 enum {
   C_TOK_END = '\0',

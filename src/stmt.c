@@ -18,11 +18,11 @@
 
 #include <stdio.h>
 
-#include "stmt.h"
+#include "il/stmt.h"
 
-#include "entity.h"
-#include "expr.h"
-#include "type.h"
+#include "il/entity.h"
+#include "il/expr.h"
+#include "il/type.h"
 
 void il_stmt_dtor(UNUSED il_stmt_t *self) {
 

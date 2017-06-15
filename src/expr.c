@@ -24,11 +24,11 @@
 #include <limits.h>
 #include <assert.h>
 
-#include "expr.h"
+#include "il/expr.h"
 
-#include "entity.h"
-#include "stmt.h"
-#include "type.h"
+#include "il/entity.h"
+#include "il/stmt.h"
+#include "il/type.h"
 
 il_expr_t il_exprs(il_expr_t *exprs) {
   il_expr_t expr = (il_expr_t) {

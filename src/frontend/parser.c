@@ -18,11 +18,11 @@
 
 #include <stdio.h>
 
-#include "parser.h"
+#include "il/parser.h"
 
-#include "compiler.h"
-#include "symbol.h"
-#include "program.h"
+#include "il/compiler.h"
+#include "il/symbol.h"
+#include "il/program.h"
 
 #include "c/c_parser.h"
 

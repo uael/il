@@ -19,7 +19,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include "compiler.h"
+#include "il/compiler.h"
 
 #include "util/io.h"
 

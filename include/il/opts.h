@@ -21,8 +21,6 @@
 
 #include <u/stdbool.h>
 
-#define IL_SRC_DIR_MSIZE 256
-
 typedef struct il_opts_t il_opts_t;
 
 enum il_backend_n {
@@ -39,7 +37,7 @@ enum il_backend_n {
 
 struct il_opts_t {
   const char *in, *out;
-  char src_dir[IL_SRC_DIR_MSIZE];
+  char src_dir[UINT8_MAX];
   bool echo, firm_graph, verbose, output_asm;
   int optimize_lvl;
   enum il_backend_n target;

@@ -1,10 +1,13 @@
-cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
-project(il)
+include(CMakeParseArguments)
 
+cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 cmake_policy(SET CMP0054 OLD)
 cmake_policy(SET CMP0045 OLD)
 
-include(CMakeParseArguments)
+if (NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/cmake/properties.cmake)
+  message(FATAL_ERROR "cmake/properties.cmake file should exists.")
+endif()
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/properties.cmake)
 
 get_directory_property(${PROJECT_NAME}_PARENT PARENT_DIRECTORY)
 if (NOT ${PROJECT_NAME}_PARENT)
@@ -48,8 +51,8 @@ if (NOT COMMAND project_dependency)
   endfunction()
 endif ()
 
-if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/dependencies.cmake)
-  include(${CMAKE_CURRENT_LIST_DIR}/dependencies.cmake)
+if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/cmake/dependencies.cmake)
+  include(${CMAKE_CURRENT_LIST_DIR}/cmake/dependencies.cmake)
 endif ()
 
 if ("${CMAKE_C_COMPILER_ID}" MATCHES "Clang")

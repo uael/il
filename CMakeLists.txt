@@ -4,36 +4,52 @@ project(il)
 cmake_policy(SET CMP0054 OLD)
 cmake_policy(SET CMP0045 OLD)
 
-option(COVERAGE "Turn on COVERAGE support" OFF)
+include(CMakeParseArguments)
 
-if (NOT COMMAND add_vendor)
-  function(add_vendor)
-    include(CMakeParseArguments)
-    cmake_parse_arguments(DL_ARGS "" "PROJ" "" ${ARGN})
-    set(DL_ARGS_BUILD_DIR "${CMAKE_BINARY_DIR}/vendor/${DL_ARGS_PROJ}")
-    set(DL_ARGS_SOURCE_DIR "${CMAKE_SOURCE_DIR}/vendor/${DL_ARGS_PROJ}")
-    file(WRITE "${DL_ARGS_BUILD_DIR}/CMakeLists.txt"
-      "cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)\n"
-      "project(vendor-${DL_ARGS_PROJ} NONE)\n"
-      "include(ExternalProject)\n"
-      "ExternalProject_Add(vendor-${DL_ARGS_PROJ}\n"
-      "${DL_ARGS_UNPARSED_ARGUMENTS}\nSOURCE_DIR \"${DL_ARGS_SOURCE_DIR}\"\n"
-      "CONFIGURE_COMMAND \"\"\nBUILD_COMMAND \"\"\nINSTALL_COMMAND \"\"\nTEST_COMMAND \"\")")
-    execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}"
-      -D "CMAKE_MAKE_PROGRAM:FILE=${CMAKE_MAKE_PROGRAM}" .
-      RESULT_VARIABLE result OUTPUT_QUIET
-      WORKING_DIRECTORY "${DL_ARGS_BUILD_DIR}")
-    if (result)
-      message(FATAL_ERROR "Config step for ${DL_ARGS_PROJ} failed: ${result}")
+get_directory_property(${PROJECT_NAME}_PARENT PARENT_DIRECTORY)
+if (NOT ${PROJECT_NAME}_PARENT)
+  set(${PROJECT_NAME}_DEVEL TRUE)
+endif ()
+
+if (NOT COMMAND project_dependency)
+  function(project_dependency DEP)
+    cmake_parse_arguments(DL_ARGS "TEST;LINK" "" "" ${ARGN})
+    if (DL_ARGS_TEST)
+      set(${PROJECT_NAME}_TEST_DEPS ${${PROJECT_NAME}_TEST_DEPS} ${DEP} PARENT_SCOPE)
+    else ()
+      set(${PROJECT_NAME}_DEPS ${${PROJECT_NAME}_DEPS} ${DEP} PARENT_SCOPE)
     endif ()
-    execute_process(COMMAND ${CMAKE_COMMAND} --build .
-      RESULT_VARIABLE result OUTPUT_QUIET
-      WORKING_DIRECTORY "${DL_ARGS_BUILD_DIR}")
-    if (result)
-      message(FATAL_ERROR "Build step for ${DL_ARGS_PROJ} failed: ${result}")
+    set(${DEP}_LINK ${DL_ARGS_LINK} PARENT_SCOPE)
+    if (NOT ${DEP}_TEST OR ${PROJECT_NAME}_DEVEL)
+      set(DL_ARGS_BUILD_DIR "${CMAKE_BINARY_DIR}/vendor/${DEP}")
+      set(DL_ARGS_SOURCE_DIR "${CMAKE_SOURCE_DIR}/vendor/${DEP}")
+      file(WRITE "${DL_ARGS_BUILD_DIR}/CMakeLists.txt"
+        "cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)\n"
+        "project(vendor-${DEP} NONE)\n"
+        "include(ExternalProject)\n"
+        "ExternalProject_Add(vendor-${DEP}\n"
+        "${DL_ARGS_UNPARSED_ARGUMENTS}\nSOURCE_DIR \"${DL_ARGS_SOURCE_DIR}\"\n"
+        "CONFIGURE_COMMAND \"\"\nBUILD_COMMAND \"\"\nINSTALL_COMMAND \"\"\nTEST_COMMAND \"\")")
+      execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}"
+        -D "CMAKE_MAKE_PROGRAM:FILE=${CMAKE_MAKE_PROGRAM}" .
+        RESULT_VARIABLE result OUTPUT_QUIET
+        WORKING_DIRECTORY "${DL_ARGS_BUILD_DIR}")
+      if (result)
+        message(FATAL_ERROR "Config step for ${DEP} failed: ${result}")
+      endif ()
+      execute_process(COMMAND ${CMAKE_COMMAND} --build .
+        RESULT_VARIABLE result OUTPUT_QUIET
+        WORKING_DIRECTORY "${DL_ARGS_BUILD_DIR}")
+      if (result)
+        message(FATAL_ERROR "Build step for ${DEP} failed: ${result}")
+      endif ()
+      add_subdirectory(${DL_ARGS_SOURCE_DIR})
     endif ()
-    add_subdirectory(${DL_ARGS_SOURCE_DIR})
   endfunction()
+endif ()
+
+if (EXISTS ${CMAKE_SOURCE_DIR}/dependencies.cmake)
+  include(dependencies.cmake)
 endif ()
 
 if ("${CMAKE_C_COMPILER_ID}" MATCHES "Clang")
@@ -54,6 +70,7 @@ else ()
   set(CMAKE_C_STANDARD 99)
 endif ()
 
+option(COVERAGE "Turn on COVERAGE support" OFF)
 if (COVERAGE AND NOT MSVC)
   set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} --coverage")
 endif ()
@@ -72,18 +89,17 @@ if (EXISTS ${${PROJECT_NAME}_SOURCE_DIR})
   file(GLOB_RECURSE ${PROJECT_NAME}_SOURCES ${${PROJECT_NAME}_SOURCES} ${${PROJECT_NAME}_SOURCE_DIR}/*.c)
 endif ()
 
-if (EXISTS ${${PROJECT_NAME}_VENDOR_DIR}/CMakeLists.txt)
-  add_subdirectory(${${PROJECT_NAME}_VENDOR_DIR})
-endif ()
-if (EXISTS ${${PROJECT_NAME}_SOURCE_DIR}/CMakeLists.txt)
-  add_subdirectory(${${PROJECT_NAME}_SOURCE_DIR})
-endif ()
-
 add_library(${PROJECT_NAME} STATIC ${${PROJECT_NAME}_SOURCES} ${${PROJECT_NAME}_HEADERS})
 set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${${PROJECT_NAME}_HEADERS}")
 
-add_dependencies(${PROJECT_NAME} u)
-target_link_libraries(${PROJECT_NAME} u)
+if (${PROJECT_NAME}_DEPS)
+  foreach (DEP ${${PROJECT_NAME}_DEPS})
+    add_dependencies(${PROJECT_NAME} ${DEP})
+    if (${DEP}_LINK)
+      target_link_libraries(${PROJECT_NAME} ${DEP})
+    endif ()
+  endforeach ()
+endif ()
 
 if (EXISTS ${${PROJECT_NAME}_INCLUDE_DIR})
   target_include_directories(${PROJECT_NAME} PUBLIC ${${PROJECT_NAME}_INCLUDE_DIR})
@@ -113,14 +129,26 @@ if (MSVC)
   endforeach ()
 endif ()
 
-get_directory_property(${PROJECT_NAME}_DEVEL PARENT_DIRECTORY)
-if (NOT ${PROJECT_NAME}_DEVEL)
-  if (EXISTS ${${PROJECT_NAME}_TEST_DIR}/CMakeLists.txt)
+if (${PROJECT_NAME}_DEVEL)
+  if (EXISTS ${${PROJECT_NAME}_TEST_DIR})
     enable_testing()
-    add_vendor(PROJ cute
-      GIT_REPOSITORY https://github.com/uael/cute.git
-      GIT_TAG master)
-    add_subdirectory(${${PROJECT_NAME}_TEST_DIR})
+      
+    file(GLOB ctest_SOURCES ${ctest_SOURCES} ${${PROJECT_NAME}_TEST_DIR}/*.c)
+    foreach (ctest_SRC ${ctest_SOURCES})
+      get_filename_component(ctest_NAME ${ctest_SRC} NAME_WE)
+      add_executable(test_${ctest_NAME} ${ctest_SRC})
+      add_dependencies(test_${ctest_NAME} ${PROJECT_NAME})
+      target_link_libraries(test_${ctest_NAME} ${PROJECT_NAME})
+      if (${PROJECT_NAME}_TEST_DEPS)
+        foreach (DEP ${${PROJECT_NAME}_TEST_DEPS})
+          add_dependencies(test_${ctest_NAME} ${DEP})
+          if (${DEP}_LINK)
+            target_link_libraries(test_${ctest_NAME} ${DEP})
+          endif ()
+        endforeach ()
+      endif ()
+      add_test(${ctest_NAME} test_${ctest_NAME})
+    endforeach ()
   endif ()
 
   install(TARGETS ${PROJECT_NAME}

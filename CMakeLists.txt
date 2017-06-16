@@ -20,7 +20,7 @@ if (NOT COMMAND project_dependency)
       set(${PROJECT_NAME}_DEPS ${${PROJECT_NAME}_DEPS} ${DEP} PARENT_SCOPE)
     endif ()
     set(${DEP}_LINK ${DL_ARGS_LINK} PARENT_SCOPE)
-    if (NOT ${DEP}_TEST OR ${PROJECT_NAME}_DEVEL)
+    if (NOT DL_ARGS_TEST OR ${PROJECT_NAME}_DEVEL)
       set(DL_ARGS_BUILD_DIR "${CMAKE_BINARY_DIR}/vendor/${DEP}")
       set(DL_ARGS_SOURCE_DIR "${CMAKE_SOURCE_DIR}/vendor/${DEP}")
       file(WRITE "${DL_ARGS_BUILD_DIR}/CMakeLists.txt"
@@ -131,7 +131,7 @@ endif ()
 if (${PROJECT_NAME}_DEVEL)
   if (EXISTS ${${PROJECT_NAME}_TEST_DIR})
     enable_testing()
-      
+
     file(GLOB ctest_SOURCES ${ctest_SOURCES} ${${PROJECT_NAME}_TEST_DIR}/*.c)
     foreach (ctest_SRC ${ctest_SOURCES})
       get_filename_component(ctest_NAME ${ctest_SRC} NAME_WE)

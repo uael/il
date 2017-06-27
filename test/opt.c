@@ -188,15 +188,27 @@ KHASH_MAP_IMPL_INT(ill_kvals_sc, ill_kval_t *)
 
 void
 ill_src_init(ill_src_t *self, const char *filename) {
-  char *sep;
+  char *sep = nullptr;
 
+#if !COMPILER_MSVC
   sep = realpath(filename, self->filename);
+#else
+  // todo
+#endif
   if (sep == nullptr) {
     memcpy(self->filename, filename, strlen(filename) + 1);
   }
+
+#if COMPILER_MSVC
+  if ((sep = strrchr(self->filename, '\\'))) {
+    memcpy(self->path, self->filename, (size_t) (sep - self->filename));
+  }
+#else
   if ((sep = strrchr(self->filename, '/'))) {
     memcpy(self->path, self->filename, (size_t) (sep - self->filename));
-  } else {
+  }
+#endif
+  else {
     UNUSED char *file = getcwd(self->filename, PATH_MAX);
   }
 }

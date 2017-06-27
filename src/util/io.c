@@ -23,17 +23,6 @@
 
 #include "u/types.h"
 
-#if defined(__linux__) || defined(__APPLE__)
-# include <sys/time.h>
-# include <sys/stat.h>
-#elif defined(_WIN32)
-# include <windows.h>
-# include <Shlwapi.h>
-# include <tchar.h>
-#elif defined(__MACH__)
-# include <mach/mach_time.h>
-#endif
-
 #include <il/adt/xmalloc.h>
 
 int64_t il_fsize(const char *path) {

@@ -83,7 +83,7 @@ typedef unsigned __int64  uint64_t;
 # include <mach/mach_time.h>
 #endif
 
-#include <adt/xmalloc.h>
+#include <il/adt/xmalloc.h>
 
 int64_t il_fsize(const char *path) {
 #ifdef WIN32

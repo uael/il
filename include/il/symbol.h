@@ -19,8 +19,8 @@
 #ifndef   IL_SYMBOL_H__
 # define  IL_SYMBOL_H__
 
-#include <adt/hash.h>
-#include <adt/vector.h>
+#include <il/adt/hash.h>
+#include <il/adt/vector.h>
 
 #include "entity.h"
 

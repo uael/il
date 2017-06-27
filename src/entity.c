@@ -21,7 +21,7 @@
 #include <limits.h>
 #include <assert.h>
 
-#include "adt/xmalloc.h"
+#include "il/adt/xmalloc.h"
 
 #include "il/entity.h"
 

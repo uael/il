@@ -20,7 +20,7 @@
 # define  IL_C_PP_H__
 
 #include <u/stdbool.h>
-#include "adt/hash.h"
+#include "il/adt/hash.h"
 
 #include "c_lexer.h"
 

@@ -19,7 +19,7 @@
 #ifndef   IL_LEXER_H__
 # define  IL_LEXER_H__
 
-#include <adt/vector.h>
+#include <il/adt/vector.h>
 
 #include "token.h"
 

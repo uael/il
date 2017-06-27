@@ -20,6 +20,9 @@
 # define  IL_OPTS_H__
 
 #include <u/stdbool.h>
+#include <u/vector.h>
+
+#include "err.h"
 
 typedef struct il_opts_t il_opts_t;
 

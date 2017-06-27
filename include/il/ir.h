@@ -19,7 +19,7 @@
 #ifndef   IL_IR_H__
 # define  IL_IR_H__
 
-#include <adt/vector.h>
+#include <il/adt/vector.h>
 
 #include "token.h"
 

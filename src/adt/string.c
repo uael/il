@@ -17,7 +17,7 @@
  */
 
 #include <stdio.h>
-#include "string.h"
+#include "il/adt/string.h"
 
 char *xstrdup(const char *str) {
   size_t len = strlen(str) + 1;

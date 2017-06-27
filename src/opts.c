@@ -72,8 +72,8 @@ typedef unsigned __int64  uint64_t;
 # include <unistd.h>
 #endif
 
-#include <adt/xmalloc.h>
-#include <adt/string.h>
+#include <il/adt/xmalloc.h>
+#include <il/adt/string.h>
 
 #include "il/opts.h"
 

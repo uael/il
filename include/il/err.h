@@ -16,21 +16,23 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>
  */
 
-#ifndef   IL_PROGRAM_H__
-# define  IL_PROGRAM_H__
+#ifndef  IL_ERR_H__
+# define IL_ERR_H__
 
-#include <il/adt/hash.h>
+typedef enum il_errlvl il_errlvl_t;
+typedef struct il_err il_err_t;
 
-#include "symbol.h"
-
-typedef struct il_program_t il_program_t;
-
-struct il_program_t {
-  il_entity_r entities;
-  il_symtab_t symtab;
+enum il_errlvl {
+  IL_ERR_LVL_NOTICE,
+  IL_ERR_LVL_WARNING,
+  IL_ERR_LVL_ERROR,
+  IL_ERR_LVL_FATAL
 };
 
-void il_program_init(il_program_t *self);
-void il_program_dtor(il_program_t *self);
+struct il_err {
+  il_errlvl_t lvl;
+  const char *msg;
+  struct il_err *prev;
+};
 
-#endif /* IL_PROGRAM_H__ */
+#endif /* IL_ERR_H__ */

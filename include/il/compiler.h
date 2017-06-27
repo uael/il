@@ -19,7 +19,7 @@
 #ifndef   IL_COMPILER_H__
 # define  IL_COMPILER_H__
 
-#include <adt/string.h>
+#include <il/adt/string.h>
 #include <u/compiler.h>
 
 #include "opts.h"
@@ -36,6 +36,7 @@ struct il_compiler_t {
   il_parser_t fe;
   il_backend_t be;
   string_r strtab;
+  char *in, *out;
 };
 
 void il_init(il_compiler_t *self, int argc, char **argv);

@@ -19,7 +19,7 @@
 #ifndef   IL_PARSER_H__
 # define  IL_PARSER_H__
 
-#include <adt/deque.h>
+#include <il/adt/deque.h>
 
 #include "lexer.h"
 

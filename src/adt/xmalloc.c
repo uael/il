@@ -20,7 +20,7 @@
 #include <assert.h>
 #include <u/compiler.h>
 
-#include "xmalloc.h"
+#include "il/adt/xmalloc.h"
 
 #ifdef WITH_LTALLOC
 #include "ltalloc.h"

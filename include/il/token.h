@@ -19,7 +19,7 @@
 #ifndef   IL_TOKEN_H__
 # define  IL_TOKEN_H__
 
-#include <adt/deque.h>
+#include <il/adt/deque.h>
 
 #include "api.h"
 

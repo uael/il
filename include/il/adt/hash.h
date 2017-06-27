@@ -183,16 +183,16 @@ typedef khint_t khiter_t;
 #endif
 
 #ifndef kcalloc
-#define kcalloc(N,Z) xcalloc(N,Z)
+#define kcalloc(N,Z) calloc(N,Z)
 #endif
 #ifndef kmalloc
-#define kmalloc(Z) xmalloc(Z)
+#define kmalloc(Z) malloc(Z)
 #endif
 #ifndef krealloc
-#define krealloc(P,Z) xrealloc(P,Z)
+#define krealloc(P,Z) realloc(P,Z)
 #endif
 #ifndef kfree
-#define kfree(P) xfree(P)
+#define kfree(P) free(P)
 #endif
 
 static const double __ac_HASH_UPPER = 0.77;
@@ -238,16 +238,16 @@ static const double __ac_HASH_UPPER = 0.77;
 	} \
 	SCOPE khint_t name##_get(const name##_t *h, khkey_t key) { \
 		if (h->n_buckets) { \
-			khint_t k, i, last, mask, step = 0; \
-			mask = h->n_buckets - 1; \
-			k = __hash_func(key); i = k & mask; \
-			last = i; \
-			while (!__ac_isempty(h->flags, i) && (__ac_isdel(h->flags, i) || !__hash_equal(h->keys[i], key))) { \
-				i = (i + (++step)) & mask; \
-				if (i == last) return h->n_buckets; \
-			} \
-			return __ac_iseither(h->flags, i)? h->n_buckets : i; \
-		} else return 0; \
+      khint_t k, i, last, mask, step = 0; \
+      mask = h->n_buckets - 1; \
+      k = __hash_func(key); i = k & mask; \
+      last = i; \
+      while (!__ac_isempty(h->flags, i) && (__ac_isdel(h->flags, i) || !__hash_equal(h->keys[i], key))) { \
+        i = (i + (++step)) & mask; \
+        if (i == last) return h->n_buckets; \
+      } \
+      return __ac_iseither(h->flags, i)? h->n_buckets : i; \
+    } return 0; \
 	} \
 	SCOPE int name##_resize(name##_t *h, khint_t new_n_buckets) { \
 		khint8_t *new_flags = 0; \
@@ -603,6 +603,9 @@ the bucket has been deleted [int*]
 */
 #define KHASH_MAP_INIT_INT(name, khval_t) \
 	KHASH_INIT(name, khint32_t, khval_t, 1, kh_int_hash_func, kh_int_hash_equal)
+
+#define KHASH_MAP_IMPL_INT(name, khval_t) \
+  KHASH_MAP_IMPL(name, khint32_t, khval_t, kh_int_hash_func, kh_int_hash_equal)
 
 /*! @function
 @abstract     Instantiate a hash map containing 64-bit integer keys

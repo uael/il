@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "adt/string.h"
+#include "il/adt/string.h"
 
 #include "il/lexer.h"
 

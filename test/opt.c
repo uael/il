@@ -17,7 +17,6 @@
  */
 
 #include <memory.h>
-#include <unistd.h>
 #include <il/adt/hash.h>
 #include <assert.h>
 #include "u/vector.h"

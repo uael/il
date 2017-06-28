@@ -19,30 +19,6 @@
 #include "cute.h"
 #include "ill.h"
 
-#define ill_lexer_attach(lexer, event) ill_lexer_pattach((ill_lexer_t *)(lexer), (ill_lexer_t *) &(event))
-
-void
-ill_lexer_pattach(ill_lexer_t *lexer, ill_event_t *event) {
-  event->sender = lexer;
-  uvec_push(lexer->events, *event);
-}
-
-int
-ill_lexer_trigger(ill_lexer_t *self, uint8_t ekind, void *arg) {
-  ill_event_t event;
-  int r = 0;
-
-  foreach(event, in(T_uvec, self->events)) {
-    if (event.kind == ekind) {
-      if ((r = event.callback(&event, arg)) != 0) {
-        return r;
-      }
-    }
-  }
-
-  return r;
-}
-
 typedef struct cpp cpp_t;
 typedef struct cpp_obs cpp_obs_t;
 

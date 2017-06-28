@@ -27,11 +27,6 @@ struct ill_cfe {
   bool echo, prepossess;
 };
 
-void
-cfe_parse(ill_cfe_t *self) {
-  puts("");
-}
-
 int
 cfe_opt_echo(ill_t *il, UNUSED const char *val) {
   ill_cfe_t *fe = (ill_cfe_t *) il->fe;
@@ -67,20 +62,18 @@ CUTEST_DATA {
 
 CUTEST_SETUP {
   static ill_opt_t opts[4] = {
-    {'S', "prepossess", "output the prepossessed input file", cfe_opt_prepossess},
-    {0, "echo", "print the content of the input file", cfe_opt_echo},
-    {'o', "output", "output file name", cbe_opt_out, true},
+    {'S', "prepossess", "output the prepossessed input file", (ill_optcb_t) cfe_opt_prepossess},
+    {0, "echo", "print the content of the input file", (ill_optcb_t) cfe_opt_echo},
+    {'o', "output", "output file name", (ill_optcb_t) cbe_opt_out, true},
     {0, nullptr}
   };
   ill_init(&self->il, (ill_fe_t *) &self->fe, (ill_be_t *) &self->be);
-  ill_opts_init(&self->opts, opts, ill_push_input);
+  ill_opts_init(&self->opts, opts, (ill_optcb_t) ill_push_input);
 }
 
 CUTEST_TEARDOWN {
   ill_opts_dtor(&self->opts);
   ill_dtor(&self->il);
-  self->fe.parse = (void (*)(ill_fe_t *)) cfe_parse;
-  self->fe.parse((ill_fe_t *) &self->fe);
   self->fe = (ill_cfe_t) {0};
   self->be = (ill_cbe_t) {0};
 }

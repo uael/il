@@ -40,7 +40,7 @@ typedef struct ill_opts ill_opts_t;
 typedef struct ill_opt ill_opt_t;
 typedef struct ill_err ill_err_t;
 
-typedef int (*ill_optcb_t)(ill_t *il, const char *val);
+typedef int (*ill_optcb_t)(void *app, const char *val);
 
 enum ill_errkind {
   IL_ERRKIND_OPTS,
@@ -80,6 +80,38 @@ struct ill_src {
   size_t length;
 };
 
+void
+ill_src_init(ill_src_t *self, const char *filename) {
+  char *sep = nullptr;
+
+#if !COMPILER_MSVC
+  sep = realpath(filename, self->filename);
+#else
+  // todo
+#endif
+  if (sep == nullptr) {
+    memcpy(self->filename, filename, strlen(filename) + 1);
+  }
+
+#if COMPILER_MSVC
+  if ((sep = strrchr(self->filename, '\\'))) {
+    memcpy(self->path, self->filename, (size_t) (sep - self->filename));
+  }
+#else
+  if ((sep = strrchr(self->filename, '/'))) {
+    memcpy(self->path, self->filename, (size_t) (sep - self->filename));
+  }
+#endif
+  else {
+    UNUSED char *file = getcwd(self->filename, PATH_MAX);
+  }
+}
+
+void
+ill_src_dtor(ill_src_t *self) {
+
+}
+
 struct ill_loc {
   ill_src_t *source;
   uint32_t lineno;
@@ -113,6 +145,30 @@ struct ill_lexer {
 
   void (*enqueue)(ill_lexer_t *self, unsigned n);
 };
+
+#define ill_lexer_attach(lexer, event) ill_lexer_pattach((ill_lexer_t *)(lexer), (ill_lexer_t *) &(event))
+
+void
+ill_lexer_pattach(ill_lexer_t *lexer, ill_event_t *event) {
+  event->sender = lexer;
+  uvec_push(lexer->events, *event);
+}
+
+int
+ill_lexer_trigger(ill_lexer_t *self, uint8_t ekind, void *arg) {
+  ill_event_t event;
+  int r = 0;
+
+  foreach(event, in(T_uvec, self->events)) {
+    if (event.kind == ekind) {
+      if ((r = event.callback(&event, arg)) != 0) {
+        return r;
+      }
+    }
+  }
+
+  return r;
+}
 
 struct ill_scope {
   int dummy;
@@ -174,38 +230,6 @@ struct ill {
 
 KHASH_MAP_IMPL_STR(ill_optmap, ill_opt_t)
 KHASH_MAP_IMPL_INT(ill_optmap_sc, ill_opt_t *)
-
-void
-ill_src_init(ill_src_t *self, const char *filename) {
-  char *sep = nullptr;
-
-#if !COMPILER_MSVC
-  sep = realpath(filename, self->filename);
-#else
-  // todo
-#endif
-  if (sep == nullptr) {
-    memcpy(self->filename, filename, strlen(filename) + 1);
-  }
-
-#if COMPILER_MSVC
-  if ((sep = strrchr(self->filename, '\\'))) {
-    memcpy(self->path, self->filename, (size_t) (sep - self->filename));
-  }
-#else
-  if ((sep = strrchr(self->filename, '/'))) {
-    memcpy(self->path, self->filename, (size_t) (sep - self->filename));
-  }
-#endif
-  else {
-    UNUSED char *file = getcwd(self->filename, PATH_MAX);
-  }
-}
-
-void
-ill_src_dtor(ill_src_t *self) {
-
-}
 
 void
 ill_err_dtor(ill_err_t *self) {
@@ -286,7 +310,7 @@ ill_lopt(ill_opts_t *opts, const char *id) {
 }
 
 int
-ill_opts_parse(ill_opts_t *self, ill_t *il, int argc, char **argv) {
+ill_opts_parse(ill_opts_t *self, void *app_ptr, int argc, char **argv) {
   char *arg, key, *lkey, *val, errmsg[UINT8_MAX];
   ill_opt_t *opt;
   int i;
@@ -349,10 +373,10 @@ ill_opts_parse(ill_opts_t *self, ill_t *il, int argc, char **argv) {
             goto opts_warning;
           }
         }
-        if (opt->callback == nullptr || opt->callback(il, val) == 0) {
+        if (opt->callback == nullptr || opt->callback(app_ptr, val) == 0) {
           opt->match = true;
         }
-      } else if (self->callback && (self->callback(il, arg) != 0)) {
+      } else if (self->callback && (self->callback(app_ptr, arg) != 0)) {
         sprintf(errmsg, "invalid command line argument ‘%s’", arg);
         goto opts_error;
       }

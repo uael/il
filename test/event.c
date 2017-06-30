@@ -48,7 +48,7 @@ CUTEST(event, trigger);
 
 int
 main(void) {
-  CUTEST_DATA test = {};
+  CUTEST_DATA test = {0};
 
   CUTEST_PASS(event, trigger);
   return EXIT_SUCCESS;

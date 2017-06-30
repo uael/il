@@ -44,17 +44,17 @@ CUTEST_DATA {
 CUTEST_SETUP {}
 CUTEST_TEARDOWN {}
 
-CUTEST(event, 001);
+CUTEST(event, trigger);
 
 int
 main(void) {
   CUTEST_DATA test = {};
 
-  CUTEST_PASS(event, 001);
+  CUTEST_PASS(event, trigger);
   return EXIT_SUCCESS;
 }
 
-CUTEST(event, 001) {
+CUTEST(event, trigger) {
   ill_lexer_t lexer = {0};
   ill_token_t token = {.kind = '\n', .name = "EOL"};
 

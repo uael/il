@@ -146,7 +146,7 @@ struct ill_lexer {
   void (*enqueue)(ill_lexer_t *self, unsigned n);
 };
 
-#define ill_lexer_attach(lexer, event) ill_lexer_pattach((ill_lexer_t *)(lexer), (ill_lexer_t *) &(event))
+#define ill_lexer_attach(lexer, event) ill_lexer_pattach((ill_lexer_t *)(lexer), (ill_event_t *) &(event))
 
 void
 ill_lexer_pattach(ill_lexer_t *lexer, ill_event_t *event) {

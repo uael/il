@@ -22,8 +22,6 @@
 typedef struct cpp cpp_t;
 typedef struct cpp_obs cpp_obs_t;
 
-typedef int (*ill_eventcb_t)(ill_event_t *, void *);
-
 struct cpp {
   int dummy;
 };

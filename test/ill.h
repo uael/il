@@ -20,6 +20,7 @@
 # define ILL_H__
 
 #include "u/vector.h"
+#include "u/fs.h"
 #include "il/adt/hash.h"
 
 typedef enum ill_errlvl ill_errlvl_t;
@@ -41,6 +42,7 @@ typedef struct ill_opt ill_opt_t;
 typedef struct ill_err ill_err_t;
 
 typedef int (*ill_optcb_t)(void *app, const char *val);
+typedef int (*ill_eventcb_t)(ill_event_t *, void *);
 
 enum ill_errkind {
   IL_ERRKIND_OPTS,
@@ -120,7 +122,7 @@ struct ill_loc {
 };
 
 struct ill_token {
-  unsigned int kind : 4;
+  uint8_t kind : 4;
   char type;
   const char *name, *value;
   size_t cursor;
@@ -133,11 +135,15 @@ struct ill_lloc {
   size_t begin, end;
 };
 
+#define ILL_SUPER(T) \
+  ill_t *il; \
+  T *parent; \
+  uvec_of(T) childs; \
+  uvec_of(ill_event_t) events; \
+  uvec_of(ill_err_t) errs
+
 struct ill_lexer {
-  ill_t *il;
-  ill_lexer_t *parent;
-  uvec_of(ill_lexer_t) childs;
-  uvec_of(ill_event_t) events;
+  ILL_SUPER(ill_lexer_t);
 
   ill_loc_t loc;
   unsigned char cap;
@@ -146,8 +152,24 @@ struct ill_lexer {
   void (*enqueue)(ill_lexer_t *self, unsigned n);
 };
 
-#define ill_lexer_attach(lexer, event) ill_lexer_pattach((ill_lexer_t *)(lexer), (ill_lexer_t *) &(event))
+void ill_lexer_init(ill_lexer_t *self, ill_t *il, ill_src_t *src) {
+  *self = (ill_lexer_t) {
+    .il = il,
+    .loc = {.source = src}
+  };
+  if (src->buffer == nullptr && src->filename) {
+    if (!ufexists(src->filename)) {
+      il_fatal_err(fe->compiler, "Input file does not exists '%s'", filename);
+    }
+    buffer = il_fread(filename, &len);
+    if (!buffer) {
+      il_fatal_err(fe->compiler, "Unable to read input file '%s'", filename);
+    }
 
+  }
+}
+
+#define ill_lexer_attach(lexer, event) ill_lexer_pattach((ill_lexer_t *)(lexer), (ill_lexer_t *) &(event))
 void
 ill_lexer_pattach(ill_lexer_t *lexer, ill_event_t *event) {
   event->sender = lexer;
@@ -175,11 +197,8 @@ struct ill_scope {
 };
 
 #define ILL_FE_SUPER \
-  ill_t *il; \
-  ill_fe_t *parent; \
-  uvec_of(ill_fe_t) childs; \
-  uvec_of(ill_event_t) events; \
-  uvec_of(ill_err_t) errs; \
+  ILL_SUPER(ill_fe_t); \
+  ill_lexer_t *lexer; \
   ill_scope_t *scope; \
   uvec_of(ill_src_t) sources; \
   void (*parse)(ill_fe_t *self)
@@ -189,11 +208,7 @@ struct ill_fe {
 };
 
 #define ILL_BE_SUPER \
-  ill_t *il; \
-  ill_be_t *parent; \
-  uvec_of(ill_be_t) childs; \
-  uvec_of(ill_event_t) events; \
-  uvec_of(ill_err_t) errs; \
+  ILL_SUPER(ill_be_t); \
   void (*emit)(ill_be_t *self)
 
 struct ill_be {

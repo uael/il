@@ -18,8 +18,6 @@ init:
   - cmd: cmake --version
   - cmd: msbuild /version
 
-clone_folder: C:\projects\il
-
 branches:
   only:
     - master
@@ -29,17 +27,14 @@ install:
   - git submodule update --init --recursive
 
 before_build:
-  - cmd: cd C:\projects\il
   - cmd: md build
   - cmd: cd build
   - cmd: if "%platform%"=="Win32" set CMAKE_GENERATOR_NAME=%msvc%
   - cmd: if "%platform%"=="x64"   set CMAKE_GENERATOR_NAME=%msvc% Win64
   - cmd: cmake -G "%CMAKE_GENERATOR_NAME%" -DCMAKE_BUILD_TYPE=%configuration% ..
 
-build:
-  project: C:\projects\il\build\il.sln
-  verbosity: quiet
+build_script:
+  - cmd: cmake --build .
 
 test_script:
-  - ps: cd C:\projects\il\build
   - cmd: ctest -VV

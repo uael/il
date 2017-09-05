@@ -23,13 +23,16 @@
  * SOFTWARE.
  */
 
-/*!@file il/mir.h
+/*!@file il/lir/visitor.h
  * @author uael
  */
-#ifndef __IL_MIR_H
-# define __IL_MIR_H
+#ifndef __IL_LIR_VISITOR_H
+# define __IL_LIR_VISITOR_H
 
-#include "mir/ir.h"
-#include "mir/visitor.h"
+typedef struct lir_visitor lir_visitor_t;
 
-#endif /* !__IL_MIR_H */
+struct lir_visitor {
+  int dummy;
+};
+
+#endif /* !__IL_LIR_VISITOR_H */

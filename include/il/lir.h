@@ -23,13 +23,13 @@
  * SOFTWARE.
  */
 
-/*!@file il/mir.h
+/*!@file il/lir.h
  * @author uael
  */
-#ifndef __IL_MIR_H
-# define __IL_MIR_H
+#ifndef __IL_LIR_H
+# define __IL_LIR_H
 
-#include "mir/ir.h"
-#include "mir/visitor.h"
+#include "lir/ir.h"
+#include "lir/visitor.h"
 
-#endif /* !__IL_MIR_H */
+#endif /* !__IL_LIR_H */

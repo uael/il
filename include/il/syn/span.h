@@ -23,13 +23,12 @@
  * SOFTWARE.
  */
 
-/*!@file il/mir.h
+/*!@file il/syn/span.h
  * @author uael
  */
-#ifndef __IL_MIR_H
-# define __IL_MIR_H
+#ifndef __IL_SYN_SPAN_H
+# define __IL_SYN_SPAN_H
 
-#include "mir/ir.h"
-#include "mir/visitor.h"
 
-#endif /* !__IL_MIR_H */
+
+#endif /* !__IL_SYN_SPAN_H */

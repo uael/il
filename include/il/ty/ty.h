@@ -23,13 +23,12 @@
  * SOFTWARE.
  */
 
-/*!@file il/mir.h
+/*!@file il/ty/ty.h
  * @author uael
  */
-#ifndef __IL_MIR_H
-# define __IL_MIR_H
+#ifndef __IL_TY_TY_H
+# define __IL_TY_TY_H
 
-#include "mir/ir.h"
-#include "mir/visitor.h"
 
-#endif /* !__IL_MIR_H */
+
+#endif /* !__IL_TY_TY_H */

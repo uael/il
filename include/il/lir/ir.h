@@ -29,6 +29,10 @@
 #ifndef __IL_LIR_IR_H
 # define __IL_LIR_IR_H
 
+#define vecof(T) struct { T *buf; unsigned long len; }
+#define setof(T) struct { T *buf; unsigned long len; }
+#define mapof(K, T) struct { T *buf; unsigned long len; }
+
 enum il_lir_select {
   IL_LIR_SELECT_ANY = 0,
   IL_LIR_SELECT_EXACTMATCH,
@@ -176,7 +180,7 @@ enum il_lir_callconv {
   IL_LIR_CALLCONV_X86_THISCALLCC,
   IL_LIR_CALLCONV_X86_VECTORCALLCC,
 };
-
+/*
 struct il_lir_id {
 
 };
@@ -255,6 +259,6 @@ struct il_lir_storeinstr {
 
 struct il_lir_fenceinstr {
 
-};
+};*/
 
 #endif /* !__IL_LIR_IR_H */

@@ -23,11 +23,11 @@
  * SOFTWARE.
  */
 
-/*!@file ds/vec.h
+/*!@file ds/vector.h
  * @author uael
  */
-#ifndef __DS_VEC_H
-# define __DS_VEC_H
+#ifndef __DS_VECTOR_H
+# define __DS_VECTOR_H
 
 #include <stdlib.h>
 
@@ -95,31 +95,21 @@
   static inline err_t \
   ID##_decay(ID##_t *restrict self, const u##TSizeBits##_t nmax) { \
     u##TSizeBits##_t nearest_pow2; \
-    if (nmax >= 0) { \
-      nearest_pow2 = pow2_next##TSizeBits(nmax); \
-      if (self->cap > nearest_pow2) { \
-        self->cap = nearest_pow2; \
-        if ((self->buf = (TItem *) \
-          REALLOC_FN(self->buf, sizeof(TItem) * (size_t) self->cap)) == nil) { \
-          return (err_t) errno; \
-        } \
-      } \
-      if (self->len > nmax) { \
-        memset((i8_t *) self->buf + nmax * sizeof(TItem), 0, \
-          ((size_t) (self->len - nmax)) * sizeof(TItem) \
-        ); \
-        self->len = nmax; \
+    nearest_pow2 = pow2_next##TSizeBits(nmax); \
+    if (self->cap > nearest_pow2) { \
+      self->cap = nearest_pow2; \
+      if ((self->buf = (TItem *) \
+        REALLOC_FN(self->buf, sizeof(TItem) * (size_t) self->cap)) == nil) { \
+        self->cap = 0; \
+        return (err_t) errno; \
       } \
     } \
-    return SUCCESS; \
-  } \
-  static inline err_t \
-  ID##_resize(ID##_t *restrict self, const u##TSizeBits##_t n) { \
-    err_t err; \
-    if ((err = ID##_growth(self, n)) > 0) { \
-      return err; \
+    if (self->len > nmax) { \
+      memset((i8_t *) self->buf + nmax * sizeof(TItem), 0, \
+        ((size_t) (self->len - nmax)) * sizeof(TItem) \
+      ); \
+      self->len = nmax; \
     } \
-    self->len = n; \
     return SUCCESS; \
   } \
   static inline err_t \
@@ -165,6 +155,15 @@
     } \
     *out = self->buf[--self->len]; \
     return SUCCESS; \
+  } \
+  static inline err_t \
+  ID##_resize(ID##_t *restrict self, const u##TSizeBits##_t n) { \
+    err_t err; \
+    if ((err = ID##_growth(self, n)) > 0) { \
+      return err; \
+    } \
+    self->len = n; \
+    return SUCCESS; \
   }
 
 #define VEC_DEFINE(ID, TItem, TSizeBits) \
@@ -195,4 +194,4 @@ V16_DEFINE(v16, void *);
 V32_DEFINE(v32, void *);
 V64_DEFINE(v64, void *);
 
-#endif /* !__DS_VEC_H */
+#endif /* !__DS_VECTOR_H */

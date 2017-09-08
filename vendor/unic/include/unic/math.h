@@ -38,7 +38,7 @@
 #define ISPOW2(n) (((n) != 0) && (((n) & (~(n) + 1)) == (n)))
 #endif
 
-static inline purecall constcall u8_t
+u8_t
 pow2_next8(u8_t n) {
   u32_t j;
   u32_t i;

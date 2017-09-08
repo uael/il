@@ -29,6 +29,8 @@
 #ifndef __UNIC_TYPES_H
 # define __UNIC_TYPES_H
 
+#include <string.h>
+
 #define nil ((void *) 0)
 
 typedef char i8_t;
@@ -69,5 +71,15 @@ typedef bool bool_t;
 #define U16_MAX 0xffffU
 #define U32_MAX 0xffffffffUL
 #define U64_MAX 0xffffffffffffffffULL
+
+#define i8_eq(a, b) ((bool_t)((i8_t)(a) == (i8_t)(b)))
+#define u8_eq(a, b) ((bool_t)((u8_t)(a) == (u8_t)(b)))
+#define i16_eq(a, b) ((bool_t)((i16_t)(a) == (i16_t)(b)))
+#define u16_eq(a, b) ((bool_t)((u16_t)(a) == (u16_t)(b)))
+#define i32_eq(a, b) ((bool_t)((i32_t)(a) == (i32_t)(b)))
+#define u32_eq(a, b) ((bool_t)((u32_t)(a) == (u32_t)(b)))
+#define i64_eq(a, b) ((bool_t)((i64_t)(a) == (i64_t)(b)))
+#define u64_eq(a, b) ((bool_t)((u64_t)(a) == (u64_t)(b)))
+#define str_eq(a, b) ((bool_t)(strcmp(a, b) == 0))
 
 #endif /* !__UNIC_TYPES_H */

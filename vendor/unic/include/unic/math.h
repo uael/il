@@ -32,22 +32,86 @@
 #include "types.h"
 #include "config.h"
 
-#define ISPOW2(n) (((n) & -(n)) == (n))
+#if HAS_BUILTIN(__builtin_popcount)
+#define ISPOW2(n) (__builtin_popcount(n) == 1)
+#else
+#define ISPOW2(n) (((n) != 0) && (((n) & (~(n) + 1)) == (n)))
+#endif
+
+static inline purecall constcall u8_t
+pow2_next8(u8_t n) {
+  u32_t j;
+  u32_t i;
+
+  if (n == U8_MAX || ISPOW2(n)) {
+    return n;
+  }
+  i = (u32_t) n;
+  i = (u32_t) (
+    (void) ((j = i & 0xFFFF0000) || (j = i)),
+    (void) ((i = j & 0xFF00FF00) || (i = j)),
+    (void) ((j = i & 0xF0F0F0F0) || (j = i)),
+    (void) ((i = j & 0xCCCCCCCC) || (i = j)),
+    (void) ((j = i & 0xAAAAAAAA) || (j = i)),
+    j << 1
+  );
+  return (i > U8_MAX || i < (u32_t) n) ? (u8_t) U8_MAX : (u8_t) i;
+}
+
+static inline purecall constcall u16_t
+pow2_next16(u16_t n) {
+  u32_t j;
+  u32_t i;
+
+  if (n == U16_MAX || ISPOW2(n)) {
+    return n;
+  }
+  i = (u32_t) n;
+  i = (u32_t) (
+    (void) ((j = i & 0xFFFF0000) || (j = i)),
+      (void) ((i = j & 0xFF00FF00) || (i = j)),
+      (void) ((j = i & 0xF0F0F0F0) || (j = i)),
+      (void) ((i = j & 0xCCCCCCCC) || (i = j)),
+      (void) ((j = i & 0xAAAAAAAA) || (j = i)),
+      j << 1
+  );
+  return (i > U16_MAX || i < (u32_t) n) ? (u16_t) U16_MAX : (u16_t) i;
+}
 
 static inline purecall constcall u32_t
-pow2_next32(i32_t n) {
-  i32_t j;
+pow2_next32(u32_t n) {
+  u32_t j;
 
-  return (u32_t) (
-    ISPOW2(n) ? n : (
-      (void) ((j = n & 0xFFFF0000) || (j = n)),
-        (void) ((n = j & 0xFF00FF00) || (n = j)),
-        (void) ((j = n & 0xF0F0F0F0) || (j = n)),
-        (void) ((n = j & 0xCCCCCCCC) || (n = j)),
-        (void) ((j = n & 0xAAAAAAAA) || (j = n)),
-        j << 1
-    )
+  if (n == U32_MAX || ISPOW2(n)) {
+    return n;
+  }
+  j = (u32_t) (
+    (void) ((j = n & 0xFFFF0000) || (j = n)),
+    (void) ((n = j & 0xFF00FF00) || (n = j)),
+    (void) ((j = n & 0xF0F0F0F0) || (j = n)),
+    (void) ((n = j & 0xCCCCCCCC) || (n = j)),
+    (void) ((j = n & 0xAAAAAAAA) || (j = n)),
+    j << 1
   );
+  return (j < n) ? (u32_t) U32_MAX : j;
+}
+
+static inline purecall constcall u64_t
+pow2_next64(u64_t n) {
+  u64_t j;
+
+  if (n == U64_MAX || ISPOW2(n)) {
+    return n;
+  }
+  j = (u64_t) (
+    (void) ((j = n & 0xFFFF0000LL) || (j = n)),
+      (void) ((n = j & 0xFF00FF00LL) || (n = j)),
+      (void) ((j = n & 0xF0F0F0F0LL) || (j = n)),
+      (void) ((n = j & 0xCCCCCCCCLL) || (n = j)),
+      (void) ((j = n & 0xAAAAAAAALL) || (j = n)),
+      j << 1
+  );
+  return (j < n) ? (u64_t) U64_MAX : j;
 }
 
 #endif /* !__UNIC_MATH_H */

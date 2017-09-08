@@ -23,29 +23,58 @@
  * SOFTWARE.
  */
 
-/*!@file unic/hash.h
+/*!@file unic/err.h
  * @author uael
  */
-#ifndef __UNIC_HASH_H
-# define __UNIC_HASH_H
+#ifndef __UNIC_ERR_H
+# define __UNIC_ERR_H
 
-#include "types.h"
-#include "config.h"
+#include <errno.h>
 
-#define i8_hash(key) ((u32_t)(key))
-#define u8_hash(key) ((u32_t)(key))
-#define i16_hash(key) ((u32_t)(key))
-#define u16_hash(key) ((u32_t)(key))
-#define i32_hash(key) ((u32_t)(key))
-#define u32_hash(key) ((u32_t)(key))
-#define i64_hash(key) ((u32_t)(((key)>>33^(key)^(key)<<11)))
-#define u64_hash(key) ((u32_t)(((key)>>33^(key)^(key)<<11)))
+enum err {
+  SUCCESS = 0,
+  ERR_PERM = EPERM,
+  ERR_NOENT = ENOENT,
+  ERR_SRCH = ESRCH,
+  ERR_INTR = EINTR,
+  ERR_IO = EIO,
+  ERR_NXIO = ENXIO,
+  ERR_2BIG = E2BIG,
+  ERR_NOEXEC = ENOEXEC,
+  ERR_BADF = EBADF,
+  ERR_CHILD = ECHILD,
+  ERR_AGAIN = EAGAIN,
+  ERR_NOMEM = ENOMEM,
+  ERR_ACCES = EACCES,
+  ERR_FAULT = EFAULT,
+  ERR_BUSY = EBUSY,
+  ERR_EXIST = EEXIST,
+  ERR_XDEV = EXDEV,
+  ERR_NODEV = ENODEV,
+  ERR_NOTDIR = ENOTDIR,
+  ERR_ISDIR = EISDIR,
+  ERR_INVAL = EINVAL,
+  ERR_NFILE = ENFILE,
+  ERR_MFILE = EMFILE,
+  ERR_NOTTY = ENOTTY,
+  ERR_FBIG = EFBIG,
+  ERR_NOSPC = ENOSPC,
+  ERR_SPIPE = ESPIPE,
+  ERR_ROFS = EROFS,
+  ERR_MLINK = EMLINK,
+  ERR_PIPE = EPIPE,
+  ERR_DOM = EDOM,
+  ERR_RANGE = ERANGE,
+  ERR_DEADLK = EDEADLK,
+  ERR_DEADLOCK = EDEADLOCK,
+  ERR_NAMETOOLONG = ENAMETOOLONG,
+  ERR_NOLCK = ENOLCK,
+  ERR_NOSYS = ENOSYS,
+  ERR_NOTEMPTY = ENOTEMPTY,
+  ERR_ILSEQ = EILSEQ,
+  FAILURE = ERR_ILSEQ + 1
+};
 
-static inline purecall constcall u32_t
-str_hash(const i8_t *s) {
-  u32_t h = (u32_t) *s;
-  if (h) for (++s; *s; ++s) h = (h << 5) - h + (u32_t) *s;
-  return h;
-}
+typedef enum err err_t;
 
-#endif /* !__UNIC_HASH_H */
+#endif /* !__UNIC_ERR_H */

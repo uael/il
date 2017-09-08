@@ -73,6 +73,7 @@
 # define unic_has_attribute_noinline 1
 # define unic_has_extension_attribute_const 1
 # define unic_has_attribute_pure 1
+# define unic_has_builtin___builtin_popcount 1
 # if defined __GNUC_GNU_INLINE__ || (CC_GCC < 40300UL)
 #  define unic_has_attribute_gnu_inline 1
 # endif

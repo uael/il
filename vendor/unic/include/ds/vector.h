@@ -68,8 +68,10 @@
           } else { \
             do self->cap *= 2; while (self->cap < nmin); \
           } \
-          if ((self->buf = REALLOC_FN(self->buf, sizeof(TItem) * self->cap)) \
+          if ((self->buf = (TItem *) \
+            REALLOC_FN(self->buf, sizeof(TItem) * (size_t) self->cap)) \
             == nil) { \
+            self->cap = 0; \
             return (err_t) errno; \
           } \
         } \
@@ -81,7 +83,9 @@
           self->cap = DS_MIN_CAP; \
           while (self->cap < nmin) self->cap *= 2; \
         } \
-        if ((self->buf = MALLOC_FN(sizeof(TItem) * self->cap)) == nil) { \
+        if ((self->buf = \
+          (TItem *) MALLOC_FN(sizeof(TItem) * (size_t) self->cap)) == nil) { \
+          self->cap = 0; \
           return (err_t) errno; \
         } \
       } \
@@ -95,14 +99,14 @@
       nearest_pow2 = pow2_next##TSizeBits(nmax); \
       if (self->cap > nearest_pow2) { \
         self->cap = nearest_pow2; \
-        if ((self->buf = REALLOC_FN(self->buf, sizeof(TItem) * self->cap)) \
-          == nil) { \
+        if ((self->buf = (TItem *) \
+          REALLOC_FN(self->buf, sizeof(TItem) * (size_t) self->cap)) == nil) { \
           return (err_t) errno; \
         } \
       } \
       if (self->len > nmax) { \
         memset((i8_t *) self->buf + nmax * sizeof(TItem), 0, \
-          (self->len - nmax) * sizeof(TItem) \
+          ((size_t) (self->len - nmax)) * sizeof(TItem) \
         ); \
         self->len = nmax; \
       } \
@@ -138,8 +142,8 @@
     nearest_pow2 = pow2_next##TSizeBits(self->len); \
     if (self->cap > nearest_pow2) { \
       self->cap = nearest_pow2; \
-      if ((self->buf = REALLOC_FN(self->buf, sizeof(TItem) * self->cap)) \
-        == nil) { \
+      if ((self->buf = (TItem *) \
+        REALLOC_FN(self->buf, sizeof(TItem) * (size_t) self->cap)) == nil) { \
         return (err_t) errno; \
       } \
     } \

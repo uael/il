@@ -75,6 +75,7 @@ typedef CUTEST_DATA CUTEST_t;
 #define ASSERT(expr) do if (!(expr)) return LOCATION " -> " #expr; while (0)
 #define FAIL(msg) return (msg);
 #define ASSERT_EQ(v, e) do if ((v) != (e)) return LOCATION " -> " #v " == " #e; while (0)
+#define ASSERT_NEQ(v, e) do if ((v) == (e)) return LOCATION " -> " #v " != " #e; while (0)
 #define ASSERT_CLOSE(v, e, p) do if (double_close(v, e, p) == 0) return LOCATION " -> " #v " == " #e; while (0)
 
 #define CUTEST_PADDING "................................."

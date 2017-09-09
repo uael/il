@@ -483,7 +483,6 @@ CUTEST(v64, decay) {
 
 CUTEST(vec, general) {
   u8_t i;
-  const i8_t *out;
   strv8_t vec;
 
   strv8_ctor(&vec);
@@ -570,13 +569,23 @@ CUTEST(vec, general) {
   }
 
   puts("");
+
+
+  dstr_t str;
+
+  dstr_ctor(&str);
+  dstr_append(&str, "Hello world", 11);
+  dstr_prepend(&str, "I say: ", 7);
+  dstr_emplace(&str, 13, "fucking ", 8);
+  dstr_push(&str, '\0');
+  puts(str.buf);
   return CUTE_SUCCESS;
 }
 
 i32_t main(void) {
   CUTEST_DATA test;
 
-  /*CUTEST_PASS(v8, growth);
+  CUTEST_PASS(v8, growth);
   CUTEST_PASS(v16, growth);
   CUTEST_PASS(v32, growth);
   CUTEST_PASS(v64, growth);
@@ -584,7 +593,7 @@ i32_t main(void) {
   CUTEST_PASS(v8, decay);
   CUTEST_PASS(v16, decay);
   CUTEST_PASS(v32, decay);
-  CUTEST_PASS(v64, decay);*/
+  CUTEST_PASS(v64, decay);
   CUTEST_PASS(vec, general);
   return EXIT_SUCCESS;
 }

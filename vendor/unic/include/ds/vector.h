@@ -151,7 +151,7 @@
       memmove( \
         self->buf + idx, \
         self->buf + idx + 1, \
-        (--self->len - idx) * sizeof(TItem) \
+        (size_t) (--self->len - idx) * sizeof(TItem) \
       ); \
     } \
     return true; \
@@ -168,13 +168,13 @@
       memmove( \
         self->buf + idx, \
         self->buf + idx + n, \
-        ((self->len -= n) - idx) * sizeof(TItem) \
+        (size_t) ((self->len -= n) - idx) * sizeof(TItem) \
       ); \
     } \
     return true; \
   } \
   static inline u##TSizeBits##_t \
-  ID##_erase(ID##_t *restrict self, TItem item) { \
+  ID##_erase(ID##_t *restrict self, const TItem item) { \
     u##TSizeBits##_t len, i, j, n; \
     if (self->len == 0) { \
       return 0; \
@@ -191,14 +191,14 @@
         memmove( \
           self->buf + j, \
           self->buf + j + n, \
-          ((self->len -= n) - j) * sizeof(TItem) \
+          (size_t) ((self->len -= n) - j) * sizeof(TItem) \
         ); \
       } \
     } \
     return len - self->len; \
   } \
   static inline u##TSizeBits##_t \
-  ID##_erasen(ID##_t *restrict self, TItem item, \
+  ID##_erasen(ID##_t *restrict self, const TItem item, \
     u##TSizeBits##_t n) { \
     u##TSizeBits##_t len, i, j, c; \
     if (n == 0 || self->len == 0) { \
@@ -219,21 +219,21 @@
         memmove( \
           self->buf + j, \
           self->buf + j + c, \
-          ((self->len -= c) - j) * sizeof(TItem) \
+          (size_t) ((self->len -= c) - j) * sizeof(TItem) \
         ); \
       } \
     } \
     return len - self->len; \
   } \
   static inline bool_t \
-  ID##_eraseonce(ID##_t *restrict self, TItem item) { \
+  ID##_eraseonce(ID##_t *restrict self, const TItem item) { \
     u##TSizeBits##_t i; \
     for (i = 0; i < self->len; ++i) { \
       if (CMP_FN(item, self->buf[i]) == 0) { \
         memmove( \
           self->buf + i, \
           self->buf + i + 1, \
-          (--self->len - i) * sizeof(TItem) \
+          (size_t) (--self->len - i) * sizeof(TItem) \
         ); \
         return true; \
       } \
@@ -241,7 +241,8 @@
     return false; \
   } \
   static inline err_t \
-  ID##_insert(ID##_t *restrict self, const u##TSizeBits##_t idx, TItem item) { \
+  ID##_insert(ID##_t *restrict self, const u##TSizeBits##_t idx, \
+    const TItem item) { \
     err_t err; \
     if (idx > self->len) { \
       return FAILURE; \
@@ -255,19 +256,40 @@
       memmove( \
         self->buf + idx + 1, \
         self->buf + idx, \
-        (self->len++ - idx) * sizeof(TItem) \
+        (size_t) (self->len++ - idx) * sizeof(TItem) \
       ); \
     } \
-    self->buf[idx] = item; \
+    self->buf[idx] = (TItem) item; \
     return SUCCESS; \
   } \
   static inline err_t \
-  ID##_push(ID##_t *restrict self, TItem item) { \
+  ID##_emplace(ID##_t *restrict self, const u##TSizeBits##_t idx, \
+    const TItem *items, const u##TSizeBits##_t n) { \
+    err_t err; \
+    if (idx > self->len) { \
+      return FAILURE; \
+    } \
+    if ((err = ID##_grow(self, n)) > 0) { \
+      return err; \
+    } \
+    if (idx != self->len) { \
+      memmove( \
+        self->buf + idx + n, \
+        self->buf + idx, \
+        (size_t) (self->len - idx) * sizeof(TItem) \
+      ); \
+    } \
+    memcpy(self->buf + idx, items, (size_t) n * sizeof(TItem)); \
+    self->len += n; \
+    return SUCCESS; \
+  } \
+  static inline err_t \
+  ID##_push(ID##_t *restrict self, const TItem item) { \
     err_t err; \
     if ((err = ID##_grow(self, 1)) > 0) { \
       return err; \
     } \
-    self->buf[self->len++] = item; \
+    self->buf[self->len++] = (TItem) item; \
     return SUCCESS; \
   } \
   static inline err_t \
@@ -282,7 +304,20 @@
     return SUCCESS; \
   } \
   static inline err_t \
-  ID##_unshift(ID##_t *restrict self, TItem item) { \
+  ID##_append(ID##_t *restrict self, TItem *items, const u##TSizeBits##_t n) { \
+    err_t err; \
+    if (n == 0) { \
+      return SUCCESS; \
+    } \
+    if ((err = ID##_grow(self, n)) > 0) { \
+      return err; \
+    } \
+    memcpy(self->buf + self->len, items, (size_t) n * sizeof(TItem)); \
+    self->len += n; \
+    return SUCCESS; \
+  } \
+  static inline err_t \
+  ID##_unshift(ID##_t *restrict self, const TItem item) { \
     err_t err; \
     if ((err = ID##_grow(self, 1)) > 0) { \
       return err; \
@@ -290,9 +325,9 @@
     memmove( \
       self->buf + 1, \
       self->buf, \
-      self->len++ * sizeof(TItem) \
+      (size_t) self->len++ * sizeof(TItem) \
     ); \
-    self->buf[0] = item; \
+    self->buf[0] = (TItem) item; \
     return SUCCESS; \
   } \
   static inline err_t \
@@ -309,9 +344,28 @@
       memmove( \
         self->buf, \
         self->buf + 1, \
-        --self->len * sizeof(TItem) \
+        (size_t) --self->len * sizeof(TItem) \
       ); \
     } \
+    return SUCCESS; \
+  } \
+  static inline err_t \
+  ID##_prepend(ID##_t *restrict self, TItem *items, \
+    const u##TSizeBits##_t n) { \
+    err_t err; \
+    if (n == 0) { \
+      return SUCCESS; \
+    } \
+    if ((err = ID##_grow(self, n)) > 0) { \
+      return err; \
+    } \
+    memmove( \
+      self->buf + n, \
+      self->buf, \
+      (size_t) self->len * sizeof(TItem) \
+    ); \
+    memcpy(self->buf, items, (size_t) n * sizeof(TItem)); \
+    self->len += n; \
     return SUCCESS; \
   } \
   static inline err_t \
@@ -321,6 +375,25 @@
       return err; \
     } \
     self->len = n; \
+    return SUCCESS; \
+  } \
+  static inline err_t \
+  ID##_cpy(ID##_t *restrict self, ID##_t *restrict src) { \
+    err_t err; \
+    if ((err = ID##_growth(self, src->len)) > 0) { \
+      return err; \
+    } \
+    memcpy(self->buf, src->buf, (size_t) (self->len = src->len)); \
+    return SUCCESS; \
+  } \
+  static inline err_t \
+  ID##_ncpy(ID##_t *restrict self, ID##_t *restrict src, \
+    const u##TSizeBits##_t n) { \
+    err_t err; \
+    if ((err = ID##_growth(self, n)) > 0) { \
+      return err; \
+    } \
+    memcpy(self->buf, src->buf, (size_t) (self->len = n)); \
     return SUCCESS; \
   }
 
@@ -347,9 +420,10 @@ V32_DEFINE(vi32, i32_t, i32cmp);
 V32_DEFINE(vu32, u32_t, u32cmp);
 V64_DEFINE(vi64, i64_t, i64cmp);
 V64_DEFINE(vu64, u64_t, u64cmp);
-V8_DEFINE(strv8, const i8_t *, strcmp);
-V16_DEFINE(strv16, const i8_t *, strcmp);
-V32_DEFINE(strv32, const i8_t *, strcmp);
-V64_DEFINE(strv64, const i8_t *, strcmp);
+V8_DEFINE(strv8, i8_t *, strcmp);
+V16_DEFINE(strv16, i8_t *, strcmp);
+V32_DEFINE(strv32, i8_t *, strcmp);
+V64_DEFINE(strv64, i8_t *, strcmp);
+V64_DEFINE(dstr, i8_t, i8cmp);
 
 #endif /* !__DS_VECTOR_H */

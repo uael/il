@@ -225,31 +225,31 @@ typedef enum set_put set_put_t;
   SET_DEFINE_ALLOC(ID, TItem, HASH_FN, HASHEQ_FN, malloc, realloc, free)
 
 #define I8_SET_DEFINE(ID) \
-  SET_DEFINE(ID, i8_t, i8_hash, i8_eq)
+  SET_DEFINE(ID, i8_t, i8_hash, i8eq)
 
 #define U8_SET_DEFINE(ID) \
-  SET_DEFINE(ID, u8_t, u8_hash, u8_eq)
+  SET_DEFINE(ID, u8_t, u8_hash, u8eq)
 
 #define I16_SET_DEFINE(ID) \
-  SET_DEFINE(ID, i16_t, i16_hash, i16_eq)
+  SET_DEFINE(ID, i16_t, i16_hash, i16eq)
 
 #define U16_SET_DEFINE(ID) \
-  SET_DEFINE(ID, u16_t, u16_hash, u16_eq)
+  SET_DEFINE(ID, u16_t, u16_hash, u16eq)
 
 #define I32_SET_DEFINE(ID) \
-  SET_DEFINE(ID, i32_t, i32_hash, i32_eq)
+  SET_DEFINE(ID, i32_t, i32_hash, i32eq)
 
 #define U32_SET_DEFINE(ID) \
-  SET_DEFINE(ID, u32_t, u32_hash, u32_eq)
+  SET_DEFINE(ID, u32_t, u32_hash, u32eq)
 
 #define I64_SET_DEFINE(ID) \
-  SET_DEFINE(ID, i64_t, i64_hash, i64_eq)
+  SET_DEFINE(ID, i64_t, i64_hash, i64eq)
 
 #define U64_SET_DEFINE(ID) \
-  SET_DEFINE(ID, u64_t, u64_hash, u64_eq)
+  SET_DEFINE(ID, u64_t, u64_hash, u64eq)
 
 #define STR_SET_DEFINE(ID) \
-  SET_DEFINE(ID, const i8_t *, str_hash, str_eq)
+  SET_DEFINE(ID, const i8_t *, str_hash, streq)
 
 SET_DECLARE(U_API, i8, i8_t);
 SET_DECLARE(U_API, u8, u8_t);

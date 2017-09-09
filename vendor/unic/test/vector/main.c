@@ -24,21 +24,26 @@
  */
 
 #include <cute.h>
+#include <ds/vector.h>
 
 #include "ds/vector.h"
 
 #define NOMEM_REALLOC(x, y) ((errno = ENOMEM), nil)
 
-VEC_DEFINE_ALLOC(v8_nomem, i8_t, 8, malloc, NOMEM_REALLOC, free);
-VEC_DEFINE_ALLOC(v16_nomem, i8_t, 16, malloc, NOMEM_REALLOC, free);
-VEC_DEFINE_ALLOC(v32_nomem, i8_t, 32, malloc, NOMEM_REALLOC, free);
-VEC_DEFINE_ALLOC(v64_nomem, i8_t, 64, malloc, NOMEM_REALLOC, free);
+VEC_DEFINE_ALLOC(v8_nomem, i8_t, 8, i8cmp, malloc, NOMEM_REALLOC, free);
+VEC_DEFINE_ALLOC(v16_nomem, i8_t, 16, i8cmp, malloc, NOMEM_REALLOC, free);
+VEC_DEFINE_ALLOC(v32_nomem, i8_t, 32, i8cmp, malloc, NOMEM_REALLOC, free);
+VEC_DEFINE_ALLOC(v64_nomem, i8_t, 64, i8cmp, malloc, NOMEM_REALLOC, free);
 
 typedef struct {
   f64_t x, y;
 } vec2_t;
 
-V64_DEFINE(line, vec2_t);
+i8_t vec2cmp(const vec2_t a, const vec2_t b) {
+  return f64cmp(a.x, b.x) + f64cmp(a.y, b.y);
+}
+
+V64_DEFINE(line, vec2_t, vec2cmp);
 
 CUTEST_DATA {
   vi8_t vi8;
@@ -476,10 +481,102 @@ CUTEST(v64, decay) {
   return CUTE_SUCCESS;
 }
 
+CUTEST(vec, general) {
+  u8_t i;
+  const i8_t *out;
+  strv8_t vec;
+
+  strv8_ctor(&vec);
+  strv8_push(&vec, "hello");
+  strv8_push(&vec, " ");
+  strv8_push(&vec, "world");
+  strv8_push(&vec, " ");
+  strv8_push(&vec, "!");
+  puts("");
+  for (i = 0; i < vec.len; ++i) {
+    printf(vec.buf[i]);
+  }
+  strv8_remove(&vec, 2);
+  puts("");
+  for (i = 0; i < vec.len; ++i) {
+    printf(vec.buf[i]);
+  }
+  strv8_removen(&vec, 1, 2);
+  puts("");
+  for (i = 0; i < vec.len; ++i) {
+    printf(vec.buf[i]);
+  }
+  strv8_push(&vec, "!");
+  strv8_push(&vec, "!");
+  strv8_push(&vec, "!");
+  strv8_push(&vec, "!");
+  puts("");
+  for (i = 0; i < vec.len; ++i) {
+    printf(vec.buf[i]);
+  }
+  strv8_removen(&vec, 1, 10);
+  puts("");
+  for (i = 0; i < vec.len; ++i) {
+    printf(vec.buf[i]);
+  }
+  strv8_push(&vec, " ");
+  strv8_push(&vec, "world");
+  strv8_push(&vec, " ");
+  strv8_push(&vec, "!");
+  puts("");
+  for (i = 0; i < vec.len; ++i) {
+    printf(vec.buf[i]);
+  }
+  strv8_erase(&vec, " ");
+  puts("");
+  for (i = 0; i < vec.len; ++i) {
+    printf(vec.buf[i]);
+  }
+  strv8_erase(&vec, "world");
+  puts("");
+  for (i = 0; i < vec.len; ++i) {
+    printf(vec.buf[i]);
+  }
+  strv8_push(&vec, "!");
+  strv8_push(&vec, "!");
+  strv8_push(&vec, "!");
+  strv8_push(&vec, "!");
+  puts("");
+  for (i = 0; i < vec.len; ++i) {
+    printf(vec.buf[i]);
+  }
+  strv8_erase(&vec, "!");
+  puts("");
+  for (i = 0; i < vec.len; ++i) {
+    printf(vec.buf[i]);
+  }
+  strv8_unshift(&vec, " ");
+  strv8_unshift(&vec, "say");
+  puts("");
+  for (i = 0; i < vec.len; ++i) {
+    printf(vec.buf[i]);
+  }
+  strv8_shift(&vec, nil);
+  strv8_unshift(&vec, "Say");
+  puts("");
+  for (i = 0; i < vec.len; ++i) {
+    printf(vec.buf[i]);
+  }
+  strv8_insert(&vec, 2, "(my name)");
+  strv8_insert(&vec, 3, " ");
+  puts("");
+  for (i = 0; i < vec.len; ++i) {
+    printf(vec.buf[i]);
+  }
+
+  puts("");
+  return CUTE_SUCCESS;
+}
+
 i32_t main(void) {
   CUTEST_DATA test;
 
-  CUTEST_PASS(v8, growth);
+  /*CUTEST_PASS(v8, growth);
   CUTEST_PASS(v16, growth);
   CUTEST_PASS(v32, growth);
   CUTEST_PASS(v64, growth);
@@ -487,6 +584,7 @@ i32_t main(void) {
   CUTEST_PASS(v8, decay);
   CUTEST_PASS(v16, decay);
   CUTEST_PASS(v32, decay);
-  CUTEST_PASS(v64, decay);
+  CUTEST_PASS(v64, decay);*/
+  CUTEST_PASS(vec, general);
   return EXIT_SUCCESS;
 }

@@ -259,31 +259,31 @@ typedef enum map_put map_put_t;
   MAP_DEFINE_ALLOC(ID, TKey, TValue, HASH_FN, HASHEQ_FN, malloc, realloc, free)
 
 #define I8_MAP_DEFINE(ID, TValue) \
-  MAP_DEFINE(ID, i8_t, TValue, i8_hash, i8_eq)
+  MAP_DEFINE(ID, i8_t, TValue, i8_hash, i8eq)
 
 #define U8_MAP_DEFINE(ID, TValue) \
-  MAP_DEFINE(ID, u8_t, TValue, u8_hash, u8_eq)
+  MAP_DEFINE(ID, u8_t, TValue, u8_hash, u8eq)
 
 #define I16_MAP_DEFINE(ID, TValue) \
-  MAP_DEFINE(ID, i16_t, TValue, i16_hash, i16_eq)
+  MAP_DEFINE(ID, i16_t, TValue, i16_hash, i16eq)
 
 #define U16_MAP_DEFINE(ID, TValue) \
-  MAP_DEFINE(ID, u16_t, TValue, u16_hash, u16_eq)
+  MAP_DEFINE(ID, u16_t, TValue, u16_hash, u16eq)
 
 #define I32_MAP_DEFINE(ID, TValue) \
-  MAP_DEFINE(ID, i32_t, TValue, i32_hash, i32_eq)
+  MAP_DEFINE(ID, i32_t, TValue, i32_hash, i32eq)
 
 #define U32_MAP_DEFINE(ID, TValue) \
-  MAP_DEFINE(ID, u32_t, TValue, u32_hash, u32_eq)
+  MAP_DEFINE(ID, u32_t, TValue, u32_hash, u32eq)
 
 #define I64_MAP_DEFINE(ID, TValue) \
-  MAP_DEFINE(ID, i64_t, TValue, i64_hash, i64_eq)
+  MAP_DEFINE(ID, i64_t, TValue, i64_hash, i64eq)
 
 #define U64_MAP_DEFINE(ID, TValue) \
-  MAP_DEFINE(ID, u64_t, TValue, u64_hash, u64_eq)
+  MAP_DEFINE(ID, u64_t, TValue, u64_hash, u64eq)
 
 #define STR_MAP_DEFINE(ID, TValue) \
-  MAP_DEFINE(ID, const i8_t *, TValue, str_hash, str_eq)
+  MAP_DEFINE(ID, const i8_t *, TValue, str_hash, streq)
 
 MAP_DECLARE(U_API, i8, i8_t, void *);
 MAP_DECLARE(U_API, u8, u8_t, void *);

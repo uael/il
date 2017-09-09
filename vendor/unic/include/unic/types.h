@@ -72,14 +72,27 @@ typedef bool bool_t;
 #define U32_MAX 0xffffffffUL
 #define U64_MAX 0xffffffffffffffffULL
 
-#define i8_eq(a, b) ((bool_t)((i8_t)(a) == (i8_t)(b)))
-#define u8_eq(a, b) ((bool_t)((u8_t)(a) == (u8_t)(b)))
-#define i16_eq(a, b) ((bool_t)((i16_t)(a) == (i16_t)(b)))
-#define u16_eq(a, b) ((bool_t)((u16_t)(a) == (u16_t)(b)))
-#define i32_eq(a, b) ((bool_t)((i32_t)(a) == (i32_t)(b)))
-#define u32_eq(a, b) ((bool_t)((u32_t)(a) == (u32_t)(b)))
-#define i64_eq(a, b) ((bool_t)((i64_t)(a) == (i64_t)(b)))
-#define u64_eq(a, b) ((bool_t)((u64_t)(a) == (u64_t)(b)))
-#define str_eq(a, b) ((bool_t)(strcmp(a, b) == 0))
+#define i8eq(a, b) ((bool_t)((i8_t)(a) == (i8_t)(b)))
+#define u8eq(a, b) ((bool_t)((u8_t)(a) == (u8_t)(b)))
+#define i16eq(a, b) ((bool_t)((i16_t)(a) == (i16_t)(b)))
+#define u16eq(a, b) ((bool_t)((u16_t)(a) == (u16_t)(b)))
+#define i32eq(a, b) ((bool_t)((i32_t)(a) == (i32_t)(b)))
+#define u32eq(a, b) ((bool_t)((u32_t)(a) == (u32_t)(b)))
+#define i64eq(a, b) ((bool_t)((i64_t)(a) == (i64_t)(b)))
+#define u64eq(a, b) ((bool_t)((u64_t)(a) == (u64_t)(b)))
+#define f32eq(a, b) ((bool_t)((f32_t)(a) == (f32_t)(b)))
+#define f64eq(a, b) ((bool_t)((f64_t)(a) == (f64_t)(b)))
+#define streq(a, b) ((bool_t)(strcmp(a, b) == 0))
+
+#define i8cmp(a, b) ((i8_t)(((a) > (b)) - ((a) < (b))))
+#define u8cmp(a, b) ((i8_t)(((a) > (b)) - ((a) < (b))))
+#define i16cmp(a, b) ((i8_t)(((a) > (b)) - ((a) < (b))))
+#define u16cmp(a, b) ((i8_t)(((a) > (b)) - ((a) < (b))))
+#define i32cmp(a, b) ((i8_t)(((a) > (b)) - ((a) < (b))))
+#define u32cmp(a, b) ((i8_t)(((a) > (b)) - ((a) < (b))))
+#define i64cmp(a, b) ((i8_t)(((a) > (b)) - ((a) < (b))))
+#define u64cmp(a, b) ((i8_t)(((a) > (b)) - ((a) < (b))))
+#define f32cmp(a, b) ((i8_t)(((a) > (b)) - ((a) < (b))))
+#define f64cmp(a, b) ((i8_t)(((a) > (b)) - ((a) < (b))))
 
 #endif /* !__UNIC_TYPES_H */

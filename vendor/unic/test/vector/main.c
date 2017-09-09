@@ -28,6 +28,19 @@
 
 #include "ds/vector.h"
 
+V8_DEFINE(vi8, i8_t, i8cmp);
+V8_DEFINE(vu8, u8_t, u8cmp);
+V16_DEFINE(vi16, i16_t, i16cmp);
+V16_DEFINE(vu16, u16_t, u16cmp);
+V32_DEFINE(vi32, i32_t, i32cmp);
+V32_DEFINE(vu32, u32_t, u32cmp);
+V64_DEFINE(vi64, i64_t, i64cmp);
+V64_DEFINE(vu64, u64_t, u64cmp);
+V8_DEFINE(strv8, i8_t *, strcmp);
+V16_DEFINE(strv16, i8_t *, strcmp);
+V32_DEFINE(strv32, i8_t *, strcmp);
+V64_DEFINE(strv64, i8_t *, strcmp);
+
 #define NOMEM_REALLOC(x, y) ((errno = ENOMEM), nil)
 
 VEC_DEFINE_ALLOC(v8_nomem, i8_t, 8, i8cmp, malloc, NOMEM_REALLOC, free);

@@ -28,39 +28,39 @@
 #include "ds/set.h"
 
 CUTEST_DATA {
-  i8_set_t i8_set;
-  u8_set_t u8_set;
-  i16_set_t i16_set;
-  u16_set_t u16_set;
-  i32_set_t i32_set;
-  u32_set_t u32_set;
-  i64_set_t i64_set;
-  u64_set_t u64_set;
-  str_set_t str_set;
+  i8set_t i8set;
+  u8set_t u8set;
+  i16set_t i16set;
+  u16set_t u16set;
+  i32set_t i32set;
+  u32set_t u32set;
+  i64set_t i64set;
+  u64set_t u64set;
+  strset_t strset;
 };
 
 CUTEST_SETUP {
-  i8_set_ctor(&self->i8_set);
-  u8_set_ctor(&self->u8_set);
-  i16_set_ctor(&self->i16_set);
-  u16_set_ctor(&self->u16_set);
-  i32_set_ctor(&self->i32_set);
-  u32_set_ctor(&self->u32_set);
-  i64_set_ctor(&self->i64_set);
-  u64_set_ctor(&self->u64_set);
-  str_set_ctor(&self->str_set);
+  i8set_ctor(&self->i8set);
+  u8set_ctor(&self->u8set);
+  i16set_ctor(&self->i16set);
+  u16set_ctor(&self->u16set);
+  i32set_ctor(&self->i32set);
+  u32set_ctor(&self->u32set);
+  i64set_ctor(&self->i64set);
+  u64set_ctor(&self->u64set);
+  strset_ctor(&self->strset);
 }
 
 CUTEST_TEARDOWN {
-  i8_set_ctor(&self->i8_set);
-  u8_set_ctor(&self->u8_set);
-  i16_set_dtor(&self->i16_set);
-  u16_set_dtor(&self->u16_set);
-  i32_set_dtor(&self->i32_set);
-  u32_set_dtor(&self->u32_set);
-  i64_set_dtor(&self->i64_set);
-  u64_set_dtor(&self->u64_set);
-  str_set_dtor(&self->str_set);
+  i8set_ctor(&self->i8set);
+  u8set_ctor(&self->u8set);
+  i16set_dtor(&self->i16set);
+  u16set_dtor(&self->u16set);
+  i32set_dtor(&self->i32set);
+  u32set_dtor(&self->u32set);
+  i64set_dtor(&self->i64set);
+  u64set_dtor(&self->u64set);
+  strset_dtor(&self->strset);
 }
 
 CUTEST(set, i8) {
@@ -68,7 +68,7 @@ CUTEST(set, i8) {
   i8_t i;
 
   for (i = 0; i < I8_MAX; ++i) {
-    switch (i8_set_put(&self->i8_set, i, &out)) {
+    switch (i8set_put(&self->i8set, i, &out)) {
       case SET_PUT_SUCCESS:
         break;
       case SET_PUT_ALLOC_FAILURE:
@@ -78,7 +78,7 @@ CUTEST(set, i8) {
       case SET_PUT_POPULATED:
         FAIL("populated");
     }
-    switch (i8_set_put(&self->i8_set, i, &out)) {
+    switch (i8set_put(&self->i8set, i, &out)) {
       case SET_PUT_SUCCESS:
         FAIL("must be populated");
       case SET_PUT_ALLOC_FAILURE:
@@ -89,15 +89,15 @@ CUTEST(set, i8) {
         break;
     }
   }
-  ASSERT_EQ(i, self->i8_set.len);
-  ASSERT_EQ(pow2_next32(i + 2), self->i8_set.cap);
+  ASSERT_EQ(i, self->i8set.len);
+  ASSERT_EQ(pow2_next32(i + 2), self->i8set.cap);
   for (i = 0; i < I8_MAX; ++i) {
-    ASSERT(i8_set_get(&self->i8_set, i, &out));
-    ASSERT(i8_set_del(&self->i8_set, out));
+    ASSERT(i8set_get(&self->i8set, i, &out));
+    ASSERT(i8set_del(&self->i8set, out));
   }
-  ASSERT_EQ(0, self->i8_set.len);
-  ASSERT_EQ(pow2_next32(i + 2), self->i8_set.cap);
-  i8_set_clear(&self->i8_set);
+  ASSERT_EQ(0, self->i8set.len);
+  ASSERT_EQ(pow2_next32(i + 2), self->i8set.cap);
+  i8set_clear(&self->i8set);
   return CUTE_SUCCESS;
 }
 
@@ -106,7 +106,7 @@ CUTEST(set, u8) {
   u8_t i;
 
   for (i = 0; i < U8_MAX; ++i) {
-    switch (u8_set_put(&self->u8_set, i, &out)) {
+    switch (u8set_put(&self->u8set, i, &out)) {
       case SET_PUT_SUCCESS:
         break;
       case SET_PUT_ALLOC_FAILURE:
@@ -116,7 +116,7 @@ CUTEST(set, u8) {
       case SET_PUT_POPULATED:
         FAIL("populated");
     }
-    switch (u8_set_put(&self->u8_set, i, &out)) {
+    switch (u8set_put(&self->u8set, i, &out)) {
       case SET_PUT_SUCCESS:
         FAIL("must be populated");
       case SET_PUT_ALLOC_FAILURE:
@@ -127,15 +127,15 @@ CUTEST(set, u8) {
         break;
     }
   }
-  ASSERT_EQ(i, self->u8_set.len);
-  ASSERT_EQ(pow2_next32(i + 2), self->u8_set.cap);
+  ASSERT_EQ(i, self->u8set.len);
+  ASSERT_EQ(pow2_next32(i + 2), self->u8set.cap);
   for (i = 0; i < U8_MAX; ++i) {
-    ASSERT(u8_set_get(&self->u8_set, i, &out));
-    ASSERT(u8_set_del(&self->u8_set, out));
+    ASSERT(u8set_get(&self->u8set, i, &out));
+    ASSERT(u8set_del(&self->u8set, out));
   }
-  ASSERT_EQ(0, self->u8_set.len);
-  ASSERT_EQ(pow2_next32(i + 2), self->u8_set.cap);
-  u8_set_clear(&self->u8_set);
+  ASSERT_EQ(0, self->u8set.len);
+  ASSERT_EQ(pow2_next32(i + 2), self->u8set.cap);
+  u8set_clear(&self->u8set);
   return CUTE_SUCCESS;
 }
 
@@ -144,7 +144,7 @@ CUTEST(set, i16) {
   i16_t i;
 
   for (i = 0; i < I16_MAX; ++i) {
-    switch (i16_set_put(&self->i16_set, i, &out)) {
+    switch (i16set_put(&self->i16set, i, &out)) {
       case SET_PUT_SUCCESS:
         break;
       case SET_PUT_ALLOC_FAILURE:
@@ -154,7 +154,7 @@ CUTEST(set, i16) {
       case SET_PUT_POPULATED:
         FAIL("populated");
     }
-    switch (i16_set_put(&self->i16_set, i, &out)) {
+    switch (i16set_put(&self->i16set, i, &out)) {
       case SET_PUT_SUCCESS:
         FAIL("must be populated");
       case SET_PUT_ALLOC_FAILURE:
@@ -165,15 +165,15 @@ CUTEST(set, i16) {
         break;
     }
   }
-  ASSERT_EQ(i, self->i16_set.len);
-  ASSERT_EQ(pow2_next32(i + 2), self->i16_set.cap);
+  ASSERT_EQ(i, self->i16set.len);
+  ASSERT_EQ(pow2_next32(i + 2), self->i16set.cap);
   for (i = 0; i < I16_MAX; ++i) {
-    ASSERT(i16_set_get(&self->i16_set, i, &out));
-    ASSERT(i16_set_del(&self->i16_set, out));
+    ASSERT(i16set_get(&self->i16set, i, &out));
+    ASSERT(i16set_del(&self->i16set, out));
   }
-  ASSERT_EQ(0, self->i16_set.len);
-  ASSERT_EQ(pow2_next32(i + 2), self->i16_set.cap);
-  i16_set_clear(&self->i16_set);
+  ASSERT_EQ(0, self->i16set.len);
+  ASSERT_EQ(pow2_next32(i + 2), self->i16set.cap);
+  i16set_clear(&self->i16set);
   return CUTE_SUCCESS;
 }
 
@@ -182,7 +182,7 @@ CUTEST(set, u16) {
   u16_t i;
 
   for (i = 0; i < U16_MAX; ++i) {
-    switch (u16_set_put(&self->u16_set, i, &out)) {
+    switch (u16set_put(&self->u16set, i, &out)) {
       case SET_PUT_SUCCESS:
         break;
       case SET_PUT_ALLOC_FAILURE:
@@ -192,7 +192,7 @@ CUTEST(set, u16) {
       case SET_PUT_POPULATED:
         FAIL("populated");
     }
-    switch (u16_set_put(&self->u16_set, i, &out)) {
+    switch (u16set_put(&self->u16set, i, &out)) {
       case SET_PUT_SUCCESS:
         FAIL("must be populated");
       case SET_PUT_ALLOC_FAILURE:
@@ -203,15 +203,15 @@ CUTEST(set, u16) {
         break;
     }
   }
-  ASSERT_EQ(i, self->u16_set.len);
-  ASSERT_EQ(pow2_next32(i + 2), self->u16_set.cap);
+  ASSERT_EQ(i, self->u16set.len);
+  ASSERT_EQ(pow2_next32(i + 2), self->u16set.cap);
   for (i = 0; i < U16_MAX; ++i) {
-    ASSERT(u16_set_get(&self->u16_set, i, &out));
-    ASSERT(u16_set_del(&self->u16_set, out));
+    ASSERT(u16set_get(&self->u16set, i, &out));
+    ASSERT(u16set_del(&self->u16set, out));
   }
-  ASSERT_EQ(0, self->u16_set.len);
-  ASSERT_EQ(pow2_next32(i + 2), self->u16_set.cap);
-  u16_set_clear(&self->u16_set);
+  ASSERT_EQ(0, self->u16set.len);
+  ASSERT_EQ(pow2_next32(i + 2), self->u16set.cap);
+  u16set_clear(&self->u16set);
   return CUTE_SUCCESS;
 }
 
@@ -220,7 +220,7 @@ CUTEST(set, i32) {
   i32_t i;
 
   for (i = 0; i < U16_MAX; ++i) {
-    switch (i32_set_put(&self->i32_set, i, &out)) {
+    switch (i32set_put(&self->i32set, i, &out)) {
       case SET_PUT_SUCCESS:
         break;
       case SET_PUT_ALLOC_FAILURE:
@@ -230,7 +230,7 @@ CUTEST(set, i32) {
       case SET_PUT_POPULATED:
         FAIL("populated");
     }
-    switch (i32_set_put(&self->i32_set, i, &out)) {
+    switch (i32set_put(&self->i32set, i, &out)) {
       case SET_PUT_SUCCESS:
         FAIL("must be populated");
       case SET_PUT_ALLOC_FAILURE:
@@ -241,15 +241,15 @@ CUTEST(set, i32) {
         break;
     }
   }
-  ASSERT_EQ(i, self->i32_set.len);
-  ASSERT_EQ(pow2_next32(i + 2), self->i32_set.cap);
+  ASSERT_EQ(i, self->i32set.len);
+  ASSERT_EQ(pow2_next32(i + 2), self->i32set.cap);
   for (i = 0; i < U16_MAX; ++i) {
-    ASSERT(i32_set_get(&self->i32_set, i, &out));
-    ASSERT(i32_set_del(&self->i32_set, out));
+    ASSERT(i32set_get(&self->i32set, i, &out));
+    ASSERT(i32set_del(&self->i32set, out));
   }
-  ASSERT_EQ(0, self->i32_set.len);
-  ASSERT_EQ(pow2_next32(i + 2), self->i32_set.cap);
-  i32_set_clear(&self->i32_set);
+  ASSERT_EQ(0, self->i32set.len);
+  ASSERT_EQ(pow2_next32(i + 2), self->i32set.cap);
+  i32set_clear(&self->i32set);
   return CUTE_SUCCESS;
 }
 
@@ -258,7 +258,7 @@ CUTEST(set, u32) {
   u32_t i;
 
   for (i = 0; i < U16_MAX; ++i) {
-    switch (u32_set_put(&self->u32_set, i, &out)) {
+    switch (u32set_put(&self->u32set, i, &out)) {
       case SET_PUT_SUCCESS:
         break;
       case SET_PUT_ALLOC_FAILURE:
@@ -268,7 +268,7 @@ CUTEST(set, u32) {
       case SET_PUT_POPULATED:
         FAIL("populated");
     }
-    switch (u32_set_put(&self->u32_set, i, &out)) {
+    switch (u32set_put(&self->u32set, i, &out)) {
       case SET_PUT_SUCCESS:
         FAIL("must be populated");
       case SET_PUT_ALLOC_FAILURE:
@@ -279,15 +279,15 @@ CUTEST(set, u32) {
         break;
     }
   }
-  ASSERT_EQ(i, self->u32_set.len);
-  ASSERT_EQ(pow2_next32(i + 2), self->u32_set.cap);
+  ASSERT_EQ(i, self->u32set.len);
+  ASSERT_EQ(pow2_next32(i + 2), self->u32set.cap);
   for (i = 0; i < U16_MAX; ++i) {
-    ASSERT(u32_set_get(&self->u32_set, i, &out));
-    ASSERT(u32_set_del(&self->u32_set, out));
+    ASSERT(u32set_get(&self->u32set, i, &out));
+    ASSERT(u32set_del(&self->u32set, out));
   }
-  ASSERT_EQ(0, self->u32_set.len);
-  ASSERT_EQ(pow2_next32(i + 2), self->u32_set.cap);
-  u32_set_clear(&self->u32_set);
+  ASSERT_EQ(0, self->u32set.len);
+  ASSERT_EQ(pow2_next32(i + 2), self->u32set.cap);
+  u32set_clear(&self->u32set);
   return CUTE_SUCCESS;
 }
 
@@ -296,7 +296,7 @@ CUTEST(set, i64) {
   i64_t i;
 
   for (i = 0; i < U16_MAX; ++i) {
-    switch (i64_set_put(&self->i64_set, i, &out)) {
+    switch (i64set_put(&self->i64set, i, &out)) {
       case SET_PUT_SUCCESS:
         break;
       case SET_PUT_ALLOC_FAILURE:
@@ -306,7 +306,7 @@ CUTEST(set, i64) {
       case SET_PUT_POPULATED:
         FAIL("populated");
     }
-    switch (i64_set_put(&self->i64_set, i, &out)) {
+    switch (i64set_put(&self->i64set, i, &out)) {
       case SET_PUT_SUCCESS:
         FAIL("must be populated");
       case SET_PUT_ALLOC_FAILURE:
@@ -317,15 +317,15 @@ CUTEST(set, i64) {
         break;
     }
   }
-  ASSERT_EQ(i, self->i64_set.len);
-  ASSERT_EQ(pow2_next32((u32_t) i + 2), self->i64_set.cap);
+  ASSERT_EQ(i, self->i64set.len);
+  ASSERT_EQ(pow2_next32((u32_t) i + 2), self->i64set.cap);
   for (i = 0; i < U16_MAX; ++i) {
-    ASSERT(i64_set_get(&self->i64_set, i, &out));
-    ASSERT(i64_set_del(&self->i64_set, out));
+    ASSERT(i64set_get(&self->i64set, i, &out));
+    ASSERT(i64set_del(&self->i64set, out));
   }
-  ASSERT_EQ(0, self->i64_set.len);
-  ASSERT_EQ(pow2_next32((u32_t) i + 2), self->i64_set.cap);
-  i64_set_clear(&self->i64_set);
+  ASSERT_EQ(0, self->i64set.len);
+  ASSERT_EQ(pow2_next32((u32_t) i + 2), self->i64set.cap);
+  i64set_clear(&self->i64set);
   return CUTE_SUCCESS;
 }
 
@@ -334,7 +334,7 @@ CUTEST(set, u64) {
   u64_t i;
 
   for (i = 0; i < U16_MAX; ++i) {
-    switch (u64_set_put(&self->u64_set, i, &out)) {
+    switch (u64set_put(&self->u64set, i, &out)) {
       case SET_PUT_SUCCESS:
         break;
       case SET_PUT_ALLOC_FAILURE:
@@ -344,7 +344,7 @@ CUTEST(set, u64) {
       case SET_PUT_POPULATED:
         FAIL("populated");
     }
-    switch (u64_set_put(&self->u64_set, i, &out)) {
+    switch (u64set_put(&self->u64set, i, &out)) {
       case SET_PUT_SUCCESS:
         FAIL("must be populated");
       case SET_PUT_ALLOC_FAILURE:
@@ -355,15 +355,15 @@ CUTEST(set, u64) {
         break;
     }
   }
-  ASSERT_EQ(i, self->u64_set.len);
-  ASSERT_EQ(pow2_next32((u32_t) i + 2), self->u64_set.cap);
+  ASSERT_EQ(i, self->u64set.len);
+  ASSERT_EQ(pow2_next32((u32_t) i + 2), self->u64set.cap);
   for (i = 0; i < U16_MAX; ++i) {
-    ASSERT(u64_set_get(&self->u64_set, i, &out));
-    ASSERT(u64_set_del(&self->u64_set, out));
+    ASSERT(u64set_get(&self->u64set, i, &out));
+    ASSERT(u64set_del(&self->u64set, out));
   }
-  ASSERT_EQ(0, self->u64_set.len);
-  ASSERT_EQ(pow2_next32((u32_t) i + 2), self->u64_set.cap);
-  u64_set_clear(&self->u64_set);
+  ASSERT_EQ(0, self->u64set.len);
+  ASSERT_EQ(pow2_next32((u32_t) i + 2), self->u64set.cap);
+  u64set_clear(&self->u64set);
   return CUTE_SUCCESS;
 }
 
@@ -426,7 +426,7 @@ CUTEST(set, str) {
 
   str = strs;
   while (*str) {
-    switch (str_set_put(&self->str_set, *str, &out)) {
+    switch (strset_put(&self->strset, *str, &out)) {
       case SET_PUT_SUCCESS:
         break;
       case SET_PUT_ALLOC_FAILURE:
@@ -436,7 +436,7 @@ CUTEST(set, str) {
       case SET_PUT_POPULATED:
         FAIL("populated");
     }
-    switch (str_set_put(&self->str_set, *str, &out)) {
+    switch (strset_put(&self->strset, *str, &out)) {
       case SET_PUT_SUCCESS:
         FAIL("must be populated");
       case SET_PUT_ALLOC_FAILURE:
@@ -448,15 +448,15 @@ CUTEST(set, str) {
     }
     ++str;
   }
-  ASSERT_EQ(50, self->str_set.len);
+  ASSERT_EQ(50, self->strset.len);
   str = strs;
   while (*str) {
-    ASSERT(str_set_get(&self->str_set, *str, &out));
-    ASSERT(str_set_del(&self->str_set, out));
+    ASSERT(strset_get(&self->strset, *str, &out));
+    ASSERT(strset_del(&self->strset, out));
     ++str;
   }
-  ASSERT_EQ(0, self->u64_set.len);
-  str_set_clear(&self->str_set);
+  ASSERT_EQ(0, self->u64set.len);
+  strset_clear(&self->strset);
   return CUTE_SUCCESS;
 }
 

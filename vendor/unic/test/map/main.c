@@ -25,42 +25,52 @@
 
 #include <cute.h>
 
-#include "data.h"
+#include "ds/map.h"
+
+I8_MAP_DEFINE(test_i8map, u8_t, u8cmp);
+U8_MAP_DEFINE(test_u8map, u8_t, u8cmp);
+I16_MAP_DEFINE(test_i16map, u8_t, u8cmp);
+U16_MAP_DEFINE(test_u16map, u8_t, u8cmp);
+I32_MAP_DEFINE(test_i32map, u8_t, u8cmp);
+U32_MAP_DEFINE(test_u32map, u8_t, u8cmp);
+I64_MAP_DEFINE(test_i64map, u8_t, u8cmp);
+U64_MAP_DEFINE(test_u64map, u8_t, u8cmp);
+STR_MAP_DEFINE(test_strmap, u8_t, u8cmp);
 
 CUTEST_DATA {
-  test_i8_map_t i8_map;
-  test_u8_map_t u8_map;
-  test_i16_map_t i16_map;
-  test_u16_map_t u16_map;
-  test_i32_map_t i32_map;
-  test_u32_map_t u32_map;
-  test_i64_map_t i64_map;
-  test_u64_map_t u64_map;
-  test_str_map_t str_map;
+  test_i8map_t i8map;
+  test_u8map_t u8map;
+  test_i16map_t i16map;
+  test_u16map_t u16map;
+  test_i32map_t i32map;
+  test_u32map_t u32map;
+  test_i64map_t i64map;
+  test_u64map_t u64map;
+  test_strmap_t strmap;
 };
 
 CUTEST_SETUP {
-  test_i8_map_ctor(&self->i8_map);
-  test_u8_map_ctor(&self->u8_map);
-  test_i16_map_ctor(&self->i16_map);
-  test_u16_map_ctor(&self->u16_map);
-  test_i32_map_ctor(&self->i32_map);
-  test_u32_map_ctor(&self->u32_map);
-  test_i64_map_ctor(&self->i64_map);
-  test_u64_map_ctor(&self->u64_map);
-  test_str_map_ctor(&self->str_map);
+  test_i8map_ctor(&self->i8map);
+  test_u8map_ctor(&self->u8map);
+  test_i16map_ctor(&self->i16map);
+  test_u16map_ctor(&self->u16map);
+  test_i32map_ctor(&self->i32map);
+  test_u32map_ctor(&self->u32map);
+  test_i64map_ctor(&self->i64map);
+  test_u64map_ctor(&self->u64map);
+  test_strmap_ctor(&self->strmap);
 }
 
 CUTEST_TEARDOWN {
-  test_i8_map_ctor(&self->i8_map);
-  test_u8_map_ctor(&self->u8_map);
-  test_i16_map_dtor(&self->i16_map);
-  test_u16_map_dtor(&self->u16_map);
-  test_i32_map_dtor(&self->i32_map);
-  test_u32_map_dtor(&self->u32_map);
-  test_i64_map_dtor(&self->i64_map);
-  test_u64_map_dtor(&self->u64_map);
-  test_str_map_dtor(&self->str_map);
+  test_i8map_ctor(&self->i8map);
+  test_u8map_ctor(&self->u8map);
+  test_i16map_dtor(&self->i16map);
+  test_u16map_dtor(&self->u16map);
+  test_i32map_dtor(&self->i32map);
+  test_u32map_dtor(&self->u32map);
+  test_i64map_dtor(&self->i64map);
+  test_u64map_dtor(&self->u64map);
+  test_strmap_dtor(&self->strmap);
 }
 
 CUTEST(map, i8) {
@@ -68,7 +78,7 @@ CUTEST(map, i8) {
   i8_t i;
 
   for (i = 0; i < I8_MAX; ++i) {
-    switch (test_i8_map_put(&self->i8_map, i, &out)) {
+    switch (test_i8map_put(&self->i8map, i, &out)) {
       case MAP_PUT_SUCCESS:
         break;
       case MAP_PUT_ALLOC_FAILURE:
@@ -78,7 +88,7 @@ CUTEST(map, i8) {
       case MAP_PUT_POPULATED:
         FAIL("populated");
     }
-    switch (test_i8_map_put(&self->i8_map, i, &out)) {
+    switch (test_i8map_put(&self->i8map, i, &out)) {
       case MAP_PUT_SUCCESS:
         FAIL("must be populated");
       case MAP_PUT_ALLOC_FAILURE:
@@ -89,15 +99,15 @@ CUTEST(map, i8) {
         break;
     }
   }
-  ASSERT_EQ(i, self->i8_map.len);
-  ASSERT_EQ(pow2_next32(i + 2), self->i8_map.cap);
+  ASSERT_EQ(i, self->i8map.len);
+  ASSERT_EQ(pow2_next32(i + 2), self->i8map.cap);
   for (i = 0; i < I8_MAX; ++i) {
-    ASSERT(test_i8_map_get(&self->i8_map, i, &out));
-    ASSERT(test_i8_map_del(&self->i8_map, out));
+    ASSERT(test_i8map_get(&self->i8map, i, &out));
+    ASSERT(test_i8map_del(&self->i8map, out));
   }
-  ASSERT_EQ(0, self->i8_map.len);
-  ASSERT_EQ(pow2_next32(i + 2), self->i8_map.cap);
-  test_i8_map_clear(&self->i8_map);
+  ASSERT_EQ(0, self->i8map.len);
+  ASSERT_EQ(pow2_next32(i + 2), self->i8map.cap);
+  test_i8map_clear(&self->i8map);
   return CUTE_SUCCESS;
 }
 
@@ -106,7 +116,7 @@ CUTEST(map, u8) {
   u8_t i;
 
   for (i = 0; i < U8_MAX; ++i) {
-    switch (test_u8_map_put(&self->u8_map, i, &out)) {
+    switch (test_u8map_put(&self->u8map, i, &out)) {
       case MAP_PUT_SUCCESS:
         break;
       case MAP_PUT_ALLOC_FAILURE:
@@ -116,7 +126,7 @@ CUTEST(map, u8) {
       case MAP_PUT_POPULATED:
         FAIL("populated");
     }
-    switch (test_u8_map_put(&self->u8_map, i, &out)) {
+    switch (test_u8map_put(&self->u8map, i, &out)) {
       case MAP_PUT_SUCCESS:
         FAIL("must be populated");
       case MAP_PUT_ALLOC_FAILURE:
@@ -127,15 +137,15 @@ CUTEST(map, u8) {
         break;
     }
   }
-  ASSERT_EQ(i, self->u8_map.len);
-  ASSERT_EQ(pow2_next32(i + 2), self->u8_map.cap);
+  ASSERT_EQ(i, self->u8map.len);
+  ASSERT_EQ(pow2_next32(i + 2), self->u8map.cap);
   for (i = 0; i < U8_MAX; ++i) {
-    ASSERT(test_u8_map_get(&self->u8_map, i, &out));
-    ASSERT(test_u8_map_del(&self->u8_map, out));
+    ASSERT(test_u8map_get(&self->u8map, i, &out));
+    ASSERT(test_u8map_del(&self->u8map, out));
   }
-  ASSERT_EQ(0, self->u8_map.len);
-  ASSERT_EQ(pow2_next32(i + 2), self->u8_map.cap);
-  test_u8_map_clear(&self->u8_map);
+  ASSERT_EQ(0, self->u8map.len);
+  ASSERT_EQ(pow2_next32(i + 2), self->u8map.cap);
+  test_u8map_clear(&self->u8map);
   return CUTE_SUCCESS;
 }
 
@@ -144,7 +154,7 @@ CUTEST(map, i16) {
   i16_t i;
 
   for (i = 0; i < I16_MAX; ++i) {
-    switch (test_i16_map_put(&self->i16_map, i, &out)) {
+    switch (test_i16map_put(&self->i16map, i, &out)) {
       case MAP_PUT_SUCCESS:
         break;
       case MAP_PUT_ALLOC_FAILURE:
@@ -154,7 +164,7 @@ CUTEST(map, i16) {
       case MAP_PUT_POPULATED:
         FAIL("populated");
     }
-    switch (test_i16_map_put(&self->i16_map, i, &out)) {
+    switch (test_i16map_put(&self->i16map, i, &out)) {
       case MAP_PUT_SUCCESS:
         FAIL("must be populated");
       case MAP_PUT_ALLOC_FAILURE:
@@ -165,15 +175,15 @@ CUTEST(map, i16) {
         break;
     }
   }
-  ASSERT_EQ(i, self->i16_map.len);
-  ASSERT_EQ(pow2_next32(i + 2), self->i16_map.cap);
+  ASSERT_EQ(i, self->i16map.len);
+  ASSERT_EQ(pow2_next32(i + 2), self->i16map.cap);
   for (i = 0; i < I16_MAX; ++i) {
-    ASSERT(test_i16_map_get(&self->i16_map, i, &out));
-    ASSERT(test_i16_map_del(&self->i16_map, out));
+    ASSERT(test_i16map_get(&self->i16map, i, &out));
+    ASSERT(test_i16map_del(&self->i16map, out));
   }
-  ASSERT_EQ(0, self->i16_map.len);
-  ASSERT_EQ(pow2_next32(i + 2), self->i16_map.cap);
-  test_i16_map_clear(&self->i16_map);
+  ASSERT_EQ(0, self->i16map.len);
+  ASSERT_EQ(pow2_next32(i + 2), self->i16map.cap);
+  test_i16map_clear(&self->i16map);
   return CUTE_SUCCESS;
 }
 
@@ -182,7 +192,7 @@ CUTEST(map, u16) {
   u16_t i;
 
   for (i = 0; i < U16_MAX; ++i) {
-    switch (test_u16_map_put(&self->u16_map, i, &out)) {
+    switch (test_u16map_put(&self->u16map, i, &out)) {
       case MAP_PUT_SUCCESS:
         break;
       case MAP_PUT_ALLOC_FAILURE:
@@ -192,7 +202,7 @@ CUTEST(map, u16) {
       case MAP_PUT_POPULATED:
         FAIL("populated");
     }
-    switch (test_u16_map_put(&self->u16_map, i, &out)) {
+    switch (test_u16map_put(&self->u16map, i, &out)) {
       case MAP_PUT_SUCCESS:
         FAIL("must be populated");
       case MAP_PUT_ALLOC_FAILURE:
@@ -203,15 +213,15 @@ CUTEST(map, u16) {
         break;
     }
   }
-  ASSERT_EQ(i, self->u16_map.len);
-  ASSERT_EQ(pow2_next32(i + 2), self->u16_map.cap);
+  ASSERT_EQ(i, self->u16map.len);
+  ASSERT_EQ(pow2_next32(i + 2), self->u16map.cap);
   for (i = 0; i < U16_MAX; ++i) {
-    ASSERT(test_u16_map_get(&self->u16_map, i, &out));
-    ASSERT(test_u16_map_del(&self->u16_map, out));
+    ASSERT(test_u16map_get(&self->u16map, i, &out));
+    ASSERT(test_u16map_del(&self->u16map, out));
   }
-  ASSERT_EQ(0, self->u16_map.len);
-  ASSERT_EQ(pow2_next32(i + 2), self->u16_map.cap);
-  test_u16_map_clear(&self->u16_map);
+  ASSERT_EQ(0, self->u16map.len);
+  ASSERT_EQ(pow2_next32(i + 2), self->u16map.cap);
+  test_u16map_clear(&self->u16map);
   return CUTE_SUCCESS;
 }
 
@@ -220,7 +230,7 @@ CUTEST(map, i32) {
   i32_t i;
 
   for (i = 0; i < U16_MAX; ++i) {
-    switch (test_i32_map_put(&self->i32_map, i, &out)) {
+    switch (test_i32map_put(&self->i32map, i, &out)) {
       case MAP_PUT_SUCCESS:
         break;
       case MAP_PUT_ALLOC_FAILURE:
@@ -230,7 +240,7 @@ CUTEST(map, i32) {
       case MAP_PUT_POPULATED:
         FAIL("populated");
     }
-    switch (test_i32_map_put(&self->i32_map, i, &out)) {
+    switch (test_i32map_put(&self->i32map, i, &out)) {
       case MAP_PUT_SUCCESS:
         FAIL("must be populated");
       case MAP_PUT_ALLOC_FAILURE:
@@ -241,15 +251,15 @@ CUTEST(map, i32) {
         break;
     }
   }
-  ASSERT_EQ(i, self->i32_map.len);
-  ASSERT_EQ(pow2_next32(i + 2), self->i32_map.cap);
+  ASSERT_EQ(i, self->i32map.len);
+  ASSERT_EQ(pow2_next32(i + 2), self->i32map.cap);
   for (i = 0; i < U16_MAX; ++i) {
-    ASSERT(test_i32_map_get(&self->i32_map, i, &out));
-    ASSERT(test_i32_map_del(&self->i32_map, out));
+    ASSERT(test_i32map_get(&self->i32map, i, &out));
+    ASSERT(test_i32map_del(&self->i32map, out));
   }
-  ASSERT_EQ(0, self->i32_map.len);
-  ASSERT_EQ(pow2_next32(i + 2), self->i32_map.cap);
-  test_i32_map_clear(&self->i32_map);
+  ASSERT_EQ(0, self->i32map.len);
+  ASSERT_EQ(pow2_next32(i + 2), self->i32map.cap);
+  test_i32map_clear(&self->i32map);
   return CUTE_SUCCESS;
 }
 
@@ -258,7 +268,7 @@ CUTEST(map, u32) {
   u32_t i;
 
   for (i = 0; i < U16_MAX; ++i) {
-    switch (test_u32_map_put(&self->u32_map, i, &out)) {
+    switch (test_u32map_put(&self->u32map, i, &out)) {
       case MAP_PUT_SUCCESS:
         break;
       case MAP_PUT_ALLOC_FAILURE:
@@ -268,7 +278,7 @@ CUTEST(map, u32) {
       case MAP_PUT_POPULATED:
         FAIL("populated");
     }
-    switch (test_u32_map_put(&self->u32_map, i, &out)) {
+    switch (test_u32map_put(&self->u32map, i, &out)) {
       case MAP_PUT_SUCCESS:
         FAIL("must be populated");
       case MAP_PUT_ALLOC_FAILURE:
@@ -279,15 +289,15 @@ CUTEST(map, u32) {
         break;
     }
   }
-  ASSERT_EQ(i, self->u32_map.len);
-  ASSERT_EQ(pow2_next32(i + 2), self->u32_map.cap);
+  ASSERT_EQ(i, self->u32map.len);
+  ASSERT_EQ(pow2_next32(i + 2), self->u32map.cap);
   for (i = 0; i < U16_MAX; ++i) {
-    ASSERT(test_u32_map_get(&self->u32_map, i, &out));
-    ASSERT(test_u32_map_del(&self->u32_map, out));
+    ASSERT(test_u32map_get(&self->u32map, i, &out));
+    ASSERT(test_u32map_del(&self->u32map, out));
   }
-  ASSERT_EQ(0, self->u32_map.len);
-  ASSERT_EQ(pow2_next32(i + 2), self->u32_map.cap);
-  test_u32_map_clear(&self->u32_map);
+  ASSERT_EQ(0, self->u32map.len);
+  ASSERT_EQ(pow2_next32(i + 2), self->u32map.cap);
+  test_u32map_clear(&self->u32map);
   return CUTE_SUCCESS;
 }
 
@@ -296,7 +306,7 @@ CUTEST(map, i64) {
   i64_t i;
 
   for (i = 0; i < U16_MAX; ++i) {
-    switch (test_i64_map_put(&self->i64_map, i, &out)) {
+    switch (test_i64map_put(&self->i64map, i, &out)) {
       case MAP_PUT_SUCCESS:
         break;
       case MAP_PUT_ALLOC_FAILURE:
@@ -306,7 +316,7 @@ CUTEST(map, i64) {
       case MAP_PUT_POPULATED:
         FAIL("populated");
     }
-    switch (test_i64_map_put(&self->i64_map, i, &out)) {
+    switch (test_i64map_put(&self->i64map, i, &out)) {
       case MAP_PUT_SUCCESS:
         FAIL("must be populated");
       case MAP_PUT_ALLOC_FAILURE:
@@ -317,15 +327,15 @@ CUTEST(map, i64) {
         break;
     }
   }
-  ASSERT_EQ(i, self->i64_map.len);
-  ASSERT_EQ(pow2_next32((u32_t) i + 2), self->i64_map.cap);
+  ASSERT_EQ(i, self->i64map.len);
+  ASSERT_EQ(pow2_next32((u32_t) i + 2), self->i64map.cap);
   for (i = 0; i < U16_MAX; ++i) {
-    ASSERT(test_i64_map_get(&self->i64_map, i, &out));
-    ASSERT(test_i64_map_del(&self->i64_map, out));
+    ASSERT(test_i64map_get(&self->i64map, i, &out));
+    ASSERT(test_i64map_del(&self->i64map, out));
   }
-  ASSERT_EQ(0, self->i64_map.len);
-  ASSERT_EQ(pow2_next32((u32_t) i + 2), self->i64_map.cap);
-  test_i64_map_clear(&self->i64_map);
+  ASSERT_EQ(0, self->i64map.len);
+  ASSERT_EQ(pow2_next32((u32_t) i + 2), self->i64map.cap);
+  test_i64map_clear(&self->i64map);
   return CUTE_SUCCESS;
 }
 
@@ -334,7 +344,7 @@ CUTEST(map, u64) {
   u64_t i;
 
   for (i = 0; i < U16_MAX; ++i) {
-    switch (test_u64_map_put(&self->u64_map, i, &out)) {
+    switch (test_u64map_put(&self->u64map, i, &out)) {
       case MAP_PUT_SUCCESS:
         break;
       case MAP_PUT_ALLOC_FAILURE:
@@ -344,7 +354,7 @@ CUTEST(map, u64) {
       case MAP_PUT_POPULATED:
         FAIL("populated");
     }
-    switch (test_u64_map_put(&self->u64_map, i, &out)) {
+    switch (test_u64map_put(&self->u64map, i, &out)) {
       case MAP_PUT_SUCCESS:
         FAIL("must be populated");
       case MAP_PUT_ALLOC_FAILURE:
@@ -355,15 +365,15 @@ CUTEST(map, u64) {
         break;
     }
   }
-  ASSERT_EQ(i, self->u64_map.len);
-  ASSERT_EQ(pow2_next32((u32_t) i + 2), self->u64_map.cap);
+  ASSERT_EQ(i, self->u64map.len);
+  ASSERT_EQ(pow2_next32((u32_t) i + 2), self->u64map.cap);
   for (i = 0; i < U16_MAX; ++i) {
-    ASSERT(test_u64_map_get(&self->u64_map, i, &out));
-    ASSERT(test_u64_map_del(&self->u64_map, out));
+    ASSERT(test_u64map_get(&self->u64map, i, &out));
+    ASSERT(test_u64map_del(&self->u64map, out));
   }
-  ASSERT_EQ(0, self->u64_map.len);
-  ASSERT_EQ(pow2_next32((u32_t) i + 2), self->u64_map.cap);
-  test_u64_map_clear(&self->u64_map);
+  ASSERT_EQ(0, self->u64map.len);
+  ASSERT_EQ(pow2_next32((u32_t) i + 2), self->u64map.cap);
+  test_u64map_clear(&self->u64map);
   return CUTE_SUCCESS;
 }
 
@@ -426,7 +436,7 @@ CUTEST(map, str) {
 
   str = strs;
   while (*str) {
-    switch (test_str_map_put(&self->str_map, *str, &out)) {
+    switch (test_strmap_put(&self->strmap, *str, &out)) {
       case MAP_PUT_SUCCESS:
         break;
       case MAP_PUT_ALLOC_FAILURE:
@@ -436,7 +446,7 @@ CUTEST(map, str) {
       case MAP_PUT_POPULATED:
         FAIL("populated");
     }
-    switch (test_str_map_put(&self->str_map, *str, &out)) {
+    switch (test_strmap_put(&self->strmap, *str, &out)) {
       case MAP_PUT_SUCCESS:
         FAIL("must be populated");
       case MAP_PUT_ALLOC_FAILURE:
@@ -448,15 +458,15 @@ CUTEST(map, str) {
     }
     ++str;
   }
-  ASSERT_EQ(50, self->str_map.len);
+  ASSERT_EQ(50, self->strmap.len);
   str = strs;
   while (*str) {
-    ASSERT(test_str_map_get(&self->str_map, *str, &out));
-    ASSERT(test_str_map_del(&self->str_map, out));
+    ASSERT(test_strmap_get(&self->strmap, *str, &out));
+    ASSERT(test_strmap_del(&self->strmap, out));
     ++str;
   }
-  ASSERT_EQ(0, self->u64_map.len);
-  test_str_map_clear(&self->str_map);
+  ASSERT_EQ(0, self->u64map.len);
+  test_strmap_clear(&self->strmap);
   return CUTE_SUCCESS;
 }
 

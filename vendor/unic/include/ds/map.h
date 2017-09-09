@@ -36,6 +36,9 @@
 #include "unic/config.h"
 #include "unic/hash.h"
 #include "unic/math.h"
+#include "unic/err.h"
+
+#include "vector.h"
 
 enum bucket {
   BUCKET_DELETED = 1,
@@ -70,28 +73,16 @@ typedef enum map_put map_put_t;
 
 #define MAP_HASH_UPPER 0.77
 
-#define MAP_DECLARE(SCOPE, ID, TKey, TValue) \
-  typedef mapof(TKey, TValue) ID##_map_t; \
-  SCOPE void \
-  ID##_map##_ctor(ID##_map_t *restrict self); \
-  SCOPE void \
-  ID##_map##_dtor(ID##_map_t *restrict self); \
-  SCOPE void \
-  ID##_map##_clear(ID##_map_t *restrict self); \
-  SCOPE u8_t \
-  ID##_map##_resize(ID##_map_t *restrict self, u32_t ensure); \
-  SCOPE bool_t \
-  ID##_map##_get(const ID##_map_t *self, TKey key, u32_t *restrict out); \
-  SCOPE map_put_t \
-  ID##_map##_put(ID##_map_t *restrict self, TKey key, u32_t *restrict out); \
-  SCOPE bool_t \
-  ID##_map##_del(ID##_map_t *restrict self, u32_t x)
-
-#define MAP_DEFINE_ALLOC(ID, TKey, TValue, HASH_FN, HASHEQ_FN, \
-  MALLOC_FN, REALLOC_FN, FREE_FN) \
-  inline void \
-  ID##_map##_ctor(ID##_map_t *restrict self) { \
-    *self = (ID##_map_t) { \
+#define MAP_DEFINE_ALLOC(ID, TKey, TValue, TKey_CMP_FN, TValue_CMP_FN, \
+  HASH_FN, HASHEQ_FN, MALLOC_FN, REALLOC_FN, FREE_FN) \
+  VEC_DEFINE_ALLOC(ID##_keys, TKey, 32, TKey_CMP_FN, MALLOC_FN, REALLOC_FN, \
+    FREE_FN) \
+  VEC_DEFINE_ALLOC(ID##_vals, TValue, 32, TValue_CMP_FN, MALLOC_FN, \
+    REALLOC_FN, FREE_FN) \
+  typedef mapof(TKey, TValue) ID##_t; \
+  static inline void \
+  ID##_ctor(ID##_t *restrict self) { \
+    *self = (ID##_t) { \
       .cap = 0, \
       .len = 0, \
       .occupieds = 0, \
@@ -101,23 +92,23 @@ typedef enum map_put map_put_t;
       .vals = nil, \
     }; \
   } \
-  inline void \
-  ID##_map##_dtor(ID##_map_t *restrict self) { \
+  static inline void \
+  ID##_dtor(ID##_t *restrict self) { \
     if (self && self->buckets) { \
       FREE_FN((void *)self->keys); \
       FREE_FN(self->buckets); \
       FREE_FN((void *)self->vals); \
     } \
   } \
-  inline void \
-  ID##_map##_clear(ID##_map_t *restrict self) { \
+  static inline void \
+  ID##_clear(ID##_t *restrict self) { \
     if (self && self->buckets) { \
       memset(self->buckets, BUCKET_EMPTY, self->cap); \
       self->len = self->occupieds = 0; \
     } \
   } \
-  inline bool_t \
-  ID##_map##_get(const ID##_map_t *self, TKey key, u32_t *restrict out) { \
+  static inline bool_t \
+  ID##_get(const ID##_t *self, TKey key, u32_t *restrict out) { \
     if (self->cap) { \
       u32_t k, i, last, mask, step; \
       step = 0; \
@@ -138,8 +129,8 @@ typedef enum map_put map_put_t;
     } \
     return false; \
   } \
-  inline u8_t \
-  ID##_map##_resize(ID##_map_t *restrict self, u32_t ensure) { \
+  static inline u8_t \
+  ID##_resize(ID##_t *restrict self, u32_t ensure) { \
     u8_t *new_buckets; \
     u32_t j; \
     new_buckets = nil; \
@@ -201,15 +192,15 @@ typedef enum map_put map_put_t;
     } \
     return 0; \
   } \
-  inline map_put_t \
-  ID##_map##_put(ID##_map_t *restrict self, TKey key, u32_t *restrict out) { \
+  static inline map_put_t \
+  ID##_put(ID##_t *restrict self, TKey key, u32_t *restrict out) { \
     u32_t x; \
     if (self->occupieds >= self->upper_bound) { /* update the hash table */ \
       if (self->cap > (self->len << 1)) { \
-        if (ID##_map##_resize(self, self->cap - 1) != 0) { /* clear "deleted" elements */ \
+        if (ID##_resize(self, self->cap - 1) != 0) { /* clear "deleted" elements */ \
           return 1; \
         } \
-      } else if (ID##_map##_resize(self, self->cap + 1) != 0) { /* expand the hash table */ \
+      } else if (ID##_resize(self, self->cap + 1) != 0) { /* expand the hash table */ \
          return 1; \
       } \
     } /* TODO: to implement automatically shrinking; resize() already support shrinking */ \
@@ -245,54 +236,76 @@ typedef enum map_put map_put_t;
     } \
     return 3; /* Don't touch self->keys[x] if present and not deleted */ \
   } \
-  inline bool_t \
-  ID##_map##_del(ID##_map_t *restrict self, u32_t x) { \
+  static inline bool_t \
+  ID##_del(ID##_t *restrict self, u32_t x) { \
     if (x != self->cap && bucket_ispopulated(self->buckets, x)) { \
       bucket_set_isdel_true(self->buckets, x); \
       --self->len; \
       return true; \
     } \
     return false; \
+  } \
+  static inline err_t \
+  ID##_keys(ID##_t *restrict self, ID##_keys_t *out) { \
+    u32_t i; \
+    err_t err; \
+    ID##_keys_ctor(out); \
+    if ((err = ID##_keys_growth(out, self->len)) > 0) { \
+      return err; \
+    } \
+    for (i = 0; i < self->cap; ++i) { \
+      if (bucket_iseither(self->buckets, i) == 0) { \
+        out->buf[out->len++] = self->keys[i]; \
+      } \
+    } \
+    return SUCCESS; \
+  } \
+  static inline err_t \
+  ID##_vals(ID##_t *restrict self, ID##_vals_t *out) { \
+    u32_t i; \
+    err_t err; \
+    ID##_vals_ctor(out); \
+    if ((err = ID##_vals_growth(out, self->len)) > 0) { \
+      return err; \
+    } \
+    for (i = 0; i < self->cap; ++i) { \
+      if (bucket_iseither(self->buckets, i) == 0) { \
+        out->buf[out->len++] = self->vals[i]; \
+      } \
+    } \
+    return SUCCESS; \
   }
 
-#define MAP_DEFINE(ID, TKey, TValue, HASH_FN, HASHEQ_FN) \
-  MAP_DEFINE_ALLOC(ID, TKey, TValue, HASH_FN, HASHEQ_FN, malloc, realloc, free)
+#define MAP_DEFINE(ID, TKey, TValue, TKey_CMP_FN, TValue_CMP_FN, HASH_FN, \
+  HASHEQ_FN) \
+  MAP_DEFINE_ALLOC(ID, TKey, TValue, TKey_CMP_FN, TValue_CMP_FN, HASH_FN, \
+    HASHEQ_FN, malloc, realloc, free)
 
-#define I8_MAP_DEFINE(ID, TValue) \
-  MAP_DEFINE(ID, i8_t, TValue, i8_hash, i8eq)
+#define I8_MAP_DEFINE(ID, TValue, TValue_CMP_FN) \
+  MAP_DEFINE(ID, i8_t, TValue, i8cmp, TValue_CMP_FN, i8_hash, i8eq)
 
-#define U8_MAP_DEFINE(ID, TValue) \
-  MAP_DEFINE(ID, u8_t, TValue, u8_hash, u8eq)
+#define U8_MAP_DEFINE(ID, TValue, TValue_CMP_FN) \
+  MAP_DEFINE(ID, u8_t, TValue, u8cmp, TValue_CMP_FN, u8_hash, u8eq)
 
-#define I16_MAP_DEFINE(ID, TValue) \
-  MAP_DEFINE(ID, i16_t, TValue, i16_hash, i16eq)
+#define I16_MAP_DEFINE(ID, TValue, TValue_CMP_FN) \
+  MAP_DEFINE(ID, i16_t, TValue, i16cmp, TValue_CMP_FN, i16_hash, i16eq)
 
-#define U16_MAP_DEFINE(ID, TValue) \
-  MAP_DEFINE(ID, u16_t, TValue, u16_hash, u16eq)
+#define U16_MAP_DEFINE(ID, TValue, TValue_CMP_FN) \
+  MAP_DEFINE(ID, u16_t, TValue, u16cmp, TValue_CMP_FN, u16_hash, u16eq)
 
-#define I32_MAP_DEFINE(ID, TValue) \
-  MAP_DEFINE(ID, i32_t, TValue, i32_hash, i32eq)
+#define I32_MAP_DEFINE(ID, TValue, TValue_CMP_FN) \
+  MAP_DEFINE(ID, i32_t, TValue, i32cmp, TValue_CMP_FN, i32_hash, i32eq)
 
-#define U32_MAP_DEFINE(ID, TValue) \
-  MAP_DEFINE(ID, u32_t, TValue, u32_hash, u32eq)
+#define U32_MAP_DEFINE(ID, TValue, TValue_CMP_FN) \
+  MAP_DEFINE(ID, u32_t, TValue, u32cmp, TValue_CMP_FN, u32_hash, u32eq)
 
-#define I64_MAP_DEFINE(ID, TValue) \
-  MAP_DEFINE(ID, i64_t, TValue, i64_hash, i64eq)
+#define I64_MAP_DEFINE(ID, TValue, TValue_CMP_FN) \
+  MAP_DEFINE(ID, i64_t, TValue, i64cmp, TValue_CMP_FN, i64_hash, i64eq)
 
-#define U64_MAP_DEFINE(ID, TValue) \
-  MAP_DEFINE(ID, u64_t, TValue, u64_hash, u64eq)
+#define U64_MAP_DEFINE(ID, TValue, TValue_CMP_FN) \
+  MAP_DEFINE(ID, u64_t, TValue, u64cmp, TValue_CMP_FN, u64_hash, u64eq)
 
-#define STR_MAP_DEFINE(ID, TValue) \
-  MAP_DEFINE(ID, const i8_t *, TValue, str_hash, streq)
-
-MAP_DECLARE(U_API, i8, i8_t, void *);
-MAP_DECLARE(U_API, u8, u8_t, void *);
-MAP_DECLARE(U_API, i16, i16_t, void *);
-MAP_DECLARE(U_API, u16, u16_t, void *);
-MAP_DECLARE(U_API, i32, i32_t, void *);
-MAP_DECLARE(U_API, u32, u32_t, void *);
-MAP_DECLARE(U_API, i64, i64_t, void *);
-MAP_DECLARE(U_API, u64, u64_t, void *);
-MAP_DECLARE(U_API, str, const i8_t *, void *);
+#define STR_MAP_DEFINE(ID, TValue, TValue_CMP_FN) \
+  MAP_DEFINE(ID, const i8_t *, TValue, strcmp, TValue_CMP_FN, str_hash, streq)
 
 #endif /* !__DS_MAP_H */

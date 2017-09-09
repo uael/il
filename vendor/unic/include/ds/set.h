@@ -46,28 +46,12 @@ typedef enum set_put set_put_t;
     TItem *items; \
   }
 
-#define SET_DECLARE(SCOPE, ID, TItem) \
-  typedef setof(TItem) ID##_set_t; \
-  SCOPE void \
-  ID##_set##_ctor(ID##_set_t *restrict self); \
-  SCOPE void \
-  ID##_set##_dtor(ID##_set_t *restrict self); \
-  SCOPE void \
-  ID##_set##_clear(ID##_set_t *restrict self); \
-  SCOPE u8_t \
-  ID##_set##_resize(ID##_set_t *restrict self, u32_t ensure); \
-  SCOPE bool_t \
-  ID##_set##_get(const ID##_set_t *self, TItem item, u32_t *restrict out); \
-  SCOPE set_put_t \
-  ID##_set##_put(ID##_set_t *restrict self, TItem item, u32_t *restrict out); \
-  SCOPE bool_t \
-  ID##_set##_del(ID##_set_t *restrict self, u32_t x)
-
 #define SET_DEFINE_ALLOC(ID, TItem, HASH_FN, HASHEQ_FN, \
   MALLOC_FN, REALLOC_FN, FREE_FN) \
-  inline void \
-  ID##_set##_ctor(ID##_set_t *restrict self) { \
-    *self = (ID##_set_t) { \
+  typedef setof(TItem) ID##_t; \
+  static inline void \
+  ID##_ctor(ID##_t *restrict self) { \
+    *self = (ID##_t) { \
       .cap = 0, \
       .len = 0, \
       .occupieds = 0, \
@@ -76,22 +60,22 @@ typedef enum set_put set_put_t;
       .items = nil \
     }; \
   } \
-  inline void \
-  ID##_set##_dtor(ID##_set_t *restrict self) { \
+  static inline void \
+  ID##_dtor(ID##_t *restrict self) { \
     if (self && self->buckets) { \
       FREE_FN((void *)self->items); \
       FREE_FN(self->buckets); \
     } \
   } \
-  inline void \
-  ID##_set##_clear(ID##_set_t *restrict self) { \
+  static inline void \
+  ID##_clear(ID##_t *restrict self) { \
     if (self && self->buckets) { \
       memset(self->buckets, BUCKET_EMPTY, self->cap); \
       self->len = self->occupieds = 0; \
     } \
   } \
-  inline bool_t \
-  ID##_set##_get(const ID##_set_t *self, TItem item, u32_t *restrict out) { \
+  static inline bool_t \
+  ID##_get(const ID##_t *self, TItem item, u32_t *restrict out) { \
     if (self->cap) { \
       u32_t k, i, last, mask, step; \
       step = 0; \
@@ -112,8 +96,8 @@ typedef enum set_put set_put_t;
     } \
     return false; \
   } \
-  inline u8_t \
-  ID##_set##_resize(ID##_set_t *restrict self, u32_t ensure) { \
+  static inline u8_t \
+  ID##_resize(ID##_t *restrict self, u32_t ensure) { \
     u8_t *new_buckets; \
     u32_t j; \
     new_buckets = nil; \
@@ -167,15 +151,15 @@ typedef enum set_put set_put_t;
     } \
     return 0; \
   } \
-  inline set_put_t \
-  ID##_set##_put(ID##_set_t *restrict self, TItem item, u32_t *restrict out) { \
+  static inline set_put_t \
+  ID##_put(ID##_t *restrict self, TItem item, u32_t *restrict out) { \
     u32_t x; \
     if (self->occupieds >= self->upper_bound) { /* update the hash table */ \
       if (self->cap > (self->len << 1)) { \
-        if (ID##_set##_resize(self, self->cap - 1) != 0) { /* clear "deleted" elements */ \
+        if (ID##_resize(self, self->cap - 1) != 0) { /* clear "deleted" elements */ \
           return SET_PUT_ALLOC_FAILURE; \
         } \
-      } else if (ID##_set##_resize(self, self->cap + 1) != 0) { /* expand the hash table */ \
+      } else if (ID##_resize(self, self->cap + 1) != 0) { /* expand the hash table */ \
          return SET_PUT_ALLOC_FAILURE; \
       } \
     } /* TODO: to implement automatically shrinking; resize() already support shrinking */ \
@@ -211,8 +195,8 @@ typedef enum set_put set_put_t;
     } \
     return SET_PUT_POPULATED; /* Don't touch self->items[x] if populated */ \
   } \
-  inline bool_t \
-  ID##_set##_del(ID##_set_t *restrict self, u32_t x) { \
+  static inline bool_t \
+  ID##_del(ID##_t *restrict self, u32_t x) { \
     if (x != self->cap && bucket_ispopulated(self->buckets, x)) { \
       bucket_set_isdel_true(self->buckets, x); \
       --self->len; \
@@ -251,14 +235,14 @@ typedef enum set_put set_put_t;
 #define STR_SET_DEFINE(ID) \
   SET_DEFINE(ID, const i8_t *, str_hash, streq)
 
-SET_DECLARE(U_API, i8, i8_t);
-SET_DECLARE(U_API, u8, u8_t);
-SET_DECLARE(U_API, i16, i16_t);
-SET_DECLARE(U_API, u16, u16_t);
-SET_DECLARE(U_API, i32, i32_t);
-SET_DECLARE(U_API, u32, u32_t);
-SET_DECLARE(U_API, i64, i64_t);
-SET_DECLARE(U_API, u64, u64_t);
-SET_DECLARE(U_API, str, const i8_t *);
+I8_SET_DEFINE(i8set);
+U8_SET_DEFINE(u8set);
+I16_SET_DEFINE(i16set);
+U16_SET_DEFINE(u16set);
+I32_SET_DEFINE(i32set);
+U32_SET_DEFINE(u32set);
+I64_SET_DEFINE(i64set);
+U64_SET_DEFINE(u64set);
+STR_SET_DEFINE(strset);
 
 #endif /* !__DS_SET_H */

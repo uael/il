@@ -1,0 +1,3 @@
+[submodule "vendor/uael/unic"]
+	path = vendor/uael/unic
+	url = https://github.com/uael/unic

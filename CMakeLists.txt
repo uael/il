@@ -3,7 +3,6 @@ cmake_policy(SET CMP0054 OLD)
 cmake_policy(SET CMP0045 OLD)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
-include(LoadLLVM)
 include(ProjectDependency)
 
 project(il C)

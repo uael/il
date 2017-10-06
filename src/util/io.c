@@ -25,7 +25,7 @@
 
 #include <il/adt/xmalloc.h>
 
-int64_t il_fsize(const char *path) {
+int64_t il_fsize(__const char *path) {
 #ifdef WIN32
   WIN32_FILE_ATTRIBUTE_DATA   fileInfo;
   if (GetFileAttributesExA(path, GetFileExInfoStandard, (void*)&fileInfo) == 0) return -1;
@@ -37,7 +37,7 @@ int64_t il_fsize(const char *path) {
 #endif
 }
 
-const char *il_fread(const char *path, size_t *len) {
+__const char *il_fread(__const char *path, size_t *len) {
   int fd = 0;
   off_t fsize = 0;
   ssize_t fsize2 = 0;
@@ -58,7 +58,7 @@ const char *il_fread(const char *path, size_t *len) {
 
   if (len) *len = (size_t) fsize2;
   close(fd);
-  return (const char *) buffer;
+  return (__const char *) buffer;
 
   abort_read:
   if (buffer) xfree((void *) buffer);
@@ -66,7 +66,7 @@ const char *il_fread(const char *path, size_t *len) {
   return NULL;
 }
 
-bool il_fexists(const char *path) {
+bool il_fexists(__const char *path) {
 #ifdef WIN32
   BOOL isDirectory;
   DWORD attributes = GetFileAttributesA(path);
@@ -90,7 +90,7 @@ bool il_fexists(const char *path) {
   return false;
 }
 
-bool il_fwrite(const char *path, const char *buffer, size_t len) {
+bool il_fwrite(__const char *path, __const char *buffer, size_t len) {
   // RW for owner, R for group, R for others
 #ifdef _WIN32
   unsigned mode = _S_IWRITE;
@@ -108,7 +108,7 @@ bool il_fwrite(const char *path, const char *buffer, size_t len) {
 }
 
 
-bool il_is_dir(const char *path) {
+bool il_is_dir(__const char *path) {
 #ifdef WIN32
   DWORD dwAttrs;
 
@@ -125,7 +125,7 @@ bool il_is_dir(const char *path) {
   return false;
 }
 
-DIRREF il_dir_init(const char *dirpath) {
+DIRREF il_dir_init(__const char *dirpath) {
 #ifdef WIN32
   WIN32_FIND_DATA findData;
   WCHAR			path[MAX_PATH];
@@ -147,7 +147,7 @@ DIRREF il_dir_init(const char *dirpath) {
 #endif
 }
 
-const char *il_dread(DIRREF ref) {
+__const char *il_dread(DIRREF ref) {
   if (ref == NULL) return NULL;
 
   while (1) {
@@ -162,7 +162,7 @@ const char *il_dread(DIRREF ref) {
     if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) continue;
     if (findData.cFileName == NULL) continue;
     if (findData.cFileName[0] == '.') continue;
-    return (const char*)findData.cFileName;
+    return (__const char*)findData.cFileName;
 #else
     struct dirent *d;
     if ((d = readdir(ref)) == NULL) {
@@ -171,7 +171,7 @@ const char *il_dread(DIRREF ref) {
     }
     if (d->d_name[0] == 0) continue;
     if (d->d_name[0] == '.') continue;
-    return (const char *) d->d_name;
+    return (__const char *) d->d_name;
 #endif
   }
   return NULL;

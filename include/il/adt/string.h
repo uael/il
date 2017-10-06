@@ -25,21 +25,21 @@
 #include "vector.h"
 #include "xmalloc.h"
 
-typedef adt_vector_of(const char *) string_r;
+typedef adt_vector_of(__const char *) string_r;
 
 /**
  * Allocates memory and copies string @p str into it.
  * This is a wrapper for strdup which calls panic() in case of errors, so no
  * error handling is required for code using it.
  */
-char *xstrdup(const char *str);
+char *xstrdup(__const char *str);
 
 /**
  * Allocates memory and copies string @p str into it.
  * This is a wrapper for strndup which calls panic() in case of errors, so no
  * error handling is required for code using it.
  */
-char *xstrndup(const char *str, size_t n);
+char *xstrndup(__const char *str, size_t n);
 
 /**
  * Sets `char **' pointer to be a buffer
@@ -48,7 +48,7 @@ char *xstrndup(const char *str, size_t n);
  * arguments.
  */
 
-int vasprintf(char **, const char *, va_list);
+int vasprintf(char **, __const char *, va_list);
 
 /**
  * Sets `char **' pointer to be a buffer
@@ -57,6 +57,6 @@ int vasprintf(char **, const char *, va_list);
  * variadic arguments.
  */
 
-int asprintf(char **, const char *, ...);
+int asprintf(char **, __const char *, ...);
 
 #endif /* IL_STRING_H__ */

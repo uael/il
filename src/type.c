@@ -274,7 +274,7 @@ il_entity_r il_type_fields(il_type_t self) {
   return il_entity_fields(*self.compound.entity);
 }
 
-il_field_t *il_field_lookup(il_type_t self, const char *name) {
+il_field_t *il_field_lookup(il_type_t self, __const char *name) {
   return il_entity_field_lookup(*self.compound.entity, name);
 }
 

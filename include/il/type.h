@@ -56,7 +56,7 @@ bool il_type_is_func(il_type_t type);
 bool il_type_equals(il_type_t a, il_type_t b);
 il_type_t il_type_deref(il_type_t a);
 il_entity_r il_type_fields(il_type_t self);
-il_field_t *il_field_lookup(il_type_t self, const char *name);
+il_field_t *il_field_lookup(il_type_t self, __const char *name);
 unsigned il_type_merge(il_type_t *self, enum il_type_n with);
 
 #endif /* IL_TYPE_H__ */

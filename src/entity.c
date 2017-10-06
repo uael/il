@@ -30,7 +30,7 @@
 #include "il/type.h"
 #include "il/compiler.h"
 
-il_entity_t il_field(UNUSED const char *name, il_type_t type) {
+il_entity_t il_field(UNUSED __const char *name, il_type_t type) {
   return (il_entity_t) {
     .kind = IL_ENTITY_FIELD,
     .field = {
@@ -46,19 +46,19 @@ static void il_field_dtor(il_field_t *self) {
   il_type_dtor(&self->type);
 }
 
-il_entity_t il_var_int(const char *name, int d) {
+il_entity_t il_var_int(__const char *name, int d) {
   return il_var(name, il_type_undefined(), il_const_int(il_no_lloc(), d));
 }
 
-il_entity_t il_var_float(const char *name, float f) {
+il_entity_t il_var_float(__const char *name, float f) {
   return il_var(name, il_type_undefined(), il_const_float(il_no_lloc(), f));
 }
 
-il_entity_t il_var_string(const char *name, const char *s) {
+il_entity_t il_var_string(__const char *name, __const char *s) {
   return il_var(name, il_type_undefined(), il_const_string(il_no_lloc(), s));
 }
 
-il_entity_t il_var(const char *name, il_type_t type, il_expr_t initializer) {
+il_entity_t il_var(__const char *name, il_type_t type, il_expr_t initializer) {
   if (!il_defined(type)) {
     type = initializer.type;
   } else if (!il_type_equals(type, initializer.type)) {
@@ -81,19 +81,19 @@ static void il_var_dtor(il_var_t *self) {
   il_expr_dtor(&self->initializer);
 }
 
-il_entity_t il_param_int(unsigned position, const char *name, int d) {
+il_entity_t il_param_int(unsigned position, __const char *name, int d) {
   return il_param(position, name, il_type_undefined(), il_const_int(il_no_lloc(), d));
 }
 
-il_entity_t il_param_float(unsigned position, const char *name, float f) {
+il_entity_t il_param_float(unsigned position, __const char *name, float f) {
   return il_param(position, name, il_type_undefined(), il_const_float(il_no_lloc(), f));
 }
 
-il_entity_t il_param_string(unsigned position, const char *name, const char *s) {
+il_entity_t il_param_string(unsigned position, __const char *name, __const char *s) {
   return il_param(position, name, il_type_undefined(), il_const_string(il_no_lloc(), s));
 }
 
-il_entity_t il_param(unsigned position, const char *name, il_type_t type, il_expr_t initializer) {
+il_entity_t il_param(unsigned position, __const char *name, il_type_t type, il_expr_t initializer) {
   if (!il_defined(type)) {
     type = initializer.type;
   } else if (!il_type_equals(type, initializer.type)) {
@@ -117,11 +117,11 @@ static void il_param_dtor(il_param_t *self) {
   il_expr_dtor(&self->initializer);
 }
 
-il_entity_t il_func_decl(il_type_t return_type, const char *name, il_param_t *params) {
+il_entity_t il_func_decl(il_type_t return_type, __const char *name, il_param_t *params) {
   return il_func(return_type, name, params, il_stmt_undefined());
 }
 
-il_entity_t il_proc_decl(const char *name, il_param_t *params) {
+il_entity_t il_proc_decl(__const char *name, il_param_t *params) {
   return il_func(il_void(), name, params, il_stmt_undefined());
 }
 
@@ -135,7 +135,7 @@ il_entity_t il_func_def(il_func_t prototype, il_stmt_t body) {
   return entity;
 }
 
-il_entity_t il_func(il_type_t return_type, const char *name, il_param_t *params, il_stmt_t body) {
+il_entity_t il_func(il_type_t return_type, __const char *name, il_param_t *params, il_stmt_t body) {
   unsigned count = 0;
   il_param_t param;
   il_entity_t entity = (il_entity_t) {
@@ -168,7 +168,7 @@ il_entity_t il_enum_anonymous(il_field_t *fields) {
   return il_enum(NULL, fields);
 }
 
-il_entity_t il_enum(const char *name, il_field_t *fields) {
+il_entity_t il_enum(__const char *name, il_field_t *fields) {
   il_field_t field;
   il_entity_t entity = (il_entity_t) {
     .kind = IL_ENTITY_ENUM,
@@ -195,12 +195,12 @@ static void il_enum_dtor(il_enum_t *self) {
   adt_vector_dtor(self->vars);
 }
 
-static il_entity_t *type_add_field(il_entity_t *self, const char *name, il_type_t type, unsigned short width);
+static il_entity_t *type_add_field(il_entity_t *self, __const char *name, il_type_t type, unsigned short width);
 
 static UNUSED void reset_field_alignment(il_entity_t *self) {
   int d;
   size_t n;
-  const il_entity_t *m;
+  __const il_entity_t *m;
 
   assert(il_pis(self, IL_ENTITY_STRUCT));
   n = adt_vector_length(self->structure.fields);
@@ -268,7 +268,7 @@ static il_entity_t *add_member(il_entity_t *self, il_entity_t m) {
   return member;
 }
 
-static int pack_field(const il_entity_t *prev, il_entity_t *m) {
+static int pack_field(__const il_entity_t *prev, il_entity_t *m) {
   unsigned short bits;
 
   assert(prev);
@@ -315,9 +315,9 @@ static size_t remove_anonymous_fields(il_entity_t *self) {
   return maxalign;
 }
 
-static il_entity_t *type_add_field(il_entity_t *self, const char *name, il_type_t type, unsigned short width) {
+static il_entity_t *type_add_field(il_entity_t *self, __const char *name, il_type_t type, unsigned short width) {
   il_entity_t m;
-  const il_entity_t *prev;
+  __const il_entity_t *prev;
 
   m = il_field(name, type);
   m.field.field_width = width;
@@ -387,7 +387,7 @@ void type_seal(il_entity_t *self) {
   }
 }
 
-il_entity_t il_struct(const char *name, il_field_t *fields) {
+il_entity_t il_struct(__const char *name, il_field_t *fields) {
   il_entity_t entity = (il_entity_t) {
     .kind = IL_ENTITY_STRUCT,
     .structure = {
@@ -419,7 +419,7 @@ void il_struct_dtor(il_struct_t *self) {
   adt_vector_dtor(self->fields);
 }
 
-il_entity_t il_union(const char *name, il_field_t *fields) {
+il_entity_t il_union(__const char *name, il_field_t *fields) {
   il_entity_t entity = (il_entity_t) {
     .kind = IL_ENTITY_UNION,
     .u_structure = {
@@ -525,7 +525,7 @@ il_entity_r il_entity_fields(il_entity_t self) {
   }
 }
 
-il_field_t *il_entity_field_lookup(il_entity_t self, const char *name) {
+il_field_t *il_entity_field_lookup(il_entity_t self, __const char *name) {
   il_entity_r fields;
   il_entity_t entity;
 
@@ -552,7 +552,7 @@ il_field_t *il_entity_field_lookup(il_entity_t self, const char *name) {
   return NULL;
 }
 
-il_entity_t *il_entity_add_field(il_entity_t *self, const char *name, il_type_t type, short width) {
+il_entity_t *il_entity_add_field(il_entity_t *self, __const char *name, il_type_t type, short width) {
   il_entity_t m;
 
   if (width) {

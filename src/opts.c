@@ -33,7 +33,7 @@
 bool il_opts_init(il_opts_t *self, int argc, char **argv) {
   char err[256], *sep, *arg;
   int value;
-  static const char *usage =
+  static __const char *usage =
     BOLD "Usage:" BOLD RED " %s" RESET " [options] file\n"
     "%s compiler options:\n"
     "  -h [ --help ]              print this help message\n"

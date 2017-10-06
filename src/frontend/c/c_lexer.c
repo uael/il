@@ -91,14 +91,14 @@ void c_lexer_init(il_lexer_t *self) {
 
 
 static void c_lexer_enqueue(il_lexer_t *self, unsigned n) {
-  static const il_token_t tokens[] = {
+  static __const il_token_t tokens[] = {
     /* 0x00 */
     XSYNT(C_TOK_END, "\0", "END"),
     KEYWD(C_TOK_AUTO, "auto"),
     KEYWD(C_TOK_BREAK, "break"),
     KEYWD(C_TOK_CASE, "case"),
     KEYWD(C_TOK_CHAR, "char"),
-    KEYWD(C_TOK_CONST, "const"),
+    KEYWD(C_TOK_CONST, "__const"),
     KEYWD(C_TOK_CONTINUE, "continue"),
     KEYWD(C_TOK_DEFAULT, "default"),
 

@@ -62,7 +62,7 @@ static void il_exprs_dtor(il_exprs_t *self) {
   adt_vector_dtor(self->vector);
 }
 
-il_expr_t il_id(il_lloc_t lloc, const char *id, il_type_t type) {
+il_expr_t il_id(il_lloc_t lloc, __const char *id, il_type_t type) {
   return (il_expr_t) {
     .kind = IL_EXPR_ID,
     .id = {
@@ -85,7 +85,7 @@ il_expr_t il_const_float(il_lloc_t lloc, float f) {
   return il_const(lloc, il_val(il_float(), .f = f));
 }
 
-il_expr_t il_const_string(il_lloc_t lloc, const char *s) {
+il_expr_t il_const_string(il_lloc_t lloc, __const char *s) {
   return il_const(lloc, il_val(il_pointer(il_char()), .s = s));
 }
 
@@ -441,8 +441,8 @@ static il_type_t constant_integer_type(unsigned long int value, enum suffix suff
   }
 }
 
-int il_const_parse(il_lloc_t lloc, const char *s, size_t len, il_expr_t *out) {
-  const char *str;
+int il_const_parse(il_lloc_t lloc, __const char *s, size_t len, il_expr_t *out) {
+  __const char *str;
   char *endptr;
   enum suffix suffix;
 

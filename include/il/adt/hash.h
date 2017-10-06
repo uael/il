@@ -195,7 +195,7 @@ typedef khint_t khiter_t;
 #define kfree(P) free(P)
 #endif
 
-static const double __ac_HASH_UPPER = 0.77;
+static __const double __ac_HASH_UPPER = 0.77;
 
 #define __KHASH_TYPE(name, khkey_t, khval_t) \
 	typedef struct name##_t { \
@@ -210,7 +210,7 @@ static const double __ac_HASH_UPPER = 0.77;
 	extern void name##_dtor(name##_t *h); \
 	extern void name##_free(name##_t *h); \
 	extern void name##_clear(name##_t *h); \
-	extern khint_t name##_get(const name##_t *h, khkey_t key); \
+	extern khint_t name##_get(__const name##_t *h, khkey_t key); \
 	extern int name##_resize(name##_t *h, khint_t new_n_buckets); \
 	extern khint_t name##_put(name##_t *h, khkey_t key, int *ret); \
 	extern void name##_del(name##_t *h, khint_t x);
@@ -236,7 +236,7 @@ static const double __ac_HASH_UPPER = 0.77;
 			h->size = h->n_occupied = 0; \
 		} \
 	} \
-	SCOPE khint_t name##_get(const name##_t *h, khkey_t key) { \
+	SCOPE khint_t name##_get(__const name##_t *h, khkey_t key) { \
 		if (h->n_buckets) { \
       khint_t k, i, last, mask, step = 0; \
       mask = h->n_buckets - 1; \
@@ -399,19 +399,19 @@ static const double __ac_HASH_UPPER = 0.77;
 */
 #define kh_int64_hash_equal(a, b) ((a) == (b))
 /*! @function
-@abstract     const char* hash function
+@abstract     __const char* hash function
 @param  s     Pointer to a null terminated string
 @return       The hash value
 */
-static kh_inline khint_t __ac_X31_hash_string(const char *s)
+static kh_inline khint_t __ac_X31_hash_string(__const char *s)
 {
   khint_t h = (khint_t)*s;
   if (h) for (++s; *s; ++s) h = (h << 5) - h + (khint_t)*s;
   return h;
 }
 /*! @function
-@abstract     Another interface to const char* hash function
-@param  key   Pointer to a null terminated string [const char*]
+@abstract     Another interface to __const char* hash function
+@param  key   Pointer to a null terminated string [__const char*]
 @return       The hash value [khint_t]
 */
 #define kh_str_hash_func(key) __ac_X31_hash_string(key)
@@ -622,16 +622,16 @@ the bucket has been deleted [int*]
 #define KHASH_MAP_INIT_INT64(name, khval_t) \
 	KHASH_INIT(name, khint64_t, khval_t, 1, kh_int64_hash_func, kh_int64_hash_equal)
 
-typedef const char *kh_cstr_t;
+typedef __const char *kh_cstr_t;
 /*! @function
-@abstract     Instantiate a hash map containing const char* keys
+@abstract     Instantiate a hash map containing __const char* keys
 @param  name  Name of the hash table [symbol]
 */
 #define KHASH_SET_INIT_STR(name) \
 	KHASH_INIT(name, kh_cstr_t, char, 0, kh_str_hash_func, kh_str_hash_equal)
 
 /*! @function
-@abstract     Instantiate a hash map containing const char* keys
+@abstract     Instantiate a hash map containing __const char* keys
 @param  name  Name of the hash table [symbol]
 @param  khval_t  Type of values [type]
 */

@@ -46,7 +46,7 @@ void il_fe_init(il_parser_t *self, enum il_parser_n kind, il_compiler_t *compile
 }
 
 void il_fe_dtor(il_parser_t *self) {
-  const char *src;
+  __const char *src;
 
   adt_vector_foreach(self->sources, src) {
     xfree((void *) src);
@@ -80,8 +80,8 @@ void il_fe_parse(il_parser_t *self, il_lexer_t *lexer, struct il_program_t *out)
   }
 }
 
-void il_fe_push_src(il_parser_t *self, const char *src) {
-  const char *file;
+void il_fe_push_src(il_parser_t *self, __const char *src) {
+  __const char *file;
 
 #ifdef _MSC_VER
   // todo

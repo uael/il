@@ -59,7 +59,7 @@ struct il_lexer_t {
   void (*enqueue)(il_lexer_t *self, unsigned n);
 };
 
-void il_lexer_init(il_lexer_t *self, struct il_compiler_t *compiler, uint32_t file_id, const char *buffer, size_t length);
+void il_lexer_init(il_lexer_t *self, struct il_compiler_t *compiler, uint32_t file_id, __const char *buffer, size_t length);
 void il_lexer_init_f(il_lexer_t *self, struct il_parser_t *fe);
 void il_lexer_dtor(il_lexer_t *self, bool free_all);
 void il_lexer_fork(il_lexer_t *destination, il_lexer_t *source);
@@ -75,7 +75,7 @@ il_token_t il_lexer_peek(il_lexer_t *self);
 il_token_t il_lexer_peekn(il_lexer_t *self, unsigned n);
 il_token_t il_lexer_next(il_lexer_t *self);
 il_token_t il_lexer_consume(il_lexer_t *self, unsigned char type);
-il_token_t il_lexer_consume_id(il_lexer_t *self, const char *id);
+il_token_t il_lexer_consume_id(il_lexer_t *self, __const char *id);
 void il_lexer_undo(il_lexer_t *lexer, il_token_t until);
 void il_lexer_undon(il_lexer_t *lexer, unsigned n);
 

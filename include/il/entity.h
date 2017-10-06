@@ -24,30 +24,30 @@
 #define il_entity_undefined() ((il_entity_t) {.kind = IL_ENTITY_UNDEFINED})
 #define il_entity_undef(eptr) (*(eptr) = il_entity_undefined())
 
-il_entity_t il_field(const char *name, il_type_t type);
-il_entity_t il_var_int(const char *name, int d);
-il_entity_t il_var_float(const char *name, float f);
-il_entity_t il_var_string(const char *name, const char *s);
-il_entity_t il_var(const char *name, il_type_t type, il_expr_t initializer);
-il_entity_t il_param_int(unsigned position, const char *name, int d);
-il_entity_t il_param_float(unsigned position, const char *name, float f);
-il_entity_t il_param_string(unsigned position, const char *name, const char *s);
-il_entity_t il_param(unsigned position, const char *name, il_type_t type, il_expr_t initializer);
-il_entity_t il_func_decl(il_type_t return_type, const char *name, il_param_t *params);
-il_entity_t il_proc_decl(const char *name, il_param_t *params);
+il_entity_t il_field(__const char *name, il_type_t type);
+il_entity_t il_var_int(__const char *name, int d);
+il_entity_t il_var_float(__const char *name, float f);
+il_entity_t il_var_string(__const char *name, __const char *s);
+il_entity_t il_var(__const char *name, il_type_t type, il_expr_t initializer);
+il_entity_t il_param_int(unsigned position, __const char *name, int d);
+il_entity_t il_param_float(unsigned position, __const char *name, float f);
+il_entity_t il_param_string(unsigned position, __const char *name, __const char *s);
+il_entity_t il_param(unsigned position, __const char *name, il_type_t type, il_expr_t initializer);
+il_entity_t il_func_decl(il_type_t return_type, __const char *name, il_param_t *params);
+il_entity_t il_proc_decl(__const char *name, il_param_t *params);
 il_entity_t il_func_def(il_func_t prototype, il_stmt_t body);
-il_entity_t il_func(il_type_t return_type, const char *name, il_param_t *params, il_stmt_t body);
+il_entity_t il_func(il_type_t return_type, __const char *name, il_param_t *params, il_stmt_t body);
 il_entity_t il_enum_anonymous(il_field_t *fields);
-il_entity_t il_enum(const char *name, il_field_t *fields);
+il_entity_t il_enum(__const char *name, il_field_t *fields);
 il_entity_t il_struct_anonymous(il_field_t *fields);
-il_entity_t il_struct(const char *name, il_field_t *fields);
+il_entity_t il_struct(__const char *name, il_field_t *fields);
 il_entity_t il_union_anonymous(il_field_t *fields);
-il_entity_t il_union(const char *name, il_field_t *fields);
+il_entity_t il_union(__const char *name, il_field_t *fields);
 
 void il_entity_dtor(il_entity_t *self);
 bool il_entity_equals(il_entity_t a, il_entity_t b);
 il_entity_r il_entity_fields(il_entity_t self);
-il_field_t *il_entity_field_lookup(il_entity_t self, const char *name);
-il_entity_t *il_entity_add_field(il_entity_t *self, const char *name, il_type_t type, short width);
+il_field_t *il_entity_field_lookup(il_entity_t self, __const char *name);
+il_entity_t *il_entity_add_field(il_entity_t *self, __const char *name, il_type_t type, short width);
 
 #endif /* IL_ENTITY_H__ */

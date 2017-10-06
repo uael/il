@@ -47,7 +47,7 @@ void il_init(il_compiler_t *self, int argc, char **argv) {
 }
 
 void il_dtor(il_compiler_t *self) {
-  const char *str;
+  __const char *str;
 
   il_opts_dtor(&self->opts);
   if (il_defined(self->fe)) {
@@ -63,7 +63,7 @@ void il_parse(il_compiler_t *self) {
   il_fe_parse(&self->fe, NULL, &self->ast);
 }
 
-NORETURN void il_err(il_compiler_t *self, const char *format, ...) {
+NORETURN void il_err(il_compiler_t *self, __const char *format, ...) {
   va_list args;
 
   if (self) {
@@ -82,7 +82,7 @@ NORETURN void il_err(il_compiler_t *self, const char *format, ...) {
   exit(EXIT_FAILURE);
 }
 
-NORETURN void il_fatal_err(il_compiler_t *self, const char *format, ...) {
+NORETURN void il_fatal_err(il_compiler_t *self, __const char *format, ...) {
   va_list args;
 
   if (self) {
@@ -101,9 +101,9 @@ NORETURN void il_fatal_err(il_compiler_t *self, const char *format, ...) {
   exit(EXIT_FAILURE);
 }
 
-NORETURN void il_parse_err(il_compiler_t *self, il_loc_t loc, const char *format, ...) {
+NORETURN void il_parse_err(il_compiler_t *self, il_loc_t loc, __const char *format, ...) {
   size_t begin = loc.position - loc.colno;
-  const char *ptr, *file;
+  __const char *ptr, *file;
   il_lexer_t lexer = (il_lexer_t) {0};
   il_token_t eol;
   va_list args;
@@ -129,11 +129,11 @@ NORETURN void il_parse_err(il_compiler_t *self, il_loc_t loc, const char *format
   exit(EXIT_FAILURE);
 }
 
-const char *il_strdup(il_compiler_t *self, const char *str) {
+__const char *il_strdup(il_compiler_t *self, __const char *str) {
   return il_strndup(self, str, strlen(str));
 }
 
-const char *il_strndup(il_compiler_t *self, const char *str, size_t n) {
+__const char *il_strndup(il_compiler_t *self, __const char *str, size_t n) {
   adt_vector_push(self->strtab, "");
   adt_vector_back(self->strtab) = xmalloc(n + 1);
   strncpy((char *) adt_vector_back(self->strtab), str, n + 1);

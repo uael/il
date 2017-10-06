@@ -34,10 +34,10 @@
 #include <stddef.h>
 #include <u/stdbool.h>
 
-int64_t il_fsize(const char *path);
-const char *il_fread(const char *path, size_t *len);
-bool il_fexists(const char *path);
-bool il_fwrite(const char *path, const char *buffer, size_t len);
+int64_t il_fsize(__const char *path);
+__const char *il_fread(__const char *path, size_t *len);
+bool il_fexists(__const char *path);
+bool il_fwrite(__const char *path, __const char *buffer, size_t len);
 
 #if defined(_WIN32)
 # include <windows.h>
@@ -47,8 +47,8 @@ bool il_fwrite(const char *path, const char *buffer, size_t len);
 # define DIRREF DIR*
 #endif
 
-bool il_is_dir(const char *path);
-DIRREF il_dir_init(const char *path);
-const char *il_dread(DIRREF ref);
+bool il_is_dir(__const char *path);
+DIRREF il_dir_init(__const char *path);
+__const char *il_dread(DIRREF ref);
 
 #endif /* IL_IO_H__ */

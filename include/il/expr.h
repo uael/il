@@ -28,10 +28,10 @@
 
 il_expr_t il_exprs(il_expr_t *exprs);
 il_expr_t il_exprs_start(il_expr_t expr);
-il_expr_t il_id(il_lloc_t lloc, const char *id, il_type_t type);
+il_expr_t il_id(il_lloc_t lloc, __const char *id, il_type_t type);
 il_expr_t il_const_int(il_lloc_t lloc, int d);
 il_expr_t il_const_float(il_lloc_t lloc, float f);
-il_expr_t il_const_string(il_lloc_t lloc, const char *s);
+il_expr_t il_const_string(il_lloc_t lloc, __const char *s);
 il_expr_t il_const(il_lloc_t lloc, il_val_t value);
 il_expr_t il_unary(il_lloc_t op_lloc, enum il_op_n op, il_expr_t operand);
 il_expr_t il_cast(il_lloc_t type_lloc, il_type_t type, il_expr_t operand);
@@ -45,7 +45,7 @@ il_expr_t il_call(il_expr_t lhs, il_lloc_t args_lloc, il_exprs_t args);
 
 void il_expr_dtor(il_expr_t *self);
 bool il_expr_is_constant(il_expr_t self);
-int il_const_parse(il_lloc_t lloc, const char *s, size_t len, il_expr_t *out);
+int il_const_parse(il_lloc_t lloc, __const char *s, size_t len, il_expr_t *out);
 long il_eval_long(il_expr_t expr);
 unsigned long il_eval_ulong(il_expr_t expr);
 

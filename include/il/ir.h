@@ -192,7 +192,7 @@ enum il_op_n {
 struct il_val {
   il_type_t type;
   union {
-    const char *s;
+    __const char *s;
     float f;
     double d;
     long double ld;
@@ -211,7 +211,7 @@ struct il_id {
   il_lloc_t lloc;
   il_type_t type;
 
-  const char *id;
+  __const char *id;
   bool is_keyword;
 };
 
@@ -225,7 +225,7 @@ struct il_const {
     struct {
       il_type_t type;
       union {
-        const char *s;
+        __const char *s;
         float f;
         double d;
         long double ld;
@@ -382,7 +382,7 @@ struct il_stmt_expr {
 struct il_stmt_label {
   il_lloc_t lloc;
 
-  const char *name;
+  __const char *name;
 };
 
 struct il_stmt_case {
@@ -443,7 +443,7 @@ struct il_stmt_for {
 struct il_stmt_goto {
   il_lloc_t lloc;
 
-  const char *label;
+  __const char *label;
 };
 
 struct il_stmt_break {
@@ -517,7 +517,7 @@ struct il_field {
   il_lloc_t lloc;
   size_t size, align;
   il_type_t type;
-  const char *name;
+  __const char *name;
 
   size_t offset;
   unsigned short field_width, field_offset;
@@ -527,7 +527,7 @@ struct il_var {
   il_lloc_t lloc;
   size_t size, align;
   il_type_t type;
-  const char *name;
+  __const char *name;
 
   il_expr_t initializer;
 };
@@ -536,7 +536,7 @@ struct il_param {
   il_lloc_t lloc;
   size_t size, align;
   il_type_t type;
-  const char *name;
+  __const char *name;
 
   unsigned position;
   il_expr_t initializer;
@@ -546,7 +546,7 @@ struct il_func {
   il_lloc_t lloc;
   size_t size, align;
   il_type_t return_type;
-  const char *name;
+  __const char *name;
 
   il_entity_r params;
   il_stmt_t body;
@@ -556,7 +556,7 @@ struct il_enum {
   il_lloc_t lloc;
   size_t size, align;
   il_type_t type;
-  const char *name;
+  __const char *name;
 
   il_entity_r vars;
 };
@@ -565,7 +565,7 @@ struct il_struct {
   il_lloc_t lloc;
   size_t size, align;
   il_type_t type;
-  const char *name;
+  __const char *name;
 
   il_entity_r fields;
 };
@@ -574,7 +574,7 @@ struct il_union {
   il_lloc_t lloc;
   size_t size, align;
   il_type_t type;
-  const char *name;
+  __const char *name;
 
   il_entity_r fields;
 };
@@ -583,7 +583,7 @@ struct il_label {
   il_lloc_t lloc;
   size_t size, align;
   il_type_t type;
-  const char *name;
+  __const char *name;
 
   il_stmt_t next;
 };
@@ -594,7 +594,7 @@ struct il_entity {
       il_lloc_t lloc;
       size_t size, align;
       il_type_t type;
-      const char *name;
+      __const char *name;
     };
     il_field_t field;
     il_var_t variable;

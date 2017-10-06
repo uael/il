@@ -28,14 +28,14 @@ struct ill_cfe {
 };
 
 int
-cfe_opt_echo(ill_t *il, UNUSED const char *val) {
+cfe_opt_echo(ill_t *il, UNUSED __const char *val) {
   ill_cfe_t *fe = (ill_cfe_t *) il->fe;
   fe->echo = true;
   return 0;
 }
 
 int
-cfe_opt_prepossess(ill_t *il, UNUSED const char *val) {
+cfe_opt_prepossess(ill_t *il, UNUSED __const char *val) {
   ill_cfe_t *fe = (ill_cfe_t *) il->fe;
   fe->prepossess = true;
   return 0;
@@ -43,11 +43,11 @@ cfe_opt_prepossess(ill_t *il, UNUSED const char *val) {
 
 struct ill_cbe {
   ILL_BE_SUPER;
-  const char *out;
+  __const char *out;
 };
 
 int
-cbe_opt_out(ill_t *il, const char *val) {
+cbe_opt_out(ill_t *il, __const char *val) {
   ill_cbe_t *be = (ill_cbe_t *) il->be;
   be->out = val;
   return 0;

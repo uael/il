@@ -40,7 +40,7 @@ typedef struct ill_opts ill_opts_t;
 typedef struct ill_opt ill_opt_t;
 typedef struct ill_err ill_err_t;
 
-typedef int (*ill_optcb_t)(void *app, const char *val);
+typedef int (*ill_optcb_t)(void *app, __const char *val);
 
 enum ill_errkind {
   IL_ERRKIND_OPTS,
@@ -81,7 +81,7 @@ struct ill_src {
 };
 
 void
-ill_src_init(ill_src_t *self, const char *filename) {
+ill_src_init(ill_src_t *self, __const char *filename) {
   char *sep = nullptr;
 
 #if !COMPILER_MSVC
@@ -122,7 +122,7 @@ struct ill_loc {
 struct ill_token {
   unsigned int kind : 4;
   char type;
-  const char *name, *value;
+  __const char *name, *value;
   size_t cursor;
   ill_loc_t loc;
   uint32_t length, leading_ws;
@@ -211,11 +211,11 @@ struct ill_opt {
   bool kval, global, match;
 };
 
-KHASH_DECLARE(ill_optmap, const char *, ill_opt_t)
+KHASH_DECLARE(ill_optmap, __const char *, ill_opt_t)
 KHASH_DECLARE(ill_optmap_sc, khint32_t, ill_opt_t *)
 
 struct ill_opts {
-  const char *program;
+  __const char *program;
   ill_optmap_t map;
   ill_optmap_sc_t map_sc;
   uvec_of(ill_err_t) errs;
@@ -299,7 +299,7 @@ ill_opt(ill_opts_t *opts, char id) {
 }
 
 ill_opt_t *
-ill_lopt(ill_opts_t *opts, const char *id) {
+ill_lopt(ill_opts_t *opts, __const char *id) {
   unsigned it;
 
   it = kh_get(ill_optmap, &opts->map, id);
@@ -392,7 +392,7 @@ ill_opts_parse(ill_opts_t *self, void *app_ptr, int argc, char **argv) {
 }
 
 int
-ill_push_input(ill_t *self, const char *filename) {
+ill_push_input(ill_t *self, __const char *filename) {
   ill_src_t src = {0};
 
   ill_src_init(&src, filename);

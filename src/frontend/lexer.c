@@ -27,7 +27,7 @@
 #include "il/compiler.h"
 #include "c/c_lexer.h"
 
-void il_lexer_init(il_lexer_t *self, il_compiler_t *compiler, uint32_t file_id, const char *buffer, size_t length) {
+void il_lexer_init(il_lexer_t *self, il_compiler_t *compiler, uint32_t file_id, __const char *buffer, size_t length) {
   *self = (il_lexer_t) {
     .compiler = compiler,
     .loc = (il_loc_t) {
@@ -55,7 +55,7 @@ void il_lexer_init(il_lexer_t *self, il_compiler_t *compiler, uint32_t file_id, 
 void il_lexer_init_f(il_lexer_t *self, il_parser_t *fe) {
   size_t len;
   uint32_t file_id;
-  const char *filename, *buffer;
+  __const char *filename, *buffer;
 
   if (!adt_deque_length(fe->sources)) {
     il_fatal_err(fe->compiler, "No input files");
@@ -246,7 +246,7 @@ il_token_t il_lexer_consume(il_lexer_t *self, unsigned char type) {
   return result;
 }
 
-il_token_t il_lexer_consume_id(il_lexer_t *self, const char *id) {
+il_token_t il_lexer_consume_id(il_lexer_t *self, __const char *id) {
   il_token_t result;
   if ((result = il_lexer_peek(self)).kind != IL_TOKEN_IDENTIFIER) {
     il_parse_err(self->compiler, result.loc,

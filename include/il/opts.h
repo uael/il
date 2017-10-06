@@ -39,7 +39,7 @@ enum il_backend_n {
 };
 
 struct il_opts_t {
-  const char *in, *out;
+  __const char *in, *out;
   char src_dir[UINT8_MAX];
   bool echo, firm_graph, verbose, output_asm;
   int optimize_lvl;

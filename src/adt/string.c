@@ -19,12 +19,12 @@
 #include <stdio.h>
 #include "il/adt/string.h"
 
-char *xstrdup(const char *str) {
+char *xstrdup(__const char *str) {
   size_t len = strlen(str) + 1;
   return (char *) memcpy(xmalloc(len), str, len);
 }
 
-char *xstrndup(const char *s, size_t n) {
+char *xstrndup(__const char *s, size_t n) {
   char *result;
   size_t len = strlen(s);
   if (len > n) {
@@ -39,7 +39,7 @@ char *xstrndup(const char *s, size_t n) {
   return (char *) memcpy(result, s, len);
 }
 
-int asprintf(char **str, const char *fmt, ...) {
+int asprintf(char **str, __const char *fmt, ...) {
   int size = 0;
   va_list args;
 
@@ -49,7 +49,7 @@ int asprintf(char **str, const char *fmt, ...) {
   return size;
 }
 
-int vasprintf(char **str, const char *fmt, va_list args) {
+int vasprintf(char **str, __const char *fmt, va_list args) {
   int size = 0;
   va_list tmpa;
 

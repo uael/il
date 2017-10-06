@@ -31,7 +31,7 @@ enum il_errlvl {
 
 struct il_err {
   il_errlvl_t lvl;
-  const char *msg;
+  __const char *msg;
   struct il_err *prev;
 };
 

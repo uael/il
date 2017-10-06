@@ -42,7 +42,7 @@ bool il_sym_has_flag(il_sym_t *self, unsigned flag) {
   return (bool) (self->flags & flag);
 }
 
-il_sym_t *il_sym_put(il_scope_t *scope, const char *id, int *r) {
+il_sym_t *il_sym_put(il_scope_t *scope, __const char *id, int *r) {
   il_sym_t *sym;
   unsigned it;
 
@@ -55,7 +55,7 @@ il_sym_t *il_sym_put(il_scope_t *scope, const char *id, int *r) {
   return sym;
 }
 
-il_sym_t *il_sym_get(il_scope_t *scope, const char *id, int *r) {
+il_sym_t *il_sym_get(il_scope_t *scope, __const char *id, int *r) {
   unsigned it;
 
   it = kh_get(il_symtab, &scope->symtab, id);

@@ -39,7 +39,7 @@ struct il_parser_t {
   struct il_compiler_t *compiler;
   struct il_scope_t *scope;
   il_lexer_t *lexer;
-  adt_deque_of(const char *) sources;
+  adt_deque_of(__const char *) sources;
 
   void (*parse)(il_parser_t *self, struct il_program_t *out);
 };
@@ -47,7 +47,7 @@ struct il_parser_t {
 void il_fe_init(il_parser_t *self, enum il_parser_n kind, struct il_compiler_t *compiler);
 void il_fe_dtor(il_parser_t *self);
 void il_fe_parse(il_parser_t *self, il_lexer_t *lexer, struct il_program_t *out);
-void il_fe_push_src(il_parser_t *self, const char *src);
+void il_fe_push_src(il_parser_t *self, __const char *src);
 void il_fe_scope(il_parser_t *self);
 void il_fe_unscope(il_parser_t *self);
 

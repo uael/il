@@ -51,7 +51,7 @@ struct il_loc {
 struct il_token {
   unsigned int kind : 4;
   char type;
-  const char *name, *value;
+  __const char *name, *value;
   size_t cursor;
   il_loc_t loc;
   uint32_t length, leading_ws;
